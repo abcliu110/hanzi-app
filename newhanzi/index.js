@@ -9,6 +9,8 @@
   var LS_VIEW = 'nhz_view';
 
   var IDX = [];
+  var indexLoaded = false;  // 索引是否成功加载
+  var indexError = false;
   var view = localStorage.getItem(LS_VIEW) || 'py';
   var onlyNew = false;
   var learned = {}; // 字 -> 首次学习日期 YYYY-MM-DD（兼容老数组格式）
@@ -108,6 +110,15 @@
   }
 
   function render() {
+    // 索引还没加载好：显示加载中/失败，不许显示"全部学完啦"
+    if (!indexLoaded) {
+      listEl.innerHTML = indexError
+        ? '<div class="noresult">字库索引加载失败。<br><br>请不要直接双击打开文件，<br>在 hanzi-app 目录运行：<br><b>python3 -m http.server</b><br>然后访问 http://localhost:8000/newhanzi/</div>'
+        : '<div class="noresult">字库加载中…</div>';
+      railEl.innerHTML = '';
+      railEl.style.display = 'none';
+      return;
+    }
     var q = qEl.value.trim().toLowerCase();
     var items = IDX;
     if (onlyNew) items = items.filter(function (e) { return !learned[e.z]; });
@@ -183,13 +194,19 @@
   });
 
   /* ---- 入口 ---- */
-  fetch('data/index.json').then(function (r) { return r.json(); }).then(function (idx) {
+  listEl.innerHTML = '<div class="noresult">字库加载中…</div>';
+  fetch('data/index.json').then(function (r) {
+    if (!r.ok) throw new Error('http ' + r.status);
+    return r.json();
+  }).then(function (idx) {
     IDX = idx;
+    indexLoaded = true;
     syncTabs();
     updateProgress();
     render();
   }).catch(function () {
-    listEl.innerHTML = '<div class="noresult">索引加载失败，请检查 data/index.json</div>';
+    indexError = true;
+    render();
   });
 
   window.addEventListener('resize', function () {
