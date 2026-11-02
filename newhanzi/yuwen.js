@@ -105,13 +105,12 @@
     });
   });
 
-  Promise.all(MODULES.map(function (m) {
-    return fetch(m.file).then(function (r) { return r.json(); }).then(function (d) {
-      DATA[m.key] = d;
-    });
-  })).then(function () {
+  /* 数据来自 yuwen/data.js 的 window.NHZ_YUWEN（file:// 与 http:// 通用） */
+  var src = window.NHZ_YUWEN || {};
+  MODULES.forEach(function (m) { if (src[m.key]) DATA[m.key] = src[m.key]; });
+  if (Object.keys(DATA).length) {
     syncTabs(); render();
-  }).catch(function () {
-    listEl.innerHTML = '<div class="noresult">知识库加载失败</div>';
-  });
+  } else {
+    listEl.innerHTML = '<div class="noresult">知识库加载失败，请确认 yuwen/data.js 存在</div>';
+  }
 })();

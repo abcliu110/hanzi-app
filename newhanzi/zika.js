@@ -333,7 +333,7 @@
     }
   }
 
-  /* ---- 入口 ---- */
+  /* ---- 入口：单字数据走 data/zika/<字>.js，经 <script> 动态加载（file:// 可用） ---- */
   function main() {
     var m = /[?&]zi=([^&]+)/.exec(location.search);
     var zi = m ? decodeURIComponent(m[1]) : '';
@@ -358,16 +358,19 @@
         localStorage.setItem(k, JSON.stringify(map));
       }
     } catch (e) {}
-    fetch('data/zika/' + encodeURIComponent(zi) + '.json')
-      .then(function (r) {
-        if (!r.ok) throw new Error('not found');
-        return r.json();
-      })
-      .then(render)
-      .catch(function () {
-        document.getElementById('app').innerHTML =
-          '<div class="err">字库里没有"' + esc(zi) + '"，<a href="index.html">回首页</a>换一个字试试</div>';
-      });
+    var s = document.createElement('script');
+    s.src = 'data/zika/' + encodeURIComponent(zi) + '.js';
+    s.onload = function () {
+      var rec = window.NHZ_ZIKA;
+      if (rec && rec.zi === zi) render(rec);
+      else showErr(zi);
+    };
+    s.onerror = function () { showErr(zi); };
+    document.head.appendChild(s);
+  }
+  function showErr(zi) {
+    document.getElementById('app').innerHTML =
+      '<div class="err">字库里没有"' + esc(zi) + '"，<a href="index.html">回首页</a>换一个字试试</div>';
   }
   main();
 })();

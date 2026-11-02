@@ -113,7 +113,7 @@
     // 索引还没加载好：显示加载中/失败，不许显示"全部学完啦"
     if (!indexLoaded) {
       listEl.innerHTML = indexError
-        ? '<div class="noresult">字库索引加载失败。<br><br>请不要直接双击打开文件，<br>在 hanzi-app 目录运行：<br><b>python3 -m http.server</b><br>然后访问 http://localhost:8000/newhanzi/</div>'
+        ? '<div class="noresult">字库索引加载失败。<br>请确认 data/index.js 文件存在。</div>'
         : '<div class="noresult">字库加载中…</div>';
       railEl.innerHTML = '';
       railEl.style.display = 'none';
@@ -193,21 +193,17 @@
     deb = setTimeout(render, 150);
   });
 
-  /* ---- 入口 ---- */
+  /* ---- 入口：数据来自 data/index.js 的 window.NHZ_INDEX（file:// 与 http:// 通用） ---- */
   listEl.innerHTML = '<div class="noresult">字库加载中…</div>';
-  fetch('data/index.json').then(function (r) {
-    if (!r.ok) throw new Error('http ' + r.status);
-    return r.json();
-  }).then(function (idx) {
-    IDX = idx;
+  if (window.NHZ_INDEX && window.NHZ_INDEX.length) {
+    IDX = window.NHZ_INDEX;
     indexLoaded = true;
-    syncTabs();
-    updateProgress();
-    render();
-  }).catch(function () {
+  } else {
     indexError = true;
-    render();
-  });
+  }
+  syncTabs();
+  updateProgress();
+  render();
 
   window.addEventListener('resize', function () {
     var top = controlsEl.offsetHeight;
