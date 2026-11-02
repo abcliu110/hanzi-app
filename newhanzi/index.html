@@ -62,8 +62,7 @@
 </div><!-- /panel-shizi -->
 
 <div id="panel-yuwen" style="display:none">
-  <div class="yw-searchbox"><input id="yq2" type="text" placeholder="搜语法点，如：把字句" autocomplete="off"></div>
-  <div id="ywlist2"></div>
+  <iframe src="proto-yuwen.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
 </div>
 
 <div id="panel-logic" style="display:none">
@@ -82,7 +81,7 @@
                 logic: document.getElementById('panel-logic')};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  /* 课程渲染（复用 yuwen 六步格式） */
+  /* 逻辑课渲染（复用六步格式） */
   function lessonHtml(it){
     var b='', step=0;
     function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
@@ -103,17 +102,6 @@
       (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
   }
-  function renderLessons(key, elId){
-    var D = (window.NHZ_YUWEN||{})[key];
-    var el = document.getElementById(elId);
-    if(!D||!el) return;
-    var h='';
-    D.categories.forEach(function(c){
-      h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
-        c.items.map(lessonHtml).join('');
-    });
-    el.innerHTML = h;
-  }
 
   tabs.forEach(function(t){
     t.addEventListener('click', function(){
@@ -121,8 +109,19 @@
       t.classList.add('active');
       var m = t.getAttribute('data-m');
       for(var k in panels) panels[k].style.display = (k===m?'block':'none');
-      if(m==='yuwen' && !panels.yuwen.dataset.done){ renderLessons('grammar','ywlist2'); panels.yuwen.dataset.done='1'; }
-      if(m==='logic' && !panels.logic.dataset.done){ renderLessons('logic','logiclist'); panels.logic.dataset.done='1'; }
+      if(m==='logic' && !panels.logic.dataset.done){
+        var D = (window.NHZ_YUWEN||{}).logic;
+        var el = document.getElementById('logiclist');
+        if(D&&el){
+          var h='';
+          D.categories.forEach(function(c){
+            h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
+              c.items.map(lessonHtml).join('');
+          });
+          el.innerHTML = h;
+        }
+        panels.logic.dataset.done='1';
+      }
       window.scrollTo(0,0);
     });
   });
@@ -139,15 +138,6 @@
       if(oi===ans){ qb.classList.add('right'); fb.innerHTML='✅ 答对了！'; }
       else { qb.classList.add('wrong'); box.querySelectorAll('button')[ans].classList.add('right'); fb.innerHTML='❌ 再想想'; }
     }
-  });
-  /* 语法搜索 */
-  var yq = document.getElementById('yq2');
-  if(yq) yq.addEventListener('input', function(){
-    var q = yq.value.trim();
-    document.querySelectorAll('#ywlist2 .yw-item').forEach(function(it){
-      var txt = it.textContent;
-      it.style.display = (!q || txt.indexOf(q)>=0) ? 'block' : 'none';
-    });
   });
 })();
 </script>
