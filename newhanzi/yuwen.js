@@ -37,8 +37,8 @@
   function itemHtml(it, idx) {
     var body = '';
     var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
-    /* 1. 打个比方 */
-    if (it['类比']) body += '<div class="yw-analogy">💡 打个比方：' + esc(it['类比']) + '</div>';
+    /* 1. 打个比方（允许<b>等简单标签） */
+    if (it['类比']) body += '<div class="yw-analogy">💡 打个比方：' + it['类比'] + '</div>';
     /* 2. 看图说话 */
     if (it['图示']) body += '<div class="yw-diagram">' + it['图示'] + '</div>';
     /* 3. 动手试试（动画） */
