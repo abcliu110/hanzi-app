@@ -12,6 +12,15 @@
   var active = 'grammar';
   var animData = {};
   var quizData = {};
+  var gameData = {};
+  /* 支持 ?tab=logic 直接进逻辑学 */
+  try {
+    var mm = location.search.match(/[?&]tab=([a-z]+)/);
+    if (mm && mm[1]) {
+      var valid = MODULES.some(function (m) { return m.key === mm[1]; });
+      if (valid) active = mm[1];
+    }
+  } catch (e) {}
 
   var listEl = document.getElementById('ywlist');
   var tabsEl = document.getElementById('ywtabs');
@@ -44,6 +53,15 @@
         '<button data-aid="' + aid + '" data-act="step">单步</button></div></div>';
       /* 存步骤数据供播放器用 */
       animData[aid] = it['动画'].steps;
+    }
+    /* 3b. 互动游戏 */
+    if (it['游戏']) {
+      var gid = 'game' + idx + '_' + Math.floor(Math.random() * 100000);
+      gameData[gid] = it['游戏'];
+      body += '<div class="yw-game" id="' + gid + '">' +
+        '<div class="game-title">🎮 ' + esc(it['游戏'].title || '互动练习') + '</div>' +
+        '<div class="game-area"></div>' +
+        '<div class="game-fb"></div></div>';
     }
     /* 4. 规则一句话 */
     if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';

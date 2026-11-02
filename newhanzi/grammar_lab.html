@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语法实验室 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<style>
+.lab-hero{background:linear-gradient(135deg,#6a1b9a,#ab47bc);color:#fff;padding:24px 16px;border-radius:0 0 20px 20px;margin-bottom:16px}
+.lab-hero h1{margin:0 0 8px;font-size:22px}
+.lab-hero p{margin:0;opacity:.9;font-size:14px}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 24px}
+.lab-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer;text-align:center}
+.lab-card .ic{font-size:36px;margin-bottom:8px}
+.lab-card h3{margin:0 0 4px;font-size:16px}
+.lab-card p{margin:0;font-size:12px;color:#888}
+.lab-page{display:none;padding:16px;max-width:640px;margin:0 auto}
+.lab-page.active{display:block}
+.sym-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.sym-btn{border:2px solid #ddd;background:#fff;border-radius:8px;padding:8px;cursor:pointer;text-align:center;min-width:64px}
+.sym-btn svg{width:36px;height:36px;display:block;margin:0 auto 4px}
+.sym-btn.sel{border-color:#8e24aa;background:#f3e5f5}
+.word-tok{display:inline-block;padding:8px 14px;margin:4px;background:#fff;border:2px solid #ddd;border-radius:8px;font-size:17px;cursor:pointer}
+.word-tok.done{background:#e8f5e9;border-color:#4caf50}
+.word-tok .badge{display:block;font-size:11px;color:#666;margin-top:2px}
+.drop-zone{min-height:60px;border:2px dashed #aaa;border-radius:8px;padding:8px;margin:12px 0;background:#fafafa}
+.drop-zone .word-tok{cursor:default}
+.quiz-btn{display:block;width:100%;margin:6px 0;padding:10px;border:2px solid #ddd;background:#fff;border-radius:8px;font-size:15px;text-align:left}
+.quiz-btn.right{border-color:#4caf50;background:#e8f5e9}
+.quiz-btn.wrong{border-color:#f44336;background:#ffebee}
+.fb{margin:10px 0;padding:10px;border-radius:8px;font-size:14px}
+.fb.ok{background:#e8f5e9;color:#2e7d32}
+.fb.no{background:#ffebee;color:#c62828}
+.back-btn{display:inline-block;margin-bottom:12px;color:#6a1b9a;text-decoration:none;font-size:15px}
+.tree-node{margin:8px 0;padding:10px;background:#f5f5f5;border-radius:8px}
+.tree-node .q{font-weight:700;margin-bottom:8px}
+</style>
+</head>
+<body>
+<header class="topbar nav">
+  <a href="index.html" class="back">← 返回</a>
+  <span id="navtitle">语法实验室</span>
+</header>
+
+<div id="lab-home">
+  <div class="lab-hero">
+    <h1>🧪 语法实验室</h1>
+    <p>动手玩语法：贴符号、拼句子、做决策，玩会为止</p>
+  </div>
+  <div class="lab-grid">
+    <div class="lab-card" data-lab="symbols">
+      <div class="ic">🔺</div><h3>符号标注</h3><p>给词戴上蒙特梭利符号帽</p>
+    </div>
+    <div class="lab-card" data-lab="baju">
+      <div class="ic">🤏</div><h3>把字句拼装</h3><p>S把OVC，亲手抓宾语</p>
+    </div>
+    <div class="lab-card" data-lab="le">
+      <div class="ic">⏱️</div><h3>了着过决策树</h3><p>三问选出对的助词</p>
+    </div>
+    <div class="lab-card" data-lab="dede">
+      <div class="ic">🎯</div><h3>的地得射击</h3><p>三色定位，一击即中</p>
+    </div>
+  </div>
+</div>
+
+<div id="lab-symbols" class="lab-page">
+  <a class="back-btn" href="#" data-back>← 返回实验室</a>
+  <h2>🔺 符号标注大冒险</h2>
+  <p>点一个词，再点它对应的蒙特梭利符号。贴对得分！</p>
+  <div id="sym-sent" style="font-size:20px;margin:16px 0;line-height:2.2"></div>
+  <div class="sym-grid" id="sym-opts"></div>
+  <div class="fb" id="sym-fb" style="display:none"></div>
+  <div>得分：<b id="sym-score">0</b></div>
+</div>
+
+<div id="lab-baju" class="lab-page">
+  <a class="back-btn" href="#" data-back>← 返回实验室</a>
+  <h2>🤏 把字句拼装</h2>
+  <p>口诀 <b>S把OVC</b>：按顺序点词块，拼出正确的把字句</p>
+  <div class="drop-zone" id="baju-drop"><span style="color:#aaa">点下方词块，按顺序拼句…</span></div>
+  <div id="baju-words"></div>
+  <div class="fb" id="baju-fb" style="display:none"></div>
+  <button class="quiz-btn" id="baju-check" style="text-align:center;background:#6a1b9a;color:#fff">检查</button>
+  <button class="quiz-btn" id="baju-reset" style="text-align:center">重来</button>
+</div>
+
+<div id="lab-le" class="lab-page">
+  <a class="back-btn" href="#" data-back>← 返回实验室</a>
+  <h2>⏱️ 了着过决策树</h2>
+  <p>三问决策：完成了吗？经历过吗？持续着吗？</p>
+  <div id="le-q"></div>
+</div>
+
+<div id="lab-dede" class="lab-page">
+  <a class="back-btn" href="#" data-back>← 返回实验室</a>
+  <h2>🎯 的地得射击</h2>
+  <p>看准位置，一击即中！</p>
+  <div id="dede-q"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $ = function(id){return document.getElementById(id);};
+
+/* 页面切换 */
+document.querySelectorAll('[data-lab]').forEach(function(c){
+  c.addEventListener('click', function(){
+    $('lab-home').style.display='none';
+    document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
+    $('lab-'+c.getAttribute('data-lab')).classList.add('active');
+    initLab(c.getAttribute('data-lab'));
+    window.scrollTo(0,0);
+  });
+});
+document.querySelectorAll('[data-back]').forEach(function(b){
+  b.addEventListener('click', function(e){
+    e.preventDefault();
+    document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
+    $('lab-home').style.display='block';
+    window.scrollTo(0,0);
+  });
+});
+
+/* 蒙特梭利符号 */
+var SYMS = [
+  {n:'名词', svg:'<polygon points="15,5 28,26 2,26" fill="#222"/>'},
+  {n:'动词', svg:'<circle cx="15" cy="15" r="12" fill="#d32f2f"/>'},
+  {n:'形容词', svg:'<polygon points="15,5 28,26 2,26" fill="#1565c0"/>'},
+  {n:'副词', svg:'<circle cx="15" cy="15" r="7" fill="#ef6c00"/>'},
+  {n:'介词', svg:'<path d="M15,3 A12,12 0 1,0 15,27 A9,9 0 1,1 15,3" fill="#2e7d32"/>'},
+  {n:'代词', svg:'<polygon points="15,5 28,26 2,26" fill="#7b1fa2"/>'},
+];
+var SENT = [['小狗',1],['在',4],['公园',0],['里',4],['飞快',3],['地',7],['跑',1],['着',7]];
+var symScore = 0, symSel = null;
+
+function initLab(which){
+  if(which==='symbols') initSymbols();
+  if(which==='baju') initBaju();
+  if(which==='le') initLe();
+  if(which==='dede') initDede();
+}
+
+function initSymbols(){
+  var s = $('sym-sent'); s.innerHTML='';
+  SENT.forEach(function(w,i){
+    var sp = document.createElement('span');
+    sp.className='word-tok'; sp.textContent=w[0]; sp.dataset.i=i;
+    sp.addEventListener('click', function(){
+      document.querySelectorAll('#sym-sent .word-tok').forEach(function(x){x.classList.remove('sel');});
+      sp.classList.add('sel'); symSel=i;
+    });
+    s.appendChild(sp);
+  });
+  var o = $('sym-opts'); o.innerHTML='';
+  SYMS.forEach(function(sym,si){
+    var b = document.createElement('div');
+    b.className='sym-btn';
+    b.innerHTML='<svg viewBox="0 0 30 30">'+sym.svg+'</svg><div style="font-size:11px">'+sym.n+'</div>';
+    b.addEventListener('click', function(){
+      if(symSel===null) return;
+      var correct = SENT[symSel][1];
+      /* 映射：0名词 1动词 3形/副 4介 7助 */
+      var map = {0:0, 1:1, 3:3, 4:4, 7:5};
+      var fb = $('sym-fb'); fb.style.display='block';
+      if(map[correct]===si || (correct===3&&si===2)){
+        /* 飞快是副词 */
+        var isOk = (SENT[symSel][0]==='飞快' && sym.n==='副词') || (SENT[symSel][0]!=='飞快' && map[correct]===si);
+        if(isOk){
+          symScore++; $('sym-score').textContent=symScore;
+          fb.className='fb ok'; fb.textContent='✅ 对！'+SENT[symSel][0]+'是'+sym.n;
+          document.querySelector('#sym-sent .word-tok.sel').classList.add('done');
+        } else {
+          fb.className='fb no'; fb.textContent='❌ 再想想：'+SENT[symSel][0]+'是什么词？';
+        }
+      } else {
+        fb.className='fb no'; fb.textContent='❌ 不对哦，再想想';
+      }
+      symSel=null;
+      document.querySelectorAll('#sym-sent .word-tok').forEach(function(x){x.classList.remove('sel');});
+    });
+    o.appendChild(b);
+  });
+}
+
+/* 把字句拼装 */
+var BAJU = ['我','把','书','看','完','了'];
+var bajuCur = [];
+function initBaju(){
+  bajuCur=[];
+  var d = $('baju-drop'); d.innerHTML='<span style="color:#aaa">点下方词块，按顺序拼句…</span>';
+  var w = $('baju-words'); w.innerHTML='';
+  var words = BAJU.slice().sort(function(){return Math.random()-0.5;});
+  words.forEach(function(wd){
+    var b = document.createElement('span');
+    b.className='word-tok'; b.textContent=wd;
+    b.addEventListener('click', function(){
+      if(bajuCur.indexOf(wd)>=0) return;
+      bajuCur.push(wd); b.classList.add('done');
+      renderBaju();
+    });
+    w.appendChild(b);
+  });
+  $('baju-fb').style.display='none';
+}
+function renderBaju(){
+  var d = $('baju-drop');
+  d.innerHTML = bajuCur.length ? '' : '<span style="color:#aaa">点下方词块，按顺序拼句…</span>';
+  bajuCur.forEach(function(wd){
+    var s = document.createElement('span');
+    s.className='word-tok'; s.textContent=wd;
+    d.appendChild(s);
+  });
+}
+$('baju-check').addEventListener('click', function(){
+  var fb = $('baju-fb'); fb.style.display='block';
+  if(bajuCur.join('')==='我把书看完了'){
+    fb.className='fb ok'; fb.textContent='✅ 完美！S把OVC：我＋把＋书＋看＋完了';
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 口诀S把OVC：主语→把→宾语→动词→补语，再试试';
+  }
+});
+$('baju-reset').addEventListener('click', initBaju);
+
+/* 了着过决策树 */
+var LE_QS = [
+  {s:'我吃饭___', opts:['了','着','过'], ans:0, why:'动作完成，用了₁'},
+  {s:'门开___', opts:['了','着','过'], ans:1, why:'状态持续，用着'},
+  {s:'我去___北京', opts:['了','着','过'], ans:2, why:'曾经经历，用过＝人生履历'},
+  {s:'下雨___', opts:['了','着','过'], ans:0, why:'新情况出现，用了₂'},
+];
+var leIdx = 0;
+function initLe(){
+  leIdx=0; renderLe();
+}
+function renderLe(){
+  var box = $('le-q');
+  if(leIdx>=LE_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 全对！三问决策树掌握了：完成→了，经历→过，持续→着</div><button class="quiz-btn" style="text-align:center" onclick="location.reload()">再来一轮</button>';
+    return;
+  }
+  var q = LE_QS[leIdx];
+  var h = '<div class="tree-node"><div class="q">'+(leIdx+1)+'. '+q.s+'</div>';
+  q.opts.forEach(function(op,oi){
+    h += '<button class="quiz-btn" data-oi="'+oi+'">'+op+'</button>';
+  });
+  h += '<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi = parseInt(b.getAttribute('data-oi'));
+      var fb = box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        setTimeout(function(){leIdx++; renderLe();}, 1200);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+
+/* 的地得 */
+var DEDE_QS = [
+  {s:'认真___听讲', opts:['的','地','得'], ans:1, why:'修饰动词"听"，用"地"'},
+  {s:'美丽___花', opts:['的','地','得'], ans:0, why:'修饰名词"花"，用"的"'},
+  {s:'跑___很快', opts:['的','地','得'], ans:2, why:'动词后补结果，用"得"'},
+  {s:'他高兴___跳起来', opts:['的','地','得'], ans:1, why:'修饰动词"跳"，用"地"'},
+];
+var dedeIdx=0;
+function initDede(){dedeIdx=0; renderDede();}
+function renderDede(){
+  var box = $('dede-q');
+  if(dedeIdx>=DEDE_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 通关！口诀：白勺的贴名，土也地跟动，得后补结果</div>';
+    return;
+  }
+  var q = DEDE_QS[dedeIdx];
+  var h = '<div class="tree-node"><div class="q">'+(dedeIdx+1)+'. '+q.s+'</div>';
+  var colors = ['#4caf50','#ff9800','#1976d2'];
+  q.opts.forEach(function(op,oi){
+    h += '<button class="quiz-btn" data-oi="'+oi+'" style="border-color:'+colors[oi]+'">'+op+'</button>';
+  });
+  h += '<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi = parseInt(b.getAttribute('data-oi'));
+      var fb = box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        setTimeout(function(){dedeIdx++; renderDede();}, 1200);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+})();
+</script>
+</body>
+</html>
