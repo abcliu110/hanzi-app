@@ -132,3 +132,10 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .loading { text-align: center; color: var(--muted); padding: 60px 0; }
 .err { text-align: center; padding: 60px 20px; color: var(--muted); }
 .src-note { font-size: 12px; color: var(--muted); margin-top: 24px; text-align: center; }
+.score {
+  margin-top: 10px; padding: 12px; border-radius: 10px; text-align: center;
+  background: #fff8ef; border: 1px dashed #e8a33d;
+}
+.score-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+.score-stars { color: #f5a623; font-size: 18px; letter-spacing: 3px; margin: 4px 0; }
+.score-tips { font-size: 13px; color: #8a6d4b; line-height: 1.7; }
