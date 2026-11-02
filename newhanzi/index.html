@@ -25,21 +25,11 @@
   <button class="mtab active" data-m="shizi">📖 识字</button>
   <button class="mtab" data-m="yuwen">📚 语法</button>
   <button class="mtab" data-m="logic">🧠 逻辑</button>
+  <button class="mtab" data-m="lab">🧪 实验</button>
+  <button class="mtab" data-m="bushou">🧩 部首</button>
 </div>
 
 <div id="panel-shizi">
-
-<a class="yuwen-banner" href="grammar_lab.html">
-  <span class="yb-icon">🧪</span>
-  <span class="yb-text"><b>语法实验室</b><small>符号标注 · 把字句拼装 · 决策树游戏</small></span>
-  <span class="rgo">›</span>
-</a>
-
-<a class="yuwen-banner" href="bushou.html">
-  <span class="yb-icon">🧩</span>
-  <span class="yb-text"><b>偏旁部首</b><small>203个部首含义 · 说文说解 · 例字</small></span>
-  <span class="rgo">›</span>
-</a>
 
 <div class="controls" id="controls">
   <div class="searchbox">
@@ -69,6 +59,14 @@
   <div id="logiclist"></div>
 </div>
 
+<div id="panel-lab" style="display:none">
+  <iframe src="grammar_lab.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
+</div>
+
+<div id="panel-bushou" style="display:none">
+  <iframe src="bushou.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
+</div>
+
 <script src="data/index.js"></script>
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
@@ -78,7 +76,9 @@
   var tabs = document.querySelectorAll('#mainTabs .mtab');
   var panels = {shizi: document.getElementById('panel-shizi'),
                 yuwen: document.getElementById('panel-yuwen'),
-                logic: document.getElementById('panel-logic')};
+                logic: document.getElementById('panel-logic'),
+                lab: document.getElementById('panel-lab'),
+                bushou: document.getElementById('panel-bushou')};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   /* 逻辑课渲染（复用六步格式） */
