@@ -26,6 +26,7 @@
 
   function itemHtml(it, idx) {
     var body = '';
+    var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
     /* 1. 打个比方 */
     if (it['类比']) body += '<div class="yw-analogy">💡 打个比方：' + esc(it['类比']) + '</div>';
     /* 2. 看图说话 */
@@ -66,6 +67,7 @@
     }
     return '<div class="yw-item">' +
       '<button class="yw-head"><span class="yw-name">' + esc(it.name || '') + '</span>' +
+      (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
       '<span class="yw-arrow">▾</span></button>' +
       '<div class="yw-body">' + body + '</div></div>';
