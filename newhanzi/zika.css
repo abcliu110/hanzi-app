@@ -251,3 +251,22 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .score-num { font-size: 28px; font-weight: 700; color: var(--accent); }
 .score-stars { color: #f5a623; font-size: 18px; letter-spacing: 3px; margin: 4px 0; }
 .score-tips { font-size: 13px; color: #8a6d4b; line-height: 1.7; }
+
+/* 图解课堂 */
+.yw-analogy{background:#fff8e1;border-left:4px solid #ffb300;padding:8px 12px;margin:0 0 10px;font-size:14px;border-radius:0 8px 8px 0}
+.yw-diagram{margin:0 0 10px;overflow-x:auto;background:#fafafa;border-radius:8px;padding:8px}
+.yw-diagram svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.yw-anim{margin:0 0 10px;background:#f3e5f5;border-radius:8px;padding:10px}
+.yw-anim-tokens{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.yw-anim-tokens .tok{padding:6px 10px;background:#fff;border:2px solid #ddd;border-radius:8px;font-size:16px;transition:all .3s}
+.yw-anim-tokens .tok.on{background:#e1bee7;border-color:#8e24aa;transform:scale(1.1);font-weight:700}
+.yw-anim-note{font-size:14px;color:#4a148c;min-height:20px;margin-bottom:8px}
+.yw-anim-ctrl button{margin-right:8px;padding:6px 14px;border:none;border-radius:6px;background:#8e24aa;color:#fff;font-size:14px}
+.yw-quiz{margin:10px 0 0;border-top:1px dashed #ddd;padding-top:10px}
+.quiz-q{margin-bottom:12px}
+.quiz-t{font-weight:700;margin-bottom:6px;font-size:14px}
+.quiz-opts{display:flex;flex-wrap:wrap;gap:6px}
+.quiz-opts button{padding:6px 12px;border:2px solid #ddd;background:#fff;border-radius:6px;font-size:14px}
+.quiz-opts button.right{border-color:#4caf50;background:#e8f5e9}
+.quiz-opts button.wrong{border-color:#f44336;background:#ffebee}
+.quiz-fb{font-size:13px;margin-top:6px;color:#555}
