@@ -65,11 +65,20 @@
 
 <div id="lab-symbols" class="lab-page">
   <a class="back-btn" href="#" data-back>← 返回实验室</a>
-  <h2>🔺 符号标注大冒险</h2>
-  <p>点一个词，再点它对应的蒙特梭利符号。贴对得分！</p>
-  <div id="sym-sent" style="font-size:20px;margin:16px 0;line-height:2.2"></div>
+  <h2>🎩 符号标注大冒险</h2>
+  <p style="color:#666">给整句话的每个词戴上正确的符号帽</p>
+  <div style="background:#fff8e1;border-left:4px solid #ffb300;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
+    <b>先想一想</b>：蒙特梭利教室里，孩子把符号实物摆在每个词的上方，这叫 Symbolizing。先点一个词，再点它的符号帽——戴对了留下，戴错了弹回来。
+  </div>
+  <div id="sym-progress" style="font-weight:700;margin-bottom:8px"></div>
+  <div id="sym-sent" style="margin:16px 0"></div>
   <div class="sym-grid" id="sym-opts"></div>
+  <div style="margin-top:12px">
+    <button class="quiz-btn" id="sym-check" style="display:inline-block;width:auto;padding:10px 24px;background:#c62828;color:#fff;border-color:#c62828">检查</button>
+    <button class="quiz-btn" id="sym-next" style="display:inline-block;width:auto;padding:10px 24px">下一句 →</button>
+  </div>
   <div class="fb" id="sym-fb" style="display:none"></div>
+  <div class="fb" id="sym-hint" style="display:none;background:#e3f2fd;color:#1565c0"></div>
   <div>得分：<b id="sym-score">0</b></div>
 </div>
 
@@ -124,15 +133,24 @@ document.querySelectorAll('[data-back]').forEach(function(b){
 
 /* 蒙特梭利符号 */
 var SYMS = [
-  {n:'名词', svg:'<polygon points="15,5 28,26 2,26" fill="#222"/>'},
-  {n:'动词', svg:'<circle cx="15" cy="15" r="12" fill="#d32f2f"/>'},
-  {n:'形容词', svg:'<polygon points="15,5 28,26 2,26" fill="#1565c0"/>'},
+  {n:'名词', svg:'<polygon points="15,4 28,26 2,26" fill="#222"/>'},
+  {n:'形容词', svg:'<polygon points="15,4 28,26 2,26" fill="#1565c0"/>'},
+  {n:'代词', svg:'<polygon points="15,4 28,26 2,26" fill="#7b1fa2"/>'},
+  {n:'动词', svg:'<circle cx="15" cy="15" r="11" fill="#d32f2f"/>'},
   {n:'副词', svg:'<circle cx="15" cy="15" r="7" fill="#ef6c00"/>'},
-  {n:'介词', svg:'<path d="M15,3 A12,12 0 1,0 15,27 A9,9 0 1,1 15,3" fill="#2e7d32"/>'},
-  {n:'代词', svg:'<polygon points="15,5 28,26 2,26" fill="#7b1fa2"/>'},
+  {n:'介词', svg:'<path d="M4,20 A11,11 0 0,1 26,20" fill="none" stroke="#2e7d32" stroke-width="4"/>'},
+  {n:'连词', svg:'<rect x="4" y="11" width="22" height="8" rx="2" fill="#ec407a"/>'},
+  {n:'感叹词', svg:'<text x="15" y="24" font-size="20" text-anchor="middle" fill="#f9a825">!</text>'},
 ];
-var SENT = [['小狗',1],['在',4],['公园',0],['里',4],['飞快',3],['地',7],['跑',1],['着',7]];
-var symScore = 0, symSel = null;
+var SYM_SENTS = [
+  {words:[['小狗','名词'],['在','介词'],['院子里','名词'],['追','动词'],['皮球','名词']],
+   hint:'院子里：地点也是「物」，戴名词三角。'},
+  {words:[['他','代词'],['已经','副词'],['飞快','副词'],['地','助词'],['跑','动词'],['出','动词'],['教室','名词']],
+   hint:'已经/飞快都是副词（小橙圆）；地是助词，暂无符号可戴，跳过。'},
+  {words:[['美丽','形容词'],['的','助词'],['花','名词'],['开','动词'],['了','助词']],
+   hint:'美丽是形容词（蓝三角）；的/了是助词，跳过。'},
+];
+var symIdx = 0, symScore = 0, symPlaced = {};
 
 function initLab(which){
   if(which==='symbols') initSymbols();
@@ -140,48 +158,98 @@ function initLab(which){
   if(which==='le') initLe();
   if(which==='dede') initDede();
 }
-
 function initSymbols(){
-  var s = $('sym-sent'); s.innerHTML='';
-  SENT.forEach(function(w,i){
-    var sp = document.createElement('span');
-    sp.className='word-tok'; sp.textContent=w[0]; sp.dataset.i=i;
-    sp.addEventListener('click', function(){
-      document.querySelectorAll('#sym-sent .word-tok').forEach(function(x){x.classList.remove('sel');});
-      sp.classList.add('sel'); symSel=i;
-    });
-    s.appendChild(sp);
+  symIdx = 0; symScore = 0;
+  $('sym-score').textContent = '0';
+  renderSymSent();
+}
+function renderSymSent(){
+  var data = SYM_SENTS[symIdx];
+  symPlaced = {};
+  $('sym-progress').textContent = '第 ' + (symIdx+1) + ' 句 / 共 ' + SYM_SENTS.length + ' 句';
+  $('sym-fb').style.display = 'none';
+  var hint = $('sym-hint'); hint.style.display = 'none';
+  /* 句子：每个词上方一个虚线槽 */
+  var s = $('sym-sent'); s.innerHTML = '';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center';
+  data.words.forEach(function(wd, i){
+    var cell = document.createElement('div');
+    cell.style.cssText = 'text-align:center;min-width:64px';
+    cell.innerHTML =
+      '<div class="sym-slot" data-i="'+i+'" style="width:56px;height:56px;margin:0 auto 6px;border:2px dashed #ccc;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#fafafa"></div>' +
+      '<div class="word-tok" data-i="'+i+'" style="margin:0">'+wd[0]+'</div>';
+    row.appendChild(cell);
   });
-  var o = $('sym-opts'); o.innerHTML='';
-  SYMS.forEach(function(sym,si){
+  s.appendChild(row);
+  /* 符号选项 */
+  var o = $('sym-opts'); o.innerHTML = '';
+  SYMS.forEach(function(sym){
     var b = document.createElement('div');
-    b.className='sym-btn';
-    b.innerHTML='<svg viewBox="0 0 30 30">'+sym.svg+'</svg><div style="font-size:11px">'+sym.n+'</div>';
-    b.addEventListener('click', function(){
-      if(symSel===null) return;
-      var correct = SENT[symSel][1];
-      /* 映射：0名词 1动词 3形/副 4介 7助 */
-      var map = {0:0, 1:1, 3:3, 4:4, 7:5};
-      var fb = $('sym-fb'); fb.style.display='block';
-      if(map[correct]===si || (correct===3&&si===2)){
-        /* 飞快是副词 */
-        var isOk = (SENT[symSel][0]==='飞快' && sym.n==='副词') || (SENT[symSel][0]!=='飞快' && map[correct]===si);
-        if(isOk){
-          symScore++; $('sym-score').textContent=symScore;
-          fb.className='fb ok'; fb.textContent='✅ 对！'+SENT[symSel][0]+'是'+sym.n;
-          document.querySelector('#sym-sent .word-tok.sel').classList.add('done');
-        } else {
-          fb.className='fb no'; fb.textContent='❌ 再想想：'+SENT[symSel][0]+'是什么词？';
-        }
-      } else {
-        fb.className='fb no'; fb.textContent='❌ 不对哦，再想想';
-      }
-      symSel=null;
-      document.querySelectorAll('#sym-sent .word-tok').forEach(function(x){x.classList.remove('sel');});
-    });
+    b.className = 'sym-btn';
+    b.innerHTML = '<svg viewBox="0 0 30 30" width="36" height="36">'+sym.svg+'</svg><div style="font-size:11px">'+sym.n+'</div>';
+    b.addEventListener('click', function(){ placeSym(sym.n, b); });
     o.appendChild(b);
   });
+  /* 点词选中 */
+  s.querySelectorAll('.word-tok').forEach(function(t){
+    t.addEventListener('click', function(){
+      s.querySelectorAll('.word-tok').forEach(function(x){x.style.borderColor='#ddd';});
+      t.style.borderColor = '#8e24aa';
+      s.dataset.sel = t.getAttribute('data-i');
+    });
+  });
 }
+function placeSym(symName, btn){
+  var s = $('sym-sent');
+  var sel = s.dataset.sel;
+  if(sel === undefined || sel === '') return;
+  var i = parseInt(sel);
+  var data = SYM_SENTS[symIdx];
+  var word = data.words[i][0], correct = data.words[i][1];
+  /* 助词跳过 */
+  if(correct === '助词'){
+    var fb0 = $('sym-fb'); fb0.style.display='block';
+    fb0.className='fb'; fb0.style.background='#fff3e0'; fb0.style.color='#e65100';
+    fb0.textContent='「'+word+'」是助词，暂无符号，跳过它';
+    return;
+  }
+  var slot = s.querySelector('.sym-slot[data-i="'+i+'"]');
+  if(symName === correct){
+    slot.innerHTML = '<svg viewBox="0 0 30 30" width="36" height="36">'+SYMS.filter(function(x){return x.n===symName;})[0].svg+'</svg>';
+    slot.style.border = '2px solid #4caf50';
+    slot.style.background = '#e8f5e9';
+    symPlaced[i] = true;
+    symScore += 10; $('sym-score').textContent = symScore;
+  } else {
+    /* 弹回动画 */
+    slot.style.border = '2px solid #f44336';
+    setTimeout(function(){ slot.style.border='2px dashed #ccc'; }, 400);
+    var fb = $('sym-fb'); fb.style.display='block';
+    fb.className='fb no'; fb.textContent='❌ 「'+word+'」不是'+symName+'，弹回来了';
+  }
+  s.dataset.sel = '';
+  s.querySelectorAll('.word-tok').forEach(function(x){x.style.borderColor='#ddd';});
+}
+$('sym-check').addEventListener('click', function(){
+  var data = SYM_SENTS[symIdx];
+  var need = data.words.filter(function(w){return w[1]!=='助词';}).length;
+  var got = Object.keys(symPlaced).length;
+  var fb = $('sym-fb'); fb.style.display='block';
+  var hint = $('sym-hint');
+  if(got >= need){
+    fb.className='fb ok'; fb.textContent='✅ 全对！+'+(need*10)+'分';
+    symScore += need*10; $('sym-score').textContent = symScore;
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 还差 '+(need-got)+' 个没戴对';
+    hint.style.display='block'; hint.textContent='💡 '+data.hint;
+  }
+});
+$('sym-next').addEventListener('click', function(){
+  symIdx = (symIdx + 1) % SYM_SENTS.length;
+  renderSymSent();
+  window.scrollTo(0,0);
+});
 
 /* 把字句拼装 */
 var BAJU = ['我','把','书','看','完','了'];
