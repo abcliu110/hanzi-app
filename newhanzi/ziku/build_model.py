@@ -148,6 +148,12 @@ for ch in level1:
     rec['bushou'] = g.get('radical') or None
     rec['fan'] = g.get('traditional') or None
     rec['src']['基础'] = '通用规范汉字表(gsc_pinyin.csv)+Unihan'
+    # 人工校正：gsc_pinyin.csv 个别部首错误（Unihan 为准）
+    # 泉: 白->氵 (Unihan水部85)；拿: 人->扌 (Unihan手部64)
+    _BUSHOU_FIX = {'泉': '氵', '拿': '扌'}
+    if ch in _BUSHOU_FIX:
+        rec['bushou'] = _BUSHOU_FIX[ch]
+        rec['src']['基础'] += '+人工校正'
 
     # 维度1：六书
     liushu, duti, jiegou = parse_struct(o.get('struct') if o else None)

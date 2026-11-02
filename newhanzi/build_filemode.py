@@ -47,7 +47,9 @@ def load_js_var(path, var):
     return json.loads(body)
 
 def main():
-    # 1. 首页索引（如只有 .js，从 .js 读回）
+    # 1. 首页索引：data/index.json -> data/index.js；若无 json 则从现有 .js 读回（保持不动）
+    #    注意：不要从 model-3500.json 重建——原 index.json 已删除，重建会丢失原有拼音/声调处理细节。
+    #    部首修正请直接改 data/index.js（surgical patch）。
     idx_js = os.path.join(ROOT, 'data', 'index.js')
     idx_json = os.path.join(ROOT, 'data', 'index.json')
     if os.path.exists(idx_json):
@@ -57,17 +59,21 @@ def main():
         idx = load_js_var(idx_js, 'NHZ_INDEX')
     print('index.js: %d entries' % len(idx))
 
-    # 2. 单字文件（就地规范化脏数据类型）
+    # 2. 单字文件：.json -> .js（就地规范化脏数据类型）；转完删 .json
     zdir = os.path.join(ROOT, 'data', 'zika')
     n = 0
     for fn in sorted(os.listdir(zdir)):
-        if not fn.endswith('.js'):
-            continue
         p = os.path.join(zdir, fn)
-        rec = normalize_rec(load_js_var(p, 'NHZ_ZIKA'))
-        write_js(p, 'NHZ_ZIKA', rec)
-        n += 1
-    print('zika: %d files normalized' % n)
+        if fn.endswith('.json'):
+            rec = normalize_rec(json.load(open(p, encoding='utf-8')))
+            write_js(p[:-5] + '.js', 'NHZ_ZIKA', rec)
+            os.remove(p)
+            n += 1
+        elif fn.endswith('.js'):
+            rec = normalize_rec(load_js_var(p, 'NHZ_ZIKA'))
+            write_js(p, 'NHZ_ZIKA', rec)
+            n += 1
+    print('zika: %d files converted/normalized' % n)
 
     # 3. 语文知识库
     yuwen = {}
