@@ -1,0 +1,95 @@
+/* newhanzi 偏旁部首知识库：含义 + 说解 + 例字 + 含此部首的字 */
+(function () {
+  'use strict';
+
+  var DATA = (window.NHZ_BUSHOU || []).slice();
+  var listEl = document.getElementById('bslist');
+  var qEl = document.getElementById('bq');
+  var filter = 'all';
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function zikaLink(z) {
+    return 'zika.html?zi=' + encodeURIComponent(z);
+  }
+
+  function itemHtml(r, i) {
+    var head_sub = r.meaning || (r.shuowen ? '《说文解字》有说解' : '暂无释义');
+    var html = '<div class="yw-item bs-item" data-i="' + i + '">' +
+      '<div class="bs-head">' +
+      '<span class="bs-char">' + esc(r.bushou) + '</span>' +
+      '<span class="bs-info"><span class="bs-meaning">' + esc(head_sub) + '</span>' +
+      '<span class="bs-sub">' + (r.benzi ? '本字「' + esc(r.benzi) + '」 · ' : '') + r.count + '字</span></span>' +
+      '<span class="bs-count">' + r.count + '字</span>' +
+      '<span class="bs-arrow">▾</span></div>' +
+      '<div class="bs-body">';
+
+    if (r.bianti) html += '<div class="bs-sec"><h4>变体</h4><div class="bs-sem">' + esc(r.bianti) + '</div></div>';
+    if (r.shuowen) {
+      html += '<div class="bs-sec"><h4>《说文解字》</h4><div class="bs-shuowen">「' + esc(r.shuowen) + '」' +
+        (r.shuowen_url ? ' <a href="' + esc(r.shuowen_url) + '" target="_blank" rel="noopener">汉典原文 ↗</a>' : '') +
+        '</div></div>';
+    }
+    if (r.semantic) html += '<div class="bs-sec"><h4>语义场</h4><div class="bs-sem">' + esc(r.semantic) + '</div></div>';
+    if (r.examples && r.examples.length) {
+      html += '<div class="bs-sec"><h4>代表例字</h4><div class="bs-ex">' +
+        r.examples.map(function (e) {
+          var inner = esc(e.z) + '<small>' + esc(e.w) + '</small>';
+          return e.in3500 ? '<a href="' + zikaLink(e.z) + '">' + inner + '</a>'
+                          : '<span class="bs-explain">' + inner + '</span>';
+        }).join('') + '</div></div>';
+    }
+    if (r.chars && r.chars.length) {
+      html += '<div class="bs-sec"><h4>含此部首的字（' + r.chars.length + '）</h4><div class="bs-grid">' +
+        r.chars.map(function (z) {
+          return '<a href="' + zikaLink(z) + '">' + esc(z) + '</a>';
+        }).join('') + '</div></div>';
+    }
+    return html + '</div></div>';
+  }
+
+  function render() {
+    var q = qEl.value.trim();
+    var html = '';
+    var n = 0;
+    DATA.forEach(function (r, i) {
+      if (filter === 'rich' && !r.has_meaning) return;
+      if (q) {
+        var hay = r.bushou + ' ' + (r.benzi || '') + ' ' + (r.meaning || '') +
+          ' ' + (r.semantic || '') + ' ' + (r.bianti || '');
+        if (hay.indexOf(q) < 0) return;
+      }
+      html += itemHtml(r, i);
+      n++;
+    });
+    listEl.innerHTML = html || '<div class="noresult">没找到相关部首，换个词试试</div>';
+
+    Array.prototype.forEach.call(listEl.querySelectorAll('.bs-head'), function (h) {
+      h.addEventListener('click', function () {
+        h.parentElement.classList.toggle('open');
+      });
+    });
+  }
+
+  var t = null;
+  qEl.addEventListener('input', function () {
+    clearTimeout(t);
+    t = setTimeout(render, 200);
+  });
+
+  document.querySelectorAll('.bs-filter .chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('.bs-filter .chip').forEach(function (x) { x.classList.remove('active'); });
+      c.classList.add('active');
+      filter = c.getAttribute('data-f');
+      render();
+    });
+  });
+
+  document.getElementById('navtitle').textContent = '偏旁部首（' + DATA.length + '）';
+  render();
+})();
