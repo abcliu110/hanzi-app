@@ -9,51 +9,43 @@
 <body>
 <header class="topbar">
   <h1>识字星球 <span class="badge">new</span></h1>
-  <p class="sub">3500 常用字 · 12 维字卡</p>
-</header>
-<main class="wrap">
-  <div class="searchbox">
-    <input id="q" type="text" placeholder="输入一个汉字，如：头" maxlength="1" autocomplete="off">
-    <button id="go">查字</button>
+  <div class="progress-line">
+    <span id="learnedCount">已学 0 / 3500</span>
+    <div class="pbar"><div id="pfill"></div></div>
   </div>
-  <div id="suggest" class="suggest"></div>
-  <h2>随便看看</h2>
-  <div id="random" class="chargrid"></div>
+</header>
+
+<div class="today-panel">
+  <div class="tstat"><span class="tnum" id="stTotal">0</span><span class="tlabel">总进度 <i>/ 3500</i></span></div>
+  <div class="tstat"><span class="tnum" id="stToday">0</span><span class="tlabel">今日新字</span></div>
+  <div class="tstat"><span class="tnum" id="stReview">0</span><span class="tlabel">待复习</span></div>
+</div>
+
+<a class="yuwen-banner" href="yuwen.html">
+  <span class="yb-icon">📚</span>
+  <span class="yb-text"><b>语文知识库</b><small>语法 · 阅读理解 · 写作技巧</small></span>
+  <span class="rgo">›</span>
+</a>
+
+<div class="controls" id="controls">
+  <div class="searchbox">
+    <input id="q" type="text" placeholder="搜汉字 / 拼音，如：头 / tou" autocomplete="off">
+  </div>
+  <div class="tabrow">
+    <div class="tabs" id="tabs">
+      <button class="tab" data-v="py">按拼音</button>
+      <button class="tab" data-v="bu">按部首</button>
+      <button class="tab" data-v="st">按笔画</button>
+    </div>
+    <button class="chip-toggle" id="onlyNew">只看未学</button>
+  </div>
+</div>
+
+<main class="listwrap">
+  <div id="list"></div>
 </main>
-<script>
-fetch('data/chars.json').then(r => r.json()).then(chars => {
-  window.__chars = chars;
-  const box = document.getElementById('random');
-  const sample = ['头','妈','日','目','明','好','学','国','爱','龙'];
-  sample.forEach(z => {
-    const a = document.createElement('a');
-    a.href = 'zika.html?zi=' + encodeURIComponent(z);
-    a.className = 'charcell';
-    a.textContent = z;
-    box.appendChild(a);
-  });
-  const q = document.getElementById('q');
-  const sug = document.getElementById('suggest');
-  q.addEventListener('input', () => {
-    const v = q.value.trim();
-    sug.innerHTML = '';
-    if (!v) return;
-    const hits = chars.filter(c => c.includes(v)).slice(0, 24);
-    hits.forEach(z => {
-      const a = document.createElement('a');
-      a.href = 'zika.html?zi=' + encodeURIComponent(z);
-      a.className = 'charcell sm';
-      a.textContent = z;
-      sug.appendChild(a);
-    });
-  });
-  document.getElementById('go').onclick = () => {
-    const v = q.value.trim();
-    if (v && chars.includes(v)) location.href = 'zika.html?zi=' + encodeURIComponent(v);
-    else if (v) alert('字库里没有"' + v + '"，换一个字试试');
-  };
-  q.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('go').click(); });
-});
-</script>
+<nav id="rail" aria-label="快速索引"></nav>
+
+<script src="index.js"></script>
 </body>
 </html>

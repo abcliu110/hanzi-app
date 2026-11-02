@@ -67,7 +67,12 @@ newhanzi/
   data/
     chars.json         3500字列表（首页搜索用）
     zika/<字>.json     3500个单字文件（字卡页按需加载）
-  index.html / zika.html / zika.css / zika.js   字卡前端（5分区呈现12维度）
+  index.html / index.js / zika.html / zika.js / zika.css   字卡前端
+    - 首页：识字表式列表（借鉴 Pleco 声调五色/Kanji Study 多视图/新华字典拼音部首笔画索引/宝宝巴士识字表/Skritter 已学计数）
+    - 按拼音/部首/笔画三视图切换 + 右侧快速索引 + 搜索 + 只看未学 + 已学进度
+    - 今日面板：总进度 / 今日新字 / 待复习（已学记录带首次学习日期，localStorage）
+    - 字卡：12维度→5分区呈现，笔顺SVG动画+canvas描红+练字打分+朗读，打开即记为已学
+  yuwen.html / yuwen.js   语文知识库前端（语法44/阅读14/写作16条，三模块Tab+分类+手风琴条目，首页banner入口）
   yuwen/             语文知识库（JSON，供 App 调用）
     grammar.json     语法：词类12 / 短语5 / 句子成分6 / 复句7 / 修辞8 / 病句6
     reading.json     阅读理解：通用方法4 / 题型公式6 / 文体策略4

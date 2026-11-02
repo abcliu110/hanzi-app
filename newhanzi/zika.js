@@ -15,6 +15,10 @@
       speechSynthesis.cancel(); speechSynthesis.speak(u);
     } catch (e) { /* 不支持则静默 */ }
   }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
   function sec(title, tag, inner) {
     if (!inner) return '';
     return '<section class="card"><h2>' + esc(title) +
@@ -338,6 +342,22 @@
         '<div class="err">没有指定汉字，<a href="index.html">回首页选字</a></div>';
       return;
     }
+    // 记为已学（首页识字表进度用），带首次学习日期
+    try {
+      var k = 'nhz_learned';
+      var raw = localStorage.getItem(k);
+      var map = raw ? JSON.parse(raw) : {};
+      if (Array.isArray(map)) {
+        // 老格式迁移：都是今天学的
+        var m2 = {};
+        map.forEach(function (x) { m2[x] = todayStr(); });
+        map = m2;
+      }
+      if (!map[zi]) {
+        map[zi] = todayStr();
+        localStorage.setItem(k, JSON.stringify(map));
+      }
+    } catch (e) {}
     fetch('data/zika/' + encodeURIComponent(zi) + '.json')
       .then(function (r) {
         if (!r.ok) throw new Error('not found');
