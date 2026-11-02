@@ -230,6 +230,7 @@
     var zy = '';
     if (dim['字源']) {
       var z = dim['字源'];
+      if (z['讲解']) zy += '<div class="ex" style="margin-bottom:6px">' + esc(z['讲解']) + '</div>';
       if (z['说文解字']) zy += kv('说文解字', esc(z['说文解字']));
       if (z['反切']) zy += kv('反切', esc(z['反切']));
       if (z['小篆']) zy += kv('小篆', '<span style="font-size:28px">' + esc(z['小篆']) + '</span>');
