@@ -92,4 +92,24 @@
 
   document.getElementById('navtitle').textContent = '偏旁部首（' + DATA.length + '）';
   render();
+
+  /* 直达：bushou.html?b=氵 → 自动展开并滚动到该部首 */
+  (function () {
+    var m = /[?&]b=([^&]+)/.exec(location.search);
+    if (!m) return;
+    var target = decodeURIComponent(m[1]);
+    var el = listEl.querySelector('.bs-item');
+    // render 后按 bushou 查找
+    var items = listEl.querySelectorAll('.bs-item');
+    for (var i = 0; i < items.length; i++) {
+      var head = items[i].querySelector('.bs-char');
+      if (head && head.textContent === target) {
+        items[i].classList.add('open');
+        setTimeout(function (t) {
+          t.scrollIntoView({ block: 'start' });
+        }, 60, items[i]);
+        break;
+      }
+    }
+  })();
 })();

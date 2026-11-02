@@ -65,8 +65,9 @@ newhanzi/
     promote_aux.py          辅助字段升维 + 切分单字文件
     sources/                Unihan / hanzi-writer-data / 说文解字 / IDS / CC-CEDICT 等原始数据
   data/
-    chars.json         3500字列表（首页搜索用）
-    zika/<字>.json     3500个单字文件（字卡页按需加载）
+    index.js           3500字索引（window.NHZ_INDEX；file:// 与 http:// 通用）
+    zika/<字>.js       3500个单字文件（window.NHZ_ZIKA，按需 <script> 加载）
+  build_filemode.py    JSON -> .js 构建脚本（幂等；源头 ziku/model-3500.json）
   index.html / index.js / zika.html / zika.js / zika.css   字卡前端
     - 首页：识字表式列表（借鉴 Pleco 声调五色/Kanji Study 多视图/新华字典拼音部首笔画索引/宝宝巴士识字表/Skritter 已学计数）
     - 按拼音/部首/笔画三视图切换 + 右侧快速索引 + 搜索 + 只看未学 + 已学进度
@@ -77,6 +78,16 @@ newhanzi/
     grammar.json     语法：词类12 / 短语5 / 句子成分6 / 复句7 / 修辞8 / 病句6
     reading.json     阅读理解：通用方法4 / 题型公式6 / 文体策略4
     writing.json     写作：审题3 / 立意3 / 选材3 / 结构4 / 语言3
+  bushou.html / bushou.js   偏旁部首知识库前端（手风琴条目：变体/说文/语义场/例字/含此部首的字，例字与字表均链字卡；搜索+有释义过滤，首页🧩banner入口）
+  bushou/            偏旁部首知识库
+    data.js          window.NHZ_BUSHOU（241条：106全资料[含义+说文+语义场+例字] + 97说解[本地说文540部提取] + 38纯字表；有释义覆盖3420/3500字）
+    zi_map.js        window.NHZ_ZI_BUSHOU（字→部首 关联表，3500字；变体已在构建时归并）
+  build_bushou.py    部首库构建脚本（研究报告解析 + 3500字映射 + 变体归并 + 超范围例字标记in3500）
+  数据模型（双向关联）：
+    部首条目 {bushou, benzi, bianti, shuowen, shuowen_url, meaning, semantic,
+              examples[{z,w,in3500}], chars[→汉字], count, has_meaning}
+    汉字 dim['部首']['部首'] --(zi_map)--> 部首条目；部首条目.chars --(zika.html?zi)--> 汉字
+    字卡 → 部首库：字头区部首chip + 🧩含义一句话均链 bushou.html?b=部首（自动展开定位）
 ```
 
 字卡分区顺序（阅读动线，12 维度 → 5 个分区）：

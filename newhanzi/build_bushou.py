@@ -117,6 +117,17 @@ def main():
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
         f.write(';')
 
+    # 字 -> 部首 关联表（供字卡反向查询部首含义；变体已在归并时解决）
+    zi_map = {}
+    for r in out:
+        for z in r['chars']:
+            zi_map[z] = r['bushou']
+    with open(os.path.join(ROOT, 'bushou', 'zi_map.js'), 'w', encoding='utf-8') as f:
+        f.write('window.NHZ_ZI_BUSHOU = ')
+        json.dump(zi_map, f, ensure_ascii=False, separators=(',', ':'))
+        f.write(';')
+    print('zi_map: %d 字' % len(zi_map))
+
     n_rich = sum(1 for r in out if r['has_meaning'])
     n_plain = len(out) - n_rich
     covered = sum(r['count'] for r in out if r['has_meaning'])
