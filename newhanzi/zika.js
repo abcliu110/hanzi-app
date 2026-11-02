@@ -19,6 +19,10 @@
     var d = new Date();
     return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
   }
+  function asArray(x) {
+    // 脏数据防弹：字符串 -> [字符串]，null/undefined -> []
+    return Array.isArray(x) ? x : (x == null ? [] : [x]);
+  }
   function sec(title, tag, inner) {
     if (!inner) return '';
     return '<section class="card"><h2>' + esc(title) +
@@ -212,7 +216,7 @@
       if (z['小篆']) zy += kv('小篆', '<span style="font-size:28px">' + esc(z['小篆']) + '</span>');
       if (z['演变阶段']) {
         zy += '<div class="kv"><div class="k">演变</div><div class="v"><div class="evo">' +
-          z['演变阶段'].map(function (s, i) {
+          asArray(z['演变阶段']).map(function (s, i) {
             return (i ? '<span class="arrow">→</span>' : '') +
               '<span class="stage">' + esc(s.stage || '') + '</span>';
           }).join('') + '</div></div></div>';
@@ -253,7 +257,7 @@
         '</div><div id="scoreResult" class="score" style="display:none"></div></div>';
       if (bs['笔顺文字']) {
         zx += '<div class="ex" style="margin-top:8px">' +
-          bs['笔顺文字'].map(esc).join('<br>') + '</div>';
+          asArray(bs['笔顺文字']).map(esc).join('<br>') + '</div>';
       }
       zx += '</div></div>';
     }
@@ -261,20 +265,20 @@
 
     /* 4. 别认错（形近字 + 易错提示） */
     var bx = '';
-    (dim['形近字'] || []).slice(0, 6).forEach(function (x) {
+    asArray(dim['形近字']).slice(0, 6).forEach(function (x) {
       var note = typeof x === 'string' ? x : (x['辨析'] || '');
       var from = typeof x === 'object' && x['来源'] ? x['来源'] : '';
       bx += '<div class="xj">' + esc(note) +
         (from ? '<div class="from">来源：' + esc(from) + '</div>' : '') + '</div>';
     });
-    (dim['易错提示'] || []).forEach(function (t) {
+    asArray(dim['易错提示']).forEach(function (t) {
       bx += '<div class="warn">⚠️ ' + esc(t) + '</div>';
     });
     h += sec('别认错', '形近字 · 易错点', bx);
 
     /* 5. 字的魔法（字→词→句→文） */
     var mf = '';
-    (dim['运用链'] || []).forEach(function (s) {
+    asArray(dim['运用链']).forEach(function (s) {
       mf += '<div class="yiyi">';
       mf += '<span class="st">' + esc(s['义项'] || '组词') + '</span>';
       if (s['类型']) mf += '<span class="lx">' + esc(s['类型']) + '</span>';
