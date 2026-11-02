@@ -87,6 +87,7 @@
     return '<div class="yw-item">' +
       '<button class="yw-head"><span class="yw-name">' + esc(it.name || '') + '</span>' +
       (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
+      (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
       '<span class="yw-arrow">▾</span></button>' +
       '<div class="yw-body">' + body + '</div></div>';

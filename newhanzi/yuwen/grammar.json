@@ -13,8 +13,9 @@
      "口诀": "人事物时地，名词要牢记",
      "易错": "方位词常被误认为副词",
      "讲解": "表示人、事物、时间、处所、方位等的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><polygon points=\"15,5 28,26 2,26\" fill=\"#222\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：黑三角</div>",
-     "类比": "身份决定职位：词性是\"身份证\"，成分是\"职位\"。名词常当主语/宾语。"
+     "图示": "<svg viewBox=\"0 0 256 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#7b1fa2\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">他</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">是</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><path d=\"M5,5 h20 v20 h-20 z\" fill=\"#00897b\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">一名</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">数词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">教师</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><text x=\"128\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "类比": "名词的符号是一座<b>黑色小山</b>▲，稳稳地立在那里——就像万物的名字，稳定、实在。你能摸到、看到、想到的东西，都有名字：桌子、北京、勇气、昨天。",
+     "subtitle": "万物的名字「黑三角」"
     },
     {
      "name": "动词",
@@ -26,8 +27,9 @@
      "口诀": "动作心理变化，动词来表达",
      "易错": "“是”有时是动词（判断），有时是副词（强调）",
      "讲解": "表示动作、行为、心理活动、存在变化的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"15\" cy=\"15\" r=\"12\" fill=\"#d32f2f\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：红圆</div>",
-     "类比": "动词是句子的\"发动机\"：没有动词，句子跑不起来。"
+     "图示": "<svg viewBox=\"0 0 320 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">小狗</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><path d=\"M15,3 A9,9 0 1,0 15,21\" fill=\"#2e7d32\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">在</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">介词</text><path d=\"M15,15 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0\" fill=\"#ef6c00\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">飞快</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">副词</text><path d=\"M15,15 m-4,0 a4,4 0 1,0 8,0\" fill=\"#78909c\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">地</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">助词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(273,5)\"/><text x=\"288\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">跑</text><text x=\"288\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><text x=\"160\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "类比": "动词的符号是一颗<b>大红太阳</b>●，散发能量——句子没有动词就像汽车没有发动机，跑不起来。跑、吃、喜欢、是，都是动作或状态。",
+     "subtitle": "动作的发动机「大红圆」"
     },
     {
      "name": "形容词",
@@ -39,7 +41,9 @@
      "口诀": "形状性质状态，形容词来扮",
      "易错": "副词“很”+形容词是常见搭配，别把“很”当形容词",
      "讲解": "表示人或事物的形状、性质、状态的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><polygon points=\"15,5 28,26 2,26\" fill=\"#1565c0\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：蓝三角</div>"
+     "图示": "<svg viewBox=\"0 0 320 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#1565c0\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">美丽</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">形容词</text><path d=\"M15,15 m-4,0 a4,4 0 1,0 8,0\" fill=\"#78909c\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">的</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">助词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">花</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">开</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><path d=\"M15,15 m-4,0 a4,4 0 1,0 8,0\" fill=\"#78909c\" transform=\"translate(273,5)\"/><text x=\"288\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">了</text><text x=\"288\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">助词</text><text x=\"160\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "subtitle": "名词的化妆师「蓝三角」",
+     "类比": "形容词的符号是一座<b>蓝色小山</b>▲，紧挨着名词的黑三角——它是名词的化妆师，专门描述样子：红的花、善良的人、雪白的墙。"
     },
     {
      "name": "数词",
@@ -73,7 +77,9 @@
      "口诀": "人称指示疑问，代词三剑客",
      "易错": "“这”“那”+量词+名词是代词性用法",
      "讲解": "代替名词、动词、形容词等的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><polygon points=\"15,5 28,26 2,26\" fill=\"#7b1fa2\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：紫三角</div>"
+     "图示": "<svg viewBox=\"0 0 320 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#7b1fa2\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">这</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">是</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><path d=\"M7,3 13,22 1,22\" fill=\"#7b1fa2\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">我</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><path d=\"M15,15 m-4,0 a4,4 0 1,0 8,0\" fill=\"#78909c\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">的</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">助词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(273,5)\"/><text x=\"288\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">书</text><text x=\"288\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><text x=\"160\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "subtitle": "名词的替身「紫三角」",
+     "类比": "代词的符号是一座<b>紫色小山</b>▲，和名词的黑三角是亲戚——它是名词的替身演员：我、你、他、这、那、谁，不用每次都喊全名。"
     },
     {
      "name": "副词",
@@ -85,7 +91,9 @@
      "口诀": "程度范围时间，副词来限制",
      "易错": "副词一般不能单独做谓语",
      "讲解": "修饰动词、形容词，表示程度、范围、时间等的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"15\" cy=\"15\" r=\"7\" fill=\"#ef6c00\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：橙小圆</div>"
+     "图示": "<svg viewBox=\"0 0 448 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#7b1fa2\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">他</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><path d=\"M15,15 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0\" fill=\"#ef6c00\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">已经</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">副词</text><path d=\"M15,15 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0\" fill=\"#ef6c00\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">飞快</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">副词</text><path d=\"M15,15 m-4,0 a4,4 0 1,0 8,0\" fill=\"#78909c\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">地</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">助词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(273,5)\"/><text x=\"288\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">跑</text><text x=\"288\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(337,5)\"/><text x=\"352\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">出</text><text x=\"352\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(401,5)\"/><text x=\"416\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">教室</text><text x=\"416\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><text x=\"224\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "subtitle": "动词的小跟班「小橙圆」",
+     "类比": "副词的符号是一颗<b>小橙圆</b>，紧挨着动词的大红圆——小圆是大圆的跟班，专门给动作加说明：怎么跑（飞快地跑）、多深（很爱）、什么时候（已经走了）。"
     },
     {
      "name": "介词",
@@ -97,7 +105,9 @@
      "口诀": "在从把被关于，介词引对象",
      "易错": "“把”字句和“被”字句是中考重点句式",
      "讲解": "用在名词、代词前，组成介词短语，表示方向、对象等的词",
-     "图示": "<svg viewBox=\"0 0 30 30\" width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M15,3 A12,12 0 1,0 15,27 A9,9 0 1,1 15,3\" fill=\"#2e7d32\"/></svg><div style=\"font-size:12px;color:#888;text-align:center\">蒙特梭利符号：绿新月</div>"
+     "图示": "<svg viewBox=\"0 0 384 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><path d=\"M7,3 13,22 1,22\" fill=\"#7b1fa2\" transform=\"translate(17,5)\"/><text x=\"32\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">我</text><text x=\"32\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><path d=\"M15,3 A9,9 0 1,0 15,21\" fill=\"#2e7d32\" transform=\"translate(81,5)\"/><text x=\"96\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">从</text><text x=\"96\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">介词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(145,5)\"/><text x=\"160\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">北京</text><text x=\"160\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><path d=\"M15,3 A9,9 0 1,0 15,21\" fill=\"#2e7d32\" transform=\"translate(209,5)\"/><text x=\"224\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">到</text><text x=\"224\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">介词</text><path d=\"M7,3 13,22 1,22\" fill=\"#222\" transform=\"translate(273,5)\"/><text x=\"288\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">上海</text><text x=\"288\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">名词</text><path d=\"M15,15 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0\" fill=\"#d32f2f\" transform=\"translate(337,5)\"/><text x=\"352\" y=\"65\" font-size=\"18\" text-anchor=\"middle\">去</text><text x=\"352\" y=\"88\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">动词</text><text x=\"192\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">每个实词头上戴着自己的符号帽——看形状颜色就知道身份</text></svg>",
+     "subtitle": "方位的月亮「绿新月」",
+     "类比": "介词的符号是一弯<b>绿色新月</b>☽，总在名词前面带路：在哪里（在公园）、从哪里（从北京）、向哪里（向南）。它像路标，指引方向。"
     },
     {
      "name": "连词",
