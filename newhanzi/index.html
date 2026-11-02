@@ -21,17 +21,13 @@
   <div class="tstat"><span class="tnum" id="stReview">0</span><span class="tlabel">待复习</span></div>
 </div>
 
-<a class="yuwen-banner" href="yuwen.html">
-  <span class="yb-icon">📚</span>
-  <span class="yb-text"><b>语文知识库</b><small>语法 · 阅读理解 · 写作技巧</small></span>
-  <span class="rgo">›</span>
-</a>
+<div class="main-tabs" id="mainTabs">
+  <button class="mtab active" data-m="shizi">📖 识字</button>
+  <button class="mtab" data-m="yuwen">📚 语法</button>
+  <button class="mtab" data-m="logic">🧠 逻辑</button>
+</div>
 
-<a class="yuwen-banner" href="yuwen.html?tab=logic">
-  <span class="yb-icon">🧠</span>
-  <span class="yb-text"><b>逻辑学</b><small>形式逻辑 · 病句逻辑 · 论证推理</small></span>
-  <span class="rgo">›</span>
-</a>
+<div id="panel-shizi">
 
 <a class="yuwen-banner" href="grammar_lab.html">
   <span class="yb-icon">🧪</span>
@@ -44,11 +40,6 @@
   <span class="yb-text"><b>偏旁部首</b><small>203个部首含义 · 说文说解 · 例字</small></span>
   <span class="rgo">›</span>
 </a>
-
-<div class="gram-showcase">
-  <div class="gs-head"><span>✨ 图解语法</span><a href="yuwen.html">全部 53 条 ›</a></div>
-  <div class="gs-scroll" id="gsScroll"></div>
-</div>
 
 <div class="controls" id="controls">
   <div class="searchbox">
@@ -68,33 +59,96 @@
   <div id="list"></div>
 </main>
 <nav id="rail" aria-label="快速索引"></nav>
+</div><!-- /panel-shizi -->
+
+<div id="panel-yuwen" style="display:none">
+  <div class="yw-searchbox"><input id="yq2" type="text" placeholder="搜语法点，如：把字句" autocomplete="off"></div>
+  <div id="ywlist2"></div>
+</div>
+
+<div id="panel-logic" style="display:none">
+  <div id="logiclist"></div>
+</div>
 
 <script src="data/index.js"></script>
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
 <script>
-/* 首页图解语法展示：从 yuwen 数据取 6 个富词类课 */
+/* 主 Tab 切换：识字 / 语法 / 逻辑 */
 (function(){
-  try {
-    var g = (window.NHZ_YUWEN||{}).grammar;
-    if(!g) return;
-    var cilei = g.categories.filter(function(c){return c.id==='cilei';})[0];
-    if(!cilei) return;
-    var rich = cilei.items.filter(function(it){return it['subtitle'] && it['图示'];}).slice(0,6);
-    var el = document.getElementById('gsScroll');
-    if(!el || !rich.length) return;
-    /* 取图示中的第一个符号 SVG */
-    el.innerHTML = rich.map(function(it){
-      var m = (it['图示']||'').match(/<svg[^>]*>.*?<\/svg>/);
-      var sym = m ? m[0].replace('width="28" height="28"','width="40" height="40"') : '';
-      var analogy = (it['类比']||'').replace(/<[^>]+>/g,'').substring(0,48)+'…';
-      return '<a class="gs-card" href="yuwen.html">'+
-        '<div class="gs-sym">'+sym+'</div>'+
-        '<h4>'+it.name+'</h4>'+
-        '<div class="gs-sub">'+(it['subtitle']||'')+'</div>'+
-        '<div class="gs-ex">'+analogy+'</div></a>';
-    }).join('');
-  } catch(e){}
+  var tabs = document.querySelectorAll('#mainTabs .mtab');
+  var panels = {shizi: document.getElementById('panel-shizi'),
+                yuwen: document.getElementById('panel-yuwen'),
+                logic: document.getElementById('panel-logic')};
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  /* 课程渲染（复用 yuwen 六步格式） */
+  function lessonHtml(it){
+    var b='', step=0;
+    function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
+    if(it['类比']) b += sh('打个比方')+'<div class="yw-analogy">'+it['类比']+'</div>';
+    if(it['图示']) b += sh('看图说话')+'<div class="yw-diagram">'+it['图示']+'</div>';
+    if(it['讲解']) b += sh('规则一句话')+'<p class="yw-exp">'+esc(it['讲解'])+'</p>';
+    if(it['口诀']) b += '<div class="yw-koujue2">🗣️ 口诀：'+esc(it['口诀'])+'</div>';
+    if(it['例子']&&it['例子'].length) b += '<div class="words">'+it['例子'].map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div>';
+    if(it['易错']) b += sh('易错诊所')+'<div class="warn">⚠️ '+esc(it['易错'])+'</div>';
+    if(it['小测']&&it['小测'].length){
+      b += sh('动手小测')+'<div class="yw-quiz">'+it['小测'].map(function(q,qi){
+        return '<div class="quiz-q"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div><div class="quiz-opts">'+
+          q.options.map(function(op,oi){return '<button data-a="'+q.answer+'" data-oi="'+oi+'">'+esc(op)+'</button>';}).join('')+
+          '</div><div class="quiz-fb"></div></div>';
+      }).join('')+'</div>';
+    }
+    return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+
+      (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
+      '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
+  }
+  function renderLessons(key, elId){
+    var D = (window.NHZ_YUWEN||{})[key];
+    var el = document.getElementById(elId);
+    if(!D||!el) return;
+    var h='';
+    D.categories.forEach(function(c){
+      h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
+        c.items.map(lessonHtml).join('');
+    });
+    el.innerHTML = h;
+  }
+
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var m = t.getAttribute('data-m');
+      for(var k in panels) panels[k].style.display = (k===m?'block':'none');
+      if(m==='yuwen' && !panels.yuwen.dataset.done){ renderLessons('grammar','ywlist2'); panels.yuwen.dataset.done='1'; }
+      if(m==='logic' && !panels.logic.dataset.done){ renderLessons('logic','logiclist'); panels.logic.dataset.done='1'; }
+      window.scrollTo(0,0);
+    });
+  });
+  /* 手风琴 + 小测 */
+  document.addEventListener('click', function(e){
+    var h = e.target.closest('.yw-head');
+    if(h){ h.parentElement.classList.toggle('open'); return; }
+    var qb = e.target.closest('.quiz-opts button');
+    if(qb){
+      var oi = parseInt(qb.getAttribute('data-oi')), ans = parseInt(qb.getAttribute('data-a'));
+      var box = qb.closest('.quiz-q');
+      var fb = box.querySelector('.quiz-fb');
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('right','wrong');});
+      if(oi===ans){ qb.classList.add('right'); fb.innerHTML='✅ 答对了！'; }
+      else { qb.classList.add('wrong'); box.querySelectorAll('button')[ans].classList.add('right'); fb.innerHTML='❌ 再想想'; }
+    }
+  });
+  /* 语法搜索 */
+  var yq = document.getElementById('yq2');
+  if(yq) yq.addEventListener('input', function(){
+    var q = yq.value.trim();
+    document.querySelectorAll('#ywlist2 .yw-item').forEach(function(it){
+      var txt = it.textContent;
+      it.style.display = (!q || txt.indexOf(q)>=0) ? 'block' : 'none';
+    });
+  });
 })();
 </script>
 </body>

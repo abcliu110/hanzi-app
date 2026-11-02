@@ -37,10 +37,18 @@
   function itemHtml(it, idx) {
     var body = '';
     var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
-    /* 1. 打个比方（允许<b>等简单标签） */
-    if (it['类比']) body += '<div class="yw-analogy">💡 打个比方：' + it['类比'] + '</div>';
+    var step = 0;
+    function stepHead(title, right){
+      step++;
+      return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span>'+
+        (right ? '<span class="yw-stepright">'+right+'</span>' : '')+'</div>';
+    }
+    /* 1. 打个比方 */
+    if (it['类比']) body += stepHead('打个比方','蒙特梭利语法符号') +
+      '<div class="yw-analogy">' + it['类比'] + '</div>';
     /* 2. 看图说话 */
-    if (it['图示']) body += '<div class="yw-diagram">' + it['图示'] + '</div>';
+    if (it['图示']) body += stepHead('看图说话','符号标注 Symbolizing') +
+      '<div class="yw-diagram">' + it['图示'] + '</div>';
     /* 3. 动手试试（动画） */
     if (it['动画'] && it['动画'].steps && it['动画'].steps.length) {
       var aid = 'anim' + idx + '_' + Math.floor(Math.random() * 100000);
@@ -64,7 +72,9 @@
         '<div class="game-fb"></div></div>';
     }
     /* 4. 规则一句话 */
-    if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
+    if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
+      body += stepHead('规则一句话');
+      if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
     if (it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
     if (it['例子'] && it['例子'].length) {
       body += '<div class="words">' + it['例子'].map(function (w) {
