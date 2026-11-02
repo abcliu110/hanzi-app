@@ -44,9 +44,14 @@
         }).join('') + '</div></div>';
     }
     if (r.chars && r.chars.length) {
-      html += '<div class="bs-sec"><h4>含此部首的字（' + r.chars.length + '）</h4><div class="bs-grid">' +
+      var fmCount = r.fm ? Object.keys(r.fm).length : 0;
+      html += '<div class="bs-sec"><h4>含此部首的字（' + r.chars.length +
+        (fmCount ? '，' + fmCount + '字有家族含义' : '') + '）</h4><div class="bs-grid">' +
         r.chars.map(function (z) {
-          return '<a href="' + zikaLink(z) + '">' + esc(z) + '</a>';
+          var fm = (r.fm && r.fm[z]) || '';
+          return '<a href="' + zikaLink(z) + '" class="' + (fm ? 'hasfm' : '') + '">' +
+            '<span class="bs-z">' + esc(z) + '</span>' +
+            (fm ? '<span class="bs-fm">' + esc(fm) + '</span>' : '') + '</a>';
         }).join('') + '</div></div>';
     }
     return html + '</div></div>';

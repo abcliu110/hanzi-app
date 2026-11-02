@@ -20,6 +20,15 @@ VARIANT_MAP = {
     '⺀': '卜',
 }
 
+# 家族含义（批量生成，见 bushou_family_meanings_full.json）
+FAMILY_MEANINGS = {}
+try:
+    FAMILY_MEANINGS = json.load(open(
+        '/home/hatch/workspace/research_notes/bushou-meaning-research-20261102-1218/bushou_family_meanings_full.json',
+        encoding='utf-8'))
+except Exception:
+    pass
+
 def load_js_var(path, var):
     with open(path, encoding='utf-8') as f:
         txt = f.read()
@@ -89,22 +98,28 @@ def main():
         chars = sort_chars(merged[r['bushou']])
         examples = [{'z': e['z'], 'w': e['w'], 'in3500': e['z'] in char_set}
                     for e in r['examples']]
+        # 家族含义：只保留本部首字表中的
+        fm_all = FAMILY_MEANINGS.get(r['bushou'], {})
+        fm = {z: fm_all[z] for z in chars if z in fm_all}
         out.append({
             'bushou': r['bushou'], 'benzi': r['benzi'],
             'bianti': r['bianti'], 'shuowen': r['shuowen'],
             'shuowen_url': r['shuowen_url'], 'meaning': r['meaning'],
             'semantic': r['semantic'], 'examples': examples,
             'chars': chars, 'count': len(chars), 'has_meaning': True,
+            'fm': fm,
         })
     # 纯字表条目按字数降序附后；能从《说文解字》找到说解的补上
     for label in sorted(plain, key=lambda l: -len(our[l])):
         chars = sort_chars(plain[label])
         sw = SHUOWEN_RAD.get(label, '') or SHUOWEN_RAD.get(label.split('、')[0], '')
+        fm_all = FAMILY_MEANINGS.get(label, {})
+        fm = {z: fm_all[z] for z in chars if z in fm_all}
         out.append({
             'bushou': label, 'benzi': '', 'bianti': '', 'shuowen': sw,
             'shuowen_url': '', 'meaning': '', 'semantic': '',
             'examples': [], 'chars': chars, 'count': len(chars),
-            'has_meaning': bool(sw),
+            'has_meaning': bool(sw), 'fm': fm,
         })
 
     out.sort(key=lambda r: (-r['count'], r['bushou']))
