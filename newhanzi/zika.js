@@ -204,9 +204,10 @@
     }
     if (dim['部首']) {
       var buLabel = dim['部首']['部首'];
+      // 偏旁部首只显示归属、不断言语义（假借字如"柒"语义与部首无关），含义见部首详情页
       chips += bsEntry
-        ? '<a class="chip" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">部首 ' + esc(buLabel) + '</a>'
-        : '<span class="chip">部首 ' + esc(buLabel) + '</span>';
+        ? '<a class="chip" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">偏旁部首 ' + esc(buLabel) + '</a>'
+        : '<span class="chip">偏旁部首 ' + esc(buLabel) + '</span>';
     }
     if (dim['笔画']) chips += '<span class="chip">' + esc(dim['笔画']['笔画数']) + ' 画</span>';
     if (dim['繁体']) chips += '<span class="chip">繁体 ' + esc(dim['繁体']['繁体']) + '</span>';
@@ -218,10 +219,10 @@
     h += '<div class="hero"><div class="bigzi">' + esc(r.zi) + '</div>' +
       (dim['读音'] ? '<div class="pinyin">' + esc(String(dim['读音']['拼音'] || '').replace(/,/g, '、')) + '</div>' : '') +
       '<div class="chips">' + chips + '</div>' +
-      // 部首含义一句话（点进部首库）
-      (bsEntry && (bsEntry.meaning || bsEntry.shuowen)
-        ? '<a class="bs-mean" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">🧩 「' +
-          esc(bsEntry.bushou) + '」' + esc(bsEntry.meaning || bsEntry.shuowen.slice(0, 28)) + ' ›</a>'
+      // 偏旁部首直达部首库（只显示归属；语义解读在部首详情页，避免对假借字误断）
+      (bsEntry
+        ? '<a class="bs-mean" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">🧩 偏旁部首「' +
+          esc(bsEntry.bushou) + '」的含义与例字 ›</a>'
         : '') +
       '<button class="speak" id="speakBtn">🔊 读一读</button></div>';
 
