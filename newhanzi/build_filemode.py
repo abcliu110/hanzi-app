@@ -77,7 +77,7 @@ def main():
 
     # 3. 语文知识库
     yuwen = {}
-    for key, fn in [('grammar', 'grammar.json'), ('reading', 'reading.json'), ('writing', 'writing.json')]:
+    for key, fn in [('grammar', 'grammar.json'), ('logic', 'logic.json'), ('reading', 'reading.json'), ('writing', 'writing.json')]:
         yuwen[key] = json.load(open(os.path.join(ROOT, 'yuwen', fn), encoding='utf-8'))
     write_js(os.path.join(ROOT, 'yuwen', 'data.js'), 'NHZ_YUWEN', yuwen)
     print('yuwen/data.js: %s' % ', '.join('%s=%d类' % (k, len(v['categories'])) for k, v in yuwen.items()))

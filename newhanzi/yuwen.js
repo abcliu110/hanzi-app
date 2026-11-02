@@ -4,6 +4,7 @@
 
   var MODULES = [
     { key: 'grammar', file: 'yuwen/grammar.json', label: '语法' },
+    { key: 'logic', file: 'yuwen/logic.json', label: '逻辑学' },
     { key: 'reading', file: 'yuwen/reading.json', label: '阅读理解' },
     { key: 'writing', file: 'yuwen/writing.json', label: '写作' }
   ];
