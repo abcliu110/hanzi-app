@@ -55,6 +55,10 @@
     if (pctEl) pctEl.textContent = '完成度 ' + (n / 3500 * 100).toFixed(1) + '%';
     var chip = document.getElementById('reviewChip');
     if (chip) chip.textContent = '复习 ' + review;
+    var pp = document.getElementById('prog-shizi');
+    if (pp) pp.style.width = (n / 3500 * 100).toFixed(1) + '%';
+    var ppt = document.getElementById('progtx-shizi');
+    if (ppt) ppt.textContent = n + ' / 3500';
   }
 
   function rowHtml(e) {

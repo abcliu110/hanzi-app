@@ -8,62 +8,52 @@
 <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body class="page-home">
-<div class="app-shell">
-  <aside class="side-nav" aria-label="主导航">
-    <div class="side-brand">
-      <strong>识字星球</strong>
-      <span>护眼学习</span>
+<!-- 首页：品牌 + 今日学习 + 6面板 -->
+<div id="view-home" class="home-view">
+  <div class="brand"><h1>识字星球</h1><p>护眼学习</p></div>
+  <div class="today">
+    <div><div class="t-num" id="stTotal">0</div><div class="t-label">今日学习</div></div>
+    <div class="t-mid">
+      <div class="t-row"><span id="heroPct">完成度 0%</span><span id="learnedCount">已学 0 / 3500</span></div>
+      <div class="t-bar"><div class="t-fill" id="pfill"></div></div>
     </div>
-    <nav class="side-tabs" id="sideTabs">
-      <button class="mtab active" type="button" data-m="shizi">识字</button>
-      <button class="mtab" type="button" data-m="yuwen">语法</button>
-      <button class="mtab" type="button" data-m="logic">逻辑</button>
-      <button class="mtab" type="button" data-m="bushou">部首</button>
-      <button class="mtab" type="button" data-m="shici">古诗词</button>
-      <button class="mtab" type="button" data-m="lab">实验</button>
-    </nav>
-    <button class="side-cta" type="button" id="btnContinueSide">继续识字</button>
-  </aside>
+    <div class="t-side"><b id="stToday">0</b> 新字 · <b id="stReview">0</b> 待复习</div>
+  </div>
+  <div class="panels">
+    <button class="panel" type="button" data-m="shizi">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="32" height="36" rx="4"/><path d="M18 18h12M24 14v16M18 26h12"/></svg>
+      <b>识字</b><div class="prog"><i id="prog-shizi"></i></div><div class="prog-tx" id="progtx-shizi"></div>
+    </button>
+    <button class="panel" type="button" data-m="yuwen">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8l8 8L20 36l-10 2 2-10z"/><path d="M28 12l8 8"/></svg>
+      <b>语法</b><div class="prog"><i style="width:12%"></i></div><div class="prog-tx">90 项</div>
+    </button>
+    <button class="panel" type="button" data-m="logic">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="16"/><path d="M24 14v10l7 5"/></svg>
+      <b>逻辑</b><div class="prog"><i style="width:5%"></i></div><div class="prog-tx">211 题</div>
+    </button>
+    <button class="panel" type="button" data-m="bushou">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h6a4 4 0 014 4v4h4a4 4 0 014 4v6a4 4 0 01-4 4h-4v4a4 4 0 01-4 4h-6a4 4 0 01-4-4v-4h-4a4 4 0 01-4-4v-6a4 4 0 014-4h4v-4a4 4 0 014-4z"/></svg>
+      <b>部首</b><div class="prog"><i style="width:8%"></i></div><div class="prog-tx">214 部首</div>
+    </button>
+    <button class="panel" type="button" data-m="shici">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 28A14 14 0 1120 8a11 11 0 0016 20z"/></svg>
+      <b>古诗词</b><div class="prog"><i style="width:20%"></i></div><div class="prog-tx">120 首</div>
+    </button>
+    <button class="panel" type="button" data-m="lab">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6h8M22 6v12l-10 18a4 4 0 003.5 6h17a4 4 0 003.5-6L26 18V6"/><path d="M16 30h16"/></svg>
+      <b>实验</b><div class="prog"><i style="width:3%"></i></div><div class="prog-tx">152 题</div>
+    </button>
+  </div>
+</div>
 
+<!-- 模块页：返回栏 + 内容 -->
+<div id="view-module" class="module-view" style="display:none">
+  <div class="topbar">
+    <button class="back" type="button" id="btnBack">← 首页</button>
+    <h1 id="modTitle">识字</h1><span class="sub" id="modSub"></span>
+  </div>
   <div class="app-main">
-    <header class="home-top">
-      <div class="home-brand">
-        <h1>识字星球 <span class="badge">new</span></h1>
-        <p class="home-sub">每天认识几个字</p>
-      </div>
-      <div class="home-top-actions">
-        <button type="button" class="chip-soft" id="reviewChip">复习 0</button>
-        <button type="button" class="btn-cta" id="btnContinue">继续识字</button>
-      </div>
-    </header>
-
-    <section class="hero-card" aria-label="学习进度">
-      <div class="hero-head">
-        <span>今日学习</span>
-        <span id="heroPct">完成度 0%</span>
-      </div>
-      <div class="hero-body">
-        <div class="hero-main">
-          <span class="hero-num" id="stTotal">0</span>
-          <span class="hero-cap" id="learnedCount">已学 0 / 3500</span>
-        </div>
-        <div class="hero-stats">
-          <div><b id="stToday">0</b><span>今日新字</span></div>
-          <div><b id="stReview">0</b><span>待复习</span></div>
-        </div>
-      </div>
-      <div class="pbar hero-pbar"><div id="pfill"></div></div>
-      <button type="button" class="hero-cta" id="btnContinueHero">继续识字</button>
-    </section>
-
-    <div class="main-tabs module-grid" id="mainTabs">
-      <button class="mtab active" type="button" data-m="shizi"><i></i>识字</button>
-      <button class="mtab" type="button" data-m="yuwen"><i></i>语法</button>
-      <button class="mtab" type="button" data-m="logic"><i></i>逻辑</button>
-      <button class="mtab" type="button" data-m="lab"><i></i>实验</button>
-      <button class="mtab" type="button" data-m="bushou"><i></i>部首</button>
-      <button class="mtab" type="button" data-m="shici"><i></i>古诗词</button>
-    </div>
 
     <div id="panel-shizi" class="panel-shizi">
       <div class="shizi-board">
@@ -120,15 +110,21 @@
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
 <script>
-/* 主 Tab 切换：识字 / 语法 / 逻辑 等 */
+/* 首页面板导航：主页 / 模块页切换 */
 (function(){
-  var tabs = document.querySelectorAll('.mtab');
+  var viewHome = document.getElementById('view-home');
+  var viewModule = document.getElementById('view-module');
+  var modTitle = document.getElementById('modTitle');
+  var modSub = document.getElementById('modSub');
   var panels = {shizi: document.getElementById('panel-shizi'),
                 yuwen: document.getElementById('panel-yuwen'),
                 logic: document.getElementById('panel-logic'),
                 lab: document.getElementById('panel-lab'),
                 bushou: document.getElementById('panel-bushou'),
                 shici: document.getElementById('panel-shici')};
+  var titles = {shizi:['识字','3500 常用字'], yuwen:['语法','句子 / 修辞 / 病句'],
+    logic:['逻辑','推理 / 判断'], lab:['实验','动手 / 观察'],
+    bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','120 首 / 常识卡']};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function lessonHtml(it){
@@ -152,10 +148,12 @@
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
   }
 
-  function activate(m){
-    tabs.forEach(function(x){
-      x.classList.toggle('active', x.getAttribute('data-m') === m);
-    });
+  function openModule(m){
+    if(!panels[m]) return;
+    viewHome.style.display='none';
+    viewModule.style.display='block';
+    modTitle.textContent = titles[m][0];
+    modSub.textContent = titles[m][1];
     for(var k in panels) panels[k].style.display = (k===m?'block':'none');
     if(m==='logic' && !panels.logic.dataset.done){
       var D = (window.NHZ_YUWEN||{}).logic;
@@ -173,31 +171,13 @@
     window.scrollTo(0,0);
   }
 
-  tabs.forEach(function(t){
-    t.addEventListener('click', function(){ activate(t.getAttribute('data-m')); });
+  document.querySelectorAll('#view-home .panel').forEach(function(p){
+    p.addEventListener('click', function(){ openModule(p.getAttribute('data-m')); });
   });
-
-  function goContinue(){
-    var rows = document.querySelectorAll('#list .row');
-    for(var i=0;i<rows.length;i++){
-      if(!rows[i].querySelector('.done')){ location.href = rows[i].getAttribute('href'); return; }
-    }
-    var q = document.getElementById('q');
-    if(q){ q.focus(); q.scrollIntoView({block:'center'}); }
-  }
-  ['btnContinue','btnContinueHero','btnContinueSide','reviewChip'].forEach(function(id){
-    var el = document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('click', function(){
-      if(id==='reviewChip'){
-        var only = document.getElementById('onlyNew');
-        activate('shizi');
-        if(only && !only.classList.contains('on')) only.click();
-        return;
-      }
-      activate('shizi');
-      goContinue();
-    });
+  document.getElementById('btnBack').addEventListener('click', function(){
+    viewModule.style.display='none';
+    viewHome.style.display='flex';
+    window.scrollTo(0,0);
   });
 
   document.addEventListener('click', function(e){

@@ -336,8 +336,46 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .ghead{margin:16px 16px 8px;font-weight:700;font-size:15px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .gcount{font-size:12px;color:var(--muted);font-weight:400}
 
-/* ========== 首页全量改版：手机 / 平板 / 桌面 ========== */
+/* ========== 首页：面板导航（无侧边栏，平板/桌面） ========== */
 .page-home { font-size: 16px; }
+.home-view{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:44px 20px 60px}
+.home-view .brand{text-align:center;margin-bottom:22px}
+.home-view .brand h1{font-size:34px;letter-spacing:3px;margin-bottom:6px}
+.home-view .brand p{color:var(--muted);font-size:14px;letter-spacing:2px}
+.home-view .today{background:linear-gradient(135deg,#3d5a40 0%,#4a7a59 100%);color:#fff;border-radius:14px;
+  padding:11px 20px;display:flex;align-items:center;gap:20px;margin-bottom:30px;
+  width:100%;max-width:620px;box-shadow:0 3px 10px rgba(61,90,64,.22)}
+.home-view .today .t-num{font-size:28px;font-weight:800;line-height:1}
+.home-view .today .t-label{font-size:11px;opacity:.85;margin-top:2px}
+.home-view .today .t-mid{flex:1;min-width:0}
+.home-view .today .t-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.home-view .today .t-bar{height:5px;background:rgba(255,255,255,.22);border-radius:3px;overflow:hidden}
+.home-view .today .t-fill{display:block;height:100%;background:#fff;border-radius:3px}
+.home-view .today .t-side{text-align:right;font-size:12px;line-height:1.7;opacity:.95;white-space:nowrap}
+.home-view .today .t-side b{font-size:16px}
+.home-view .panels{display:grid;grid-template-columns:repeat(3,200px);gap:22px;justify-content:center}
+.home-view .panel{position:relative;border:1px solid var(--line);border-radius:18px;padding:26px 10px 20px;
+  text-align:center;cursor:pointer;font-family:inherit;background:var(--surface);
+  box-shadow:0 2px 8px rgba(44,51,40,.07);
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+  display:flex;flex-direction:column;align-items:center}
+.home-view .panel:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(44,51,40,.14);border-color:var(--accent)}
+.home-view .panel:active{transform:translateY(-1px)}
+.home-view .panel svg{width:44px;height:44px;margin-bottom:12px}
+.home-view .panel b{font-size:17px;color:var(--ink);letter-spacing:2px}
+.home-view .panel .prog{margin-top:10px;width:80%;height:5px;background:var(--accent-soft);border-radius:3px;overflow:hidden}
+.home-view .panel .prog i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.home-view .panel .prog-tx{margin-top:5px;font-size:11px;color:var(--muted)}
+/* 模块页 */
+.module-view{min-height:100vh}
+.module-view .topbar{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);
+  padding:14px 28px;display:flex;align-items:center;gap:16px}
+.module-view .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 16px;
+  font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.module-view .back:hover{border-color:var(--accent);color:var(--accent-deep)}
+.module-view .topbar h1{font-size:20px;letter-spacing:2px}
+.module-view .topbar .sub{font-size:13px;color:var(--muted)}
+.module-view .app-main{min-width:0}
 .page-home .app-shell { min-height: 100vh; }
 .page-home .side-nav { display: none; }
 .page-home .app-main { min-width: 0; }
