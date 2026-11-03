@@ -39,6 +39,8 @@
 .sc-famous .sc-fbai{font-size:14px;color:var(--xzq-muted,#8a8578);margin-top:8px;line-height:1.7}
 .sc-famous .sc-fstory{font-size:14px;margin-top:8px;line-height:1.8}
 .sc-famous .sc-flink{margin-top:8px;font-size:13px}
+.sc-hitline{font-size:16px;line-height:1.9;color:var(--xzq-text,#e8e4d8)}
+.sc-hitline mark{background:#f5c518;color:#1a1a1a;padding:0 2px;border-radius:3px}
 .sc-imgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 16px}
 .sc-im{aspect-ratio:1;border:1px solid var(--xzq-border,#e5e0d5);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--xzq-surface,#fff)}
 .sc-im .sc-imzi{font-size:30px;font-weight:700}
@@ -184,15 +186,49 @@ function vFamous(){
   });
 }
 
+function imageryNetworkSVG(){
+  var cx=180, cy=168, r1=60, r2=126;
+  var n = D.imagery.length;
+  var poemOrder = [];
+  D.imagery.forEach(function(g){ g.poems.forEach(function(o){ if(poemOrder.indexOf(o)<0) poemOrder.push(o); }); });
+  var m = poemOrder.length;
+  var s = '<svg viewBox="0 0 360 336" style="width:100%;max-width:430px;display:block;margin:0 auto">';
+  D.imagery.forEach(function(g,i){
+    var a = (i/n)*Math.PI*2 - Math.PI/2;
+    var x1 = cx + r1*Math.cos(a), y1 = cy + r1*Math.sin(a);
+    g.poems.forEach(function(o){
+      var j = poemOrder.indexOf(o);
+      var b = (j/m)*Math.PI*2 - Math.PI/2;
+      s += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+(cx+r2*Math.cos(b)).toFixed(1)+'" y2="'+(cy+r2*Math.sin(b)).toFixed(1)+'" stroke="#f5c518" stroke-width="1" opacity="0.22"/>';
+    });
+  });
+  poemOrder.forEach(function(o,j){
+    var b = (j/m)*Math.PI*2 - Math.PI/2;
+    var p = poemByOrder(o);
+    s += '<g data-poem="'+o+'" style="cursor:pointer"><title>'+esc(p?p.title:'')+'</title><circle cx="'+(cx+r2*Math.cos(b)).toFixed(1)+'" cy="'+(cy+r2*Math.sin(b)).toFixed(1)+'" r="5" fill="#8a8578"/></g>';
+  });
+  D.imagery.forEach(function(g,i){
+    var a = (i/n)*Math.PI*2 - Math.PI/2;
+    var x = cx + r1*Math.cos(a), y = cy + r1*Math.sin(a);
+    s += '<g data-im="'+i+'" style="cursor:pointer"><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="15" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/><text x="'+x.toFixed(1)+'" y="'+(y+6).toFixed(1)+'" text-anchor="middle" font-size="16" fill="#f5c518">'+esc(g.zi)+'</text></g>';
+  });
+  return s + '</svg>';
+}
+
 function vImagery(){
   setTitle('意象地图');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += '<div class="sc-imgrid">' + D.imagery.map(function(g,i){
-    return '<div class="sc-im" data-im="'+i+'"><div class="sc-imzi">'+esc(g.zi)+'</div><div class="sc-immean">'+esc(g.mean)+'</div></div>';
-  }).join('') + '</div>';
+  h += '<div class="sc-know"><p>每个意象都连着几首诗——点中间的字，看它背后的诗句；点外圈的点，直达那首诗。</p></div>';
+  h += imageryNetworkSVG();
+  h += D.imagery.map(function(g,i){
+    return '<div class="sc-poet" data-im="'+i+'"><div class="sc-pname">'+esc(g.zi)+' · '+esc(g.mean)+'</div><div class="sc-pbio">“'+esc(g.line)+'”</div></div>';
+  }).join('');
   listEl.innerHTML = h; showList(); wireBack();
   listEl.querySelectorAll('[data-im]').forEach(function(el){
     el.addEventListener('click', function(){ openImagery(parseInt(el.getAttribute('data-im'),10)); });
+  });
+  listEl.querySelectorAll('[data-poem]').forEach(function(el){
+    el.addEventListener('click', function(e){ e.stopPropagation(); openPoem(parseInt(el.getAttribute('data-poem'),10)); });
   });
 }
 
@@ -200,6 +236,7 @@ function openImagery(i){
   var g = D.imagery[i];
   setTitle('意象 · '+g.zi);
   var h = '<div class="sc-detail-head"><h2 style="font-size:44px">'+esc(g.zi)+'</h2><div class="sc-detail-meta">'+esc(g.mean)+'</div></div>';
+  h += '<div class="sc-know"><p style="font-size:17px">“'+esc(g.line)+'”</p></div>';
   h += '<div class="sc-know"><p>'+esc(g.desc)+'</p></div>';
   h += '<div class="sc-know"><h3>相关诗句</h3><p>' + g.poems.map(function(o){
     var p = poemByOrder(o);
@@ -216,17 +253,28 @@ function openImagery(i){
 function vZilian(preZi){
   setTitle('字→诗句链');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += '<div class="sc-know"><p>输入一个汉字，找出诗库里含这个字的诗句。字卡里的“诗句里的这个字”也是从这里链过来的。</p></div>';
+  h += '<div class="sc-know"><p>输入一个汉字，找出诗库里含这个字的<b>原句</b>，字会标黄。字卡里的“诗句里的这个字”也是从这里链过来的。</p></div>';
   h += '<div class="sc-zrow"><input id="ziinput" maxlength="1" placeholder="如：月"><button id="zigo">找诗句</button></div>';
-  h += '<div class="sc-chips"><span class="sc-chip" data-zi="月">月</span><span class="sc-chip" data-zi="柳">柳</span><span class="sc-chip" data-zi="剑">剑</span><span class="sc-chip" data-zi="酒">酒</span><span class="sc-chip" data-zi="山">山</span></div>';
+  h += '<div class="sc-chips">' + ['月','柳','剑','酒','山','花','风','雪'].map(function(z){
+    return '<span class="sc-chip" data-zi="'+z+'">'+z+'</span>';
+  }).join('') + '</div>';
   h += '<div id="ziresult"></div>';
   listEl.innerHTML = h; showList(); wireBack();
   function run(zi){
     var box = document.getElementById('ziresult');
-    var orders = SHIJU[zi] || [];
-    if(!orders.length){ box.innerHTML = '<div class="sc-know"><p>“'+esc(zi)+'”在诗库里没有出现，换个字试试。</p></div>'; return; }
-    box.innerHTML = '<div class="sc-know"><h3>含“'+esc(zi)+'”的诗（'+orders.length+'首）</h3><p>' +
-      orders.map(function(o){ var p=poemByOrder(o); return p?'<span class="sc-worklink" data-o="'+o+'">《'+esc(p.title)+'》</span>':''; }).join(' · ') + '</p></div>';
+    var hits = [];
+    D.poems.forEach(function(p){
+      var ls = p.lines.filter(function(l){ return l.indexOf(zi) >= 0; });
+      if(ls.length) hits.push({p:p, ls:ls.slice(0,3)});
+    });
+    if(!hits.length){ box.innerHTML = '<div class="sc-know"><p>“'+esc(zi)+'”在诗库里没有出现，换个字试试。</p></div>'; return; }
+    var shown = hits.slice(0,8);
+    box.innerHTML = '<div class="sc-know"><h3>含“'+esc(zi)+'”的诗句（'+hits.length+'首）</h3>' + shown.map(function(hh){
+      var lines = hh.ls.map(function(l){
+        return '<div class="sc-hitline">'+esc(l).split(esc(zi)).join('<mark>'+esc(zi)+'</mark>')+'</div>';
+      }).join('');
+      return '<div style="margin:10px 0 4px"><span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span><span style="font-size:12px;color:var(--xzq-muted,#8a8578)"> '+esc(hh.p.author)+'</span></div>' + lines;
+    }).join('') + (hits.length>8?'<p style="font-size:13px;color:var(--xzq-muted,#8a8578)">还有 '+(hits.length-8)+' 首，在诗库里搜“'+esc(zi)+'”查看</p>':'') + '</div>';
     box.querySelectorAll('.sc-worklink').forEach(function(a){
       a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
     });
