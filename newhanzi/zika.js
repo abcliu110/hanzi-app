@@ -34,78 +34,6 @@
     return '<div class="kv"><div class="k">' + esc(k) + '</div><div class="v">' + v + '</div></div>';
   }
 
-  /* ---- 笔顺静态展示：笔画按顺序直接画出，带笔顺序号（数据为 y-up 坐标，翻转后显示） ---- */
-  function renderStrokes(svg, strokes) {
-    svg.innerHTML = '';
-    var g = document.createElementNS(NS, 'g');
-    g.setAttribute('transform', 'translate(0,900) scale(1,-1)');
-    strokes.forEach(function (d) {
-      var p = document.createElementNS(NS, 'path');
-      p.setAttribute('d', d);
-      p.setAttribute('fill', 'none');
-      p.setAttribute('stroke', '#e8762d');
-      p.setAttribute('stroke-width', '14');
-      p.setAttribute('stroke-linecap', 'round');
-      p.setAttribute('stroke-linejoin', 'round');
-      g.appendChild(p);
-    });
-    svg.appendChild(g);
-    // 笔顺序号：标在每笔起笔处（坐标同样翻转）
-    strokes.forEach(function (d, i) {
-      var m = d.match(/M\s*([\d.]+)[,\s]+([\d.]+)/);
-      if (!m) return;
-      var t = document.createElementNS(NS, 'text');
-      t.setAttribute('x', parseFloat(m[1]) + 20);
-      t.setAttribute('y', 900 - parseFloat(m[2]) - 16);
-      t.setAttribute('font-size', '30');
-      t.setAttribute('fill', '#b3541e');
-      t.textContent = (i + 1);
-      svg.appendChild(t);
-    });
-  }
-
-  /* ---- 描红 ---- */
-  function initTrace(canvas, strokes) {
-    var ctx = canvas.getContext('2d');
-    var S = 900;
-    canvas.width = S; canvas.height = S;
-    function drawTemplate() {
-      ctx.clearRect(0, 0, S, S);
-      ctx.save();
-      ctx.translate(0, S); ctx.scale(1, -1); // 笔画数据为 y-up 坐标，翻转后显示
-      ctx.strokeStyle = '#d8d2c8'; ctx.lineWidth = 16;
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      strokes.forEach(function (d) {
-        ctx.stroke(new Path2D(d));
-      });
-      ctx.restore();
-    }
-    drawTemplate();
-    var drawing = false, last = null;
-    function pos(e) {
-      var r = canvas.getBoundingClientRect();
-      var p = e.touches ? e.touches[0] : e;
-      return [(p.clientX - r.left) * S / r.width, (p.clientY - r.top) * S / r.height];
-    }
-    canvas.addEventListener('pointerdown', function (e) {
-      drawing = true; last = pos(e); e.preventDefault();
-    });
-    canvas.addEventListener('pointermove', function (e) {
-      if (!drawing) return;
-      var p = pos(e);
-      ctx.strokeStyle = '#e8762d'; ctx.lineWidth = 18;
-      ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
-      last = p; e.preventDefault();
-    });
-    window.addEventListener('pointerup', function () {
-      drawing = false;
-    });
-    return {
-      clear: function () { drawTemplate(); }
-    };
-  }
-
   /* ---- 主渲染 ---- */
   function render(r) {
     var dim = r.dim || {};
@@ -178,7 +106,7 @@
     }
     h += sec('字从哪来', '字源 · 六书', zy);
 
-    /* 3. 字长什么样（结构 + 形声拆解 + 笔顺 + 描红） */
+    /* 3. 字长什么样（结构 + 形声拆解） */
     var zx = '';
     if (dim['结构'] && dim['结构']['顶层部件']) {
       zx += kv('部件', dim['结构']['顶层部件'].map(function (c) {
@@ -191,21 +119,7 @@
         (pd.sound ? '<br>' + esc(pd.sound) : '') +
         (pd.note ? '<div class="ex">' + esc(pd.note) + '</div>' : ''));
     }
-    var bs = dim['笔顺'] || {};
-    if ((bs.strokes && bs.strokes.length) || bs['笔顺文字']) {
-      zx += '<div class="kv"><div class="k">笔顺</div><div class="v"><div class="strokebox">' +
-        '<div id="svgwrap"><svg viewBox="0 0 900 900"></svg></div>' +
-        '<div id="tracewrap"><canvas id="trace"></canvas></div>' +
-        '<div class="stroke-ctl">' +
-        '<button class="btn" id="clearBtn">🧽 描红清除</button>' +
-        '</div></div>';
-      if (bs['笔顺文字']) {
-        zx += '<div class="ex" style="margin-top:8px">' +
-          asArray(bs['笔顺文字']).map(esc).join('<br>') + '</div>';
-      }
-      zx += '</div></div>';
-    }
-    h += sec('字长什么样', '结构 · 笔顺 · 描红', zx);
+    h += sec('字长什么样', '结构', zx);
 
     /* 4. 别认错（形近字 + 易错提示） */
     var bx = '';
@@ -266,15 +180,6 @@
       if (dim['读音'] && dim['读音']['拼音']) t += '，' + dim['读音']['拼音'];
       speak(t);
     };
-    var strokes = (dim['笔顺'] && dim['笔顺'].strokes) || [];
-    if (strokes.length) {
-      var svg = document.querySelector('#svgwrap svg');
-      var trace = initTrace(document.getElementById('trace'), strokes);
-      document.getElementById('clearBtn').onclick = function () {
-        trace.clear();
-      };
-      renderStrokes(svg, strokes); // 静态展示：笔画按笔顺直接画出
-    }
   }
 
   /* ---- 入口：单字数据走 data/zika/<字>.js，经 <script> 动态加载（file:// 可用） ---- */
