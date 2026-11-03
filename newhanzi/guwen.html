@@ -10,10 +10,6 @@
 .gw-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);cursor:pointer;align-self:start}
 .gw-card h3{margin:0 0 6px;font-size:18px}
 .gw-card p{margin:0;color:var(--muted);font-size:14px}
-.gw-navgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-.gw-navgrid>*{align-self:start}
-@media(min-width:768px){.gw-navgrid{grid-template-columns:1fr 1fr 1fr}}
-@media(min-width:1200px){.gw-navgrid{grid-template-columns:1fr 1fr 1fr 1fr}}
 .gw-item{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
 .gw-item:active{background:var(--accent-soft)}
 .gw-ititle{font-size:18px;font-weight:bold}
@@ -35,7 +31,7 @@
 .gw-filterbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
 .gw-src{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
-a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,.gw-item:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,.gw-item:focus-visible,.yw-head:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body class="page-sub page-guwen">
@@ -56,16 +52,27 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
 <script src="data/guwen_knowledge.js"></script>
 <script>
 (function(){
+  'use strict';
   var D = window.NHZ_GUWEN || {texts: []};
-  var K = window.NHZ_GUWEN_KNOWLEDGE || {byId: {}};
+  /* 知识数据：语法模块式结构 {categories:[{id,name,icon,intro,items:[点]}]}。
+     点字段与语法模块一致：讲解、口诀、例子、分类、深讲、怎么认、辨析、例句解析、易错、动手练（练习）、小测。
+     题库 key 用“子模块:点名”（如 xuci:而），不用裸点名：裸名在子模块间会撞（安在实词与一词多义、
+     见/去/何/若/乃跨多个子模块），命名空间 key 才能保证题库挂到正确的点上。 */
+  var K = window.NHZ_GUWEN_KNOWLEDGE || {categories: []};
+  /* 题库：每子模块一个 bank 脚本，在本页主脚本之前加载，file:// 下也能用；合并式写入，不覆盖 */
+  var bankData = window.NHZ_GUWEN_BANK || {};
+  var bankState = {};
+  var bankQuizData = {};
+  var quizData = {};
+  var currentItems = {};
   var MODS = [
     {id:'pianmu', icon:'📜', t:'古文篇目', d:'12篇 · 论语选读、寓言故事、名家短篇'},
-    {id:'xuci', icon:'🔤', t:'虚词', d:'18个 · 用法、例句、辨析'},
-    {id:'shici', icon:'📝', t:'实词', d:'120个 · 含55个初中优先'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'18个点 · 用法、例句、辨析、题库'},
+    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
     {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式'},
-    {id:'tongjia', icon:'🔁', t:'通假', d:'16例 · 通假字读本字'},
-    {id:'guyin', icon:'⚖️', t:'古今异义', d:'16例 · 古今意思大不同'},
-    {id:'duoyi', icon:'🌿', t:'一词多义', d:'12字 · 一字多义看语境'},
+    {id:'tongjia', icon:'🔁', t:'通假', d:'16个点 · 通假字读本字'},
+    {id:'guyin', icon:'⚖️', t:'古今异义', d:'16个点 · 古今意思大不同'},
+    {id:'duoyi', icon:'🌿', t:'一词多义', d:'12个点 · 一字多义看语境'},
     {id:'huoyong', icon:'🔄', t:'词类活用', d:'按类型 · 换词性换意思'},
     {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
     {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
@@ -87,18 +94,30 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
   var mlistEl = document.getElementById('gwmlist');
   var mdetEl = document.getElementById('gwmdetail');
   var curMod = null, curFilter = '', curJr = false;
-  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function catById(id){
+    for(var i=0;i<K.categories.length;i++) if(K.categories[i].id===id) return K.categories[i];
+    return null;
+  }
+  function modMeta(id){
+    for(var i=0;i<MODS.length;i++) if(MODS[i].id===id) return MODS[i];
+    return {id:id, icon:'📖', t:id, d:''};
+  }
   function hideAll(){
     navEl.style.display='none'; listEl.style.display='none'; detEl.style.display='none';
     mlistEl.style.display='none'; mdetEl.style.display='none';
   }
+  /* ---------- 子模块列表（语法模块式 panel 网格） ---------- */
   function showNav(){
     hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<div class="gw-navgrid">' + MODS.map(function(m){
-      return '<div class="gw-card" data-mod="'+esc(m.id)+'"><h3>'+m.icon+' '+esc(m.t)+'</h3><p>'+esc(m.d)+'</p></div>';
+    var h = '<div class="yw-grid">' + MODS.map(function(m){
+      var n = m.id==='pianmu' ? D.texts.length : (catById(m.id) ? catById(m.id).items.length : 0);
+      var unit = m.id==='pianmu' ? '篇' : '点';
+      return '<button class="yw-head" data-mod="'+esc(m.id)+'"><span class="yw-ico">'+m.icon+'</span><span class="yw-name">'+esc(m.t)+'</span><span class="yw-sub">'+n+unit+' · '+esc(m.d)+'</span><span class="yw-arrow">▾</span></button>';
     }).join('') + '</div>';
     navEl.innerHTML = h;
   }
+  /* ---------- 篇目流（原有分类→列表→明细，原样不动） ---------- */
   function showSections(){
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
@@ -112,7 +131,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var items = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
     var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
-    h += items.map(function(t, i){
+    h += items.map(function(t){
       var idx = D.texts.indexOf(t);
       return '<div class="gw-item" data-idx="'+idx+'"><div class="gw-ititle">'+esc(t.title)+'</div><div class="gw-imeta">'+esc(t.author)+' · '+esc(t.source)+' · '+esc(t.cat)+'</div></div>';
     }).join('');
@@ -132,41 +151,198 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     detEl.innerHTML = h;
     detEl.dataset.back = t.cat;
   }
-  function modById(id){ return K.byId[id] || null; }
-  function entryTitle(e){
-    var h = esc(e.t);
-    if(e.jr) h += '<span class="gw-tag">初中优先</span>';
-    return h;
+  /* ---------- 题库（语法模块 bank 机制，key 为点 key） ---------- */
+  function bankFiltered(bid){
+    var st = bankState[bid];
+    var qs = bankData[st.key].questions;
+    if(!st.filter || st.filter==='全部') return qs;
+    return qs.filter(function(q){ return q['类']===st.filter; });
   }
-  function renderMItems(){
-    var mod = modById(curMod); if(!mod) return;
-    var box = document.getElementById('gwMItems'); if(!box) return;
-    var q = curFilter.trim();
-    var list = (mod.entries || []).filter(function(e){
-      if(curJr && !e.jr) return false;
-      if(!q) return true;
-      var hay = (e.t || '') + (e.sub || '') + (e.ps || []).join(' ');
-      return hay.indexOf(q) !== -1;
-    });
-    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的条目。</p>'; return; }
-    box.innerHTML = list.map(function(e){
-      var idx = (mod.entries || []).indexOf(e);
-      var meta = e.sub ? '<div class="gw-imeta">'+esc(e.sub)+'</div>' : '';
-      return '<div class="gw-item" data-midx="'+idx+'"><div class="gw-ititle">'+entryTitle(e)+'</div>'+meta+'</div>';
+  function bankHeadHtml(bid){
+    var st = bankState[bid];
+    var qs = bankFiltered(bid);
+    var end = Math.min(st.offset+10, qs.length);
+    var label = (st.filter && st.filter!=='全部') ? '（'+st.filter+'）' : '';
+    return '第 '+(st.offset+1)+'–'+end+' 道 / 共 '+qs.length+' 道'+label+' · 本轮答对 '+st.score+' / 已答 '+st.answered;
+  }
+  function bankBatchHtml(bid){
+    var st = bankState[bid];
+    var qs = bankFiltered(bid);
+    var batch = qs.slice(st.offset, st.offset+10);
+    return batch.map(function(q, qi){
+      var qid = 'bk'+bid+'_'+qi+'_'+Math.floor(Math.random()*100000);
+      bankQuizData[qid] = q;
+      return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+(st.offset+qi+1)+'. '+esc(q.q)+'</div>'+
+        '<div class="quiz-opts">'+q.options.map(function(op, oi){
+          return '<button data-bqid="'+qid+'" data-boi="'+oi+'">'+esc(op)+'</button>';
+        }).join('')+'</div><div class="quiz-fb"></div></div>';
     }).join('');
   }
-  function showMList(id){
-    curMod = id; curFilter = ''; curJr = false;
-    var mod = modById(id);
+  function renderBank(bid){
+    var box = document.getElementById(bid);
+    if(!box) return;
+    var st = bankState[bid];
+    box.querySelector('.bank-head').textContent = bankHeadHtml(bid);
+    box.querySelector('.bank-qs').innerHTML = bankBatchHtml(bid);
+    var btns = box.querySelectorAll('[data-bank-filter]');
+    for(var i=0;i<btns.length;i++){
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-bank-filter').split('|')[1]===st.filter);
+    }
+  }
+  /* ---------- 点渲染（语法模块渲染顺序） ---------- */
+  function itemHtml(it, idx, icon){
+    var body = '';
+    var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
+    var step = 0;
+    function stepHead(title){
+      step++;
+      return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span></div>';
+    }
+    if(it['类比']) body += stepHead('打个比方') + '<div class="yw-analogy">' + it['类比'] + '</div>';
+    if(it['图示']) body += stepHead('看图说话') + '<div class="yw-diagram">' + it['图示'] + '</div>';
+    /* 规则一句话 */
+    if(it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)){
+      body += stepHead('规则一句话');
+      if(it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
+      if(it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
+      if(it['例子'] && it['例子'].length){
+        body += '<div class="words">' + it['例子'].map(function(w){
+          return '<span>' + esc(w) + '</span>';
+        }).join('') + '</div>';
+      }
+    }
+    /* 分类：每类独立块 */
+    if(it['分类'] && it['分类'].length){
+      var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
+      body += stepHead('分类 · ' + it['分类'].length + '类');
+      body += it['分类'].map(function(c, ci){
+        return '<div class="yw-fenlei" style="--fl:' + flColors[ci % flColors.length] + '">' +
+          '<div class="yw-fl-head"><span class="yw-fl-name">' + esc(c['类']) + '</span>' +
+          '<span class="yw-fl-rep">' + esc(c['代表'] || '') + '</span></div>' +
+          '<p class="yw-exp">' + esc(c['说明'] || '') + '</p>' +
+          (c['例子'] ? c['例子'].map(function(e){
+            return '<p class="yw-exp">📝 ' + esc(e) + '</p>';
+          }).join('') : '') + '</div>';
+      }).join('');
+    }
+    if(it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
+    if(it['怎么认'] && it['怎么认'].length) body += stepHead('怎么认') +
+      it['怎么认'].map(function(s, si){
+        return '<p class="yw-exp">' + (si+1) + '. ' + esc(s) + '</p>';
+      }).join('');
+    if(it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
+    if(it['例句解析'] && it['例句解析'].length) body += stepHead('例句解析') +
+      it['例句解析'].map(function(e){
+        return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
+      }).join('');
+    if(it['易错']) body += '<div class="warn">⚠️ ' + esc(it['易错']) + '</div>';
+    /* 题库动手练：有点库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
+    var bk = it.key ? bankData[it.key] : null;
+    if(bk && bk.questions && bk.questions.length){
+      var bid = 'bank'+idx+'_'+Math.floor(Math.random()*100000);
+      bankState[bid] = {key: it.key, offset: 0, score: 0, answered: 0, filter: '全部'};
+      var bclasses = ['全部'];
+      bk.questions.forEach(function(q){
+        if(q['类'] && bclasses.indexOf(q['类']) < 0) bclasses.push(q['类']);
+      });
+      body += '<div class="yw-quiz yw-bank" id="' + bid + '">' +
+        '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>' +
+        '<div class="bank-filters">' + bclasses.map(function(c){
+          return '<button class="' + (c==='全部' ? 'on' : '') + '" data-bank-filter="' + bid + '|' + c + '">按类练：' + esc(c) + '</button>';
+        }).join('') + '</div>' +
+        '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
+        '<div class="bank-qs">' + bankBatchHtml(bid) + '</div>' +
+        '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button></div>';
+    }
+    /* 动手练（每点 3 道带解析的选择题，按类分组） */
+    if(it['练习'] && it['练习'].length && !bk){
+      var groups = [];
+      it['练习'].forEach(function(q){
+        var gname = q['类'] || '综合';
+        var g = null;
+        for(var gi=0; gi<groups.length; gi++) if(groups[gi].name===gname) g = groups[gi];
+        if(!g){ g = {name: gname, qs: []}; groups.push(g); }
+        g.qs.push(q);
+      });
+      var qi = 0;
+      body += '<div class="yw-quiz"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练</span></div>' + groups.map(function(g){
+        return '<div class="yw-lx-group"><div class="yw-lx-grouphead">按类练：' + esc(g.name) + '</div>' + g.qs.map(function(q){
+          var qid = 'lx'+idx+'_'+(qi++)+'_'+Math.floor(Math.random()*100000);
+          quizData[qid] = q;
+          return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+esc(q.q)+'</div>'+
+            '<div class="quiz-opts">'+q.options.map(function(op, oi){
+              return '<button data-qid="'+qid+'" data-oi="'+oi+'">'+esc(op)+'</button>';
+            }).join('')+'</div><div class="quiz-fb"></div></div>';
+        }).join('') + '</div>';
+      }).join('') + '</div>';
+    }
+    /* 小测（有则保留；古文点目前无小测） */
+    if(it['小测'] && it['小测'].length){
+      body += '<div class="yw-quiz">' + it['小测'].map(function(q, qi){
+        var qid = 'q'+idx+'_'+qi+'_'+Math.floor(Math.random()*100000);
+        quizData[qid] = q;
+        return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div>'+
+          '<div class="quiz-opts">'+q.options.map(function(op, oi){
+            return '<button data-qid="'+qid+'" data-oi="'+oi+'">'+esc(op)+'</button>';
+          }).join('')+'</div><div class="quiz-fb"></div></div>';
+      }).join('') + '</div>';
+    }
+    /* 古文原有内容：外链与备注，放在最后保留 */
+    if(it.links && it.links.length){
+      body += '<div class="gw-sec">链接</div>' + it.links.map(function(l){
+        return '<a class="gw-linkbtn" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t)+'</a><p class="gw-p">'+esc(l.note || '')+'</p>';
+      }).join('');
+    }
+    if(it.note) body += '<p class="gw-src">'+esc(it.note)+'</p>';
+    currentItems[idx] = {it: it, body: body, icon: icon};
+    var bank = bk;
+    return '<div class="yw-item">' +
+      '<button class="yw-head" data-idx="'+idx+'"><span class="yw-ico">'+icon+'</span><span class="yw-name">'+esc(it.name || '')+'</span>' +
+      (it['口诀'] ? '<span class="yw-kj">'+esc(it['口诀'])+'</span>' : '') +
+      (it['subtitle'] ? '<span class="yw-sub">'+esc(it['subtitle'])+'</span>' : '') +
+      '<span class="yw-badges">' +
+      (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
+      (bank ? '<span class="yw-badge">📝'+bank.total+'道</span>' :
+        (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
+      '</span>' +
+      '<span class="yw-arrow">▾</span></button>' +
+      '<div class="yw-body" data-idx="'+idx+'">' + body + '</div></div>';
+  }
+  /* ---------- 点列表（语法模块式 panel 网格 + 搜索） ---------- */
+  function renderMItems(){
+    var cat = catById(curMod); if(!cat) return;
+    var box = document.getElementById('gwMItems'); if(!box) return;
+    var meta = modMeta(curMod);
+    var q = curFilter.trim();
+    var list = (cat.items || []).filter(function(it){
+      if(curMod==='shici' && curJr && !it.jr) return false;
+      if(!q) return true;
+      return (it.name || '').indexOf(q) >= 0 ||
+        (it['讲解'] || '').indexOf(q) >= 0 ||
+        (it['深讲'] || '').indexOf(q) >= 0 ||
+        (it['辨析'] || '').indexOf(q) >= 0 ||
+        (it['口诀'] || '').indexOf(q) >= 0;
+    });
+    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的知识点，换个词试试。</p>'; return; }
+    box.innerHTML = '<div class="yw-grid">' + list.map(function(it){
+      var idx = (cat.items || []).indexOf(it);
+      return itemHtml(it, curMod+'_'+idx, meta.icon);
+    }).join('') + '</div>';
+  }
+  function showMList(id, keepFilter){
+    curMod = id;
+    if(!keepFilter){ curFilter = ''; curJr = false; }
+    var cat = catById(id);
+    var meta = modMeta(id);
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
-    var meta = MODS.filter(function(m){return m.id===id;})[0] || {t:id, d:''};
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
-    h += '<div class="gw-head"><h2>'+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
-    if(!mod){ h += '<p class="gw-p">本子模块内容正在补充。</p>'; mlistEl.innerHTML = h; return; }
-    if(mod.intro) h += '<p class="gw-p">'+esc(mod.intro)+'</p>';
+    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    if(!cat){ h += '<p class="gw-p">本子模块内容正在补充。</p>'; mlistEl.innerHTML = h; return; }
+    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点</span></div>';
+    if(cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
+    h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
     if(id==='shici'){
-      h += '<input class="gw-input" id="gwSearch" placeholder="搜索实词或义项…">';
-      h += '<button class="gw-filterbtn" id="gwJrBtn">只看初中优先</button>';
+      h += '<button class="gw-filterbtn'+(curJr ? ' on' : '')+'" id="gwJrBtn">只看初中优先</button>';
     }
     h += '<div id="gwMItems"></div>';
     mlistEl.innerHTML = h;
@@ -176,29 +352,38 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
     renderMItems();
   }
+  /* ---------- 点详情（移动节点，非复制） ---------- */
   function showMDetail(idx){
-    var mod = modById(curMod); if(!mod) return;
-    var e = (mod.entries || [])[idx]; if(!e) return;
+    var rec = currentItems[idx]; if(!rec) return;
+    var it = rec.it;
+    var headEl = mlistEl.querySelector('.yw-head[data-idx="'+idx+'"]');
+    var itemEl = headEl ? headEl.closest('.yw-item') : null;
+    var bodyEl = itemEl ? itemEl.querySelector('.yw-body') : null;
     hideAll(); mdetEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<button class="gw-backbtn" data-go="__mlist">← 回列表</button>';
-    h += '<div class="gw-head"><h2>'+entryTitle(e)+'</h2>' + (e.sub ? '<div class="gw-meta">'+esc(e.sub)+'</div>' : '') + '</div>';
-    (e.ps || []).forEach(function(p){ h += '<p class="gw-p">'+esc(p)+'</p>'; });
-    if(e.items && e.items.length){
-      h += '<div class="gw-words">'+e.items.map(function(w){
-        return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
-      }).join('')+'</div>';
+    mdetEl.innerHTML =
+      '<div style="display:flex;gap:10px;margin-bottom:16px">' +
+      '<button class="gw-backbtn" style="margin:0" id="gwMBack">← 回列表</button>' +
+      '<button class="gw-backbtn" style="margin:0" id="gwMHome">🏠 主页</button></div>' +
+      '<div class="yw-detail-head"><span class="yw-ico-lg">'+rec.icon+'</span>' +
+      '<div><h2>'+esc(it.name || '')+'</h2>' +
+      (it['口诀'] ? '<p class="yw-kj-lg">'+esc(it['口诀'])+'</p>' : '') + '</div></div>' +
+      '<div class="yw-detail-body" id="gwDetailBody"></div>';
+    if(bodyEl) document.getElementById('gwDetailBody').appendChild(bodyEl);
+    document.getElementById('gwMBack').addEventListener('click', hideMDetail);
+    document.getElementById('gwMHome').addEventListener('click', function(){
+      if(window.self !== window.top){ window.top.location.href = 'index.html'; }
+      else{ window.location.href = 'index.html'; }
+    });
+  }
+  function hideMDetail(){
+    var bodyEl = document.querySelector('#gwDetailBody .yw-body');
+    if(bodyEl){
+      var idx = bodyEl.getAttribute('data-idx');
+      var headEl = mlistEl.querySelector('.yw-head[data-idx="'+idx+'"]');
+      if(headEl) headEl.closest('.yw-item').appendChild(bodyEl);
     }
-    if(e.li && e.li.length){
-      h += '<div class="gw-sec">例句</div>' + e.li.map(function(s){ return '<p class="gw-eg">'+esc(s)+'</p>'; }).join('');
-    }
-    if(e.hun) h += '<div class="gw-sec">辨析</div><p class="gw-p">'+esc(e.hun)+'</p>';
-    if(e.links && e.links.length){
-      h += '<div class="gw-sec">链接</div>' + e.links.map(function(l){
-        return '<a class="gw-linkbtn" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t)+'</a><p class="gw-p">'+esc(l.note || '')+'</p>';
-      }).join('');
-    }
-    if(e.note) h += '<p class="gw-src">'+esc(e.note)+'</p>';
-    mdetEl.innerHTML = h;
+    mdetEl.style.display='none'; mdetEl.innerHTML = '';
+    mlistEl.style.display='block'; window.scrollTo(0,0);
   }
   document.addEventListener('click', function(e){
     var card = e.target.closest('[data-mod]');
@@ -213,16 +398,100 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
       if(g==='__nav') showNav();
       else if(g==='__sections') showSections();
       else if(g==='__back') showList(detEl.dataset.back || '全部');
-      else if(g==='__mlist') showMList(curMod);
       else showList(g);
       return;
     }
-    var mi = e.target.closest('[data-midx]');
-    if(mi){ showMDetail(parseInt(mi.getAttribute('data-midx'), 10)); return; }
-    var it = e.target.closest('.gw-item');
-    if(it && it.hasAttribute('data-idx')) showDetail(parseInt(it.getAttribute('data-idx'), 10));
+    var head = e.target.closest('.yw-head');
+    if(head && head.hasAttribute('data-idx') && mlistEl.style.display!=='none'){
+      showMDetail(head.getAttribute('data-idx'));
+      return;
+    }
+    var mi = e.target.closest('.gw-item');
+    if(mi && mi.hasAttribute('data-idx')){ showDetail(parseInt(mi.getAttribute('data-idx'), 10)); return; }
+    /* 题库按类过滤 */
+    var fb = e.target.closest('[data-bank-filter]');
+    if(fb){
+      var parts = fb.getAttribute('data-bank-filter').split('|');
+      var fbid = parts[0];
+      var fst = bankState[fbid];
+      if(!fst) return;
+      e.stopPropagation();
+      fst.filter = parts[1];
+      fst.offset = 0; fst.score = 0; fst.answered = 0;
+      renderBank(fbid);
+      return;
+    }
+    /* 题库换批 */
+    var nb = e.target.closest('[data-bank-next]');
+    if(nb){
+      var bid = nb.getAttribute('data-bank-next');
+      var st = bankState[bid];
+      if(!st) return;
+      e.stopPropagation();
+      var flen = bankFiltered(bid).length;
+      if(flen) st.offset = (st.offset+10) % flen;
+      st.score = 0; st.answered = 0;
+      renderBank(bid);
+      return;
+    }
+    /* 题库答题（防重复点击） */
+    var bb = e.target.closest('[data-bqid]');
+    if(bb){
+      var bqid = bb.getAttribute('data-bqid');
+      var boi = parseInt(bb.getAttribute('data-boi'), 10);
+      var bq = bankQuizData[bqid];
+      var bqbox = document.getElementById(bqid);
+      if(!bq || !bqbox) return;
+      e.stopPropagation();
+      if(bqbox.getAttribute('data-done')) return;
+      bqbox.setAttribute('data-done', '1');
+      var bankBox = bqbox.closest('.yw-bank');
+      var bid2 = bankBox ? bankBox.id : null;
+      var st2 = bid2 ? bankState[bid2] : null;
+      if(st2) st2.answered++;
+      var bfb = bqbox.querySelector('.quiz-fb');
+      var bbtns = bqbox.querySelectorAll('[data-boi]');
+      for(var b2=0; b2<bbtns.length; b2++) bbtns[b2].classList.remove('right', 'wrong');
+      if(boi===bq.answer){
+        bb.classList.add('right');
+        if(st2) st2.score++;
+        bfb.innerHTML = '✅ 答对了！' + (bq['解析'] ? esc(bq['解析']) : '');
+      }else{
+        bb.classList.add('wrong');
+        bbtns[bq.answer].classList.add('right');
+        bfb.innerHTML = '❌ 再想想。' + (bq['解析'] ? esc(bq['解析']) : '');
+      }
+      if(bankBox && st2) bankBox.querySelector('.bank-head').textContent = bankHeadHtml(bid2);
+      return;
+    }
+    /* 动手练 / 小测答题 */
+    var qb = e.target.closest('[data-qid]');
+    if(qb){
+      var qid = qb.getAttribute('data-qid');
+      var oi = parseInt(qb.getAttribute('data-oi'), 10);
+      var q = quizData[qid];
+      var qbox = document.getElementById(qid);
+      if(!q || !qbox) return;
+      e.stopPropagation();
+      var fb2 = qbox.querySelector('.quiz-fb');
+      var btns = qbox.querySelectorAll('[data-oi]');
+      for(var b=0; b<btns.length; b++) btns[b].classList.remove('right', 'wrong');
+      if(oi===q.answer){
+        qb.classList.add('right');
+        fb2.innerHTML = '✅ 答对了！' + (q['解析'] ? esc(q['解析']) : '');
+      }else{
+        qb.classList.add('wrong');
+        btns[q.answer].classList.add('right');
+        fb2.innerHTML = '❌ 再想想。' + (q['解析'] ? esc(q['解析']) : '');
+      }
+      return;
+    }
   });
-  showNav();
+  if(!K.categories || !K.categories.length){
+    navEl.innerHTML = '<p class="gw-p">知识库加载失败，请确认 data/guwen_knowledge.js 存在。</p>';
+  }else{
+    showNav();
+  }
 })();
 </script>
 </body>
