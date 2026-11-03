@@ -349,28 +349,30 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .page-home .btn-cta { background: var(--accent-deep); color: #fff; font-weight: 700; }
 
 .page-home .hero-card {
-  margin: 8px 16px 0; padding: 18px;
-  background: var(--accent-deep); color: #fff; border-radius: 22px;
+  margin: 8px 16px 0; padding: 14px 16px;
+  background: var(--accent-deep); color: #fff; border-radius: 18px;
   max-width: 1100px;
+  /* 高度只跟内容，禁止被父级拉伸 */
+  height: auto; align-self: start;
 }
 .page-home .hero-head {
   display: flex; justify-content: space-between; gap: 8px;
-  font-size: 13px; opacity: .88; margin-bottom: 12px;
+  font-size: 12px; opacity: .88; margin-bottom: 8px;
 }
 .page-home .hero-body {
-  display: flex; justify-content: space-between; gap: 16px; align-items: flex-end;
-  margin-bottom: 14px;
+  display: flex; justify-content: space-between; gap: 12px; align-items: flex-end;
+  margin-bottom: 10px;
 }
-.page-home .hero-num { display: block; font-size: 44px; font-weight: 800; line-height: 1; }
-.page-home .hero-cap { display: block; margin-top: 6px; font-size: 13px; opacity: .85; }
-.page-home .hero-stats { display: flex; flex-direction: column; gap: 8px; min-width: 110px; }
-.page-home .hero-stats div { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; opacity: .9; }
-.page-home .hero-stats b { font-size: 16px; font-weight: 800; }
-.page-home .hero-pbar { background: rgba(0,0,0,.28); margin-bottom: 14px; }
+.page-home .hero-num { display: block; font-size: 36px; font-weight: 800; line-height: 1; }
+.page-home .hero-cap { display: block; margin-top: 4px; font-size: 12px; opacity: .85; }
+.page-home .hero-stats { display: flex; flex-direction: column; gap: 6px; min-width: 100px; }
+.page-home .hero-stats div { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; opacity: .9; }
+.page-home .hero-stats b { font-size: 15px; font-weight: 800; }
+.page-home .hero-pbar { background: rgba(0,0,0,.28); margin-bottom: 10px; height: 6px; }
 .page-home .hero-pbar #pfill { background: var(--leaf); }
 .page-home .hero-cta {
-  width: 100%; border: 0; border-radius: 14px; padding: 12px;
-  background: var(--leaf); color: var(--accent-deep); font-size: 15px; font-weight: 800; cursor: pointer;
+  width: 100%; border: 0; border-radius: 12px; padding: 10px;
+  background: var(--leaf); color: var(--accent-deep); font-size: 14px; font-weight: 800; cursor: pointer;
 }
 
 .page-home .module-grid {
@@ -468,26 +470,38 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
   .page-home .controls { position: sticky; top: 0; padding-left: 0; padding-right: 0; }
   .page-home .listwrap { padding: 0 48px 48px 0; }
   .page-home .home-top-actions .btn-cta { display: inline-flex; }
-  /* 把英雄卡移进板式布局：HTML 顺序是 top/hero/modules/panel，用 contents 技巧 */
+  /* 左进度 / 右字库；行高随内容，英雄卡不跟列表等高拉伸 */
   .page-home .app-main {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-columns: 260px minmax(0, 1fr);
     grid-template-areas:
       "top top"
       "mods mods"
       "hero board";
     column-gap: 16px;
     row-gap: 12px;
+    align-items: start;
     padding: 0 24px 32px;
     max-width: 1100px;
     margin: 0 auto;
   }
   .page-home .home-top { grid-area: top; padding: 16px 0 0; max-width: none; }
-  .page-home .hero-card { grid-area: hero; margin: 0; position: sticky; top: 16px; }
+  .page-home .hero-card {
+    grid-area: hero;
+    margin: 0;
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    width: 100%;
+    box-sizing: border-box;
+    /* 顶栏已有「继续识字」，平板上不再重复占高 */
+  }
+  .page-home .hero-cta { display: none; }
+  .page-home .hero-num { font-size: 32px; }
   .page-home .module-grid { grid-area: mods; padding: 0; max-width: none; }
   .page-home .panel-shizi,
   .page-home .panel-frame,
-  .page-home .panel-logic { grid-area: board; max-width: none; }
+  .page-home .panel-logic { grid-area: board; max-width: none; min-width: 0; }
   .page-home .shizi-board { display: block; padding: 0; }
   .page-home .panel-frame iframe { height: calc(100vh - 120px); border-radius: 16px; border: 1px solid var(--line); }
 }
@@ -520,11 +534,14 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
   .page-home .module-grid { display: none; }
   .page-home .app-main {
     max-width: 1200px; margin: 0; padding: 20px 28px 40px;
-    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-columns: 280px minmax(0, 1fr);
     grid-template-areas:
       "top top"
       "hero board";
+    align-items: start;
   }
+  .page-home .hero-card { align-self: start; }
+  .page-home .hero-cta { display: none; }
   .page-home .listwrap {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px;
     padding-right: 56px;
