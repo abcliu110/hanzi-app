@@ -316,7 +316,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .quiz-opts button.right{border-color:var(--green);background:var(--accent-soft)}
 .quiz-opts button.wrong{border-color:var(--red);background:#f3e4e2}
 .quiz-fb{font-size:13px;margin-top:6px;color:var(--muted)}
-.bank-next{margin:8px 0;padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:700;font-size:15px}
+.bank-next{margin:8px 0;padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer}
 .yw-fenlei{margin:8px 0;padding:10px 12px;border-left:4px solid var(--fl,#4a7a59);background:var(--surface);border-radius:0 10px 10px 0}
 .yw-fl-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:4px}
 .yw-fl-name{font-weight:800;font-size:16px}
