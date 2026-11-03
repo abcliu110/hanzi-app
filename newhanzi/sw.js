@@ -4,11 +4,11 @@
    - 页面：先走网络，失败时用缓存
    - 其他同源静态文件（含单字数据脚本）：先用缓存，同时在后台更新
    改了预缓存清单或想强制更新时，把 VERSION 加 1。 */
-const VERSION = "nhz-v1";
+const VERSION = "nhz-v2";
 const CORE = [
-  "./", "index.html", "zika.html", "yuwen.html", "bushou.html", "grammar_lab.html", "proto-yuwen.html",
+  "./", "index.html", "zika.html", "yuwen.html", "bushou.html", "shici.html", "grammar_lab.html", "proto-yuwen.html",
   "zika.css", "index.js", "zika.js", "yuwen.js", "bushou.js",
-  "data/index.js", "yuwen/data.js", "bushou/data.js", "bushou/zi_map.js",
+  "data/index.js", "data/shici.js", "data/shiju.js", "yuwen/data.js", "bushou/data.js", "bushou/zi_map.js",
   "manifest.webmanifest"
 ];
 

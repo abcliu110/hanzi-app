@@ -319,6 +319,22 @@
     });
     h += sec('字的魔法', '字 → 词 → 句 → 文', mf);
 
+    /* 6. 诗句里的这个字（字→诗句链） */
+    var sjInner = '';
+    try {
+      var sjIdx = (window.NHZ_SHIJU && window.NHZ_SHIJU.idx) || {};
+      var sjMeta = (window.NHZ_SHIJU && window.NHZ_SHIJU.meta) || {};
+      var sjOrders = sjIdx[r.zi] || [];
+      if (sjOrders.length) {
+        sjInner = '<div class="yiyi">' + sjOrders.slice(0, 3).map(function (o) {
+          var m = sjMeta[String(o)] || {};
+          return '<a class="sc-worklink" href="shici.html#poem-' + o + '">《' + esc(m.t || ('第' + o + '首')) + '》</a>';
+        }).join(' · ') +
+        '<div style="margin-top:8px"><a class="sc-worklink" href="shici.html#zilian-' + encodeURIComponent(r.zi) + '">更多含「' + esc(r.zi) + '」的诗句 →</a></div></div>';
+      }
+    } catch (e) { sjInner = ''; }
+    h += sec('诗句里的「' + r.zi + '」', '字 → 诗句', sjInner);
+
     h += '<div class="src-note">数据来源：通用规范汉字表 · Unihan · 《说文解字》· hanzi-writer-data · CC-CEDICT</div>';
 
     app.innerHTML = h;
