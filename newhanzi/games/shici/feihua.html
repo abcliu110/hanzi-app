@@ -38,15 +38,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","M
 </head>
 <body>
 <div class="wrap">
-  <div class="proto-head">
-    <div class="proto-title">🌸 飞花令人机对战</div>
-    <div class="proto-src">玩法抄自：飞花小令（开源 github.com/kuriko1023/fhl）+ 飞花令AI对诗（CSDN 纯前端教程）</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../shici.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🌸 飞花令人机对战</h1></div>
+<div class="proto-src">玩法抄自：飞花小令（开源 github.com/kuriko1023/fhl）+ 飞花令AI对诗（CSDN 纯前端教程）</div>
     <div class="proto-badge">原型待核对 · 未进 App</div>
   </div>
 
   <div id="screen-pick" class="card">
     <h3 style="margin:0 0 6px">选一个字开局</h3>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 8px">你一句、AI 一句，轮流说含这个字的诗句，共 5 轮。"水"字含水/江/河/湖/海/雨/雪都算。</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px">你一句、AI 一句，轮流说含这个字的诗句，共 5 轮。"水"字含水/江/河/湖/海/雨/雪都算；"雪"字含雪/霜。</p>
     <div class="kw-grid" id="kwGrid"></div>
     <button class="btn" id="btnStart">开战！</button>
   </div>
@@ -69,31 +68,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","M
     <button class="btn" id="btnAgain">再来一局</button>
   </div>
 </div>
+<script src="data_feihua.js"></script>
 <script>
-var POEMS = [
- {t:"静夜思",a:"李白",lines:["床前明月光","疑是地上霜","举头望明月","低头思故乡"]},
- {t:"春晓",a:"孟浩然",lines:["春眠不觉晓","处处闻啼鸟","夜来风雨声","花落知多少"]},
- {t:"登鹳雀楼",a:"王之涣",lines:["白日依山尽","黄河入海流","欲穷千里目","更上一层楼"]},
- {t:"望庐山瀑布",a:"李白",lines:["日照香炉生紫烟","遥看瀑布挂前川","飞流直下三千尺","疑是银河落九天"]},
- {t:"早发白帝城",a:"李白",lines:["朝辞白帝彩云间","千里江陵一日还","两岸猿声啼不住","轻舟已过万重山"]},
- {t:"枫桥夜泊",a:"张继",lines:["月落乌啼霜满天","江枫渔火对愁眠","姑苏城外寒山寺","夜半钟声到客船"]},
- {t:"绝句",a:"杜甫",lines:["迟日江山丽","春风花草香","泥融飞燕子","沙暖睡鸳鸯"]},
- {t:"江雪",a:"柳宗元",lines:["千山鸟飞绝","万径人踪灭","孤舟蓑笠翁","独钓寒江雪"]},
- {t:"咏柳",a:"贺知章",lines:["碧玉妆成一树高","万条垂下绿丝绦","不知细叶谁裁出","二月春风似剪刀"]},
- {t:"出塞",a:"王昌龄",lines:["秦时明月汉时关","万里长征人未还","但使龙城飞将在","不教胡马度阴山"]},
- {t:"送元二使安西",a:"王维",lines:["渭城朝雨浥轻尘","客舍青青柳色新","劝君更尽一杯酒","西出阳关无故人"]},
- {t:"黄鹤楼送孟浩然之广陵",a:"李白",lines:["故人西辞黄鹤楼","烟花三月下扬州","孤帆远影碧空尽","唯见长江天际流"]},
- {t:"望天门山",a:"李白",lines:["天门中断楚江开","碧水东流至此回","两岸青山相对出","孤帆一片日边来"]},
- {t:"独坐敬亭山",a:"李白",lines:["众鸟高飞尽","孤云独去闲","相看两不厌","只有敬亭山"]},
- {t:"山行",a:"杜牧",lines:["远上寒山石径斜","白云生处有人家","停车坐爱枫林晚","霜叶红于二月花"]},
- {t:"泊秦淮",a:"杜牧",lines:["烟笼寒水月笼沙","夜泊秦淮近酒家","商女不知亡国恨","隔江犹唱后庭花"]},
- {t:"江南春",a:"杜牧",lines:["千里莺啼绿映红","水村山郭酒旗风","南朝四百八十寺","多少楼台烟雨中"]},
- {t:"晓出净慈寺送林子方",a:"杨万里",lines:["毕竟西湖六月中","风光不与四时同","接天莲叶无穷碧","映日荷花别样红"]},
- {t:"村居",a:"高鼎",lines:["草长莺飞二月天","拂堤杨柳醉春烟","儿童散学归来早","忙趁东风放纸鸢"]},
- {t:"雪梅",a:"卢梅坡",lines:["梅雪争春未肯降","骚人阁笔费评章","梅须逊雪三分白","雪却输梅一段香"]},
- {t:"逢雪宿芙蓉山主人",a:"刘长卿",lines:["日暮苍山远","天寒白屋贫","柴门闻犬吠","风雪夜归人"]}
-];
-var KW = {月:["月"],花:["花"],山:["山"],水:["水","江","河","湖","海","雨","雪","泉","瀑","溪","波","浪","潮"],风:["风"],雪:["雪"]};
+var KW = {月:["月"],花:["花"],山:["山"],水:["水","江","河","湖","海","雨","雪","泉","瀑","溪","波","浪","潮"],风:["风"],雪:["雪","霜"]};
 var TOTAL = 5;
 var kw = "月", round = 1, score = 0, usedAI = {}, userVerses = [];
 
