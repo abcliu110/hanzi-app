@@ -75,7 +75,40 @@
       srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
       save(SK, srs);
     }
+    /* ---- SRS模型§3：三态派生视图（只读，不新增存储） ----
+     * 未学：id ∉ nhz_srs
+     * 学习中：srs[id].iv < 5
+     * 已稳：srs[id].iv >= 5（IV.length - 1，30天档）
+     */
+    function stateOf(id) {
+      var srs = load(SK, {});
+      if (!srs[id]) return '未学';
+      return srs[id].iv >= IV.length - 1 ? '已稳' : '学习中';
+    }
+    /* ---- SRS模型§8：阶段1效率引擎只读查询接口 ----
+     * dueItems(now)：srs中 next <= now 的，按 (now - next) 降序（将忘/已忘优先）
+     */
+    function dueItems(now) {
+      var srs = load(SK, {}), t = now == null ? Date.now() : now, out = [];
+      for (var id in srs) {
+        if (srs[id] && srs[id].next <= t) {
+          out.push({ id: id, iv: srs[id].iv, next: srs[id].next });
+        }
+      }
+      out.sort(function (a, b) { return (t - b.next) - (t - a.next); });
+      return out;
+    }
+    /* wrongItems()：nhz_wrong中 iv=0 或不在srs的（错题回炉候选） */
+    function wrongItems() {
+      var wrong = load(WK, []), srs = load(SK, {}), out = [];
+      for (var i = 0; i < wrong.length; i++) {
+        var id = wrong[i].id;
+        if (!srs[id] || srs[id].iv === 0) out.push(wrong[i]);
+      }
+      return out;
+    }
     return { record: record, review: review, clearWrong: clearWrong, schedule: schedule, idOf: idOf,
+      stateOf: stateOf, dueItems: dueItems, wrongItems: wrongItems,
       loadWrong: function () { return load(WK, []); },
       loadSrs: function () { return load(SK, {}); } };
   })();
