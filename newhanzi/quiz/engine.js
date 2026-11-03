@@ -248,7 +248,7 @@ function renderQ() {
   $('qfb').hidden = true;
   $('btnNext').hidden = true;
 }
-function buildExp(m, q) {
+function buildExp(m, q, pickedIdx) {
   var x = '';
   if (m === 'spot') {
     x = '<div class="qz-fix">✅ 改正：' + esc(q.fix) + '</div>';
@@ -258,6 +258,22 @@ function buildExp(m, q) {
     x = q.tokens.map(function (t) { return esc(t.t) + ' → ' + esc(t.tag); }).join('<br>');
   } else if (m === 'match') {
     x = '全部配对完成！';
+  }
+  /* 第三刀：选项级反馈——答错时指出具体误解 */
+  if (pickedIdx != null && q['误解标注'] && q['误解标注'].length) {
+    var optLabel = String.fromCharCode(65 + pickedIdx); // A/B/C/D
+    for (var mi = 0; mi < q['误解标注'].length; mi++) {
+      var mz = q['误解标注'][mi];
+      if (mz['选项'] === optLabel) {
+        x += '<div class="qz-miscon"><b>💡 你可能误解了：</b>' + esc(mz['误解']) + '</div>';
+        if (mz['正反例'] && mz['正反例'].length) {
+          x += '<div class="qz-pair">' + mz['正反例'].map(function (pr) {
+            return '<p>' + esc(pr) + '</p>';
+          }).join('') + '</div>';
+        }
+        break;
+      }
+    }
   }
   if (q.exp) x += (x ? '<br>' : '') + esc(q.exp);
   return x;
@@ -423,7 +439,7 @@ function onTap(el) {
       if (k === ci) btns[k].classList.add('right');
     }
     if (!ok) el.classList.add('wrong');
-    finishQuestion(ok, buildExp(m, q));
+    finishQuestion(ok, buildExp(m, q, ok ? null : i));
     return;
   }
   if (S.locked) return;

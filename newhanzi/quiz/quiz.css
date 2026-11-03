@@ -117,3 +117,7 @@ body{background:var(--qz-bg);color:var(--qz-text);
 .quiz-entry{display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;
   background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;
   font-size:16px;font-weight:bold;text-decoration:none;}
+
+.qz-miscon{background:#fff8e1;border-left:4px solid #f5c518;padding:10px 12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:14px}
+.qz-pair{margin:8px 0;padding:8px 12px;background:#f8faf5;border-radius:8px;font-size:14px}
+.qz-pair p{margin:4px 0;font-family:Georgia,"Songti SC",serif}

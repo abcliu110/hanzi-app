@@ -248,6 +248,24 @@
       it['例句解析'].map(function (e) {
         return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
       }).join('');
+    /* 4f. 变式表（阶段2）：不变/可变/边界 */
+    if (it['变式表']) {
+      var vt = it['变式表'];
+      var vth = '<div class="yw-vtable"><table><tr><th>不变</th><td>' + esc(vt['不变'] || '') + '</td></tr>';
+      if (vt['可变']) {
+        var dims = Object.keys(vt['可变']).map(function (k) {
+          return '<b>' + esc(k) + '</b>：' + esc((vt['可变'][k] || []).join(' / '));
+        }).join('<br>');
+        vth += '<tr><th>可变</th><td>' + dims + '</td></tr>';
+      }
+      if (vt['边界']) vth += '<tr><th>边界</th><td>' + esc(vt['边界']) + '</td></tr>';
+      vth += '</table>';
+      if (vt['覆盖缺失'] && vt['覆盖缺失'].length) {
+        vth += '<p class="yw-exp" style="color:#b85a52">⚠️ 待补维度：' + esc(vt['覆盖缺失'].join('、')) + '</p>';
+      }
+      vth += '</div>';
+      body += stepHead('📐 变式表') + vth;
+    }
     /* 5. 易错诊所 */
     if (it['易错']) body += '<div class="warn">⚠️ ' + esc(it['易错']) + '</div>';
     /* 5b1. 题库动手练：有 200 道题库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
