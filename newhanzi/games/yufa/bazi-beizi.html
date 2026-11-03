@@ -59,7 +59,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 </head>
 <body>
 <div class="wrap">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔄 把被字句变形机</h1></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔄 把被字句变形机</h1></div>
 <div class="sec-title">① 先看变形：点按钮，词语块自己"搬家"</div>
   <div class="demo">
     <div class="formula" id="formula">把字句公式：谁 ＋ 把 ＋ 什么 ＋ 怎么样</div>
@@ -70,12 +70,13 @@ body{margin:0;background:var(--bg);color:var(--ink);
   </div>
   <div class="tip">💡 61me 口诀：圈动词 → 问"谁干的 / 谁挨着" → 重排。"把"像举手说"是我干的"，"被"像指着自己说"这事发生在我身上"（eChineseLearning #11）。</div>
 
-  <div class="sec-title">② 练 5 道（含 1 个陷阱题）</div>
+  <div class="sec-title">② 练 500 道（把→被 / 被→把 / 陷阱题混排，每轮随机顺序）</div>
   <div id="quiz"></div>
-  <div class="score" id="score">得分 0 / 50</div>
+  <div class="score" id="score">得分 0</div>
   <div class="done" id="done"></div>
 </div>
 
+<script src="data_bazi.js"></script>
 <script>
 function $(id){ return document.getElementById(id); }
 
@@ -124,38 +125,35 @@ $("btnSwap").onclick = function(){
 };
 renderBlocks();
 
-/* ---------- 5 道练习 ---------- */
-var QS = [
-  {stem:"我把作业写完了。", opts:["作业被我写完了。","我被作业写完了。","作业把我写完了。"], a:0,
-   why:"'作业'是被处置的对象，提到'被'前面；'我'是动作发出者，放在'被'后面。"},
-  {stem:"妈妈把房间打扫干净了。", opts:["妈妈被房间打扫干净了。","房间被妈妈打扫干净了。","房间把妈妈打扫干净了。"], a:1,
-   why:"'房间'挨了打扫→被字句主语；'妈妈'干的→'被'后面。"},
-  {stem:"他把玻璃打碎了。", opts:["玻璃把他打碎了。","他被玻璃打碎了。","玻璃被他打碎了。"], a:2,
-   why:"谁挨着？玻璃。谁干的？他。所以'玻璃被他打碎了'。"},
-  {stem:"老师把试卷发下来了。", opts:["试卷被老师发下来了。","老师被试卷发下来了。","试卷把老师发下来了。"], a:0,
-   why:"'试卷'是被发的东西→主语；'老师'发出动作→'被'后面。"},
-  {stem:"哥哥喜欢打篮球。（陷阱题）", opts:["打篮球被哥哥喜欢了。","喜欢被哥哥打篮球了。","这句不能改"], a:2,
-   why:"'喜欢'是心理动词，没有'处置'动作，不能硬改成被字句！61me #10 说：第五天就放这种题，看你会不会上当。"}
-];
+/* ---------- 500 道练习（题库见 data_bazi.js） ---------- */
 var qi = 0, qscore = 0;
+var QTOTAL = QS.length * 10;
+function shuffleQS(){
+  for(var i = QS.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = QS[i]; QS[i] = QS[j]; QS[j] = t;
+  }
+}
+shuffleQS();
 
 function renderQ(){
   var box = $("quiz"); box.innerHTML = "";
   $("done").className = "done";
   if(qi >= QS.length){
-    $("score").textContent = "得分 " + qscore + " / 50";
+    $("score").textContent = "得分 " + qscore + " / " + QTOTAL;
     var d = $("done");
     d.className = "done show";
-    d.innerHTML = "🏁 练完啦！得分 " + qscore + " / 50 分<br>" +
-      (qscore === 50 ? "🎉 满分！陷阱题都没骗到你！" : "陷阱题（第5题）最容易错，记住：没有处置动作的句不能改。") +
+    d.innerHTML = "🏁 练完啦！得分 " + qscore + " / " + QTOTAL + " 分<br>" +
+      (qscore === QTOTAL ? "🎉 满分！陷阱题都没骗到你！" : "陷阱题最容易错，记住：没有处置动作的句不能改。") +
       '<div class="btnrow"><button class="btn primary" id="btnAgain">再来一轮</button></div>';
-    $("btnAgain").onclick = function(){ qi = 0; qscore = 0; renderQ(); window.scrollTo(0, document.body.scrollHeight); };
+    $("btnAgain").onclick = function(){ qi = 0; qscore = 0; shuffleQS(); renderQ(); window.scrollTo(0, document.body.scrollHeight); };
     return;
   }
   var q = QS[qi];
+  var dirTxt = q.dir === "bei2ba" ? "把下面这句改成把字句" : "把下面这句改成被字句";
   var card = document.createElement("div");
   card.className = "qcard";
-  var h = '<div class="stem">第 ' + (qi+1) + ' 题：把下面这句改成被字句<br>「' + q.stem + '」</div><div class="opts">';
+  var h = '<div class="stem">第 ' + (qi+1) + ' 题：' + dirTxt + '<br>「' + q.stem + '」</div><div class="opts">';
   q.opts.forEach(function(o, i){
     h += '<button class="opt" type="button" data-i="' + i + '">' + o + "</button>";
   });
@@ -186,7 +184,7 @@ function answerQ(btn, q){
     fb.innerHTML = "❌ 再想想<div class='why'>📖 " + q.why + "</div>";
   }
   fb.className = "qfb show";
-  $("score").textContent = "得分 " + qscore + " / 50";
+  $("score").textContent = "得分 " + qscore + " / " + QTOTAL;
   var nb = document.createElement("div");
   nb.className = "btnrow";
   nb.innerHTML = '<button class="btn primary" type="button">下一题 →</button>';

@@ -56,14 +56,14 @@ body{margin:0;background:var(--bg);color:var(--ink);
 </head>
 <body>
 <div class="wrap">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔗 关联词连线</h1></div>
-<div class="sec-title">① 配对：左边点一个，右边点它的搭档（共 4 对）</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔗 关联词连线</h1></div>
+<div class="sec-title">① 配对：左边点一个，右边点它的搭档（每轮 6 对，有时反过来考你）</div>
   <div class="match">
     <div class="col" id="left"></div>
     <div class="vs">⇄</div>
     <div class="col" id="right"></div>
   </div>
-  <div class="pairbar" id="pairbar">已配对 0 / 4</div>
+  <div class="pairbar" id="pairbar"></div>
 
   <div id="phase2" style="display:none">
     <div class="sec-title">② 找错：下面 3 句里有 1 句关联词用错了，点出来</div>
@@ -74,6 +74,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
   <div class="alldone" id="alldone"></div>
 </div>
 
+<script src="data_guanlianci.js"></script>
 <script>
 function $(id){ return document.getElementById(id); }
 function shuffle(a){
@@ -83,23 +84,62 @@ function shuffle(a){
   return a;
 }
 
+/* 题库：data_guanlianci.js 提供 window.GUANLIANCI_PAIRS / window.GUANLIANCI_FINDS */
+var PAIRS_ALL = window.GUANLIANCI_PAIRS || [];
+var FINDS_ALL = window.GUANLIANCI_FINDS || [];
+var ROUND_N = 6;
+
+/* 洗牌取样器：取完自动重洗，保证 500 题轮流出现 */
+function makeDeck(arr){
+  var o = [];
+  for(var i=0;i<arr.length;i++) o.push(i);
+  return {a:arr, order:shuffle(o), pos:0};
+}
+function draw(deck, k){
+  var out = [];
+  for(var j=0;j<k;j++){
+    if(deck.pos >= deck.order.length){ deck.order = shuffle(deck.order); deck.pos = 0; }
+    out.push(deck.a[deck.order[deck.pos++]]);
+  }
+  return out;
+}
+var pairDeck = makeDeck(PAIRS_ALL);
+var wrongDeck = makeDeck(FINDS_ALL.filter(function(f){ return f.wrong; }));
+var okDeck = makeDeck(FINDS_ALL.filter(function(f){ return !f.wrong; }));
+
 /* ---------- 第一关：配对 ---------- */
-var PAIRS = [
-  {l:"因为", r:"所以", ex:"因为下雨，所以没去春游。"},
-  {l:"虽然", r:"但是", ex:"虽然下雨，但是我们还是去了。"},
-  {l:"如果", r:"就", ex:"如果明天天晴，我们就去春游。"},
-  {l:"一边", r:"一边", ex:"他一边走路，一边唱歌。"}
-];
+var PAIRS = [];
 var selL = null, doneCount = 0;
+
+function hintFor(ex, shown){
+  var parts = ex.split(/[，。；]/);
+  for(var i=0;i<parts.length;i++){
+    if(parts[i] && parts[i].indexOf(shown) >= 0) return parts[i] + "…";
+  }
+  return parts[0] + "…";
+}
+
+function newRound(){
+  PAIRS = draw(pairDeck, ROUND_N).map(function(p){
+    var sw = (p.l !== p.r) && Math.random() < 0.4; /* 40% 反向出题 */
+    return {l:p.l, r:p.r, ex:p.ex, dL: sw ? p.r : p.l, dR: sw ? p.l : p.r};
+  });
+  selL = null; doneCount = 0;
+  $("pairbar").textContent = "已配对 0 / " + PAIRS.length +
+    "（配对题库共 " + PAIRS_ALL.length + " 道）";
+  $("phase2").style.display = "none";
+  $("alldone").className = "alldone";
+  renderMatch();
+}
 
 function renderMatch(){
   var L = $("left"), R = $("right");
   L.innerHTML = ""; R.innerHTML = "";
-  var rights = shuffle(PAIRS.map(function(p,i){ return {t:p.r, i:i}; }));
+  var rights = shuffle(PAIRS.map(function(p,i){ return {t:p.dR, i:i}; }));
   PAIRS.forEach(function(p, i){
     var b = document.createElement("button");
     b.className = "pill"; b.type = "button";
-    b.innerHTML = p.l + "<small>" + p.ex.split("，")[0] + "…</small>";
+    b.innerHTML = p.dL + "<small>" + hintFor(p.ex, p.dL) + "</small>";
     b.setAttribute("data-i", i);
     b.onclick = function(){ tapL(b, i); };
     L.appendChild(b);
@@ -145,14 +185,10 @@ function tapR(el, i){
 }
 
 /* ---------- 第二关：找错（陷阱） ---------- */
-var FINDS = [
-  {s:"虽然下雨，<b>所以</b>我们没去春游。", wrong:true,
-   why:"'虽然'的搭档是'但是'，不是'所以'！'虽然下雨，但是我们还是去了'才对。"},
-  {s:"因为努力，<b>所以</b>他考了第一名。", wrong:false, why:""},
-  {s:"如果明天下雨，<b>就</b>在家看书。", wrong:false, why:""}
-];
+var FINDS = [];
 
 function renderFind(){
+  FINDS = shuffle(draw(wrongDeck, 1).concat(draw(okDeck, 2)));
   var box = $("findcard"); box.innerHTML = "";
   FINDS.forEach(function(f){
     var b = document.createElement("button");
@@ -176,7 +212,12 @@ function tapFind(btn, f){
     for(var i=0;i<rows.length;i++) rows[i].disabled = true;
     var done = $("alldone");
     done.className = "alldone show";
-    done.innerHTML = "🏁 两关全过！关联词小达人就是你。<br><span style='font-size:14px;color:var(--muted)'>记住：关联词要'门当户对'，'虽然'配'但是'，'因为'配'所以'。</span>";
+    done.innerHTML = "🏁 两关全过！关联词小达人就是你。<br><span style='font-size:14px;color:var(--muted)'>记住：关联词要'门当户对'，'虽然'配'但是'，'因为'配'所以'。</span><br><br>" +
+      "<button id='again' type='button' style='font-size:17px;padding:10px 26px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-soft);color:var(--accent-deep);font-weight:bold;cursor:pointer;'>🔄 再来一轮</button>";
+    $("again").onclick = function(){
+      newRound();
+      window.scrollTo({top:0, behavior:"smooth"});
+    };
   }else{
     btn.classList.add("bad");
     setTimeout(function(){ btn.classList.remove("bad"); }, 400);
@@ -185,7 +226,7 @@ function tapFind(btn, f){
   }
 }
 
-renderMatch();
+newRound();
 </script>
 </body>
 </html>

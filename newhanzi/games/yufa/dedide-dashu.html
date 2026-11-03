@@ -60,7 +60,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 </head>
 <body>
 <div class="wrap">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🎯 的地得打地鼠</h1></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🎯 的地得打地鼠</h1></div>
 <div class="hud">
     <div class="pill"><small>⏱ 时间</small><span id="time">60</span></div>
     <div class="pill"><small>⭐ 得分</small><span id="score">0</span></div>
@@ -84,27 +84,9 @@ body{margin:0;background:var(--bg);color:var(--ink);
   <div class="koujue">💡 新东方儿歌口诀（#17）："的地得，不一样，用法分别记心上：<b>的</b>后面跟名词，<b>地</b>后面跟动词，<b>得</b>后面跟形容补结果。"</div>
 </div>
 
+<script src="data_dede.js"></script>
 <script>
 function $(id){ return document.getElementById(id); }
-/* [句子模板, 空白处答案] —— __ 处填答案 */
-var DATA = [
-  ["他跑__很快", "得"],
-  ["美丽__花", "的"],
-  ["认真__写字", "地"],
-  ["唱歌唱__很好听", "得"],
-  ["飞快__奔跑", "地"],
-  ["可爱__小狗", "的"],
-  ["他说__很慢", "得"],
-  ["高兴__跳起来", "得"],
-  ["慢慢__走", "地"],
-  ["红红__苹果", "的"],
-  ["妈妈笑__很开心", "得"],
-  ["大声__朗读", "地"],
-  ["清清__河水", "的"],
-  ["拼命__追赶", "地"],
-  ["热__满头大汗", "得"],
-  ["蔚蓝__天空", "的"]
-];
 var HINTS = {"的":"的＋名词（什么样的东西）","地":"地＋动词（怎么做的）","得":"动词＋得＋怎么样（结果）"};
 
 var timeLeft = 60, score = 0, streak = 0, timer = null, playing = false, qi = 0, order = [];

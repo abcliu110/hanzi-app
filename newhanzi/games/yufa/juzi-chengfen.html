@@ -60,7 +60,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 </head>
 <body>
 <div class="wrap">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔍 句子成分标注</h1></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../yuwen.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🔍 句子成分标注</h1></div>
 <div class="scorebar">
     <div class="round-tag" id="roundTag">第 1 / 3 句</div>
     <div class="score" id="score">得分 0</div>
@@ -83,18 +83,8 @@ body{margin:0;background:var(--bg);color:var(--ink);
   </div>
 </div>
 
+<script src="data_juzi.js"></script>
 <script>
-var ROUNDS = [
-  {sent:["小鸟","唱","歌"], tags:["主语","谓语","宾语"],
-   answer:{"小鸟":"主语","唱":"谓语","歌":"宾语"},
-   exp:"小鸟（谁）→主语；唱（做什么）→谓语；歌（唱什么）→宾语。"},
-  {sent:["我","把","苹果","吃","了"], tags:["主语","把字","宾语","谓语","助词"],
-   answer:{"我":"主语","把":"把字","苹果":"宾语","吃":"谓语","了":"助词"},
-   exp:"把字句里'把＋宾语'提前：'把'是介词，只起标记作用，不算谓语；真正的谓语是'吃'。"},
-  {sent:["他","认真地","写","字"], tags:["主语","状语","谓语","宾语"],
-   answer:{"他":"主语","认真地":"状语","写":"谓语","字":"宾语"},
-   exp:"'认真地'修饰动词'写'，回答'怎么写的'→状语。记住：'地'字后面的常常是状语。"}
-];
 var ri = 0, selLabel = null, assign = {}, score = 0, locked = false;
 
 function $(id){ return document.getElementById(id); }
