@@ -34,125 +34,51 @@
     return '<div class="kv"><div class="k">' + esc(k) + '</div><div class="v">' + v + '</div></div>';
   }
 
-  /* ---- 笔顺动画 ---- */
-  function playStrokes(svg, strokes) {
+  /* ---- 笔顺静态展示：笔画按顺序直接画出，带笔顺序号（数据为 y-up 坐标，翻转后显示） ---- */
+  function renderStrokes(svg, strokes) {
     svg.innerHTML = '';
-    var i = 0;
-    function next() {
-      if (i >= strokes.length) return;
+    var g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', 'translate(0,900) scale(1,-1)');
+    strokes.forEach(function (d) {
       var p = document.createElementNS(NS, 'path');
-      p.setAttribute('d', strokes[i]);
+      p.setAttribute('d', d);
       p.setAttribute('fill', 'none');
       p.setAttribute('stroke', '#e8762d');
-      p.setAttribute('stroke-width', '12');
+      p.setAttribute('stroke-width', '14');
       p.setAttribute('stroke-linecap', 'round');
       p.setAttribute('stroke-linejoin', 'round');
-      p.setAttribute('pathLength', '1');
-      p.style.strokeDasharray = '1';
-      p.style.strokeDashoffset = '1';
-      svg.appendChild(p);
-      // 强制 reflow 后再启动过渡
-      void p.getBoundingClientRect();
-      p.style.transition = 'stroke-dashoffset .45s linear';
-      p.style.strokeDashoffset = '0';
-      i++;
-      setTimeout(next, 500);
-    }
-    next();
-  }
-
-  /* ---- 描红打分 ---- */
-  function resample(pts, n) {
-    // 把折线按弧长重采样为 n 个点
-    if (!pts.length) return [];
-    var total = 0, segs = [], i, k;
-    for (i = 1; i < pts.length; i++) {
-      var dx = pts[i][0] - pts[i - 1][0], dy = pts[i][1] - pts[i - 1][1];
-      var d = Math.sqrt(dx * dx + dy * dy);
-      segs.push(d); total += d;
-    }
-    if (total === 0) {
-      var r0 = [];
-      for (k = 0; k < n; k++) r0.push([pts[0][0], pts[0][1]]);
-      return r0;
-    }
-    var out = [[pts[0][0], pts[0][1]]], acc = 0, si = 0;
-    for (k = 1; k < n; k++) {
-      var target = k * total / (n - 1);
-      while (si < segs.length - 1 && acc + segs[si] < target) { acc += segs[si]; si++; }
-      var segLen = segs[si] || 1e-9;
-      var t = (target - acc) / segLen;
-      t = Math.max(0, Math.min(1, t));
-      out.push([
-        pts[si][0] + (pts[si + 1][0] - pts[si][0]) * t,
-        pts[si][1] + (pts[si + 1][1] - pts[si][1]) * t
-      ]);
-    }
-    return out;
-  }
-  function strokeCoverage(userPts, medianPts, tol) {
-    // 模板中线上有多少采样点落在用户笔画容差范围内
-    var u = resample(userPts, 32), m = resample(medianPts, 32), hit = 0, i, j;
-    for (i = 0; i < m.length; i++) {
-      var best = 1e9;
-      for (j = 0; j < u.length; j++) {
-        var dx = m[i][0] - u[j][0], dy = m[i][1] - u[j][1];
-        var d = Math.sqrt(dx * dx + dy * dy);
-        if (d < best) best = d;
-      }
-      if (best <= tol) hit++;
-    }
-    return hit / m.length;
-  }
-  function scoreTracing(userStrokes, medians) {
-    var TOL = 70; // 900 坐标系下的容差
-    var n = medians.length, k = userStrokes.length, j, i;
-    if (!k || !n) return null;
-    // 每笔用户笔画找覆盖率最高的模板笔画
-    var matched = [], covs = [];
-    for (j = 0; j < k; j++) {
-      var bestI = 0, bestC = -1;
-      for (i = 0; i < n; i++) {
-        var c = strokeCoverage(userStrokes[j], medians[i], TOL);
-        if (c > bestC) { bestC = c; bestI = i; }
-      }
-      matched.push(bestI); covs.push(bestC);
-    }
-    var shape = 0;
-    for (j = 0; j < covs.length; j++) shape += covs[j];
-    shape = shape / covs.length * (Math.min(k, n) / Math.max(k, n)); // 笔数不对要扣分
-    var order, good, msg;
-    if (k < 2) { order = 1; }
-    else {
-      good = 0;
-      for (j = 1; j < k; j++) if (matched[j] > matched[j - 1]) good++;
-      order = good / (k - 1);
-    }
-    var score = Math.round(100 * (0.65 * shape + 0.35 * order));
-    var tips = [], worst = 0;
-    for (j = 1; j < covs.length; j++) if (covs[j] < covs[worst]) worst = j;
-    if (covs[worst] < 0.6) tips.push('第' + (worst + 1) + '笔偏离太多，跟着虚线再写一遍');
-    if (order < 1) {
-      var bad = (k - 1) - Math.round(order * (k - 1));
-      tips.push('注意笔顺：有 ' + bad + ' 处顺序不对');
-    }
-    if (k !== n) tips.push('这个字共 ' + n + ' 笔，你写了 ' + k + ' 笔');
-    return { score: score, tips: tips };
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
+    // 笔顺序号：标在每笔起笔处（坐标同样翻转）
+    strokes.forEach(function (d, i) {
+      var m = d.match(/M\s*([\d.]+)[,\s]+([\d.]+)/);
+      if (!m) return;
+      var t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', parseFloat(m[1]) + 20);
+      t.setAttribute('y', 900 - parseFloat(m[2]) - 16);
+      t.setAttribute('font-size', '30');
+      t.setAttribute('fill', '#b3541e');
+      t.textContent = (i + 1);
+      svg.appendChild(t);
+    });
   }
 
   /* ---- 描红 ---- */
-  function initTrace(canvas, strokes, medians) {
+  function initTrace(canvas, strokes) {
     var ctx = canvas.getContext('2d');
     var S = 900;
     canvas.width = S; canvas.height = S;
-    var userStrokes = [], cur = null; // 记录用户每一笔的采样点
     function drawTemplate() {
       ctx.clearRect(0, 0, S, S);
+      ctx.save();
+      ctx.translate(0, S); ctx.scale(1, -1); // 笔画数据为 y-up 坐标，翻转后显示
       ctx.strokeStyle = '#d8d2c8'; ctx.lineWidth = 16;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       strokes.forEach(function (d) {
         ctx.stroke(new Path2D(d));
       });
+      ctx.restore();
     }
     drawTemplate();
     var drawing = false, last = null;
@@ -162,7 +88,7 @@
       return [(p.clientX - r.left) * S / r.width, (p.clientY - r.top) * S / r.height];
     }
     canvas.addEventListener('pointerdown', function (e) {
-      drawing = true; last = pos(e); cur = [last]; e.preventDefault();
+      drawing = true; last = pos(e); e.preventDefault();
     });
     canvas.addEventListener('pointermove', function (e) {
       if (!drawing) return;
@@ -170,16 +96,13 @@
       ctx.strokeStyle = '#e8762d'; ctx.lineWidth = 18;
       ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
-      last = p; if (cur) cur.push(p); e.preventDefault();
+      last = p; e.preventDefault();
     });
     window.addEventListener('pointerup', function () {
       drawing = false;
-      if (cur && cur.length > 1) userStrokes.push(cur);
-      cur = null;
     });
     return {
-      clear: function () { drawTemplate(); userStrokes.length = 0; },
-      getScore: function () { return scoreTracing(userStrokes, medians || []); }
+      clear: function () { drawTemplate(); }
     };
   }
 
@@ -274,10 +197,8 @@
         '<div id="svgwrap"><svg viewBox="0 0 900 900"></svg></div>' +
         '<div id="tracewrap"><canvas id="trace"></canvas></div>' +
         '<div class="stroke-ctl">' +
-        '<button class="btn primary" id="playBtn">▶ 笔顺动画</button>' +
         '<button class="btn" id="clearBtn">🧽 描红清除</button>' +
-        '<button class="btn primary" id="scoreBtn">📝 练字打分</button>' +
-        '</div><div id="scoreResult" class="score" style="display:none"></div></div>';
+        '</div></div>';
       if (bs['笔顺文字']) {
         zx += '<div class="ex" style="margin-top:8px">' +
           asArray(bs['笔顺文字']).map(esc).join('<br>') + '</div>';
@@ -346,33 +267,13 @@
       speak(t);
     };
     var strokes = (dim['笔顺'] && dim['笔顺'].strokes) || [];
-    var medians = (dim['笔顺'] && dim['笔顺'].medians) || [];
     if (strokes.length) {
       var svg = document.querySelector('#svgwrap svg');
-      var trace = initTrace(document.getElementById('trace'), strokes, medians);
-      var scoreEl = document.getElementById('scoreResult');
-      document.getElementById('playBtn').onclick = function () { playStrokes(svg, strokes); };
+      var trace = initTrace(document.getElementById('trace'), strokes);
       document.getElementById('clearBtn').onclick = function () {
-        trace.clear(); scoreEl.style.display = 'none';
+        trace.clear();
       };
-      document.getElementById('scoreBtn').onclick = function () {
-        var res = trace.getScore();
-        scoreEl.style.display = 'block';
-        if (!res) {
-          scoreEl.innerHTML = '<div class="score-tips">先在描红区写一写，再来打分 ✍️</div>';
-          return;
-        }
-        var full = Math.round(res.score / 20);
-        var stars = '';
-        for (var s = 0; s < 5; s++) stars += s < full ? '★' : '☆';
-        scoreEl.innerHTML =
-          '<div class="score-num">' + res.score + ' 分</div>' +
-          '<div class="score-stars">' + stars + '</div>' +
-          (res.tips.length
-            ? '<div class="score-tips">' + res.tips.map(esc).join('<br>') + '</div>'
-            : '<div class="score-tips">写得很棒，继续保持！🎉</div>');
-      };
-      playStrokes(svg, strokes); // 自动播放一次
+      renderStrokes(svg, strokes); // 静态展示：笔画按笔顺直接画出
     }
   }
 
