@@ -14,6 +14,7 @@
   var indexError = false;
   var view = localStorage.getItem(LS_VIEW) || 'py';
   var onlyNew = false;
+  var gradeFilter = ''; /* 按年级筛选：''=全部，'1上'...'6下'，'none'=未分级（不在 grade_map 中） */
   var learned = {}; // 字 -> 首次学习日期 YYYY-MM-DD（兼容老数组格式）
   function todayStr() {
     var d = new Date();
@@ -132,6 +133,11 @@
     var q = qEl.value.trim().toLowerCase();
     var items = IDX;
     if (onlyNew) items = items.filter(function (e) { return !learned[e.z]; });
+    if (gradeFilter) {
+      var gm = window.NHZ_GRADE_MAP || {};
+      if (gradeFilter === 'none') items = items.filter(function (e) { return !gm[e.z]; });
+      else items = items.filter(function (e) { return gm[e.z] === gradeFilter; });
+    }
 
     var html = '', rail = '';
     if (q) {
@@ -152,7 +158,14 @@
           '<span class="gcount">' + g.items.length + '字</span></div>' +
           g.items.map(rowHtml).join('');
       });
-      html = parts.join('') || '<div class="noresult">全部学完啦 🎉</div>';
+      /* 年级筛空时分两种：该册尚无核对录入（待补） vs 该册字已学完（只看未学） */
+      var gradeEmpty = '';
+      if (gradeFilter && gradeFilter !== 'none') {
+        var gm2 = window.NHZ_GRADE_MAP || {}, hasMapped = false;
+        for (var k in gm2) if (gm2[k] === gradeFilter) { hasMapped = true; break; }
+        if (!hasMapped) gradeEmpty = '<div class="noresult">该年级生字表待核对录入<br><small>目前按年级核对的字为 0 个；未分级的字请选“未分级”查看</small></div>';
+      }
+      html = parts.join('') || gradeEmpty || '<div class="noresult">全部学完啦 🎉</div>';
       rail = groups.map(function (g, i) {
         return '<button data-g="' + i + '">' + esc(railLabel(g, view)) + '</button>';
       }).join('');
@@ -194,6 +207,12 @@
     onlyNew = !onlyNew;
     this.classList.toggle('on', onlyNew);
     this.textContent = onlyNew ? '✓ 只看未学' : '只看未学';
+    render();
+  });
+
+  var gradeSel = document.getElementById('gradeSel');
+  if (gradeSel) gradeSel.addEventListener('change', function () {
+    gradeFilter = gradeSel.value;
     render();
   });
 

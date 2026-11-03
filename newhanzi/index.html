@@ -80,6 +80,22 @@
           </div>
           <div class="tabrow">
             <span class="browse-hint">点右侧索引可快速跳转</span>
+            <select id="gradeSel" title="按年级筛选" style="padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px">
+              <option value="">全部年级</option>
+              <option value="1上">一年级上册</option>
+              <option value="1下">一年级下册</option>
+              <option value="2上">二年级上册</option>
+              <option value="2下">二年级下册</option>
+              <option value="3上">三年级上册</option>
+              <option value="3下">三年级下册</option>
+              <option value="4上">四年级上册</option>
+              <option value="4下">四年级下册</option>
+              <option value="5上">五年级上册</option>
+              <option value="5下">五年级下册</option>
+              <option value="6上">六年级上册</option>
+              <option value="6下">六年级下册</option>
+              <option value="none">未分级</option>
+            </select>
             <button class="chip-toggle" type="button" id="onlyNew">只看未学</button>
           </div>
         </div>
@@ -120,6 +136,7 @@
 </div>
 
 <script src="data/index.js"></script>
+<script src="data/grade_map.js"></script>
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
 <script src="today-task.js"></script>
