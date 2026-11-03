@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>偏旁部首 · newhanzi</title>
 <link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 .bs-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
 .bs-char{font-size:44px;line-height:1;min-width:56px;text-align:center;font-weight:700}
@@ -58,5 +59,11 @@
 
 <script src="bushou/data.js"></script>
 <script src="bushou.js"></script>
+<script>
+/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
 </body>
 </html>
