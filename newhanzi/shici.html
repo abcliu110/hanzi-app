@@ -90,6 +90,7 @@ if (window.self !== window.top) {
 }
 </script>
 <script src="data/shici.js"></script>
+<script src="data/shangxi.js"></script>
 <script src="data/shiju.js"></script>
 <script>
 (function(){
@@ -135,7 +136,7 @@ function vHome(){
   });
 }
 
-var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活'],['jilu','🎥','纪录片·实拍']];
+var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活'],['jilu','🎥','纪录片·实拍'],['jichu','🌱','诗歌基础'],['yixiang','🌙','意象'],['cixi','🎶','词'],['shangxifa','🔬','赏析方法'],['gelv3','📐','格律深化'],['chuangzuo','✍️','创作入门']];
 
 function svgSisheng(){
   var rows = [
@@ -692,6 +693,15 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l){return '<p>'+esc(l)+'</p>';}).join('')+'</div>';
+  /* 名篇精讲赏析 */
+  try{
+    var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
+    if(sx){
+      h += '<div class="sc-card" style="margin-top:12px"><h3>📜 背景</h3><p>'+esc(sx.bg)+'</p></div>';
+      h += '<div class="sc-card" style="margin-top:8px"><h3>🔍 逐句讲</h3>'+sx.zj.map(function(z){return '<p>'+esc(z)+'</p>';}).join('')+'</div>';
+      h += '<div class="sc-card" style="margin-top:8px"><h3>✨ 艺术特色</h3><p>'+esc(sx.ys)+'</p></div>';
+    }
+  }catch(e){}
   h += '<button class="sc-backbtn" id="scback">← 返回</button>';
   detEl.innerHTML = h; showDetail();
   document.getElementById('scback').addEventListener('click', function(){ showList(); });
