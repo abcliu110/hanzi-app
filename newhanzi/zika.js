@@ -232,6 +232,8 @@
       var z = dim['字源'];
       if (z['讲解']) zy += '<div class="ex" style="margin-bottom:6px">' + esc(z['讲解']) + '</div>';
       if (z['说文解字']) zy += kv('说文解字', esc(z['说文解字']));
+      /* 字源可信度：迁移自老 app origin.conf；空值显示“未标注”，不编造 */
+      zy += kv('字源可信度', z['可信度'] ? esc(z['可信度']) + (z['可信度'] === '待查' ? '（说法尚待核对）' : '') : '未标注');
       if (z['反切']) zy += kv('反切', esc(z['反切']));
       if (z['小篆']) zy += kv('小篆', '<span style="font-size:28px">' + esc(z['小篆']) + '</span>');
       if (z['演变阶段']) {
