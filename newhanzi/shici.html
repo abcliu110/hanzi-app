@@ -186,50 +186,73 @@ function vFamous(){
   });
 }
 
+var imSel = 0;
 function imageryNetworkSVG(){
-  var cx=180, cy=168, r1=60, r2=126;
+  var cx=180, cy=180, r1=100;
   var n = D.imagery.length;
-  var poemOrder = [];
-  D.imagery.forEach(function(g){ g.poems.forEach(function(o){ if(poemOrder.indexOf(o)<0) poemOrder.push(o); }); });
-  var m = poemOrder.length;
-  var s = '<svg viewBox="0 0 360 336" style="width:100%;max-width:430px;display:block;margin:0 auto">';
-  D.imagery.forEach(function(g,i){
-    var a = (i/n)*Math.PI*2 - Math.PI/2;
-    var x1 = cx + r1*Math.cos(a), y1 = cy + r1*Math.sin(a);
-    g.poems.forEach(function(o){
-      var j = poemOrder.indexOf(o);
-      var b = (j/m)*Math.PI*2 - Math.PI/2;
-      s += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+(cx+r2*Math.cos(b)).toFixed(1)+'" y2="'+(cy+r2*Math.sin(b)).toFixed(1)+'" stroke="#f5c518" stroke-width="1" opacity="0.22"/>';
-    });
-  });
-  poemOrder.forEach(function(o,j){
-    var b = (j/m)*Math.PI*2 - Math.PI/2;
-    var p = poemByOrder(o);
-    s += '<g data-poem="'+o+'" style="cursor:pointer"><title>'+esc(p?p.title:'')+'</title><circle cx="'+(cx+r2*Math.cos(b)).toFixed(1)+'" cy="'+(cy+r2*Math.sin(b)).toFixed(1)+'" r="5" fill="#8a8578"/></g>';
-  });
+  var s = '<svg id="imnet" viewBox="0 0 360 360" style="width:100%;max-width:400px;display:block;margin:0 auto">';
+  s += '<g id="imlinks"></g><g id="impoems"></g>';
   D.imagery.forEach(function(g,i){
     var a = (i/n)*Math.PI*2 - Math.PI/2;
     var x = cx + r1*Math.cos(a), y = cy + r1*Math.sin(a);
-    s += '<g data-im="'+i+'" style="cursor:pointer"><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="15" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/><text x="'+x.toFixed(1)+'" y="'+(y+6).toFixed(1)+'" text-anchor="middle" font-size="16" fill="#f5c518">'+esc(g.zi)+'</text></g>';
+    s += '<g class="imnode" data-im="'+i+'" style="cursor:pointer">'
+       + '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="17" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/>'
+       + '<text x="'+x.toFixed(1)+'" y="'+(y+6).toFixed(1)+'" text-anchor="middle" font-size="17" fill="#f5c518">'+esc(g.zi)+'</text></g>';
   });
-  return s + '</svg>';
+  return s + '</svg><div id="imexplorer"></div>';
+}
+
+function imSelect(i){
+  imSel = i;
+  var g = D.imagery[i];
+  var cx=180, cy=180, r1=100, r2=152, n=D.imagery.length;
+  var a = (i/n)*Math.PI*2 - Math.PI/2;
+  var nx = cx + r1*Math.cos(a), ny = cy + r1*Math.sin(a);
+  var circles = document.querySelectorAll('#imnet .imnode circle');
+  for(var ci=0; ci<circles.length; ci++) circles[ci].setAttribute('fill', ci===i ? '#f5c518' : '#1c1c1e');
+  var texts = document.querySelectorAll('#imnet .imnode text');
+  for(var ti=0; ti<texts.length; ti++) texts[ti].setAttribute('fill', ti===i ? '#1c1c1e' : '#f5c518');
+  var ls='', ps='';
+  g.poems.forEach(function(o,pi){
+    var b = a + (pi-(g.poems.length-1)/2)*0.55;
+    var x2 = cx + r2*Math.cos(b), y2 = cy + r2*Math.sin(b);
+    var p = poemByOrder(o);
+    ls += '<line x1="'+nx.toFixed(1)+'" y1="'+ny.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="#f5c518" stroke-width="1.2" opacity="0.65"/>';
+    ps += '<g data-poem="'+o+'" style="cursor:pointer"><title>'+esc(p?p.title:'')+'</title><circle cx="'+x2.toFixed(1)+'" cy="'+y2.toFixed(1)+'" r="7" fill="#8a8578"/></g>';
+  });
+  document.getElementById('imlinks').innerHTML = ls;
+  var pg = document.getElementById('impoems');
+  pg.innerHTML = ps;
+  pg.querySelectorAll('[data-poem]').forEach(function(el){
+    el.addEventListener('click', function(e){ e.stopPropagation(); openPoem(parseInt(el.getAttribute('data-poem'),10)); });
+  });
+  var ex = document.getElementById('imexplorer');
+  ex.innerHTML = '<div class="sc-know"><h3>'+esc(g.zi)+' · '+esc(g.mean)+'</h3><p style="font-size:15px">“'+esc(g.line)+'”</p><p>'
+    + g.poems.map(function(o){ var p=poemByOrder(o); return p?'<span class="sc-worklink" data-o="'+o+'">《'+esc(p.title)+'》</span>':''; }).join(' · ')
+    + '</p><p><span class="sc-worklink" data-full="'+i+'">完整讲解 →</span></p></div>';
+  ex.querySelectorAll('[data-o]').forEach(function(el){
+    el.addEventListener('click', function(){ openPoem(parseInt(el.getAttribute('data-o'),10)); });
+  });
+  var fl = ex.querySelector('[data-full]');
+  fl.addEventListener('click', function(){ openImagery(parseInt(fl.getAttribute('data-full'),10)); });
 }
 
 function vImagery(){
   setTitle('意象地图');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += '<div class="sc-know"><p>每个意象都连着几首诗——点中间的字，看它背后的诗句；点外圈的点，直达那首诗。</p></div>';
+  h += '<div class="sc-know"><p>点一个字，看看它连着哪几首诗。</p></div>';
   h += imageryNetworkSVG();
   h += D.imagery.map(function(g,i){
     return '<div class="sc-poet" data-im="'+i+'"><div class="sc-pname">'+esc(g.zi)+' · '+esc(g.mean)+'</div><div class="sc-pbio">“'+esc(g.line)+'”</div></div>';
   }).join('');
   listEl.innerHTML = h; showList(); wireBack();
-  listEl.querySelectorAll('[data-im]').forEach(function(el){
+  listEl.querySelectorAll('#imnet .imnode').forEach(function(el){
+    el.addEventListener('click', function(){ imSelect(parseInt(el.getAttribute('data-im'),10)); });
+  });
+  listEl.querySelectorAll('.sc-poet[data-im]').forEach(function(el){
     el.addEventListener('click', function(){ openImagery(parseInt(el.getAttribute('data-im'),10)); });
   });
-  listEl.querySelectorAll('[data-poem]').forEach(function(el){
-    el.addEventListener('click', function(e){ e.stopPropagation(); openPoem(parseInt(el.getAttribute('data-poem'),10)); });
-  });
+  imSelect(0);
 }
 
 function openImagery(i){
@@ -238,10 +261,19 @@ function openImagery(i){
   var h = '<div class="sc-detail-head"><h2 style="font-size:44px">'+esc(g.zi)+'</h2><div class="sc-detail-meta">'+esc(g.mean)+'</div></div>';
   h += '<div class="sc-know"><p style="font-size:17px">“'+esc(g.line)+'”</p></div>';
   h += '<div class="sc-know"><p>'+esc(g.desc)+'</p></div>';
-  h += '<div class="sc-know"><h3>相关诗句</h3><p>' + g.poems.map(function(o){
-    var p = poemByOrder(o);
-    return p ? '<span class="sc-worklink" data-o="'+o+'">《'+esc(p.title)+'》</span>' : '';
-  }).join(' · ') + '</p></div>';
+  var hits = [];
+  D.poems.forEach(function(p){
+    p.lines.forEach(function(l){
+      if(l.indexOf(g.zi)>=0 && l!==g.line) hits.push({p:p, l:l});
+    });
+  });
+  hits = hits.slice(0,15);
+  if(hits.length){
+    h += '<div class="sc-know"><h3>含“'+esc(g.zi)+'”的诗句（'+hits.length+'条）</h3>' + hits.map(function(hh){
+      return '<div class="sc-hitline">'+esc(hh.l).split(esc(g.zi)).join('<mark>'+esc(g.zi)+'</mark>')+
+        ' <span style="font-size:12px;color:var(--xzq-muted,#8a8578)">——<span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span></span></div>';
+    }).join('') + '</div>';
+  }
   h += '<button class="sc-backbtn" id="scback">← 返回意象地图</button>';
   detEl.innerHTML = h; showDetail();
   document.getElementById('scback').addEventListener('click', function(){ vImagery(); });
