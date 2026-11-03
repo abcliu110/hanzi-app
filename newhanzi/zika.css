@@ -34,7 +34,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   border-radius: 8px; padding: 1px 8px; vertical-align: middle;
 }
 .topbar.nav { display: flex; align-items: center; gap: 12px; }
-.back { color: var(--accent); text-decoration: none; font-size: 16px; }
+/* 返回按钮：全站统一醒目样式（绿底白字大按钮，深色模式改深字保证对比） */
+.back { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border: 2px solid var(--accent-deep); border-radius: 12px; background: var(--accent); color: #fff; font-family: inherit; font-size: 17px; font-weight: 700; line-height: 1.4; text-decoration: none; cursor: pointer; }
+.back:hover { background: var(--accent-deep); }
+.back:active { transform: scale(.97); }
+.yw-back { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border: 2px solid var(--accent-deep); border-radius: 12px; background: var(--accent); color: #fff; font-family: inherit; font-size: 17px; font-weight: 700; line-height: 1.4; cursor: pointer; }
+.yw-back:hover { background: var(--accent-deep); }
+@media (prefers-color-scheme: dark) {
+  .back, .yw-back { color: #14211a; }
+}
 /* 字卡页：行长收窄到 680px，眼睛左右扫动幅度小，段落呼吸感更大 */
 .wrap { max-width: 680px; margin: 0 auto; padding: 20px 20px 80px; }
 
@@ -399,9 +407,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .module-view{min-height:100vh}
 .module-view .topbar{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);
   padding:14px 28px;display:flex;align-items:center;gap:16px}
-.module-view .back{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 16px;
-  font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink)}
-.module-view .back:hover{border-color:var(--accent);color:var(--accent-deep)}
+/* 模块页返回按钮沿用全局 .back 醒目样式，不再单设小字样式 */
 .module-view .topbar h1{font-size:20px;letter-spacing:2px}
 .module-view .topbar .sub{font-size:13px;color:var(--muted)}
 .module-view .app-main{min-width:0}
