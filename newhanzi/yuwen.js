@@ -210,13 +210,17 @@
           }).join('') + '</div><div class="quiz-fb"></div></div>';
       }).join('') + '</div>';
     }
+    var iconMap = {'名词':'🔺','动词':'🔴','形容词':'🔷','数词':'🔢','量词':'📏','代词':'➕','副词':'⚡','介词':'🔗','连词':'⛓️','助词':'📌','语气词':'💬','叹词':'❗','主语':'👤','谓语':'🏃','宾语':'🎯','定语':'🏷️','状语':'📍','补语':'➕','比喻':'🪞','拟人':'🧍','夸张':'🎈','排比':'📚','对偶':'⚖️','反复':'🔁','设问':'❓','反问':'‼️'};
+    var icon = iconMap[it.name] || '📖';
     return '<div class="yw-item">' +
-      '<button class="yw-head"><span class="yw-name">' + esc(it.name || '') + '</span>' +
-      (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
-      (bankData[it.name] ? '<span class="yw-badge">📝' + bankData[it.name].total + '道题库</span>' :
-        (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
-      (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
+      '<button class="yw-head"><span class="yw-ico">' + icon + '</span><span class="yw-name">' + esc(it.name || '') + '</span>' +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
+      (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
+      '<span class="yw-badges">' +
+      (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
+      (bankData[it.name] ? '<span class="yw-badge">📝' + bankData[it.name].total + '道</span>' :
+        (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
+      '</span>' +
       '<span class="yw-arrow">▾</span></button>' +
       '<div class="yw-body">' + body + '</div></div>';
   }
@@ -242,7 +246,9 @@
       }
       html += '<div class="ghead" id="ywc-' + ci + '">' + esc(c.name) +
         '<span class="gcount">' + items.length + '条</span></div>' +
-        items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii); }).join('');
+        '<div class="yw-grid">' +
+        items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii); }).join('') +
+        '</div>';
     });
     listEl.innerHTML = html ||
       '<div class="noresult">没找到相关知识点，换个词试试</div>';
