@@ -22,6 +22,12 @@
 | jie-ziyi-kuozhan-tu.html | 单字示例「节」 |
 | verify-pilot.html | 「待查」条目核对报告（试点） |
 
+## 前端 UI 规范
+
+- 仓库级：`docs/frontend-ui.md`（根目录 `--xzq-*` 与 `newhanzi/` 护眼套如何分工）
+- newhanzi 详细：`newhanzi/FRONTEND_UI.md`（鼠尾草绿 token、断点、逐页验收）
+- Agent 规则：`.cursor/rules/frontend-ui.mdc`
+
 ## 公共文件
 | 文件 | 作用 |
 |---|---|
