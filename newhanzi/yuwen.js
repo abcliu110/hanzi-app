@@ -13,6 +13,10 @@
   var animData = {};
   var quizData = {};
   var gameData = {};
+  /* 按点分文件的语法题库（如名词 200 道），yuwen.html 以 <script> 引入，file:// 下也能用 */
+  var bankData = window.NHZ_GRAMMAR_BANK || {};
+  var bankState = {};
+  var bankQuizData = {};
   /* 支持 ?tab=logic 直接进逻辑学 */
   try {
     var mm = location.search.match(/[?&]tab=([a-z]+)/);
@@ -32,6 +36,35 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function bankHeadHtml(bid) {
+    var st = bankState[bid];
+    var bank = bankData[st.name];
+    var end = Math.min(st.offset + 10, bank.total);
+    return '第 ' + (st.offset + 1) + '–' + end + ' 道 / 共 ' + bank.total +
+      ' 道 · 本轮答对 ' + st.score + ' / 已答 ' + st.answered;
+  }
+
+  function bankBatchHtml(bid, name) {
+    var st = bankState[bid];
+    var qs = bankData[name].questions;
+    var batch = qs.slice(st.offset, st.offset + 10);
+    return batch.map(function (q, qi) {
+      var qid = 'bk' + bid + '_' + qi + '_' + Math.floor(Math.random() * 100000);
+      bankQuizData[qid] = q;
+      return '<div class="quiz-q" id="' + qid + '"><div class="quiz-t">' + (st.offset + qi + 1) + '. ' + esc(q.q) + '</div>' +
+        '<div class="quiz-opts">' + q.options.map(function (op, oi) {
+          return '<button data-bqid="' + qid + '" data-boi="' + oi + '">' + esc(op) + '</button>';
+        }).join('') + '</div><div class="quiz-fb"></div></div>';
+    }).join('');
+  }
+
+  function renderBank(bid) {
+    var box = document.getElementById(bid);
+    if (!box) return;
+    box.querySelector('.bank-head').textContent = bankHeadHtml(bid);
+    box.querySelector('.bank-qs').innerHTML = bankBatchHtml(bid, bankState[bid].name);
   }
 
   function itemHtml(it, idx) {
@@ -82,8 +115,43 @@
       }).join('') + '</div>';
     }
     } /* 4. 规则一句话结束：此前缺了这个右括号，导致文件尾多出一个 }) */
+    /* 4b. 深讲一点（语法深讲样板：词类） */
+    if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
+    /* 4c. 怎么认 */
+    if (it['怎么认'] && it['怎么认'].length) body += stepHead('怎么认') +
+      it['怎么认'].map(function (s, si) {
+        return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
+      }).join('');
+    /* 4d. 辨析 */
+    if (it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
+    /* 4e. 例句解析 */
+    if (it['例句解析'] && it['例句解析'].length) body += stepHead('例句解析') +
+      it['例句解析'].map(function (e) {
+        return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
+      }).join('');
     /* 5. 易错诊所 */
     if (it['易错']) body += '<div class="warn">⚠️ ' + esc(it['易错']) + '</div>';
+    /* 5b1. 题库动手练：有 200 道题库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
+    if (bankData[it.name] && bankData[it.name].questions && bankData[it.name].questions.length) {
+      var bid = 'bank' + idx + '_' + Math.floor(Math.random() * 100000);
+      bankState[bid] = { name: it.name, offset: 0, score: 0, answered: 0 };
+      body += '<div class="yw-quiz yw-bank" id="' + bid + '">' +
+        '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>' +
+        '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
+        '<div class="bank-qs">' + bankBatchHtml(bid, it.name) + '</div>' +
+        '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button></div>';
+    }
+    /* 5b. 动手练（每点 3 道带解析的选择题，复用小测的答题逻辑） */
+    if (it['练习'] && it['练习'].length && !bankData[it.name]) {
+      body += '<div class="yw-quiz"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练</span></div>' + it['练习'].map(function (q, qi) {
+        var qid = 'lx' + idx + '_' + qi + '_' + Math.floor(Math.random() * 100000);
+        quizData[qid] = q;
+        return '<div class="quiz-q" id="' + qid + '"><div class="quiz-t">' + (qi + 1) + '. ' + esc(q.q) + '</div>' +
+          '<div class="quiz-opts">' + q.options.map(function (op, oi) {
+            return '<button data-qid="' + qid + '" data-oi="' + oi + '">' + esc(op) + '</button>';
+          }).join('') + '</div><div class="quiz-fb"></div></div>';
+      }).join('') + '</div>';
+    }
     /* 6. 小测 */
     if (it['小测'] && it['小测'].length) {
       body += '<div class="yw-quiz">' + it['小测'].map(function (q, qi) {
@@ -98,6 +166,8 @@
     return '<div class="yw-item">' +
       '<button class="yw-head"><span class="yw-name">' + esc(it.name || '') + '</span>' +
       (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
+      (bankData[it.name] ? '<span class="yw-badge">📝' + bankData[it.name].total + '道题库</span>' :
+        (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
       (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
       '<span class="yw-arrow">▾</span></button>' +
@@ -117,6 +187,8 @@
         items = items.filter(function (it) {
           return (it.name || '').indexOf(q) >= 0 ||
             (it['讲解'] || '').indexOf(q) >= 0 ||
+            (it['深讲'] || '').indexOf(q) >= 0 ||
+            (it['辨析'] || '').indexOf(q) >= 0 ||
             (it['口诀'] || '').indexOf(q) >= 0;
         });
         if (!items.length) return;
@@ -186,6 +258,51 @@
         }
         note.textContent = steps[i].note || '';
       }
+      return;
+    }
+
+    /* 题库换批：每轮 10 道，循环 200 道，本轮计分清零 */
+    var nb = e.target.closest('[data-bank-next]');
+    if (nb) {
+      var bid = nb.getAttribute('data-bank-next');
+      var st = bankState[bid];
+      if (!st) return;
+      e.stopPropagation();
+      st.offset = (st.offset + 10) % bankData[st.name].questions.length;
+      st.score = 0;
+      st.answered = 0;
+      renderBank(bid);
+      return;
+    }
+
+    /* 题库答题：与小测同逻辑，另计本轮得分并防重复点击 */
+    var bb = e.target.closest('[data-bqid]');
+    if (bb) {
+      var bqid = bb.getAttribute('data-bqid');
+      var boi = parseInt(bb.getAttribute('data-boi'), 10);
+      var bq = bankQuizData[bqid];
+      var bqbox = document.getElementById(bqid);
+      if (!bq || !bqbox) return;
+      e.stopPropagation();
+      if (bqbox.getAttribute('data-done')) return;
+      bqbox.setAttribute('data-done', '1');
+      var bankBox = bqbox.closest('.yw-bank');
+      var bid2 = bankBox ? bankBox.id : null;
+      var st2 = bid2 ? bankState[bid2] : null;
+      if (st2) st2.answered++;
+      var bfb = bqbox.querySelector('.quiz-fb');
+      var bbtns = bqbox.querySelectorAll('[data-boi]');
+      for (var b2 = 0; b2 < bbtns.length; b2++) bbtns[b2].classList.remove('right', 'wrong');
+      if (boi === bq.answer) {
+        bb.classList.add('right');
+        if (st2) st2.score++;
+        bfb.innerHTML = '✅ 答对了！' + (bq['解析'] ? esc(bq['解析']) : '');
+      } else {
+        bb.classList.add('wrong');
+        bbtns[bq.answer].classList.add('right');
+        bfb.innerHTML = '❌ 再想想。' + (bq['解析'] ? esc(bq['解析']) : '');
+      }
+      if (bankBox && st2) bankBox.querySelector('.bank-head').textContent = bankHeadHtml(bid2);
       return;
     }
 

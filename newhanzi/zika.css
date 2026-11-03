@@ -287,6 +287,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .quiz-opts button.right{border-color:var(--green);background:var(--accent-soft)}
 .quiz-opts button.wrong{border-color:var(--red);background:#f3e4e2}
 .quiz-fb{font-size:13px;margin-top:6px;color:var(--muted)}
+.bank-next{margin:8px 0;padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:700;font-size:15px}
 .yw-badge{font-size:11px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;margin-left:8px;flex-shrink:0}
 .yw-sub{font-size:12px;color:var(--muted);margin-left:8px;flex-shrink:0}
 
