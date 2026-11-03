@@ -458,10 +458,12 @@ function vKnow(){
       var svg = knowSVG(k.g);
       if(svg) h += '<div class="sc-svg">'+svg+'</div>';
       var dHtml = escD(k.d);
-      /* 解释与例句分开样式 */
-      var parts = dHtml.split(/<b>📜 例句<\/b>/);
+      /* 解释与例句分开样式：匹配 <b>📜 例句...</b> */
+      var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
       if (parts.length > 1) {
-        h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>📜 例句</b>'+parts[1]+'</div>';
+        var titleMatch = dHtml.match(/<b>(📜 例句.*?)<\/b>/);
+        var title = titleMatch ? titleMatch[1] : '📜 例句';
+        h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+title+'</b>'+parts[1]+'</div>';
       } else {
         h += '<p>'+dHtml+'</p>';
       }
