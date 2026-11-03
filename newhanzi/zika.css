@@ -529,22 +529,12 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
   }
   .page-home .side-brand strong { display: block; font-size: 20px; }
   .page-home .side-brand span { color: var(--muted); font-size: 12px; }
-  .page-home .side-tabs { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .page-home .side-tabs { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
   .page-home .side-tabs .mtab {
     flex: none; width: 100%; text-align: left; padding: 12px 14px;
-    border-radius: 14px; background: var(--surface); border: 1px solid var(--line);
-    box-shadow: 0 1px 3px rgba(44,51,40,.06); cursor: pointer;
-    display: flex; align-items: center; gap: 12px;
-    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    border-radius: 12px; background: transparent; border: 0; box-shadow: none;
   }
-  .page-home .side-tabs .mtab:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(44,51,40,.10); border-color: var(--accent); }
-  .page-home .side-tabs .mtab.active { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 2px 6px rgba(74,122,89,.15); }
-  .page-home .side-tabs .mtab.active .mtab-tx b { color: var(--accent-deep); }
-  .page-home .mtab-ico { font-size: 22px; flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--card); border-radius: 10px; border: 1px solid var(--line); }
-  .page-home .mtab.active .mtab-ico { background: #fff; border-color: var(--accent); }
-  .page-home .mtab-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .page-home .mtab-tx b { font-size: 15px; color: var(--ink); font-weight: 700; }
-  .page-home .mtab-tx i { font-style: normal; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .page-home .side-tabs .mtab.active { background: var(--accent-soft); color: var(--accent-deep); }
   .page-home .side-cta {
     display: block; margin-top: auto; width: 100%;
     border: 0; border-radius: 12px; padding: 12px;
