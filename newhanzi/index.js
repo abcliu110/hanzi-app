@@ -119,7 +119,7 @@
     // 索引还没加载好：显示加载中/失败，不许显示"全部学完啦"
     if (!indexLoaded) {
       listEl.innerHTML = indexError
-        ? '<div class="noresult">字库索引加载失败。<br>请确认 data/index.js 文件存在。</div>'
+        ? '<div class="noresult">字库索引加载失败<br><small>请确认 data/index.js 文件存在</small></div>'
         : '<div class="noresult">字库加载中…</div>';
       railEl.innerHTML = '';
       railEl.style.display = 'none';
@@ -138,7 +138,7 @@
       html = '<div class="ghead">搜索到 ' + hits.length + ' 个字' +
         (hits.length >= 300 ? '（只显示前 300）' : '') + '</div>' +
         hits.map(rowHtml).join('') ||
-        '<div class="noresult">没找到，换个字或拼音试试</div>';
+        '<div class="noresult">没有找到相关汉字<br><small>换个字或拼音试试</small></div>';
       railEl.innerHTML = '';
       railEl.style.display = 'none';
     } else {

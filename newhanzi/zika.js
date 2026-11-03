@@ -147,7 +147,7 @@
         ? '<a class="bs-mean" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">🧩 偏旁部首「' +
           esc(bsEntry.bushou) + '」的含义与例字 ›</a>'
         : '') +
-      '<button class="speak" id="speakBtn">🔊 读一读</button></div>';
+      '<button class="speak" id="speakBtn">读一读</button></div>';
 
     /* 2. 字从哪来（字源 + 六书） */
     var zy = '';
