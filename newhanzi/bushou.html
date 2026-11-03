@@ -35,6 +35,24 @@
 .bs-fm{font-size:10px;color:#2f7d32;line-height:1.3;max-width:72px;text-align:center}
 .bs-filter{display:flex;gap:8px;padding:0 16px 8px}
 .bs-filter .chip{font-size:13px}
+.bs-know{margin:12px 16px 0;background:#fffbe8;border:1px solid #f0dfa8;border-radius:12px;padding:12px 14px;font-size:14px;color:#5a4a22;line-height:1.8}
+.bs-know-title{font-weight:700;font-size:15px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.bs-know-toggle{font-size:12px;color:#b8860b;font-weight:400}
+.bs-know p{margin:6px 0}
+.bs-know-ex{background:#fff;border:1px dashed #e3cfa0;border-radius:8px;padding:8px 10px}
+.bs-know-motto{color:#b8860b;font-weight:600}
+.bs-know.closed .bs-know-body{display:none}
+.pp-sec{padding:8px 16px 28px}
+.pp-sec h3{font-size:16px;margin:8px 0 10px}
+.pp-sec h3 small{font-size:12px;color:#999;font-weight:400}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pp-card{background:#fff;border:1px solid #e5e5e5;border-radius:10px;padding:10px 12px;text-decoration:none;color:#222;display:block}
+.pp-card:active{background:#f0f0f0}
+.pp-top{display:flex;align-items:baseline;gap:8px}
+.pp-p{font-size:26px;font-weight:700}
+.pp-name{font-size:12px;color:#2b7cd3}
+.pp-m{font-size:13px;color:#666;margin:4px 0}
+.pp-ex{font-size:12px;color:#999}
 </style>
 </head>
 <body>
@@ -42,6 +60,17 @@
   <a href="index.html" class="back">← 返回</a>
   <span id="navtitle">偏旁部首</span>
 </header>
+
+<section class="bs-know" id="bsknow">
+  <div class="bs-know-title"><span>💡 偏旁 vs 部首，一分钟弄懂</span><span class="bs-know-toggle">收起 ▾</span></div>
+  <div class="bs-know-body">
+    <p><b>部首</b>是查字典用的"部门"：比如"水部"，专门收留带水的字，是给汉字上户口、归类的。</p>
+    <p><b>偏旁</b>是汉字的"零件"：比如"氵"（三点水），是拼字的积木块。</p>
+    <p><b>关系</b>：同一个"水"，查字典时叫"水部"；跑到"江"字左边，就变成偏旁"氵"。</p>
+    <p class="bs-know-ex">手 → 扌（提手旁）　心 → 忄（竖心旁）　人 → 亻（单人旁）　火 → 灬（四点底）　衣 → 衤（衣字旁）　言 → 讠（言字旁）</p>
+    <p class="bs-know-motto">口诀：部首是户口本，偏旁是积木块。</p>
+  </div>
+</section>
 
 <div class="controls" id="bscontrols">
   <div class="searchbox">
@@ -57,8 +86,38 @@
   <div id="bslist"></div>
 </main>
 
+<section class="pp-sec" id="ppsec">
+  <h3>📋 常用表义偏旁表 <small><span id="ppcount"></span>个 · 点偏旁直达对应部首</small></h3>
+  <div class="pp-grid" id="ppgrid"></div>
+</section>
+
 <script src="bushou/data.js"></script>
+<script src="bushou/pianpang.js"></script>
 <script src="bushou.js"></script>
+<script>
+/* 常用偏旁表渲染 + 常识区折叠 */
+(function () {
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  var grid = document.getElementById('ppgrid');
+  var list = window.NHZ_PIANPANG || [];
+  grid.innerHTML = list.map(function (it) {
+    return '<a class="pp-card" href="bushou.html?b=' + encodeURIComponent(it.to) + '">' +
+      '<div class="pp-top"><span class="pp-p">' + esc(it.p) + '</span>' +
+      '<span class="pp-name">' + esc(it.name) + '</span></div>' +
+      '<div class="pp-m">' + esc(it.meaning) + '</div>' +
+      '<div class="pp-ex">' + it.ex.map(function (e) { return esc(e[0]); }).join(' · ') + '</div></a>';
+  }).join('');
+  document.getElementById('ppcount').textContent = list.length;
+  var know = document.getElementById('bsknow');
+  know.querySelector('.bs-know-title').addEventListener('click', function () {
+    know.classList.toggle('closed');
+    know.querySelector('.bs-know-toggle').textContent = know.classList.contains('closed') ? '展开 ▸' : '收起 ▾';
+  });
+})();
+</script>
 <script>
 /* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
 if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {

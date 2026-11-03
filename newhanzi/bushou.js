@@ -34,6 +34,9 @@
         (r.shuowen_url ? ' <a href="' + esc(r.shuowen_url) + '" target="_blank" rel="noopener">汉典原文 ↗</a>' : '') +
         '</div></div>';
     }
+    if (r.evo) {
+      html += '<div class="bs-sec"><h4>字形演变</h4><div class="bs-sem">🦴 ' + esc(r.evo) + '</div></div>';
+    }
     if (r.semantic) html += '<div class="bs-sec"><h4>语义场</h4><div class="bs-sem">' + esc(r.semantic) + '</div></div>';
     if (r.examples && r.examples.length) {
       html += '<div class="bs-sec"><h4>代表例字</h4><div class="bs-ex">' +
