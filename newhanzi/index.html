@@ -28,6 +28,7 @@
   <button class="mtab" data-m="logic">🧠 逻辑</button>
   <button class="mtab" data-m="lab">🧪 实验</button>
   <button class="mtab" data-m="bushou">🧩 部首</button>
+  <button class="mtab" data-m="shici">📜 古诗词</button>
 </div>
 
 <div id="panel-shizi">
@@ -69,6 +70,10 @@
   <iframe src="bushou.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
 </div>
 
+<div id="panel-shici" style="display:none">
+  <iframe src="shici.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
+</div>
+
 <script src="data/index.js"></script>
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
@@ -80,7 +85,8 @@
                 yuwen: document.getElementById('panel-yuwen'),
                 logic: document.getElementById('panel-logic'),
                 lab: document.getElementById('panel-lab'),
-                bushou: document.getElementById('panel-bushou')};
+                bushou: document.getElementById('panel-bushou'),
+                shici: document.getElementById('panel-shici')};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   /* 逻辑课渲染（复用六步格式） */

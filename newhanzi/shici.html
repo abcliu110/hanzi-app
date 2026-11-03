@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古诗词 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.sc-poem{padding:14px 16px;border-bottom:1px solid var(--xzq-border,#e5e0d5);cursor:pointer}
+.sc-poem:active{background:var(--xzq-surface-muted,#f7f3ea)}
+.sc-ptitle{font-size:18px;font-weight:700}
+.sc-pmeta{font-size:13px;color:var(--xzq-muted,#8a8578);margin-top:4px}
+.sc-badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:10px;background:var(--xzq-surface-muted,#f7f3ea);border:1px solid var(--xzq-border,#e5e0d5);margin-right:6px}
+.sc-lines{font-size:20px;line-height:2;text-align:center;padding:18px 8px}
+.sc-lines p{margin:0}
+.sc-poet{padding:14px 16px;border-bottom:1px solid var(--xzq-border,#e5e0d5);cursor:pointer}
+.sc-poet .sc-pname{font-size:17px;font-weight:700}
+.sc-poet .sc-pbio{font-size:14px;color:var(--xzq-muted,#8a8578);margin-top:6px;line-height:1.7}
+.sc-know{margin:12px 16px;padding:14px;border:1px solid var(--xzq-border,#e5e0d5);border-radius:12px;background:var(--xzq-surface,#fff)}
+.sc-know h3{margin:0 0 8px;font-size:16px}
+.sc-know p{margin:0;font-size:14px;line-height:1.8;color:var(--xzq-text,#333)}
+.sc-detail-head{text-align:center;padding:20px 16px 6px}
+.sc-detail-head h2{margin:0;font-size:26px}
+.sc-detail-meta{margin-top:8px;font-size:14px;color:var(--xzq-muted,#8a8578)}
+.sc-backbtn{display:block;margin:6px 16px 0;padding:10px;border-radius:10px;border:1px solid var(--xzq-border,#e5e0d5);background:var(--xzq-surface,#fff);font-size:15px;cursor:pointer;width:calc(100% - 32px)}
+.sc-src{font-size:12px;color:var(--xzq-muted,#8a8578);text-align:center;padding:16px}
+select.sc-sel{font-size:14px;padding:8px 10px;border-radius:10px;border:1px solid var(--xzq-border,#e5e0d5);background:var(--xzq-surface,#fff);max-width:100%}
+</style>
+</head>
+<body>
+<header class="topbar nav">
+  <a href="index.html" class="back">← 返回</a>
+  <span id="navtitle">古诗词</span>
+</header>
+
+<div class="controls" id="sccontrols">
+  <div class="searchbox">
+    <input id="sq" type="text" placeholder="搜诗名 / 诗人 / 诗句，如：静夜思 / 李白 / 明月" autocomplete="off">
+  </div>
+  <div class="tabs" id="sctabs">
+    <button class="tab active" data-v="poems">📜 诗库</button>
+    <button class="tab" data-v="poets">👤 诗人</button>
+    <button class="tab" data-v="know">💡 常识</button>
+  </div>
+  <div id="scfilter" style="margin-top:8px"></div>
+</div>
+
+<main class="listwrap">
+  <div id="sclist"></div>
+  <div id="scdetail" style="display:none"></div>
+  <p class="sc-src">诗文出自 chinese-poetry 开源库（MIT），常识卡为原创编写</p>
+</main>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="data/shici.js"></script>
+<script>
+(function(){
+  var D = window.NHZ_SHICI || {poems:[],poets:{},knowledge:[]};
+  var view = 'poems', q = '', poetFilter = '';
+  var listEl = document.getElementById('sclist');
+  var detEl = document.getElementById('scdetail');
+  var filterEl = document.getElementById('scfilter');
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function showList(){ detEl.style.display='none'; listEl.style.display='block'; }
+  function showDetail(){ listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0); }
+
+  function renderFilter(){
+    if(view!=='poems'){ filterEl.innerHTML=''; return; }
+    var poets = Object.keys(D.poets).sort();
+    var h = '<select class="sc-sel" id="poetsel"><option value="">全部诗人</option>' +
+      poets.map(function(p){return '<option value="'+esc(p)+'"'+(poetFilter===p?' selected':'')+'>'+esc(p)+'</option>';}).join('') +
+      '</select>';
+    filterEl.innerHTML = h;
+    document.getElementById('poetsel').addEventListener('change', function(e){
+      poetFilter = e.target.value; render();
+    });
+  }
+
+  function matchPoem(p){
+    if(poetFilter && p.author!==poetFilter) return false;
+    if(!q) return true;
+    return p.title.indexOf(q)>=0 || p.author.indexOf(q)>=0 ||
+      p.lines.join('').indexOf(q)>=0;
+  }
+
+  function renderPoems(){
+    var arr = D.poems.filter(matchPoem);
+    if(!arr.length){ listEl.innerHTML='<div class="noresult">没有找到，换个关键词试试</div>'; return; }
+    listEl.innerHTML = arr.map(function(p,i){
+      return '<div class="sc-poem" data-i="'+p.order+'">'+
+        '<div class="sc-ptitle">'+esc(p.title)+'</div>'+
+        '<div class="sc-pmeta"><span class="sc-badge">'+esc(p.ticai)+'</span>'+esc(p.author)+' · 唐</div></div>';
+    }).join('');
+    listEl.querySelectorAll('.sc-poem').forEach(function(el){
+      el.addEventListener('click', function(){ openPoem(parseInt(el.getAttribute('data-i'),10)); });
+    });
+  }
+
+  function openPoem(order){
+    var p = null;
+    D.poems.forEach(function(x){ if(x.order===order) p=x; });
+    if(!p) return;
+    var bio = D.poets[p.author] || '';
+    detEl.innerHTML =
+      '<button class="sc-backbtn" id="scback">← 返回诗库</button>'+
+      '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2>'+
+      '<div class="sc-detail-meta"><span class="sc-badge">'+esc(p.ticai)+'</span>'+esc(p.author)+' · 唐代</div></div>'+
+      '<div class="sc-lines">'+p.lines.map(function(l){return '<p>'+esc(l)+'</p>';}).join('')+'</div>'+
+      (bio?'<div class="sc-know"><h3>👤 '+esc(p.author)+'</h3><p>'+esc(bio)+'</p></div>':'');
+    document.getElementById('scback').addEventListener('click', showList);
+    showDetail();
+  }
+
+  function renderPoets(){
+    var arr = Object.keys(D.poets).sort().filter(function(name){
+      return !q || name.indexOf(q)>=0 || D.poets[name].indexOf(q)>=0;
+    });
+    if(!arr.length){ listEl.innerHTML='<div class="noresult">没有找到，换个关键词试试</div>'; return; }
+    listEl.innerHTML = arr.map(function(name){
+      return '<div class="sc-poet" data-n="'+esc(name)+'">'+
+        '<div class="sc-pname">'+esc(name)+'</div>'+
+        '<div class="sc-pbio">'+esc(D.poets[name].slice(0,60))+'…</div></div>';
+    }).join('');
+    listEl.querySelectorAll('.sc-poet').forEach(function(el){
+      el.addEventListener('click', function(){ openPoet(el.getAttribute('data-n')); });
+    });
+  }
+
+  function openPoet(name){
+    var works = D.poems.filter(function(p){return p.author===name;});
+    detEl.innerHTML =
+      '<button class="sc-backbtn" id="scback">← 返回诗人</button>'+
+      '<div class="sc-detail-head"><h2>'+esc(name)+'</h2>'+
+      '<div class="sc-detail-meta">唐代 · 本库收录'+works.length+'首</div></div>'+
+      '<div class="sc-know"><h3>📖 小传</h3><p>'+esc(D.poets[name]||'')+'</p></div>'+
+      (works.length?'<div class="sc-know"><h3>📜 代表作</h3><p>'+
+        works.map(function(p){return '<a href="javascript:void(0)" data-o="'+p.order+'" class="sc-worklink">'+esc(p.title)+'</a>';}).join(' · ')+
+        '</p></div>':'');
+    document.getElementById('scback').addEventListener('click', showList);
+    detEl.querySelectorAll('.sc-worklink').forEach(function(a){
+      a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+    });
+    showDetail();
+  }
+
+  function renderKnow(){
+    var arr = D.knowledge.filter(function(k){
+      return !q || k.t.indexOf(q)>=0 || k.b.indexOf(q)>=0;
+    });
+    if(!arr.length){ listEl.innerHTML='<div class="noresult">没有找到，换个关键词试试</div>'; return; }
+    listEl.innerHTML = arr.map(function(k){
+      return '<div class="sc-know"><h3>💡 '+esc(k.t)+'</h3><p>'+esc(k.b)+'</p></div>';
+    }).join('');
+  }
+
+  function render(){
+    showList(); renderFilter();
+    if(view==='poems') renderPoems();
+    else if(view==='poets') renderPoets();
+    else renderKnow();
+  }
+
+  document.querySelectorAll('#sctabs .tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('#sctabs .tab').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      view = t.getAttribute('data-v'); q=''; poetFilter='';
+      document.getElementById('sq').value='';
+      render(); window.scrollTo(0,0);
+    });
+  });
+  document.getElementById('sq').addEventListener('input', function(e){
+    q = e.target.value.trim(); render();
+  });
+  render();
+})();
+</script>
+<script>
+/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
