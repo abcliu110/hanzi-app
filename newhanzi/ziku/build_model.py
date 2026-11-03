@@ -84,10 +84,10 @@ for fp in glob.glob(os.path.join(SRC, 'shuowen', 'data', '*.json')):
         sw_index[wh] = e
 print('shuowen entries:', len(sw_index))
 
-LIUSHU_RE = re.compile(r'六書為(.{2})')
+LIUSHU_RE = re.compile(r'六書[為爲](.{2})')
 
 def liushu_from_shuowen(entry):
-    """从段注中提取'於六書為XX'."""
+    """从段注中提取'於六書爲XX'（段注用爲不用為，原正则漏检）."""
     for n in entry.get('duan_notes', []) or []:
         m = LIUSHU_RE.search(n.get('note', '') + n.get('explanation', ''))
         if m:
