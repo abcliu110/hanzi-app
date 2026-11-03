@@ -455,6 +455,322 @@ function svgLiupai(){
   });
   return s + '</svg>';
 }
+/* ===== 图式卡推广·诗词区25张（2026-11-04） ===== */
+function svgTushi135(){
+  var s = '<svg viewBox="0 0 340 104">';
+  var pos = [[1,0],[2,1],[3,0],[4,1],[5,0],[6,1],[7,1]];
+  pos.forEach(function(p,i){
+    var x = 20 + i*46;
+    s += '<circle cx="'+x+'" cy="30" r="15" fill="none" stroke-width="1.8" class="'+(p[1]?'svg-accent-s':'svg-muted-s')+'"/>';
+    s += '<text x="'+x+'" y="36" font-size="14" text-anchor="middle" class="'+(p[1]?'svg-accent':'svg-muted')+'">'+(p[1]?'●':'△')+'</text>';
+    s += '<text x="'+x+'" y="64" font-size="12" text-anchor="middle" class="svg-muted">第'+p[0]+'字</text>';
+  });
+  s += '<text x="170" y="90" font-size="12" text-anchor="middle" class="svg-muted">△=不论（可平可仄）　●=分明（平仄必须守住）</text>';
+  return s + '</svg>';
+}
+function svgTushiGp(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="28" font-size="14" class="svg-ink">仄仄仄平仄</text>';
+  [0,1,2,4].forEach(function(i){
+    s += '<circle cx="'+(30+i*26)+'" cy="48" r="10" class="svg-red" opacity="0.85"/>';
+    s += '<text x="'+(30+i*26)+'" y="53" font-size="12" text-anchor="middle" fill="#fff">仄</text>';
+  });
+  s += '<circle cx="'+(30+3*26)+'" cy="48" r="10" class="svg-accent" opacity="0.85"/>';
+  s += '<text x="'+(30+3*26)+'" y="53" font-size="12" text-anchor="middle" fill="#fff">平</text>';
+  s += '<text x="200" y="32" font-size="13" class="svg-red">✗ 孤平：全句只有一个平声字</text>';
+  s += '<text x="200" y="54" font-size="12" class="svg-muted">诗家大忌，无法补救</text>';
+  s += '<text x="16" y="88" font-size="12" class="svg-muted">对比：仄仄平平仄（两个平声，不算孤平）</text>';
+  return s + '</svg>';
+}
+function svgTushiDou(){
+  var s = '<svg viewBox="0 0 340 104">';
+  s += '<text x="16" y="30" font-size="16" class="svg-ink">落霞与孤鹜齐飞，</text>';
+  s += '<text x="16" y="58" font-size="16" class="svg-ink">秋水共长天一色。</text>';
+  s += '<rect x="14" y="12" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<rect x="62" y="12" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<text x="170" y="30" font-size="12" class="svg-accent">句中自对：落霞 ↔ 孤鹜</text>';
+  s += '<rect x="14" y="40" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-blue-s"/>';
+  s += '<rect x="62" y="40" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-blue-s"/>';
+  s += '<text x="170" y="58" font-size="12" class="svg-blue">句中自对：秋水 ↔ 长天</text>';
+  s += '<text x="16" y="90" font-size="12" class="svg-muted">同一句内，前后两截互相对仗</text>';
+  return s + '</svg>';
+}
+function svgTushiPulu(){
+  var s = '<svg viewBox="0 0 340 210">';
+  var lines = ['仄仄平平仄','平平仄仄平','平平平仄仄','仄仄仄平平','仄仄平平仄','平平仄仄平','平平平仄仄','仄仄仄平平'];
+  var yun = [1,3,5,7];
+  lines.forEach(function(ln,i){
+    var y = 24 + i*24;
+    s += '<text x="16" y="'+y+'" font-size="13" class="svg-muted">'+(i+1)+'</text>';
+    for(var j=0;j<5;j++){
+      var isP = ln[j]==='平';
+      s += '<circle cx="'+(52+j*30)+'" cy="'+(y-5)+'" r="10" class="'+(isP?'svg-accent':'svg-red')+'" opacity="0.8"/>';
+      s += '<text x="'+(52+j*30)+'" y="'+(y-1)+'" font-size="11" text-anchor="middle" fill="#fff">'+ln[j]+'</text>';
+    }
+    if(yun.indexOf(i)>=0) s += '<text x="215" y="'+y+'" font-size="12" class="svg-accent">● 押韵</text>';
+  });
+  s += '<text x="16" y="206" font-size="11" class="svg-muted">七律平仄谱（仄起首句不入韵式）　●=平　●=仄</text>';
+  return s + '</svg>';
+}
+function svgTushiRy(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="14" class="svg-accent">首句入韵</text>';
+  ['句1 ●','句2 ●','句3','句4 ●'].forEach(function(t,i){
+    var x = 16 + i*78;
+    s += '<rect x="'+x+'" y="34" width="66" height="30" rx="6" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+33)+'" y="54" font-size="12" text-anchor="middle" class="svg-ink">'+t+'</text>';
+  });
+  s += '<text x="16" y="92" font-size="14" class="svg-blue">首句不入韵</text>';
+  ['句1','句2 ●','句3','句4 ●'].forEach(function(t,i){
+    var x = 16 + i*78;
+    s += '<rect x="'+x+'" y="98" width="66" height="30" rx="6" class="svg-panel svg-blue-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+33)+'" y="118" font-size="12" text-anchor="middle" class="svg-ink">'+t+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgTushiZicha(){
+  var s = '<svg viewBox="0 0 340 84">';
+  var steps = ['1数句数','2查押韵','3标平仄','4看粘对','5找拗救'];
+  steps.forEach(function(st,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="12" width="58" height="34" rx="8" class="svg-accent" opacity="0.9"/>';
+    s += '<text x="'+(x+29)+'" y="34" font-size="12" text-anchor="middle" fill="#fff">'+st+'</text>';
+    if(i<4) s += '<text x="'+(x+62)+'" y="34" font-size="14" class="svg-accent">→</text>';
+  });
+  s += '<text x="170" y="68" font-size="12" text-anchor="middle" class="svg-muted">五步走完，一首诗格律合不合格就有数了</text>';
+  return s + '</svg>';
+}
+function svgTushiAoju(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="28" font-size="16" class="svg-ink">国破山河在</text>';
+  s += '<text x="16" y="52" font-size="12" class="svg-muted">标准：仄仄平平仄（第1字该仄）</text>';
+  s += '<rect x="14" y="62" width="26" height="26" rx="5" fill="none" stroke-width="2" class="svg-red-s"/>';
+  s += '<text x="60" y="80" font-size="13" class="svg-red">“国”是入声字=仄声，但古音里它也算仄</text>';
+  s += '<text x="16" y="104" font-size="12" class="svg-muted">按今音“国”是阳平，该用平却用了仄 → 拗</text>';
+  return s + '</svg>';
+}
+function svgTushiPswj(){
+  var s = '<svg viewBox="0 0 340 104">';
+  var vols = [['上平','15韵'],['下平','15韵'],['上声','29韵'],['去声','30韵'],['入声','17韵']];
+  vols.forEach(function(v,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="10" width="58" height="52" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+29)+'" y="32" font-size="13" text-anchor="middle" class="svg-ink">'+v[0]+'</text>';
+    s += '<text x="'+(x+29)+'" y="52" font-size="12" text-anchor="middle" class="svg-accent">'+v[1]+'</text>';
+  });
+  s += '<text x="170" y="86" font-size="12" text-anchor="middle" class="svg-muted">平水韵共106韵：写诗押韵只能在同卷内</text>';
+  return s + '</svg>';
+}
+function svgTushiBjzj(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="13" class="svg-red">拗：仄仄仄平仄（第3字该平用了仄）</text>';
+  s += '<rect x="150" y="10" width="22" height="22" rx="4" fill="none" stroke-width="2" class="svg-red-s"/>';
+  s += '<text x="200" y="28" font-size="14" class="svg-accent">↓ 本句自救</text>';
+  s += '<text x="16" y="62" font-size="13" class="svg-accent">救：仄仄仄平仄 → 第4字改仄找补</text>';
+  s += '<text x="16" y="88" font-size="12" class="svg-muted">口诀：三拗四救（第3字拗，第4字来救）</text>';
+  s += '<text x="16" y="108" font-size="12" class="svg-muted">救在本句内部完成，不麻烦对句</text>';
+  return s + '</svg>';
+}
+function svgTushiDjzj(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">上句：<tspan class="svg-red">仄仄平平仄</tspan>（拗）</text>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">下句：<tspan class="svg-accent">平平仄仄平</tspan>（救）</text>';
+  s += '<line x1="120" y1="30" x2="120" y2="44" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<text x="200" y="42" font-size="12" class="svg-accent">对句在对应位置找补</text>';
+  s += '<text x="16" y="82" font-size="12" class="svg-muted">口诀：上句拗，下句救</text>';
+  s += '<text x="16" y="102" font-size="12" class="svg-muted">救在对句完成，上下句互相成全</text>';
+  return s + '</svg>';
+}
+function svgTushiAjdy(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<rect x="8" y="8" width="100" height="44" rx="8" class="svg-red" opacity="0.12"/>';
+  s += '<text x="58" y="28" font-size="14" text-anchor="middle" class="svg-red">拗</text>';
+  s += '<text x="58" y="46" font-size="11" text-anchor="middle" class="svg-muted">该平用仄/该仄用平</text>';
+  s += '<text x="128" y="36" font-size="18" class="svg-accent">+</text>';
+  s += '<rect x="148" y="8" width="100" height="44" rx="8" class="svg-accent" opacity="0.12"/>';
+  s += '<text x="198" y="28" font-size="14" text-anchor="middle" class="svg-accent">救</text>';
+  s += '<text x="198" y="46" font-size="11" text-anchor="middle" class="svg-muted">在别处找补回来</text>';
+  s += '<text x="268" y="36" font-size="18" class="svg-accent">=</text>';
+  s += '<rect x="288" y="8" width="44" height="44" rx="8" class="svg-deep" opacity="0.9"/>';
+  s += '<text x="310" y="36" font-size="14" text-anchor="middle" fill="#fff">拗救</text>';
+  s += '<text x="170" y="78" font-size="12" text-anchor="middle" class="svg-muted">破了格律再补回来，诗味反而更足</text>';
+  s += '<text x="170" y="98" font-size="12" text-anchor="middle" class="svg-muted">救法：本句自救 / 对句相救</text>';
+  return s + '</svg>';
+}
+function svgTushiNddy(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<rect x="8" y="8" width="156" height="60" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="86" y="30" font-size="14" text-anchor="middle" class="svg-accent">对</text>';
+  s += '<text x="86" y="50" font-size="11" text-anchor="middle" class="svg-muted">一联内：上句↔下句</text>';
+  s += '<text x="86" y="64" font-size="11" text-anchor="middle" class="svg-muted">平仄相反（照镜子）</text>';
+  s += '<rect x="176" y="8" width="156" height="60" rx="8" class="svg-panel svg-blue-s" stroke-width="1.4"/>';
+  s += '<text x="254" y="30" font-size="14" text-anchor="middle" class="svg-blue">粘</text>';
+  s += '<text x="254" y="50" font-size="11" text-anchor="middle" class="svg-muted">两联间：上联↔下联</text>';
+  s += '<text x="254" y="64" font-size="11" text-anchor="middle" class="svg-muted">平仄相同（胶水粘住）</text>';
+  s += '<text x="170" y="92" font-size="12" text-anchor="middle" class="svg-muted">对管联内，粘管联间 —— 记住这句就不会混</text>';
+  return s + '</svg>';
+}
+function svgTushiCi(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">明月几时有</text>';
+  s += '<rect x="130" y="10" width="90" height="18" rx="4" class="svg-accent" opacity="0.7"/>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">把酒问青天</text>';
+  s += '<rect x="130" y="38" width="90" height="18" rx="4" class="svg-accent" opacity="0.7"/>';
+  s += '<text x="16" y="80" font-size="13" class="svg-ink">不知天上宫阙，今夕是何年</text>';
+  s += '<rect x="200" y="66" width="130" height="18" rx="4" class="svg-blue" opacity="0.7"/>';
+  s += '<text x="16" y="104" font-size="12" class="svg-muted">词=长短句：句子长短参差，不像诗那么整齐</text>';
+  return s + '</svg>';
+}
+function svgTushiGuti(){
+  var s = '<svg viewBox="0 0 340 110">';
+  var rows = [['句数','不限（几句到几百句）'],['字数','每句可长可短'],['平仄','不讲'],['押韵','宽松，可换韵']];
+  rows.forEach(function(r,i){
+    var y = 14 + i*24;
+    s += '<text x="16" y="'+y+'" font-size="13" class="svg-accent">'+r[0]+'</text>';
+    s += '<text x="70" y="'+y+'" font-size="13" class="svg-ink">'+r[1]+'</text>';
+  });
+  s += '<text x="240" y="38" font-size="14" class="svg-muted">自由体</text>';
+  s += '<text x="240" y="62" font-size="12" class="svg-muted">代表：《将进酒》</text>';
+  s += '<text x="240" y="82" font-size="12" class="svg-muted">《蜀道难》《琵琶行》</text>';
+  return s + '</svg>';
+}
+function svgTushiJinti(){
+  var s = '<svg viewBox="0 0 340 110">';
+  var rows = [['绝句','4句（五绝20字/七绝28字）'],['律诗','8句（颔联颈联必对仗）'],['排律','8句以上（中间两两对仗）']];
+  rows.forEach(function(r,i){
+    var y = 20 + i*30;
+    s += '<rect x="8" y="'+(y-16)+'" width="60" height="24" rx="6" class="svg-accent" opacity="0.85"/>';
+    s += '<text x="38" y="'+(y)+'" font-size="12" text-anchor="middle" fill="#fff">'+r[0]+'</text>';
+    s += '<text x="80" y="'+y+'" font-size="12" class="svg-ink">'+r[1]+'</text>';
+  });
+  s += '<text x="16" y="104" font-size="11" class="svg-muted">近体诗=格律诗：句数/字数/平仄/押韵全有规矩</text>';
+  return s + '</svg>';
+}
+function svgTushiFbx(){
+  var s = '<svg viewBox="0 0 340 116">';
+  var rows = [['赋','直陈其事','“关关雎鸠，在河之洲”','svg-accent'],['比','打比方','“如切如磋，如琢如磨”','svg-blue'],['兴','先言他物','“桃之夭夭，灼灼其华”','svg-green']];
+  rows.forEach(function(r,i){
+    var y = 16 + i*32;
+    s += '<circle cx="28" cy="'+(y-4)+'" r="13" class="'+r[3]+'" opacity="0.85"/>';
+    s += '<text x="28" y="'+y+'" font-size="13" text-anchor="middle" fill="#fff">'+r[0]+'</text>';
+    s += '<text x="50" y="'+y+'" font-size="12" class="svg-ink">'+r[1]+'：'+r[2]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgTushiYxfl(){
+  var s = '<svg viewBox="0 0 340 130">';
+  var cats = [['天文','月/风/霜/雪','svg-blue'],['植物','柳/梅/菊/竹','svg-green'],['动物','雁/蝉/杜鹃','svg-accent'],['器物','酒/剑/舟/镜','svg-red'],['建筑','楼/桥/亭/道','svg-deep']];
+  cats.forEach(function(c,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="8" width="58" height="66" rx="8" class="svg-panel" stroke-width="1.4" stroke="currentColor"/>';
+    s += '<text x="'+(x+29)+'" y="30" font-size="12" text-anchor="middle" class="'+c[2]+'">'+c[0]+'</text>';
+    s += '<text x="'+(x+29)+'" y="50" font-size="10" text-anchor="middle" class="svg-muted">'+c[1]+'</text>';
+  });
+  s += '<text x="170" y="96" font-size="12" text-anchor="middle" class="svg-muted">意象=寄托了情感的物：看到物，想到情</text>';
+  s += '<text x="170" y="114" font-size="12" text-anchor="middle" class="svg-muted">五大类全记住，读诗先看意象</text>';
+  return s + '</svg>';
+}
+function svgTushiJjq(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="14" width="120" height="44" rx="8" class="svg-blue" opacity="0.12"/>';
+  s += '<text x="68" y="34" font-size="14" text-anchor="middle" class="svg-blue">景</text>';
+  s += '<text x="68" y="52" font-size="11" text-anchor="middle" class="svg-muted">月/柳/雨/山水</text>';
+  s += '<text x="148" y="42" font-size="20" class="svg-accent">→</text>';
+  s += '<rect x="172" y="14" width="120" height="44" rx="8" class="svg-red" opacity="0.12"/>';
+  s += '<text x="232" y="34" font-size="14" text-anchor="middle" class="svg-red">情</text>';
+  s += '<text x="232" y="52" font-size="11" text-anchor="middle" class="svg-muted">愁/喜/思乡/壮志</text>';
+  s += '<text x="310" y="42" font-size="12" class="svg-muted">生发</text>';
+  s += '<text x="170" y="82" font-size="12" text-anchor="middle" class="svg-muted">借景生情：先写景，情从景里长出来</text>';
+  return s + '</svg>';
+}
+function svgTushiTwyz(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="14" width="120" height="44" rx="8" class="svg-green" opacity="0.12"/>';
+  s += '<text x="68" y="34" font-size="14" text-anchor="middle" class="svg-green">物</text>';
+  s += '<text x="68" y="52" font-size="11" text-anchor="middle" class="svg-muted">松/竹/梅/兰</text>';
+  s += '<text x="148" y="42" font-size="20" class="svg-accent">→</text>';
+  s += '<rect x="172" y="14" width="120" height="44" rx="8" class="svg-deep" opacity="0.12"/>';
+  s += '<text x="232" y="34" font-size="14" text-anchor="middle" class="svg-deep">志</text>';
+  s += '<text x="232" y="52" font-size="11" text-anchor="middle" class="svg-muted">气节/操守/理想</text>';
+  s += '<text x="310" y="42" font-size="12" class="svg-muted">寄托</text>';
+  s += '<text x="170" y="82" font-size="12" text-anchor="middle" class="svg-muted">托物言志：不直说志向，借物的品格来说</text>';
+  return s + '</svg>';
+}
+function svgTushiYongd(){
+  var s = '<svg viewBox="0 0 340 104">';
+  s += '<rect x="8" y="10" width="140" height="48" rx="8" class="svg-panel svg-muted-s" stroke-width="1.4"/>';
+  s += '<text x="78" y="30" font-size="13" text-anchor="middle" class="svg-ink">典故</text>';
+  s += '<text x="78" y="48" font-size="11" text-anchor="middle" class="svg-muted">历史故事/前人诗句</text>';
+  s += '<text x="168" y="38" font-size="18" class="svg-accent">→</text>';
+  s += '<rect x="192" y="10" width="140" height="48" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="262" y="30" font-size="13" text-anchor="middle" class="svg-ink">诗句</text>';
+  s += '<text x="262" y="48" font-size="11" text-anchor="middle" class="svg-muted">含蓄/典雅/有深度</text>';
+  s += '<text x="170" y="80" font-size="12" text-anchor="middle" class="svg-muted">例：“怀旧空吟闻笛赋”→向秀《思旧赋》</text>';
+  s += '<text x="170" y="98" font-size="11" text-anchor="middle" class="svg-muted">用典三法：正用/反用/化用</text>';
+  return s + '</svg>';
+}
+function svgTushiLian(){
+  var s = '<svg viewBox="0 0 340 116">';
+  s += '<text x="16" y="22" font-size="13" class="svg-accent">联 = 上句 + 下句（两句为一联）</text>';
+  var lians = [['首联','1·2'],['颔联','3·4'],['颈联','5·6'],['尾联','7·8']];
+  lians.forEach(function(L,i){
+    var x = 8 + i*82;
+    s += '<rect x="'+x+'" y="32" width="74" height="52" rx="8" class="svg-panel '+(i===1||i===2?'svg-accent-s':'svg-muted-s')+'" stroke-width="1.4"/>';
+    s += '<text x="'+(x+37)+'" y="54" font-size="13" text-anchor="middle" class="svg-ink">'+L[0]+'</text>';
+    s += '<text x="'+(x+37)+'" y="72" font-size="11" text-anchor="middle" class="svg-muted">第'+L[1]+'句</text>';
+  });
+  s += '<text x="170" y="104" font-size="12" text-anchor="middle" class="svg-muted">颔联颈联必须对仗（绿框）</text>';
+  return s + '</svg>';
+}
+function svgTushiJz(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">五言（2-2-1）：</text>';
+  s += '<text x="120" y="24" font-size="14" class="svg-ink">床前<tspan class="svg-accent">|</tspan>明月<tspan class="svg-accent">|</tspan>光</text>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">七言（2-2-2-1）：</text>';
+  s += '<text x="140" y="52" font-size="14" class="svg-ink">白日<tspan class="svg-accent">|</tspan>依山<tspan class="svg-accent">|</tspan>尽</text>';
+  s += '<line x1="120" y1="62" x2="300" y2="62" stroke-width="1" stroke-dasharray="4" class="svg-muted-s"/>';
+  s += '<text x="16" y="84" font-size="12" class="svg-muted">朗读时按 | 停顿，节奏感就出来了</text>';
+  s += '<text x="16" y="102" font-size="12" class="svg-muted">五言多为2-3式，七言多为4-3式（2-2-2-1）</text>';
+  return s + '</svg>';
+}
+function svgTushiWq(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="10" width="150" height="56" rx="8" class="svg-panel svg-accent-s" stroke-width="1.5"/>';
+  s += '<text x="83" y="32" font-size="14" text-anchor="middle" class="svg-accent">五言</text>';
+  s += '<text x="83" y="52" font-size="12" text-anchor="middle" class="svg-muted">每句5字 · 节奏2-2-1</text>';
+  s += '<rect x="182" y="10" width="150" height="56" rx="8" class="svg-panel svg-blue-s" stroke-width="1.5"/>';
+  s += '<text x="257" y="32" font-size="14" text-anchor="middle" class="svg-blue">七言</text>';
+  s += '<text x="257" y="52" font-size="12" text-anchor="middle" class="svg-muted">每句7字 · 节奏2-2-2-1</text>';
+  s += '<text x="170" y="88" font-size="12" text-anchor="middle" class="svg-muted">五言+绝句=五绝（20字）　七言+律诗=七律（56字）</text>';
+  return s + '</svg>';
+}
+function svgTushiGjjt(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<rect x="8" y="8" width="156" height="76" rx="8" class="svg-panel svg-green-s" stroke-width="1.4"/>';
+  s += '<text x="86" y="30" font-size="14" text-anchor="middle" class="svg-green">古体诗</text>';
+  s += '<text x="86" y="50" font-size="11" text-anchor="middle" class="svg-muted">句数/字数不限</text>';
+  s += '<text x="86" y="66" font-size="11" text-anchor="middle" class="svg-muted">不讲平仄 · 可换韵</text>';
+  s += '<rect x="176" y="8" width="156" height="76" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="254" y="30" font-size="14" text-anchor="middle" class="svg-accent">近体诗</text>';
+  s += '<text x="254" y="50" font-size="11" text-anchor="middle" class="svg-muted">4句/8句 · 5言/7言</text>';
+  s += '<text x="254" y="66" font-size="11" text-anchor="middle" class="svg-muted">讲平仄 · 一韵到底</text>';
+  s += '<text x="170" y="106" font-size="12" text-anchor="middle" class="svg-muted">分水岭：唐朝。唐以前多古体，唐以后格律定型</text>';
+  return s + '</svg>';
+}
+function svgTushiQch(){
+  var s = '<svg viewBox="0 0 340 96">';
+  var steps = [['起','开篇','svg-accent'],['承','承接','svg-blue'],['转','转折','svg-red'],['合','收束','svg-deep']];
+  steps.forEach(function(st,i){
+    var x = 8 + i*82;
+    s += '<circle cx="'+(x+33)+'" cy="28" r="22" class="'+st[2]+'" opacity="0.85"/>';
+    s += '<text x="'+(x+33)+'" y="34" font-size="16" text-anchor="middle" fill="#fff">'+st[0]+'</text>';
+    s += '<text x="'+(x+33)+'" y="64" font-size="11" text-anchor="middle" class="svg-muted">'+st[1]+'</text>';
+    if(i<3) s += '<text x="'+(x+66)+'" y="34" font-size="16" class="svg-muted">→</text>';
+  });
+  s += '<text x="170" y="86" font-size="12" text-anchor="middle" class="svg-muted">绝句四句正好对应：起承转合一气呵成</text>';
+  return s + '</svg>';
+}
+
 function knowSVG(g){
   if(g==='sisheng') return svgSisheng();
   if(g==='yayun') return svgYayun();
@@ -471,6 +787,31 @@ function knowSVG(g){
   if(g==='tangshifenqi') return svgTangshiFenqi();
   if(g==='pingshuiyun') return svgPingshuiyun();
   if(g==='liupai') return svgLiupai();
+  if(g==='tushi135') return svgTushi135();
+  if(g==='tushigp') return svgTushiGp();
+  if(g==='tushidou') return svgTushiDou();
+  if(g==='tusipulu') return svgTushiPulu();
+  if(g==='tushiry') return svgTushiRy();
+  if(g==='tushizicha') return svgTushiZicha();
+  if(g==='tushiaoju') return svgTushiAoju();
+  if(g==='tushipswj') return svgTushiPswj();
+  if(g==='tushibjzj') return svgTushiBjzj();
+  if(g==='tushidjzj') return svgTushiDjzj();
+  if(g==='tushiajdy') return svgTushiAjdy();
+  if(g==='tushinddy') return svgTushiNddy();
+  if(g==='tushici') return svgTushiCi();
+  if(g==='tushiguti') return svgTushiGuti();
+  if(g==='tushijinti') return svgTushiJinti();
+  if(g==='tushifbx') return svgTushiFbx();
+  if(g==='tushiyxfl') return svgTushiYxfl();
+  if(g==='tushijjq') return svgTushiJjq();
+  if(g==='tushitwyz') return svgTushiTwyz();
+  if(g==='tushiyongd') return svgTushiYongd();
+  if(g==='tushilian') return svgTushiLian();
+  if(g==='tushijz') return svgTushiJz();
+  if(g==='tushiwq') return svgTushiWq();
+  if(g==='tushigjjt') return svgTushiGjjt();
+  if(g==='tusihqch') return svgTushiQch();
   return '';
 }
 function vKnow(){

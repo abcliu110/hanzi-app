@@ -135,7 +135,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“而”表示承接：温习旧知识，然后知道新知识。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 380 140\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"150\" y=\"8\" width=\"80\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"190.0\" y=\"34\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">而</text><text x=\"190.0\" y=\"40\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">连词枢纽</text><line x1=\"170\" y1=\"48\" x2=\"50\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"100\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">承接</text><line x1=\"185\" y1=\"48\" x2=\"170\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"178\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">并列</text><line x1=\"200\" y1=\"48\" x2=\"230\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"218\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">转折</text><line x1=\"215\" y1=\"48\" x2=\"310\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"270\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">修饰</text><rect x=\"10\" y=\"80\" width=\"80\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"50.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">学而时习</text><text x=\"50.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">顺接</text><rect x=\"105\" y=\"80\" width=\"80\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"145.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">敏而好学</text><text x=\"145.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">并列</text><rect x=\"200\" y=\"80\" width=\"80\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"240.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">人不知而不愠</text><text x=\"240.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">转折</text><rect x=\"295\" y=\"80\" width=\"80\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"335.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">怒而飞</text><text x=\"335.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">修饰</text></svg>"
     },
     {
      "name": "何",
@@ -362,7 +363,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“乎”是介词，相当于“于”：在（比我早出生）。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"20\" y=\"30\" width=\"100\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"70.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">陈述句</text><text x=\"70.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">不亦说乎</text><rect x=\"240\" y=\"30\" width=\"100\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"290.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">疑问句</text><text x=\"290.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">何陋之有乎</text><text x=\"170\" y=\"56\" font-size=\"15\" text-anchor=\"middle\" fill=\"#4a7a59\">+ 乎</text><text x=\"180\" y=\"100\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">句末语气词：表疑问/感叹/测度</text></svg>"
     },
     {
      "name": "乃",
@@ -614,7 +616,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“其”是代词，他的（爱他的孩子，选择老师来教他）。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"140\" y=\"8\" width=\"80\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"180.0\" y=\"34\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">其</text><text x=\"180.0\" y=\"40\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">指示代词</text><line x1=\"160\" y1=\"48\" x2=\"60\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><line x1=\"200\" y1=\"48\" x2=\"300\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><rect x=\"10\" y=\"80\" width=\"100\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"60.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">其人</text><text x=\"60.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">他/他们</text><rect x=\"250\" y=\"80\" width=\"100\" height=\"36\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"300.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">其书</text><text x=\"300.0\" y=\"108\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">他的书</text><text x=\"180\" y=\"105\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">第三人称</text></svg>"
     },
     {
      "name": "且",
@@ -978,7 +981,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“所”和动词组成“所＋动词”结构，“所从来”指来的地方。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"20\" y=\"30\" width=\"60\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"50.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">所</text><line x1=\"80\" y1=\"52\" x2=\"120\" y2=\"52\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><rect x=\"130\" y=\"30\" width=\"90\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"175.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">动词</text><text x=\"175.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">如\"言\"</text><line x1=\"220\" y1=\"52\" x2=\"260\" y2=\"52\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><rect x=\"270\" y=\"30\" width=\"70\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"305.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">所言</text><text x=\"305.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">所说的</text><text x=\"180\" y=\"100\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"所\"+动词 = 名词性短语</text></svg>"
     },
     {
      "name": "为",
@@ -1222,7 +1226,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“焉”是兼词，相当于“于此”（风雨在这里兴起）。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 340 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"30\" y=\"30\" width=\"70\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"65.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">于</text><text x=\"65.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">介词</text><text x=\"115\" y=\"56\" font-size=\"16\" text-anchor=\"middle\" fill=\"#4a7a59\">+</text><rect x=\"130\" y=\"30\" width=\"70\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"165.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">之</text><text x=\"165.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">代词</text><line x1=\"200\" y1=\"52\" x2=\"240\" y2=\"52\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"220.0\" y=\"46\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">合并</text><rect x=\"250\" y=\"30\" width=\"60\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"280.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">焉</text><text x=\"280.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">兼词</text><text x=\"170\" y=\"100\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">焉 = 于之（三一三十一）</text></svg>"
     },
     {
      "name": "也",
@@ -1451,7 +1456,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“以”是介词，表原因；“卑鄙”是古义，地位低微、见识浅陋。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"140\" y=\"8\" width=\"80\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"180.0\" y=\"34\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">以</text><text x=\"180.0\" y=\"40\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">多功能</text><line x1=\"160\" y1=\"48\" x2=\"70\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"105\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">介词</text><line x1=\"200\" y1=\"48\" x2=\"290\" y2=\"75\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"255\" y=\"70\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">连词</text><rect x=\"10\" y=\"80\" width=\"120\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"70.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">以刀劈狼首</text><text x=\"70.0\" y=\"112\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">用/拿</text><rect x=\"230\" y=\"80\" width=\"120\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"290.0\" y=\"106\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">以其人之道</text><text x=\"290.0\" y=\"112\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">凭借</text><text x=\"180\" y=\"105\" font-size=\"11\" text-anchor=\"middle\" fill=\"#6b7566\">+ 来/去/为 表目的</text></svg>"
     },
     {
      "name": "因",
@@ -2005,7 +2011,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“者”的用法是：助词：代词性结构（……的人、事、物）；判断句主语后停顿（……者，……也）；句中停顿、时间词后。",
        "类": "正误判断"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 110\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"20\" y=\"30\" width=\"90\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"65.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">动词/形容词</text><text x=\"65.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">如\"仁\"</text><line x1=\"110\" y1=\"52\" x2=\"160\" y2=\"52\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"135.0\" y=\"46\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">+者</text><rect x=\"170\" y=\"30\" width=\"90\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"215.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">仁者</text><text x=\"215.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">……的人</text><text x=\"305\" y=\"56\" font-size=\"13\" text-anchor=\"middle\" fill=\"#4a7a59\">= 名词化</text><text x=\"180\" y=\"100\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">知者乐水 → 智慧的人喜欢水</text></svg>"
     },
     {
      "name": "之",
@@ -2147,7 +2154,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "'之'在这里是'动词“往”'的用法。",
        "类": "选用法"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"140\" y=\"10\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"180.0\" y=\"36\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">之</text><text x=\"180.0\" y=\"46\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">核心虚词</text><line x1=\"180\" y1=\"54\" x2=\"70\" y2=\"80\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"115\" y=\"75\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">的</text><line x1=\"180\" y1=\"54\" x2=\"180\" y2=\"80\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"180\" y=\"75\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">取消独立性</text><line x1=\"180\" y1=\"54\" x2=\"290\" y2=\"80\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"245\" y=\"75\" font-size=\"12\" text-anchor=\"middle\" fill=\"#4a7a59\">宾语前置标志</text><rect x=\"20\" y=\"86\" width=\"100\" height=\"38\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"70.0\" y=\"112\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">学而时习之</text><rect x=\"130\" y=\"86\" width=\"100\" height=\"38\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"180.0\" y=\"112\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">之谓也</text><rect x=\"240\" y=\"86\" width=\"100\" height=\"38\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"290.0\" y=\"112\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">何陋之有</text></svg>"
     }
    ]
   },
@@ -12051,7 +12059,7 @@ window.NHZ_GUWEN_KNOWLEDGE = {
      "口诀": "者也表判断",
      "深讲": "",
      "辨析": "判断句说“是什么”，不要和被动句混：被动句说“被怎么样”。",
-     "图示": "<div style=\"text-align:center;font-size:18px\">主语 ＋ 者 ＋ 谓语 ＋ 也</div><p>看到“者…也”，先判判断句。</p>",
+     "图示": "<svg viewBox=\"0 0 380 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><text x=\"190\" y=\"20\" font-size=\"14\" text-anchor=\"middle\" fill=\"#2c3328\">判断句 = A 是 B</text><rect x=\"10\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"65.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">A者，B也</text><text x=\"65.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">陈胜者，阳城人也</text><rect x=\"135\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"190.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">A即/乃B</text><text x=\"190.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">此乃忠臣也</text><rect x=\"260\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"315.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">A，B</text><text x=\"315.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">莲，花之君子者也</text><text x=\"190\" y=\"115\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">看到\"者…也\"先判判断句</text></svg>",
      "怎么认": [
       "一找主干：先找主语、谓语、宾语。",
       "二看虚词标志：者…也判判断，为…所判被动，何…之判宾语前置。",
@@ -12119,7 +12127,7 @@ window.NHZ_GUWEN_KNOWLEDGE = {
      "口诀": "为所见于被动",
      "深讲": "",
      "辨析": "被动句主语是承受者，标志是“为…所…、见…于…、于…”。",
-     "图示": "<div style=\"text-align:center;font-size:18px\">为 ＋ 施事 ＋ 所 ＋ 动词 ／ 见 ＋ 动词 ＋ 于 ＋ 施事</div><p>主语是动作的承受者。</p>",
+     "图示": "<svg viewBox=\"0 0 380 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><text x=\"190\" y=\"20\" font-size=\"14\" text-anchor=\"middle\" fill=\"#2c3328\">被动句 = 主语是受事</text><rect x=\"10\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"65.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">见+动词</text><text x=\"65.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">见欺于王</text><rect x=\"135\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"190.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">于+施事</text><text x=\"190.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">兵败于秦</text><rect x=\"260\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"315.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">为…所…</text><text x=\"315.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">为天下笑</text><text x=\"190\" y=\"115\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"见\"\"于\"\"为…所\"都是被动标志</text></svg>",
      "怎么认": [
       "一找主干：先找主语、谓语、宾语。",
       "二看虚词标志：者…也判判断，为…所判被动，何…之判宾语前置。",
@@ -12223,7 +12231,7 @@ window.NHZ_GUWEN_KNOWLEDGE = {
       }
      ],
      "辨析": "倒装句语序和现代汉语不一样，翻译时先还原语序。",
-     "图示": "<div style=\"text-align:center;font-size:18px\">宾语前置 ／ 定语后置 ／ 状语后置 ／ 主谓倒装</div><p>语序和现代汉语不一样，翻译时先还原。</p>",
+     "图示": "<svg viewBox=\"0 0 400 140\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><text x=\"200\" y=\"20\" font-size=\"14\" text-anchor=\"middle\" fill=\"#2c3328\">倒装 = 语序非常规</text><rect x=\"10\" y=\"35\" width=\"120\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"70.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">宾语前置</text><text x=\"70.0\" y=\"71\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">何陋之有</text><rect x=\"145\" y=\"35\" width=\"120\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"205.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">定语后置</text><text x=\"205.0\" y=\"71\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">马之千里者</text><rect x=\"280\" y=\"35\" width=\"110\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"335.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">状语后置</text><text x=\"335.0\" y=\"71\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">战于长勺</text><line x1=\"70\" y1=\"90\" x2=\"70\" y2=\"105\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><line x1=\"205\" y1=\"90\" x2=\"205\" y2=\"105\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><line x1=\"335\" y1=\"90\" x2=\"335\" y2=\"105\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"200\" y=\"125\" font-size=\"11\" text-anchor=\"middle\" fill=\"#6b7566\">宾语跑到动词前 / 定语跑到中心语后</text></svg>",
      "怎么认": [
       "一找主干：先找主语、谓语、宾语。",
       "二看虚词标志：者…也判判断，为…所判被动，何…之判宾语前置。",
@@ -12298,7 +12306,7 @@ window.NHZ_GUWEN_KNOWLEDGE = {
      "口诀": "缺啥补啥省略句",
      "深讲": "",
      "辨析": "省略句缺主语、谓语或宾语，读时按上下文补出来。",
-     "图示": "<div style=\"text-align:center;font-size:18px\">（省主语／谓语／宾语）＋ 句</div><p>读时按上下文补出来。</p>",
+     "图示": "<svg viewBox=\"0 0 380 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><text x=\"190\" y=\"20\" font-size=\"14\" text-anchor=\"middle\" fill=\"#2c3328\">省略 = 该有的成分没出现</text><rect x=\"10\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"65.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">省主语</text><text x=\"65.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">（蛇）乃饮酒</text><rect x=\"135\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"190.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">省谓语</text><text x=\"190.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">一鼓作气，再（鼓）而衰</text><rect x=\"260\" y=\"35\" width=\"110\" height=\"40\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"315.0\" y=\"61\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">省宾语</text><text x=\"315.0\" y=\"67\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">以（之）为妙</text><text x=\"190\" y=\"115\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">靠上下文补出省略成分</text></svg>",
      "怎么认": [
       "一找主干：先找主语、谓语、宾语。",
       "二看虚词标志：者…也判判断，为…所判被动，何…之判宾语前置。",
@@ -13020,7 +13028,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“说”通“悦”，按本字理解。",
        "类": "选通假字"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"40\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"80.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">说</text><text x=\"80.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">借字</text><text x=\"140\" y=\"56\" font-size=\"14\" text-anchor=\"middle\" fill=\"#4a7a59\">通</text><rect x=\"160\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"200.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">悦</text><text x=\"200.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">本字</text><text x=\"260\" y=\"56\" font-size=\"13\" text-anchor=\"middle\" fill=\"#2c3328\">= 愉快</text><text x=\"180\" y=\"105\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"学而时习之，不亦说乎\" → 说通悦</text></svg>"
     },
     {
      "name": "知",
@@ -13081,7 +13090,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“知”通“智”，按本字理解。",
        "类": "选通假字"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"40\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"80.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">知</text><text x=\"80.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">借字</text><text x=\"140\" y=\"56\" font-size=\"14\" text-anchor=\"middle\" fill=\"#4a7a59\">通</text><rect x=\"160\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"200.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">智</text><text x=\"200.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">本字</text><text x=\"260\" y=\"56\" font-size=\"13\" text-anchor=\"middle\" fill=\"#2c3328\">= 智慧</text><text x=\"180\" y=\"105\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"知者乐水\" → 知通智</text></svg>"
     },
     {
      "name": "畔",
@@ -13208,7 +13218,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“被”通“披”，读本字的音和意思。",
        "类": "正误判断"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"40\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"80.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">被</text><text x=\"80.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">借字</text><text x=\"140\" y=\"56\" font-size=\"14\" text-anchor=\"middle\" fill=\"#4a7a59\">通</text><rect x=\"160\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"200.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">披</text><text x=\"200.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">本字</text><text x=\"260\" y=\"56\" font-size=\"13\" text-anchor=\"middle\" fill=\"#2c3328\">= 穿着</text><text x=\"180\" y=\"105\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"被坚执锐\" → 被通披</text></svg>"
     },
     {
      "name": "曾",
@@ -13574,7 +13585,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“亡”通“无”，按本字理解。",
        "类": "选通假字"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"40\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"80.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">亡</text><text x=\"80.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">借字</text><text x=\"140\" y=\"56\" font-size=\"14\" text-anchor=\"middle\" fill=\"#4a7a59\">通</text><rect x=\"160\" y=\"30\" width=\"80\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"200.0\" y=\"56\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">无</text><text x=\"200.0\" y=\"66\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">本字</text><text x=\"260\" y=\"56\" font-size=\"13\" text-anchor=\"middle\" fill=\"#2c3328\">= 没有</text><text x=\"180\" y=\"105\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">\"河曲智叟亡以应\" → 亡通无</text></svg>"
     },
     {
      "name": "具",
@@ -13965,7 +13977,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“妻子”古义是古义：妻子和儿女，今义是今义：仅指丈夫的配偶。",
        "类": "选今义"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"30\" y=\"25\" width=\"120\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"90.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">妻子</text><text x=\"90.0\" y=\"61\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">古义</text><text x=\"170\" y=\"52\" font-size=\"16\" text-anchor=\"middle\" fill=\"#4a7a59\">=</text><rect x=\"190\" y=\"25\" width=\"140\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"260.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">妻 + 子</text><text x=\"260.0\" y=\"61\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">妻子儿女</text><line x1=\"90\" y1=\"80\" x2=\"90\" y2=\"95\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"180\" y=\"110\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">今义 = wife（词义缩小）</text></svg>"
     },
     {
      "name": "绝境",
@@ -14119,7 +14132,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“交通”古义是古义：交错相通，今义是今义：运输、往来通达的总称。",
        "类": "选今义"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 380 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"20\" y=\"25\" width=\"160\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"100.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">阡陌交通</text><text x=\"100.0\" y=\"61\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">古：交错相通</text><text x=\"200\" y=\"52\" font-size=\"18\" text-anchor=\"middle\" fill=\"#4a7a59\">→</text><rect x=\"220\" y=\"25\" width=\"140\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"290.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">交通</text><text x=\"290.0\" y=\"61\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">今：运输往来</text><text x=\"190\" y=\"110\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">词义转移：从\"交错\"到\"运输\"</text></svg>"
     },
     {
      "name": "卑鄙",
@@ -14196,7 +14210,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“卑鄙”古义是古义：地位低微、见识浅陋（自谦），今义是今义：品质恶劣、不道德（贬义）。",
        "类": "选今义"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 380 130\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"20\" y=\"20\" width=\"160\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"100.0\" y=\"46\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">卑鄙</text><text x=\"100.0\" y=\"56\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">古：卑（地位低）</text><text x=\"200\" y=\"45\" font-size=\"14\" text-anchor=\"middle\" fill=\"#4a7a59\">+</text><rect x=\"220\" y=\"20\" width=\"140\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"290.0\" y=\"46\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">鄙</text><text x=\"290.0\" y=\"56\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">鄙（见识浅）</text><line x1=\"190\" y1=\"75\" x2=\"190\" y2=\"90\" stroke=\"#4a7a59\" stroke-width=\"2\" marker-end=\"url(#ah)\"/><text x=\"190\" y=\"115\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">今义 = 品德恶劣（感情色彩变坏）</text></svg>"
     },
     {
      "name": "牺牲",
@@ -14510,7 +14525,8 @@ window.NHZ_GUWEN_KNOWLEDGE = {
        "解析": "“可以”古义是古义：可以凭借、可以用来，今义是今义：能够、表示许可。",
        "类": "选今义"
       }
-     ]
+     ],
+     "图示": "<svg viewBox=\"0 0 360 120\" xmlns=\"http://www.w3.org/2000/svg\" style=\"max-width:100%\"><defs><marker id=\"ah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8\" fill=\"none\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/></marker></defs><rect x=\"30\" y=\"25\" width=\"60\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"60.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">可</text><text x=\"105\" y=\"52\" font-size=\"16\" text-anchor=\"middle\" fill=\"#4a7a59\">+</text><rect x=\"120\" y=\"25\" width=\"60\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"150.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">以</text><text x=\"195\" y=\"52\" font-size=\"16\" text-anchor=\"middle\" fill=\"#4a7a59\">=</text><rect x=\"210\" y=\"25\" width=\"120\" height=\"44\" rx=\"9\" fill=\"#f2f6ee\" stroke=\"#4a7a59\" stroke-width=\"1.6\"/><text x=\"270.0\" y=\"51\" font-size=\"17\" text-anchor=\"middle\" fill=\"#2c3328\">可以</text><text x=\"270.0\" y=\"61\" font-size=\"11\" fill=\"#888\" text-anchor=\"middle\">古：可以凭借</text><text x=\"180\" y=\"110\" font-size=\"12\" text-anchor=\"middle\" fill=\"#6b7566\">今义 = 表示许可（may）</text></svg>"
     },
     {
      "name": "汤",

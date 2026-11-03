@@ -132,6 +132,11 @@
     }
     h += sec('字长什么样', '结构', zx);
 
+    /* 图示（机制图） */
+    if (r['图示']) {
+      h += sec('看图说话', '机制图', '<div class="yw-diagram">' + r['图示'] + '</div>');
+    }
+
     /* 4. 别认错（形近字 + 易错提示） */
     var bx = '';
     asArray(dim['形近字']).slice(0, 6).forEach(function (x) {

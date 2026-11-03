@@ -50,6 +50,9 @@
         (r.shuowen_url ? ' <a href="' + esc(r.shuowen_url) + '" target="_blank" rel="noopener">汉典原文 ↗</a>' : '') +
         '</div></div>';
     }
+    if (r['图示']) {
+      html += '<div class="bs-sec"><h4>看图说话</h4><div class="yw-diagram">' + r['图示'] + '</div></div>';
+    }
     if (r.evo) {
       html += '<div class="bs-sec"><h4>字形演变</h4><div class="bs-sem">🦴 ' + esc(r.evo) + '</div>';
       if (EVO_ANIM[r.bushou]) html += animHtml(EVO_ANIM[r.bushou]);
