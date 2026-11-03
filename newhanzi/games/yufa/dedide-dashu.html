@@ -65,6 +65,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
     <div class="pill"><small>⏱ 时间</small><span id="time">60</span></div>
     <div class="pill"><small>⭐ 得分</small><span id="score">0</span></div>
     <div class="pill"><small>🔥 连击</small><span id="streak">0</span></div>
+    <button type="button" id="btnSkipQ" style="font-size:14px;padding:6px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;">换一题 →</button>
   </div>
 
   <div class="stage" id="stage">
@@ -177,6 +178,7 @@ function end(){
 }
 
 $("btnStart").onclick = start;
+$("btnSkipQ").onclick = function(){ if(playing) nextQ(); };
 var holes = $("holes").children;
 for(var i=0;i<holes.length;i++){
   holes[i].onclick = (function(b){ return function(){ hit(b); }; })(holes[i]);

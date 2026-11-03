@@ -157,7 +157,7 @@ function renderQ(){
   q.opts.forEach(function(o, i){
     h += '<button class="opt" type="button" data-i="' + i + '">' + o + "</button>";
   });
-  h += '</div><div class="qfb" id="qfb"></div>';
+  h += '</div><div class="qfb" id="qfb"></div><div class="btnrow"><button class="btn ghost" type="button" id="btnSkipQ">跳过 →</button></div>';
   card.innerHTML = h;
   box.appendChild(card);
   var btns = card.querySelectorAll(".opt");
@@ -191,6 +191,9 @@ function answerQ(btn, q){
   card.appendChild(nb);
   nb.querySelector("button").onclick = function(){ qi++; renderQ(); };
 }
+$("box").addEventListener("click", function(e){
+  if(e.target && e.target.id === "btnSkipQ"){ qi++; renderQ(); window.scrollTo(0,0); }
+});
 renderQ();
 </script>
 </body>

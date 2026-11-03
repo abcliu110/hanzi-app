@@ -64,6 +64,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
     <div class="col" id="right"></div>
   </div>
   <div class="pairbar" id="pairbar"></div>
+  <div style="text-align:center;margin-top:8px;"><button type="button" id="btnSkipMatch" style="font-size:15px;padding:8px 20px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;">换一组 →</button></div>
 
   <div id="phase2" style="display:none">
     <div class="sec-title">② 找错：下面 3 句里有 1 句关联词用错了，点出来</div>
@@ -227,6 +228,7 @@ function tapFind(btn, f){
 }
 
 newRound();
+$("btnSkipMatch").onclick = function(){ newRound(); window.scrollTo(0,0); };
 </script>
 </body>
 </html>
