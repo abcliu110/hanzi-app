@@ -76,11 +76,14 @@
     }
   }
 
-  /* 内容分型：规律型/辨析型/程序型（CONTENT_PATTERNS.md v2.0） */
+  /* 内容分型：规律型/辨析型/程序型（CONTENT_PATTERNS.md v3.0）
+     注意：用精确匹配避免"短语的结构"误判为程序型 */
   function itemType(it, catName) {
     var cn = catName || '';
-    if (/病句|逻辑错误|阅读方法|题型|答题|审题|立意|选材|结构|语言|翻译|诵读|赏析|创作|读法|应用/.test(cn)) return '程序';
-    if (/关联词|虚词|辨析|文体|古今异义|手法/.test(cn)) return '辨析';
+    /* 程序型：病句类、方法步骤类（精确匹配） */
+    if (/病句|逻辑错误|阅读方法|题型|答题公式|^审题$|^立意$|^选材$|^结构$|^语言$|翻译方法|诵读|赏析法|创作|读法|应用/.test(cn)) return '程序';
+    /* 辨析型：对比类 */
+    if (/关联词|虚词精讲|辨析|文体辨识|古今异义|手法/.test(cn)) return '辨析';
     return '规律';
   }
   var TYPE_LABEL = { '规律': '规律型', '辨析': '辨析型', '程序': '程序型' };
@@ -102,7 +105,7 @@
     var T = {
       '规律': { analogy: '💡 啊哈现象', rule: '一句话', ex: '例组', bad: '病例' },
       '辨析': { analogy: '💡 啊哈现象', rule: '辨析对照', ex: '分水岭例句', bad: '天坑病例' },
-      '程序': { analogy: '💡 啊哈现象', rule: '步骤卡', ex: '全程演示', bad: '易错诊所' }
+      '程序': { analogy: '💡 啊哈现象', rule: '一句话', ex: '全程演示', bad: '易错诊所' }
     }[tp];
     /* 1. 啊哈现象（类比） */
     if (it['类比']) body += stepHead(T.analogy,'蒙特梭利语法符号') +
@@ -159,15 +162,24 @@
     }
     /* 4b. 深讲一点（语法深讲样板：词类） */
     if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
-    /* 4c. 怎么认 */
-    if (it['怎么认'] && it['怎么认'].length) body += stepHead('怎么认') +
-      it['怎么认'].map(function (s, si) {
-        return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
-      }).join('');
+    /* 4c. 怎么认：程序型重排为步骤卡形态 */
+    if (it['怎么认'] && it['怎么认'].length) {
+      if (tp === '程序') {
+        body += stepHead('🃏 步骤卡') + '<div class="yw-stepcards">' +
+          it['怎么认'].map(function (s, si) {
+            return '<div class="yw-stepcard"><span class="yw-stepcard-n">' + (si + 1) + '</span><span>' + esc(s) + '</span></div>';
+          }).join('') + '</div>';
+      } else {
+        body += stepHead('怎么认') +
+          it['怎么认'].map(function (s, si) {
+            return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
+          }).join('');
+      }
+    }
     /* 4d. 辨析 */
     if (it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
-    /* 4e. 例句解析 */
-    if (it['例句解析'] && it['例句解析'].length) body += stepHead('例句解析') +
+    /* 4e. 例句解析：程序型标题为全程演示 */
+    if (it['例句解析'] && it['例句解析'].length) body += stepHead(tp === '程序' ? '🎬 全程演示' : '例句解析') +
       it['例句解析'].map(function (e) {
         return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
       }).join('');

@@ -243,7 +243,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
       '规律': { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' },
       '辨析': { analogy:'💡 啊哈现象', rule:'辨析对照', ex:'分水岭例句', bad:'天坑病例' },
       '词条': { analogy:'💡 啊哈现象', rule:'释义精讲', ex:'例组', bad:'易错诊所' },
-      '程序': { analogy:'💡 啊哈现象', rule:'步骤卡', ex:'全程演示', bad:'易错诊所' },
+      '程序': { analogy:'💡 啊哈现象', rule:'一句话', ex:'全程演示', bad:'易错诊所' },
       '故事': { analogy:'💡 啊哈现象', rule:'时间轴', ex:'关键节点', bad:'易错诊所' },
       '清单': { analogy:'💡 啊哈现象', rule:'一览', ex:'例组', bad:'易错诊所' }
     }[tp] || { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' };
@@ -275,12 +275,38 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
       }).join('');
     }
     if(it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
-    if(it['怎么认'] && it['怎么认'].length) body += stepHead('怎么认') +
-      it['怎么认'].map(function(s, si){
-        return '<p class="yw-exp">' + (si+1) + '. ' + esc(s) + '</p>';
-      }).join('');
-    if(it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
-    if(it['例句解析'] && it['例句解析'].length) body += stepHead('例句解析') +
+    /* 怎么认：程序型重排为步骤卡形态 */
+    if(it['怎么认'] && it['怎么认'].length){
+      if(tp === '程序'){
+        body += stepHead('🃏 步骤卡') + '<div class="yw-stepcards">' +
+          it['怎么认'].map(function(s, si){
+            return '<div class="yw-stepcard"><span class="yw-stepcard-n">' + (si+1) + '</span><span>' + esc(s) + '</span></div>';
+          }).join('') + '</div>';
+      } else {
+        body += stepHead('怎么认') +
+          it['怎么认'].map(function(s, si){
+            return '<p class="yw-exp">' + (si+1) + '. ' + esc(s) + '</p>';
+          }).join('');
+      }
+    }
+    /* 辨析：guyin模块的"古义是X，今义是Y"解析为对照表，其余保持原文 */
+    if(it['辨析']){
+      var bxHtml = '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
+      if(modId === 'guyin'){
+        var bxm = String(it['辨析']).match(/^古义是(.+?)，今义是(.+?)[，。]/);
+        if(bxm){
+          bxHtml = '<div class="sec-t" style="font-size:15px;font-weight:bold;color:#3d5a40;margin:16px 0 8px">对照表</div>' +
+            '<table style="width:100%;border-collapse:collapse;font-size:14px;margin:8px 0">' +
+            '<tr><th style="border:1px solid #d5dfd0;padding:8px 10px;background:#f8faf5;text-align:left">古义</th>' +
+            '<th style="border:1px solid #d5dfd0;padding:8px 10px;background:#f8faf5;text-align:left">今义</th></tr>' +
+            '<tr><td style="border:1px solid #d5dfd0;padding:8px 10px">' + esc(bxm[1]) + '</td>' +
+            '<td style="border:1px solid #d5dfd0;padding:8px 10px">' + esc(bxm[2]) + '</td></tr></table>';
+        }
+      }
+      body += bxHtml;
+    }
+    /* 例句解析：程序型标题为全程演示 */
+    if(it['例句解析'] && it['例句解析'].length) body += stepHead(tp === '程序' ? '🎬 全程演示' : '例句解析') +
       it['例句解析'].map(function(e){
         return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
       }).join('');
