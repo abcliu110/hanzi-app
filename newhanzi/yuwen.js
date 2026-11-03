@@ -38,17 +38,26 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  /* 题库按类过滤：未选类时返回全部题；选类后只返回该类的题 */
+  function bankFiltered(bid) {
+    var st = bankState[bid];
+    var qs = bankData[st.name].questions;
+    if (!st.filter || st.filter === '全部') return qs;
+    return qs.filter(function (q) { return q['类'] === st.filter; });
+  }
+
   function bankHeadHtml(bid) {
     var st = bankState[bid];
-    var bank = bankData[st.name];
-    var end = Math.min(st.offset + 10, bank.total);
-    return '第 ' + (st.offset + 1) + '–' + end + ' 道 / 共 ' + bank.total +
-      ' 道 · 本轮答对 ' + st.score + ' / 已答 ' + st.answered;
+    var qs = bankFiltered(bid);
+    var end = Math.min(st.offset + 10, qs.length);
+    var label = (st.filter && st.filter !== '全部') ? '（' + st.filter + '）' : '';
+    return '第 ' + (st.offset + 1) + '–' + end + ' 道 / 共 ' + qs.length +
+      ' 道' + label + ' · 本轮答对 ' + st.score + ' / 已答 ' + st.answered;
   }
 
   function bankBatchHtml(bid, name) {
     var st = bankState[bid];
-    var qs = bankData[name].questions;
+    var qs = bankFiltered(bid);
     var batch = qs.slice(st.offset, st.offset + 10);
     return batch.map(function (q, qi) {
       var qid = 'bk' + bid + '_' + qi + '_' + Math.floor(Math.random() * 100000);
@@ -63,8 +72,13 @@
   function renderBank(bid) {
     var box = document.getElementById(bid);
     if (!box) return;
+    var st = bankState[bid];
     box.querySelector('.bank-head').textContent = bankHeadHtml(bid);
-    box.querySelector('.bank-qs').innerHTML = bankBatchHtml(bid, bankState[bid].name);
+    box.querySelector('.bank-qs').innerHTML = bankBatchHtml(bid, st.name);
+    var btns = box.querySelectorAll('[data-bank-filter]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-bank-filter').split('|')[1] === st.filter);
+    }
   }
 
   function itemHtml(it, idx) {
@@ -115,6 +129,20 @@
       }).join('') + '</div>';
     }
     } /* 4. 规则一句话结束：此前缺了这个右括号，导致文件尾多出一个 }) */
+    /* 4a. 分类：每个子类单独一块（类名 + 代表词 + 例句），不再只藏在一段话里 */
+    if (it['分类'] && it['分类'].length) {
+      var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
+      body += stepHead('分类 · ' + it['分类'].length + '类');
+      body += it['分类'].map(function (c, ci) {
+        return '<div class="yw-fenlei" style="--fl:' + flColors[ci % flColors.length] + '">' +
+          '<div class="yw-fl-head"><span class="yw-fl-name">' + esc(c['类']) + '</span>' +
+          '<span class="yw-fl-rep">' + esc(c['代表'] || '') + '</span></div>' +
+          '<p class="yw-exp">' + esc(c['说明'] || '') + '</p>' +
+          (c['例子'] ? c['例子'].map(function (e) {
+            return '<p class="yw-exp">📝 ' + esc(e) + '</p>';
+          }).join('') : '') + '</div>';
+      }).join('');
+    }
     /* 4b. 深讲一点（语法深讲样板：词类） */
     if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
     /* 4c. 怎么认 */
@@ -134,22 +162,41 @@
     /* 5b1. 题库动手练：有 200 道题库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
     if (bankData[it.name] && bankData[it.name].questions && bankData[it.name].questions.length) {
       var bid = 'bank' + idx + '_' + Math.floor(Math.random() * 100000);
-      bankState[bid] = { name: it.name, offset: 0, score: 0, answered: 0 };
+      bankState[bid] = { name: it.name, offset: 0, score: 0, answered: 0, filter: '全部' };
+      var bclasses = ['全部'];
+      bankData[it.name].questions.forEach(function (q) {
+        if (q['类'] && bclasses.indexOf(q['类']) < 0) bclasses.push(q['类']);
+      });
       body += '<div class="yw-quiz yw-bank" id="' + bid + '">' +
         '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>' +
+        '<div class="bank-filters">' + bclasses.map(function (c) {
+          return '<button class="' + (c === '全部' ? 'on' : '') + '" data-bank-filter="' + bid + '|' + c + '">按类练：' + esc(c) + '</button>';
+        }).join('') + '</div>' +
         '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
         '<div class="bank-qs">' + bankBatchHtml(bid, it.name) + '</div>' +
         '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button></div>';
     }
     /* 5b. 动手练（每点 3 道带解析的选择题，复用小测的答题逻辑） */
     if (it['练习'] && it['练习'].length && !bankData[it.name]) {
-      body += '<div class="yw-quiz"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练</span></div>' + it['练习'].map(function (q, qi) {
-        var qid = 'lx' + idx + '_' + qi + '_' + Math.floor(Math.random() * 100000);
-        quizData[qid] = q;
-        return '<div class="quiz-q" id="' + qid + '"><div class="quiz-t">' + (qi + 1) + '. ' + esc(q.q) + '</div>' +
-          '<div class="quiz-opts">' + q.options.map(function (op, oi) {
-            return '<button data-qid="' + qid + '" data-oi="' + oi + '">' + esc(op) + '</button>';
-          }).join('') + '</div><div class="quiz-fb"></div></div>';
+      /* 练习按类分组：同类题放一块，组头就是类名 */
+      var groups = [];
+      it['练习'].forEach(function (q) {
+        var gname = q['类'] || '综合';
+        var g = null;
+        for (var gi = 0; gi < groups.length; gi++) if (groups[gi].name === gname) g = groups[gi];
+        if (!g) { g = { name: gname, qs: [] }; groups.push(g); }
+        g.qs.push(q);
+      });
+      var qi = 0;
+      body += '<div class="yw-quiz"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练</span></div>' + groups.map(function (g) {
+        return '<div class="yw-lx-group"><div class="yw-lx-grouphead">按类练：' + esc(g.name) + '</div>' + g.qs.map(function (q) {
+          var qid = 'lx' + idx + '_' + (qi++) + '_' + Math.floor(Math.random() * 100000);
+          quizData[qid] = q;
+          return '<div class="quiz-q" id="' + qid + '"><div class="quiz-t">' + esc(q.q) + '</div>' +
+            '<div class="quiz-opts">' + q.options.map(function (op, oi) {
+              return '<button data-qid="' + qid + '" data-oi="' + oi + '">' + esc(op) + '</button>';
+            }).join('') + '</div><div class="quiz-fb"></div></div>';
+        }).join('') + '</div>';
       }).join('') + '</div>';
     }
     /* 6. 小测 */
@@ -261,14 +308,31 @@
       return;
     }
 
-    /* 题库换批：每轮 10 道，循环 200 道，本轮计分清零 */
+    /* 题库按类过滤：选类后从该类第 1 道开始，本轮计分清零 */
+    var fb = e.target.closest('[data-bank-filter]');
+    if (fb) {
+      var parts = fb.getAttribute('data-bank-filter').split('|');
+      var fbid = parts[0];
+      var fst = bankState[fbid];
+      if (!fst) return;
+      e.stopPropagation();
+      fst.filter = parts[1];
+      fst.offset = 0;
+      fst.score = 0;
+      fst.answered = 0;
+      renderBank(fbid);
+      return;
+    }
+
+    /* 题库换批：每轮 10 道，在当前类内循环，本轮计分清零 */
     var nb = e.target.closest('[data-bank-next]');
     if (nb) {
       var bid = nb.getAttribute('data-bank-next');
       var st = bankState[bid];
       if (!st) return;
       e.stopPropagation();
-      st.offset = (st.offset + 10) % bankData[st.name].questions.length;
+      var flen = bankFiltered(bid).length;
+      if (flen) st.offset = (st.offset + 10) % flen;
       st.score = 0;
       st.answered = 0;
       renderBank(bid);
