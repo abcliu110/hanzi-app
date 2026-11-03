@@ -30,7 +30,7 @@
   }
 
   function itemHtml(r, i) {
-    var head_sub = r.meaning || (r.shuowen ? '《说文解字》有说解' : '暂无释义');
+    var head_sub = r.meaning || (r.shuowen ? '《说文解字》有讲解' : '');
     var html = '<div class="yw-item bs-item" data-i="' + i + '">' +
       '<div class="bs-head">' +
       '<span class="bs-char">' + esc(r.bushou) + '</span>' +

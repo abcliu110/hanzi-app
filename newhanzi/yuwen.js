@@ -108,7 +108,7 @@
     if (it['类比']) body += stepHead(T.analogy,'蒙特梭利语法符号') +
       '<div class="yw-analogy">' + it['类比'] + '</div>';
     /* 2. 看图说话 */
-    if (it['图示']) body += stepHead('看图说话','符号标注 Symbolizing') +
+    if (it['图示']) body += stepHead('看图说话','符号标注') +
       '<div class="yw-diagram">' + it['图示'] + '</div>';
     /* 3. 动手试试（动画） */
     if (it['动画'] && it['动画'].steps && it['动画'].steps.length) {
