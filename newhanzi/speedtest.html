@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首开测速 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<style>
+  .st-wrap{max-width:760px;margin:0 auto;padding:20px}
+  .st-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}
+  .st-card h2{margin:0 0 10px;font-size:17px;color:var(--accent-deep)}
+  .st-card h3{margin:14px 0 8px;font-size:15px;color:var(--ink)}
+  .st-meta{font-size:13px;color:var(--muted);line-height:1.9}
+  .st-meta b{color:var(--ink)}
+  table.st-t{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  table.st-t th,table.st-t td{border:1px solid var(--line);padding:7px 9px;text-align:right;white-space:nowrap}
+  table.st-t th:first-child,table.st-t td:first-child{text-align:left;white-space:normal;word-break:break-all}
+  table.st-t th{background:var(--surface);font-weight:600}
+  .st-flag{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12px;font-weight:700}
+  .st-flag.hot{background:#fdecea;color:#b85a52}
+  .st-flag.warm{background:#fff8e1;color:#8a6d1a}
+  .st-flag.ok{background:var(--accent-soft);color:var(--accent-deep)}
+  .st-run{display:block;width:100%;padding:13px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px}
+  .st-run:disabled{opacity:.5;cursor:default}
+  .st-note{font-size:12px;color:var(--muted);line-height:1.8;margin-top:10px}
+  .st-big{font-size:26px;font-weight:800;color:var(--accent-deep)}
+  .st-kv{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+  .st-kv div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:140px}
+  .st-kv .k{font-size:12px;color:var(--muted)}
+  .st-kv .v{font-size:20px;font-weight:800;color:var(--ink)}
+</style>
+</head>
+<body class="page-sub">
+<header class="topbar nav">
+  <a href="index.html" class="back">← 返回</a>
+  <span id="navtitle">首开测速</span>
+</header>
+<main class="st-wrap">
+
+  <div class="st-card">
+    <h2>📏 测试口径（先看这里）</h2>
+    <div class="st-meta">
+      <b>协议：</b>file:// 本地文件直读（与 Lucas 实际使用方式一致，无 HTTP 服务器、无网络）<br>
+      <b>目标设备：</b>平板 + 桌面（本页在当前设备实测，结果仅代表本机；换设备请重跑）<br>
+      <b>网络条件：</b>无（磁盘读取速度即加载速度）<br>
+      <b>缓存：</b>冷启动 = URL 加时间戳 bust 缓存（模拟首次打开）；热启动 = 同 URL 二次加载（模拟重复打开）<br>
+      <b>计时：</b>performance.now()，脚本从创建 &lt;script&gt; 到 onload；CSS 用 resource timing<br>
+      <b>TTI（可交互）定义：</b>全部 A 组资源就绪 + 2 帧 rAF 后，再测一次点击事件派发→处理回来的延迟<br>
+      <b>浏览器：</b><span id="stUA"></span><br>
+      <b>内存：</b><span id="stMem"></span>
+    </div>
+  </div>
+
+  <div class="st-card">
+    <h2>▶ 运行测试</h2>
+    <div class="st-meta">按顺序加载各资源并计时。A 组 = index.html 首开必备；B 组 = 子页面重型数据（懒加载候选评估，不影响首开）。</div>
+    <button class="st-run" id="stRun">开始测试</button>
+    <div class="st-note" id="stStatus">就绪。点击开始后约需数秒（冷+热两轮）。</div>
+  </div>
+
+  <div class="st-card" id="stSumCard" style="display:none">
+    <h2>📊 汇总</h2>
+    <div class="st-kv">
+      <div><div class="k">DOMContentLoaded</div><div class="v" id="stDCL">–</div></div>
+      <div><div class="k">A组全部就绪（冷）</div><div class="v" id="stAReady">–</div></div>
+      <div><div class="k">TTI（估）</div><div class="v st-big" id="stTTI">–</div></div>
+      <div><div class="k">点击延迟</div><div class="v" id="stClick">–</div></div>
+    </div>
+    <div class="st-note">TTI（估）= 导航开始 → A组冷加载全部完成 → 2×rAF。点击延迟 = synthetic click 派发到 handler 执行的时间，反映主线程是否被长任务阻塞。</div>
+  </div>
+
+  <div class="st-card" id="stACard" style="display:none">
+    <h2>A 组 · index.html 首开必备</h2>
+    <table class="st-t"><thead><tr>
+      <th>资源</th><th>体积</th><th>冷加载 ms</th><th>热加载 ms</th><th>评估</th>
+    </tr></thead><tbody id="stABody"></tbody></table>
+  </div>
+
+  <div class="st-card" id="stBCard" style="display:none">
+    <h2>B 组 · 子页面重型数据（懒加载候选）</h2>
+    <table class="st-t"><thead><tr>
+      <th>资源</th><th>体积</th><th>冷加载 ms</th><th>热加载 ms</th><th>评估</th>
+    </tr></thead><tbody id="stBBody"></tbody></table>
+    <div class="st-note">B 组不在首开路径内，仅为懒加载决策提供"如果某天被提前加载会多慢"的数字。评估列按冷加载耗时打标：&gt;800ms 红 / 300–800ms 黄 / &lt;300ms 绿，仅供参考，裁定由 Lucas 定。</div>
+  </div>
+
+  <div class="st-card">
+    <h2>📝 给懒加载裁定的原始数字</h2>
+    <div class="st-meta" id="stRaw">测试完成后这里会输出一行可复制的原始数据（JSON）。</div>
+  </div>
+
+</main>
+<script>
+(function(){
+'use strict';
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* 环境信息 */
+$('stUA').textContent = navigator.userAgent;
+try{
+  $('stMem').textContent = (navigator.deviceMemory?navigator.deviceMemory+' GB（约）':'未知') +
+    '，逻辑核 ' + (navigator.hardwareConcurrency||'未知');
+}catch(e){ $('stMem').textContent='未知'; }
+
+var A_GROUP=[
+  {src:'zika.css', kind:'css'},
+  {src:'data/index.js', kind:'js'},
+  {src:'yuwen/data.js', kind:'js'},
+  {src:'index.js', kind:'js'}
+];
+var B_GROUP=[
+  {src:'data/guwen_knowledge.js', kind:'js'},
+  {src:'data/shici.js', kind:'js'},
+  {src:'bushou/data.js', kind:'js'},
+  {src:'data/shangxi.js', kind:'js'},
+  {src:'data/guwen.js', kind:'js'},
+  {src:'quiz/data_shici.js', kind:'js'},
+  {src:'quiz/data_yuwen.js', kind:'js'},
+  {src:'data/pinyin_lookup.js', kind:'js'},
+  {src:'bushou/zi_map.js', kind:'js'},
+  {src:'data/shiju.js', kind:'js'}
+];
+var navT0 = (performance.getEntriesByType('navigation')[0]||{}).startTime||0;
+
+function resSize(url){
+  try{
+    var es=performance.getEntriesByType('resource');
+    for(var i=es.length-1;i>=0;i--){
+      if(es[i].name.indexOf(url)>=0 && es[i].decodedBodySize) return es[i].decodedBodySize;
+    }
+  }catch(e){}
+  return 0;
+}
+function fmtSize(b){
+  if(!b) return '—';
+  return b>=1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(1)+' KB';
+}
+function flag(ms){
+  if(ms<0) return '<span class="st-flag hot">失败</span>';
+  if(ms>800) return '<span class="st-flag hot">偏慢</span>';
+  if(ms>300) return '<span class="st-flag warm">一般</span>';
+  return '<span class="st-flag ok">快</span>';
+}
+function loadOne(it, cold){
+  return new Promise(function(resolve){
+    var url = it.src + (cold ? ('?cold='+Date.now()+Math.random().toString(16).slice(2)) : '');
+    var t0 = performance.now();
+    function done(ok){
+      var ms = ok ? (performance.now()-t0) : -1;
+      resolve({src:it.src, ms:ms, size:resSize(it.src)});
+    }
+    if(it.kind==='css'){
+      var l=document.createElement('link');
+      l.rel='stylesheet'; l.href=url;
+      l.onload=function(){done(true);}; l.onerror=function(){done(false);};
+      document.head.appendChild(l);
+    }else{
+      var s=document.createElement('script');
+      s.src=url;
+      s.onload=function(){done(true);}; s.onerror=function(){done(false);};
+      /* 顺序执行：保证与 index.html 一致的串行语义 */
+      s.async=false;
+      document.head.appendChild(s);
+    }
+  });
+}
+function renderRows(tbodyId, results){
+  var tb=$(tbodyId); tb.innerHTML='';
+  results.forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+esc(r.src)+'</td><td>'+fmtSize(r.size)+'</td><td>'+
+      (r.cold<0?'失败':r.cold.toFixed(1))+'</td><td>'+
+      (r.warm<0?'失败':r.warm.toFixed(1))+'</td><td>'+flag(r.cold)+'</td>';
+    tb.appendChild(tr);
+  });
+}
+
+$('stRun').addEventListener('click', function(){
+  var btn=this; btn.disabled=true;
+  $('stStatus').textContent='测试中…先跑 A 组冷启动…';
+  var raw={ua:navigator.userAgent, t0:new Date().toISOString(), A:[], B:[]};
+  var aStart=performance.now();
+
+  function seq(list, cold){
+    var p=Promise.resolve(), out=[];
+    list.forEach(function(it){
+      p=p.then(function(){
+        $('stStatus').textContent='测试中… '+(cold?'冷':'热')+'启动：'+it.src;
+        return loadOne(it, cold).then(function(r){ out.push(r); });
+      });
+    });
+    return p.then(function(){return out;});
+  }
+
+  /* A组冷 → A组热 → B组冷 → B组热 */
+  seq(A_GROUP,true).then(function(aCold){
+    var aEnd=performance.now();
+    return seq(A_GROUP,false).then(function(aWarm){
+      /* TTI 估算：2×rAF 后测点击延迟 */
+      return new Promise(function(res){
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            var tti=performance.now()-navT0;
+            var probe=$('stRun'), lat=-1;
+            function h(){ lat=performance.now()-tDispatch; probe.removeEventListener('click',h); }
+            probe.addEventListener('click',h);
+            var tDispatch=performance.now();
+            probe.dispatchEvent(new Event('click'));
+            setTimeout(function(){
+              res({aCold:aCold,aWarm:aWarm,aMs:aEnd-aStart,tti:tti,clickLat:lat});
+            },50);
+          });
+        });
+      });
+    });
+  }).then(function(mid){
+    $('stStatus').textContent='测试中… B 组冷启动（子页面重型数据）…';
+    return seq(B_GROUP,true).then(function(bCold){
+      $('stStatus').textContent='测试中… B 组热启动…';
+      return seq(B_GROUP,false).then(function(bWarm){
+        mid.bCold=bCold; mid.bWarm=bWarm; return mid;
+      });
+    });
+  }).then(function(mid){
+    /* 合并冷热 */
+    function merge(c,w){
+      return c.map(function(r,i){return {src:r.src,size:r.size,cold:r.ms,warm:w[i]?w[i].ms:-1};});
+    }
+    var A=merge(mid.aCold,mid.aWarm), B=merge(mid.bCold,mid.bWarm);
+    raw.A=A; raw.B=B; raw.aGroupMs=+mid.aMs.toFixed(1); raw.ttiEst=+mid.tti.toFixed(1);
+    raw.clickLatency=mid.clickLat<0?-1:+mid.clickLat.toFixed(2);
+
+    /* 导航 timing */
+    try{
+      var n=performance.getEntriesByType('navigation')[0];
+      if(n){
+        raw.domContentLoaded=+(n.domContentLoadedEventEnd-n.startTime).toFixed(1);
+        raw.loadEvent=+(n.loadEventEnd-n.startTime).toFixed(1);
+      }
+    }catch(e){}
+
+    /* 渲染 */
+    renderRows('stABody',A); renderRows('stBBody',B);
+    $('stACard').style.display=''; $('stBCard').style.display='';
+    $('stSumCard').style.display='';
+    $('stDCL').textContent=(raw.domContentLoaded!=null?raw.domContentLoaded+' ms':'—');
+    $('stAReady').textContent=mid.aMs.toFixed(0)+' ms';
+    $('stTTI').textContent=mid.tti.toFixed(0)+' ms';
+    $('stClick').textContent=mid.clickLat<0?'—':mid.clickLat.toFixed(2)+' ms';
+    $('stRaw').innerHTML='<pre style="white-space:pre-wrap;font-size:11px">'+esc(JSON.stringify(raw,null,1))+'</pre>';
+    $('stStatus').textContent='完成。共测 '+A.length+' 个 A 组 + '+B.length+' 个 B 组资源（冷/热各一轮）。';
+    btn.disabled=false;
+  }).catch(function(e){
+    $('stStatus').textContent='出错：'+e.message; btn.disabled=false;
+  });
+});
+})();
+</script>
+</body>
+</html>
