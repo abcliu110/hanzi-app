@@ -102,6 +102,8 @@ var navTitle = document.getElementById('navtitle');
 document.getElementById('scsrc').textContent = '诗文：' + (D.src || '');
 
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* 卡片 d 字段含 <br><b> 排版标签：转义后把允许的标签恢复 */
+function escD(s){return esc(s).replace(/&lt;br&gt;/g,'<br>').replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>');}
 function showList(){ detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0); }
 function showDetail(){ listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0); }
 function setTitle(t){ if(navTitle) navTitle.textContent = t; }
@@ -451,7 +453,7 @@ function vKnow(){
       h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
       var svg = knowSVG(k.g);
       if(svg) h += '<div class="sc-svg">'+svg+'</div>';
-      h += '<p>'+esc(k.d)+'</p>';
+      h += '<p>'+escD(k.d)+'</p>';
       var links = '';
       (k.v||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
       (k.l||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
