@@ -22,8 +22,16 @@
 
 <main class="listwrap">
   <div id="ywlist"></div>
+  <p class="src-note">实验内容：<a href="proto-yuwen.html">图解课堂原型（蒙特梭利语法符号等）</a>，不在主知识库内，内容以正式版为准。</p>
 </main>
 
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
 <script src="yuwen/data.js"></script>
 <script src="yuwen.js"></script>
 </body>
