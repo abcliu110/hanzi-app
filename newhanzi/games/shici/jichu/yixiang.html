@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>意象配对 · 连线</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5;
+  --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6;
+  --line:#d5dfd0; --red:#b85a52; --green:#3f8e6b;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1a211c; --card:#243028; --surface:#1e2620; --ink:#e6eee4; --muted:#9aa89b;
+  --accent:#6fa87d; --accent-deep:#8fc49a; --accent-soft:#2a3a2e; --line:#33402f; }
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; font-size:17px; line-height:1.6;}
+.wrap{max-width:640px; margin:0 auto; padding:12px 14px 40px;}
+.proto-head{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px;}
+.proto-head h1{font-size:20px; margin:0 0 4px;}
+.proto-head .meta{font-size:13px; color:var(--muted); margin:0 0 6px;}
+.proto-head .note{display:inline-block; font-size:12px; background:var(--accent-soft); color:var(--accent-deep); border-radius:20px; padding:3px 12px; font-weight:bold;}
+.hud{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:15px;}
+.hud .pill{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:6px 14px;}
+.hud .score{font-weight:bold; color:var(--accent-deep);}
+.sec-title{font-size:15px; color:var(--muted); margin:10px 0 8px; text-align:center;}
+.match{display:flex; gap:8px; align-items:stretch;}
+.col{flex:1; display:flex; flex-direction:column; gap:8px;}
+.vs{align-self:center; font-size:22px; color:var(--muted);}
+.pill-btn{min-height:56px; font-size:17px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-family:inherit; padding:8px 6px;}
+.pill-btn.sel{border-color:var(--accent); background:var(--accent-soft);}
+.pill-btn.done{border-color:var(--green); background:var(--green); color:#fff; opacity:.75;}
+.pill-btn.err{border-color:var(--red); animation:shake .3s;}
+@keyframes shake{ 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+.pairbar{text-align:center; font-size:15px; color:var(--muted); margin-top:12px;}
+.btnrow{display:flex; gap:10px; margin-top:10px;}
+.btn{flex:1; min-height:56px; font-size:17px; border-radius:12px; border:2px solid var(--accent); cursor:pointer; font-family:inherit; font-weight:bold;}
+.btn.primary{background:var(--accent); color:#fff;}
+.btn.ghost{background:var(--card); color:var(--accent-deep);}
+.result{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px 16px; text-align:center; display:none;}
+.result.show{display:block;}
+.result .big{font-size:44px; margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../shici.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🌙 意象配对</h1></div>
+<div id="game">
+    <div class="hud">
+      <span class="pill" id="round">第 1 轮</span>
+      <span class="pill score" id="score">得分 0</span>
+    </div>
+    <div class="sec-title">左边点意象 → 右边点象征（每轮 6 对）</div>
+    <div class="match">
+      <div class="col" id="left"></div>
+      <div class="vs">⇄</div>
+      <div class="col" id="right"></div>
+    </div>
+    <div class="pairbar" id="pairbar"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="btnSkip">换一组 →</button>
+    </div>
+  </div>
+  <div class="result" id="result"></div>
+</div>
+<script>
+var ALL = [{"y": "月", "s": "思乡"}, {"y": "月", "s": "团圆"}, {"y": "残月", "s": "孤独"}, {"y": "残月", "s": "不圆满"}, {"y": "夕阳", "s": "怀古"}, {"y": "夕阳", "s": "时光流逝"}, {"y": "浮云", "s": "游子"}, {"y": "浮云", "s": "漂泊"}, {"y": "风", "s": "惆怅"}, {"y": "风", "s": "凄凉"}, {"y": "霜", "s": "人生易老"}, {"y": "霜", "s": "坎坷"}, {"y": "雪", "s": "高洁"}, {"y": "雪", "s": "苍凉"}, {"y": "雨", "s": "愁思"}, {"y": "雨", "s": "滋润"}, {"y": "露", "s": "短暂"}, {"y": "露", "s": "清新"}, {"y": "烟", "s": "迷离"}, {"y": "烟", "s": "苍茫"}, {"y": "柳", "s": "离别"}, {"y": "柳", "s": "留恋"}, {"y": "菊", "s": "高洁"}, {"y": "菊", "s": "隐逸"}, {"y": "梅", "s": "坚贞"}, {"y": "梅", "s": "高洁"}, {"y": "竹", "s": "虚心"}, {"y": "竹", "s": "气节"}, {"y": "松", "s": "坚贞"}, {"y": "松", "s": "长寿"}, {"y": "莲", "s": "高洁"}, {"y": "莲", "s": "纯洁"}, {"y": "梧桐", "s": "孤独"}, {"y": "梧桐", "s": "相思"}, {"y": "芭蕉", "s": "愁思"}, {"y": "芭蕉", "s": "孤独"}, {"y": "丁香", "s": "愁思"}, {"y": "丁香", "s": "忧郁"}, {"y": "落花", "s": "伤春"}, {"y": "落花", "s": "时光"}, {"y": "桃花", "s": "美好"}, {"y": "桃花", "s": "爱情"}, {"y": "兰", "s": "高洁"}, {"y": "兰", "s": "君子"}, {"y": "牡丹", "s": "富贵"}, {"y": "牡丹", "s": "繁华"}, {"y": "草", "s": "离别"}, {"y": "草", "s": "生机"}, {"y": "萍", "s": "漂泊"}, {"y": "萍", "s": "无根"}, {"y": "红豆", "s": "相思"}, {"y": "红豆", "s": "爱情"}, {"y": "杨花", "s": "漂泊"}, {"y": "杨花", "s": "轻浮"}, {"y": "黄叶", "s": "衰败"}, {"y": "黄叶", "s": "秋思"}, {"y": "雁", "s": "书信"}, {"y": "雁", "s": "思乡"}, {"y": "杜鹃", "s": "哀怨"}, {"y": "杜鹃", "s": "思乡"}, {"y": "猿", "s": "哀愁"}, {"y": "猿", "s": "凄凉"}, {"y": "蝉", "s": "高洁"}, {"y": "蝉", "s": "秋思"}, {"y": "鸳鸯", "s": "爱情"}, {"y": "鸳鸯", "s": "恩爱"}, {"y": "青鸟", "s": "信使"}, {"y": "青鸟", "s": "爱情"}, {"y": "鹧鸪", "s": "离愁"}, {"y": "鹧鸪", "s": "旅思"}, {"y": "燕", "s": "春归"}, {"y": "燕", "s": "旧人"}, {"y": "马", "s": "征战"}, {"y": "马", "s": "旅途"}, {"y": "鱼", "s": "书信"}, {"y": "鱼", "s": "爱情"}, {"y": "乌鸦", "s": "凄凉"}, {"y": "乌鸦", "s": "黄昏"}, {"y": "灯", "s": "孤独"}, {"y": "灯", "s": "希望"}, {"y": "镜", "s": "团圆"}, {"y": "镜", "s": "容颜"}, {"y": "琴", "s": "知音"}, {"y": "琴", "s": "高雅"}, {"y": "剑", "s": "报国"}, {"y": "剑", "s": "豪情"}, {"y": "酒", "s": "愁"}, {"y": "酒", "s": "豪情"}, {"y": "舟", "s": "漂泊"}, {"y": "舟", "s": "归隐"}, {"y": "红叶", "s": "相思"}, {"y": "红叶", "s": "秋思"}, {"y": "长亭", "s": "送别"}, {"y": "长亭", "s": "离愁"}, {"y": "南浦", "s": "送别"}, {"y": "南浦", "s": "离别"}, {"y": "楼", "s": "思念"}, {"y": "楼", "s": "登高"}, {"y": "桥", "s": "离别"}, {"y": "桥", "s": "相思"}, {"y": "古道", "s": "苍凉"}, {"y": "古道", "s": "旅思"}];
+var ROUND_N = 6;
+var deck = [], round = 0, score = 0, pairs = [], selL = null, doneCount = 0;
+function $(id){ return document.getElementById(id); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function start(){
+  deck = shuffle(ALL); round = 0; score = 0;
+  $("result").className="result"; $("game").style.display="block";
+  newRound();
+}
+function newRound(){
+  if(deck.length < ROUND_N) deck = shuffle(ALL);
+  pairs = deck.splice(0, ROUND_N);
+  round++;
+  $("round").textContent = "第 " + round + " 轮";
+  $("score").textContent = "得分 " + score;
+  selL = null; doneCount = 0;
+  render();
+}
+function render(){
+  var L = $("left"), R = $("right");
+  L.innerHTML=""; R.innerHTML="";
+  var rights = shuffle(pairs.map(function(p,i){ return {s:p.s, i:i}; }));
+  pairs.forEach(function(p,i){
+    var b = document.createElement("button");
+    b.className="pill-btn"; b.type="button"; b.textContent=p.y;
+    b.setAttribute("data-i", i);
+    b.onclick=function(){ tapL(b,i); };
+    L.appendChild(b);
+  });
+  rights.forEach(function(r){
+    var b = document.createElement("button");
+    b.className="pill-btn"; b.type="button"; b.textContent=r.s;
+    b.setAttribute("data-i", r.i);
+    b.onclick=function(){ tapR(b,r.i); };
+    R.appendChild(b);
+  });
+  $("pairbar").textContent = "已配对 0 / " + ROUND_N;
+}
+function tapL(b,i){
+  if(b.classList.contains("done")) return;
+  var old = document.querySelector("#left .sel");
+  if(old) old.classList.remove("sel");
+  b.classList.add("sel"); selL = i;
+}
+function tapR(b,i){
+  if(b.classList.contains("done") || selL===null) return;
+  if(selL === i){
+    score += 10;
+    var lb = document.querySelector('#left [data-i="'+i+'"]');
+    lb.classList.remove("sel"); lb.classList.add("done");
+    b.classList.add("done");
+    selL = null; doneCount++;
+    $("score").textContent = "得分 " + score;
+    $("pairbar").textContent = "已配对 " + doneCount + " / " + ROUND_N;
+    if(doneCount >= ROUND_N){ setTimeout(newRound, 600); }
+  } else {
+    b.classList.add("err");
+    setTimeout(function(){ b.classList.remove("err"); }, 350);
+  }
+}
+$("btnSkip").onclick = function(){ newRound(); window.scrollTo(0,0); };
+start();
+</script>
+</body>
+</html>

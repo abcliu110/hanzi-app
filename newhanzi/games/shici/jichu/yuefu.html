@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>乐府知识问答</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--green:#3f8e6b;--red:#b85a52;}
+@media (prefers-color-scheme:dark){:root{--bg:#1a211c;--card:#243028;--surface:#202a23;--ink:#e6eee4;--muted:#9aa79b;--accent:#6fa87d;--accent-deep:#8fc39a;--accent-soft:#2c3d31;--line:#33402f;}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.6;padding:12px;max-width:640px;margin:0 auto;min-height:100vh;}
+.proto-head{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px;color:var(--accent-deep);font-weight:bold;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.round{font-size:15px;color:var(--muted);}
+.score{font-size:16px;font-weight:700;color:var(--accent-deep);}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;}
+.qtext{font-size:19px;font-weight:bold;margin-bottom:14px;line-height:1.5;}
+.opts{display:grid;grid-template-columns:1fr;gap:10px;}
+.opt{min-height:56px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:left;padding:12px 14px;}
+.opt:active{transform:scale(.98);}
+.opt.right{border-color:var(--green);background:var(--accent-soft);}
+.opt.wrong{border-color:var(--red);opacity:.7;}
+.feedback{border-radius:12px;padding:12px 14px;margin-bottom:12px;display:none;font-size:16px;}
+.feedback.show{display:block;}
+.feedback.good{background:var(--accent-soft);border:1px solid var(--accent);}
+.feedback.bad{background:var(--card);border:1px solid var(--red);}
+.feedback .exp{margin-top:6px;font-size:15px;color:var(--muted);}
+.btnrow{display:flex;gap:10px;margin-bottom:12px;}
+.btn{flex:1;min-height:56px;font-size:17px;font-weight:bold;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.result{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center;}
+.result h2{font-size:24px;margin-bottom:10px;}
+.result .big{font-size:48px;margin:10px 0;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../shici.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">🎶 乐府知识</h1></div>
+<div id="game">
+  <div class="topbar"><div class="round" id="round"></div><div class="score" id="score"></div></div>
+  <div class="qcard">
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <div class="btnrow"><button class="btn" id="btnSkip">下一题 →</button></div>
+</div>
+<div id="end" class="hidden"></div>
+<script>
+var QS = [{"q": "《长歌行》百川东到海的下一句？", "ans": "何时复西归", "exp": "时光一去不返。", "opts": ["何时复西归", "何时复东归", "何时复北归", "何时复南归"]}, {"q": "《十五从军征》舂谷的舂指？", "ans": "捣米", "exp": "舂谷持作饭。", "opts": ["春天", "冲击", "柱子", "捣米"]}, {"q": "《孔雀东南飞》开头孔雀东南飞的写法是？", "ans": "比兴", "exp": "以孔雀起兴，引出故事。", "opts": ["直抒胸臆", "夸张", "用典", "比兴"]}, {"q": "《木兰诗》鞍鞯的鞯读？", "ans": "jian一声", "exp": "马鞍下的垫子。", "opts": ["qian一声", "jian四声", "jian一声", "jian三声"]}, {"q": "《江南》是哪里的民歌？", "ans": "汉代江南", "exp": "《江南》是汉乐府民歌。", "opts": ["汉代江南", "明代江南", "唐代江南", "宋代江南"]}, {"q": "《敕勒歌》是哪个民族的民歌？", "ans": "鲜卑族", "exp": "敕勒是北朝少数民族。", "opts": ["鲜卑族", "蒙古族", "藏族", "汉族"]}, {"q": "《敕勒歌》的野指？", "ans": "原野", "exp": "野茫茫。", "opts": ["原野", "视野", "郊野", "田野"]}, {"q": "曹操《观沧海》属于？", "ans": "乐府诗", "exp": "步出夏门行一章。", "opts": ["词", "乐府诗", "绝句", "律诗"]}, {"q": "北朝乐府多描写？", "ans": "尚武粗犷", "exp": "木兰诗、敕勒歌。", "opts": ["宫廷", "田园", "尚武粗犷", "儿女情长"]}, {"q": "《敕勒歌》是谁翻译成汉语的？", "ans": "相传为斛律金", "exp": "北齐斛律金所唱。", "opts": ["相传为斛律金", "杜甫", "李白", "白居易"]}, {"q": "《十五从军征》狗窦指？", "ans": "狗洞", "exp": "兔从狗窦入。", "opts": ["狗洞", "门口", "狗窝", "窗户"]}, {"q": "《孔雀东南飞》的人物结局是？", "ans": "双双殉情", "exp": "化作鸳鸯。", "opts": ["团圆", "出家", "远走", "双双殉情"]}, {"q": "《上邪》山无陵中陵指？", "ans": "山丘", "exp": "山无陵，天地合。", "opts": ["陵墓", "越过", "登上", "山丘"]}, {"q": "《木兰诗》朔气传金柝的金柝指？", "ans": "打更器", "exp": "军中打更器。", "opts": ["金子", "铃铛", "打更器", "刀剑"]}, {"q": "《孔雀东南飞》全诗有多少句？", "ans": "357句", "exp": "汉乐府最长叙事诗。", "opts": ["100句", "500句", "357句", "200句"]}, {"q": "汉乐府《江南》的田田用了？", "ans": "叠词", "exp": "莲叶何田田。", "opts": ["叠词", "对偶", "夸张", "用典"]}, {"q": "《陌上桑》的女主人公是？", "ans": "罗敷", "exp": "日出东南隅，照我秦氏楼。", "opts": ["王昭君", "罗敷", "卓文君", "蔡文姬"]}, {"q": "《木兰诗》旦辞爷娘去的旦指？", "ans": "早晨", "exp": "旦辞爷娘去，暮宿黄河边。", "opts": ["中午", "夜晚", "晚上", "早晨"]}, {"q": "蔡文姬的代表作是？", "ans": "悲愤诗", "exp": "蔡琰悲愤诗。", "opts": ["敕勒歌", "孔雀东南飞", "悲愤诗", "木兰诗"]}, {"q": "《陌上桑》里有小姑吗？", "ans": "有，小姑未嫁", "exp": "小姑未嫁。", "opts": ["有两个", "有，小姑未嫁", "没有", "不清楚"]}, {"q": "《敕勒歌》中穹庐指？", "ans": "蒙古包", "exp": "天似穹庐，笼盖四野。", "opts": ["天空", "宫殿", "帐篷布", "蒙古包"]}, {"q": "《孔雀东南飞》奄奄黄昏后中奄奄指？", "ans": "暗淡", "exp": "黄昏暗淡。", "opts": ["暗淡", "奄奄一息", "安静", "忽然"]}, {"q": "曹操、曹丕、曹植父子对乐府的贡献是？", "ans": "文人仿作乐府", "exp": "建安文人学习民歌写乐府。", "opts": ["创立乐府", "文人仿作乐府", "禁止民歌", "废除乐府"]}, {"q": "《七步诗》相传是谁所作？", "ans": "曹植", "exp": "煮豆燃豆萁。", "opts": ["曹冲", "曹操", "曹丕", "曹植"]}, {"q": "《敕勒歌》的作者是？", "ans": "佚名", "exp": "北朝民歌。", "opts": ["李白", "王维", "杜甫", "佚名"]}, {"q": "《长歌行》阳春布德泽中德泽指？", "ans": "恩惠", "exp": "春天带来恩泽。", "opts": ["选择", "道德", "恩惠", "沼泽"]}, {"q": "曹植《白马篇》歌颂的是？", "ans": "游侠少年", "exp": "白马饰金羁。", "opts": ["官员", "农夫", "游侠少年", "商人"]}, {"q": "乐府诗的重章叠句指？", "ans": "反复咏唱", "exp": "如江南鱼戏莲叶反复。", "opts": ["句子很长", "反复咏唱", "叠词很多", "章节很多"]}, {"q": "乐府诗语言多用？", "ans": "口语", "exp": "通俗易懂。", "opts": ["骈文", "口语", "赋体", "文言"]}, {"q": "《陌上桑》中使君调戏罗敷，罗敷怎样应对？", "ans": "机智拒绝", "exp": "罗敷夸夫，巧妙拒绝。", "opts": ["逃跑了", "机智拒绝", "答应了", "哭泣了"]}, {"q": "《十五从军征》的情感是？", "ans": "悲凉控诉", "exp": "控诉战争灾难。", "opts": ["豪迈", "喜悦", "悲凉控诉", "平淡"]}, {"q": "《陌上桑》五马指？", "ans": "太守", "exp": "使君从南来，五马立踟蹰。", "opts": ["太守", "使君", "将军", "五匹马"]}, {"q": "乐府诗《上邪》出自？", "ans": "汉铙歌", "exp": "汉乐府铙歌。", "opts": ["汉铙歌", "唐诗", "诗经", "楚辞"]}, {"q": "《木兰诗》策勋十二转的转指？", "ans": "勋级", "exp": "赏赐很高。", "opts": ["转动", "转身", "转移", "勋级"]}, {"q": "《江南》鱼戏莲叶间共出现几个方位词？", "ans": "五个", "exp": "东、西、南、北、间回环。", "opts": ["三个", "四个", "六个", "五个"]}, {"q": "《十五从军征》舂谷持作饭写出？", "ans": "家中荒凉无人", "exp": "只有野葵可吃。", "opts": ["生活富足", "家中荒凉无人", "饭菜丰盛", "待客热情"]}, {"q": "《长歌行》属于？", "ans": "汉乐府", "exp": "青青园中葵。", "opts": ["元曲", "唐诗", "汉乐府", "宋词"]}, {"q": "《上邪》的绝指？", "ans": "断绝", "exp": "乃敢与君绝。", "opts": ["妙绝", "拒绝", "绝对", "断绝"]}, {"q": "《龟虽寿》老骥伏枥的下一句是？", "ans": "志在千里", "exp": "曹操乐府抒壮志。", "opts": ["志在万里", "志在千里", "志在四方", "志在天下"]}, {"q": "《敕勒歌》的阴山在今天的？", "ans": "内蒙古", "exp": "阴山横亘内蒙古中部。", "opts": ["甘肃", "新疆", "内蒙古", "西藏"]}, {"q": "汉乐府的铙歌指？", "ans": "军乐", "exp": "上邪出自汉铙歌。", "opts": ["儿歌", "情歌", "军乐", "民歌"]}, {"q": "《江南》的作者是？", "ans": "佚名", "exp": "汉乐府民歌。", "opts": ["杜甫", "李白", "佚名", "白居易"]}, {"q": "乐府最初是汉朝的什么机构？", "ans": "掌管音乐的官署", "exp": "汉武帝设乐府，负责采集民歌、配乐演唱。", "opts": ["掌管音乐的官署", "掌管军事的官署", "掌管农业的官署", "掌管教育的官署"]}, {"q": "《上邪》用了几个假设？", "ans": "五个", "exp": "山无陵、江水竭、冬雷震震、夏雨雪、天地合。", "opts": ["四个", "五个", "六个", "三个"]}, {"q": "乐府诗常用的句式是？", "ans": "杂言（长短不一）", "exp": "汉乐府多杂言，自由活泼。", "opts": ["杂言（长短不一）", "全是五言", "全是四言", "全是七言"]}, {"q": "古诗十九首与乐府的关系是？", "ans": "都是汉代诗歌", "exp": "汉代文人五言诗。", "opts": ["都是宋词", "都是元曲", "都是唐诗", "都是汉代诗歌"]}, {"q": "《长歌行》的少壮指？", "ans": "年轻时", "exp": "少壮不努力。", "opts": ["小孩", "年轻时", "壮年", "少年"]}, {"q": "《上邪》的君指？", "ans": "爱人", "exp": "我欲与君相知。", "opts": ["朋友", "君王", "父亲", "爱人"]}, {"q": "《孔雀东南飞》的人物中，谁最专制？", "ans": "焦母", "exp": "焦母逼休儿媳。", "opts": ["刘兄", "焦仲卿", "刘兰芝", "焦母"]}, {"q": "木兰从军多少年？", "ans": "十二年", "exp": "同行十二年，不知木兰是女郎。", "opts": ["八年", "三年", "十二年", "五年"]}, {"q": "《十五从军征》中主人公回家看到？", "ans": "一片荒凉", "exp": "兔从狗窦入，雉从梁上飞。", "opts": ["一片荒凉", "田地丰收", "房屋新建", "家人团聚"]}, {"q": "《木兰诗》归来见天子后木兰要什么？", "ans": "还乡", "exp": "送儿还故乡。", "opts": ["骏马", "当官", "赏金", "还乡"]}, {"q": "《十五从军征》主人公年寿？", "ans": "八十", "exp": "八十始得归。", "opts": ["七十", "八十", "六十", "九十"]}, {"q": "《陌上桑》的秦氏指？", "ans": "罗敷家", "exp": "照我秦氏楼。", "opts": ["姓秦", "秦国", "罗敷家", "秦朝"]}, {"q": "乐府诗大多来自哪里？", "ans": "民间歌谣", "exp": "乐府采集各地民歌，所以语言通俗。", "opts": ["朝廷诏书", "寺庙经文", "民间歌谣", "文人书信"]}, {"q": "《江南》的莲与怜的关系是？", "ans": "谐音双关", "exp": "莲怜谐音，表达爱慕。", "opts": ["谐音双关", "毫无关系", "反义词", "同字"]}, {"q": "以下哪一项不是乐府诗的特点？", "ans": "讲究平仄格律", "exp": "乐府是汉代民歌，还没有近体诗的平仄格律。", "opts": ["多用比兴", "反映民生疾苦", "语言通俗", "讲究平仄格律"]}, {"q": "《木兰诗》里木兰的姓是？", "ans": "本诗未提", "exp": "花木兰是后人附会。", "opts": ["花", "本诗未提", "朱", "木"]}, {"q": "《敕勒歌》的川指？", "ans": "平原", "exp": "敕勒川。", "opts": ["河流", "山川", "四川", "平原"]}, {"q": "《木兰诗》唧唧在诗中出现几次？", "ans": "多次", "exp": "首尾呼应。", "opts": ["三次", "两次", "多次", "一次"]}, {"q": "《孔雀东南飞》刘兰芝的鸡鸣指？", "ans": "五更起床", "exp": "鸡鸣外欲曙。", "opts": ["鸡叫声", "地名", "五更起床", "名字"]}, {"q": "乐府中新娘罗敷的敷读？", "ans": "fu一声", "exp": "秦罗敷。", "opts": ["fu二声", "fu一声", "lu二声", "fu四声"]}, {"q": "乐府诗的语言风格多是？", "ans": "通俗口语", "exp": "民歌口语化，老百姓都听得懂。", "opts": ["通俗口语", "外来语多", "华丽辞藻", "文言深奥"]}, {"q": "《孔雀东南飞》与什么并称乐府双璧？", "ans": "《木兰诗》", "exp": "最长的两篇叙事诗。", "opts": ["《上邪》", "《木兰诗》", "《江南》", "《长歌行》"]}, {"q": "《长歌行》焜黄华叶衰的焜黄指？", "ans": "枯黄", "exp": "秋天叶黄。", "opts": ["昏黄", "明黄", "枯黄", "辉煌"]}, {"q": "《孔雀东南飞》十三能织素中素指？", "ans": "白绢", "exp": "十三能织素。", "opts": ["白绢", "塑料", "朴素", "要素"]}, {"q": "《木兰诗》结尾安能辨我是雄雌用的是？", "ans": "反问", "exp": "反问收束。", "opts": ["反问", "设问", "排比", "夸张"]}, {"q": "《上邪》的乃敢与君绝中乃指？", "ans": "才", "exp": "才敢与你断绝。", "opts": ["才", "你", "于是", "奶"]}, {"q": "《木兰诗》东市买骏马的市指？", "ans": "集市", "exp": "买骏马、鞍鞯等。", "opts": ["县城", "城市", "集市", "市区"]}, {"q": "《江南》是几言诗？", "ans": "七言", "exp": "江南可采莲是七字句。", "opts": ["七言", "四言", "三言", "五言"]}, {"q": "建安风骨与哪种诗歌关系密切？", "ans": "乐府", "exp": "继承乐府现实主义。", "opts": ["宋词", "唐诗", "乐府", "楚辞"]}, {"q": "《上邪》中上邪的邪读作？", "ans": "ye二声", "exp": "上邪！我欲与君相知。", "opts": ["xue一声", "xie二声", "ye二声", "ya二声"]}, {"q": "《木兰诗》属于？", "ans": "北朝乐府民歌", "exp": "乐府双璧之一。", "opts": ["宋词", "汉赋", "北朝乐府民歌", "唐诗"]}, {"q": "《江南》的戏指？", "ans": "嬉戏", "exp": "鱼戏莲叶间。", "opts": ["戏剧", "嬉戏", "戏弄", "游戏"]}, {"q": "《十五从军征》葵指？", "ans": "野菜", "exp": "采葵持作羹。", "opts": ["荷花", "菊花", "野菜", "向日葵"]}, {"q": "《敕勒歌》天苍苍野茫茫描写的是？", "ans": "草原", "exp": "敕勒川，阴山下，天似穹庐。", "opts": ["雪山", "大海", "草原", "沙漠"]}, {"q": "汉乐府的府本义是？", "ans": "官署", "exp": "乐府是官署名。", "opts": ["仓库", "官署", "府第", "省份"]}, {"q": "《孔雀东南飞》反映了什么？", "ans": "封建家长制摧残婚姻", "exp": "焦母逼迫，刘兰芝被遣。", "opts": ["田园生活", "科举考试", "边塞战争", "封建家长制摧残婚姻"]}, {"q": "《孔雀东南飞》的主人公是？", "ans": "刘兰芝与焦仲卿", "exp": "中国古代最长的叙事诗之一。", "opts": ["牛郎与织女", "刘兰芝与焦仲卿", "梁山伯与祝英台", "孟姜女与范喜良"]}, {"q": "《江南》江南可采莲中，莲指？", "ans": "荷花", "exp": "莲就是荷花，江南采莲是水乡风情。", "opts": ["荷花", "莲子", "莲藕", "莲蓬"]}, {"q": "《江南》描写了什么场景？", "ans": "采莲", "exp": "江南可采莲，莲叶何田田。", "opts": ["种田", "采莲", "打鱼", "放牧"]}, {"q": "《敕勒歌》天似穹庐的比喻是？", "ans": "天空像蒙古包", "exp": "笼盖四野。", "opts": ["天空像草原", "天空像大海", "天空像沙漠", "天空像蒙古包"]}, {"q": "《江南》莲叶何田田中田田形容？", "ans": "荷叶茂盛", "exp": "田田形容荷叶又大又密。", "opts": ["水面平静", "荷叶茂盛", "天空辽阔", "田地广阔"]}, {"q": "汉乐府代表了什么文学成就？", "ans": "现实主义高峰", "exp": "反映民生疾苦。", "opts": ["形式主义", "古典主义", "浪漫主义", "现实主义高峰"]}, {"q": "《七哀诗》的作者是？", "ans": "王粲", "exp": "建安七子王粲。", "opts": ["蔡文姬", "曹操", "曹植", "王粲"]}, {"q": "刘兰芝被遣回娘家的原因是？", "ans": "焦母不喜欢她", "exp": "焦母逼儿子休妻。", "opts": ["她想家了", "她生病了", "焦母不喜欢她", "她不会做饭"]}, {"q": "《上邪》表达了什么？", "ans": "坚贞的爱情", "exp": "山无陵乃敢与君绝。", "opts": ["爱国", "思乡", "友情", "坚贞的爱情"]}, {"q": "《木兰诗》朔气指？", "ans": "北方寒气", "exp": "朔气传金柝。", "opts": ["新月", "朔日", "北方寒气", "早晨"]}, {"q": "《孔雀东南飞》鸡鸣外欲曙的曙指？", "ans": "天亮", "exp": "天将亮，刘兰芝起床。", "opts": ["天亮", "黄昏", "鸡叫", "夜晚"]}, {"q": "《孔雀东南飞》的阿母指？", "ans": "母亲", "exp": "刘兰芝的母亲。", "opts": ["阿姨", "奶奶", "姐姐", "母亲"]}, {"q": "《长歌行》的葵指？", "ans": "冬葵", "exp": "青青园中葵。", "opts": ["向日葵", "菊花", "荷花", "冬葵"]}, {"q": "《短歌行》对酒当歌的下一句是？", "ans": "人生几何", "exp": "曹操求贤若渴。", "opts": ["人生无常", "人生几何", "人生如梦", "人生苦短"]}, {"q": "《木兰诗》万里赴戎机中戎机指？", "ans": "战争", "exp": "戎机指军事。", "opts": ["乐器", "农具", "战争", "织布机"]}, {"q": "《木兰诗》有多少句？", "ans": "约62句", "exp": "长篇叙事。", "opts": ["20句", "40句", "约62句", "100句"]}, {"q": "《十五从军征》讲的是？", "ans": "老兵回乡的悲凉", "exp": "十五从军征，八十始得归。", "opts": ["农民丰收", "老兵回乡的悲凉", "少年立志", "将军胜仗"]}, {"q": "《观沧海》日月之行表现了？", "ans": "诗人博大胸怀", "exp": "借大海抒发抱负。", "opts": ["田园", "爱情", "诗人博大胸怀", "思乡"]}, {"q": "汉乐府中的汉指的是？", "ans": "汉朝", "exp": "汉代乐府机关采集的诗歌叫汉乐府。", "opts": ["汉水", "汉族", "汉朝", "汉中"]}, {"q": "《孔雀东南飞》的仲卿指？", "ans": "焦仲卿", "exp": "男主人公。", "opts": ["刘兰芝", "焦母", "焦仲卿", "刘兄"]}, {"q": "《陌上桑》来归相怨怒中坐指？", "ans": "因为", "exp": "因为观看罗敷。", "opts": ["坐车", "因为", "坐下", "座位"]}, {"q": "《江南》鱼戏莲叶东的修辞是？", "ans": "顶真", "exp": "鱼戏莲叶东、西、南、北，重复回环。", "opts": ["顶真", "夸张", "用典", "比喻"]}, {"q": "《孔雀东南飞》的东南飞象征？", "ans": "夫妇分离", "exp": "比兴手法。", "opts": ["孔雀美丽", "季节", "方向", "夫妇分离"]}, {"q": "《孔雀东南飞》举身赴清池指？", "ans": "投水自尽", "exp": "刘兰芝殉情。", "opts": ["游泳", "飞翔", "投水自尽", "举起身体"]}, {"q": "《敕勒歌》风吹草低见牛羊表现了？", "ans": "草原丰美", "exp": "牛羊成群，草原富饶。", "opts": ["草原丰美", "离别之苦", "丰收喜悦", "战争残酷"]}, {"q": "《木兰诗》雄兔脚扑朔说明？", "ans": "男女难辨", "exp": "双兔傍地走，安能辨我是雄雌。", "opts": ["思乡之情", "男女难辨", "战争残酷", "兔子可爱"]}, {"q": "《孔雀东南飞》又名？", "ans": "古诗为焦仲卿妻作", "exp": "古诗为焦仲卿妻作。", "opts": ["兵车行", "古诗为焦仲卿妻作", "长恨歌", "琵琶行"]}, {"q": "《木兰诗》唧唧复唧唧中唧唧指？", "ans": "织布机声", "exp": "开篇写木兰织布叹息。", "opts": ["叹息声", "风声", "织布机声", "虫鸣声"]}, {"q": "北朝乐府《木兰诗》的可汗指？", "ans": "皇帝", "exp": "可汗大点兵。", "opts": ["皇帝", "将军", "王子", "大臣"]}, {"q": "木兰辞官的原因是？", "ans": "思念父母", "exp": "愿驰千里足，送儿还故乡。", "opts": ["身体不好", "思念父母", "想当大官", "害怕打仗"]}, {"q": "《长歌行》少壮不努力的下一句是？", "ans": "老大徒伤悲", "exp": "劝人珍惜时光。", "opts": ["老大徒悲伤", "老大徒后悔", "老大徒伤悲", "老大徒伤心"]}, {"q": "以下哪首不是乐府诗？", "ans": "《春晓》", "exp": "春晓是唐五绝。", "opts": ["《木兰诗》", "《江南》", "《春晓》", "《敕勒歌》"]}, {"q": "《敕勒歌》见牛羊前一句是？", "ans": "风吹草低", "exp": "风吹草低见牛羊。", "opts": ["阴山下", "野茫茫", "风吹草低", "天苍苍"]}, {"q": "《观沧海》的沧海指？", "ans": "渤海", "exp": "曹操东临碣石观渤海。", "opts": ["东海", "黄海", "渤海", "南海"]}, {"q": "《上邪》的震震形容？", "ans": "雷声", "exp": "冬雷震震。", "opts": ["振奋", "地震", "震动", "雷声"]}, {"q": "《江南》的何指？", "ans": "多么", "exp": "莲叶何田田。", "opts": ["什么", "为何", "哪里", "多么"]}, {"q": "《木兰诗》同行十二年说明？", "ans": "从军时间长", "exp": "十二年无人识破。", "opts": ["战争激烈", "从军时间长", "同伴很多", "路途遥远"]}, {"q": "南朝乐府多描写？", "ans": "儿女之情", "exp": "吴歌西曲柔情。", "opts": ["战争", "儿女之情", "朝廷", "田园"]}, {"q": "《木兰诗》中木兰替父从军的原因是？", "ans": "父亲年老弟弟年幼", "exp": "阿爷无大儿，木兰无长兄。", "opts": ["父亲年老弟弟年幼", "被强征入伍", "为了立功", "她喜欢打仗"]}];
+var qi = 0, score = 0, answered = false;
+function $(id){return document.getElementById(id);}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+QS = shuffle(QS.slice());
+function render(){
+  answered = false;
+  var q = QS[qi];
+  $("round").textContent = "第 " + (qi+1) + " / " + QS.length + " 题";
+  $("score").textContent = "得分 " + score;
+  $("qtext").textContent = q.q;
+  var box = $("opts"); box.innerHTML = "";
+  q.opts.forEach(function(o){
+    var b = document.createElement("button");
+    b.className = "opt"; b.textContent = o;
+    b.onclick = function(){ answer(o, b); };
+    box.appendChild(b);
+  });
+  $("fb").className = "feedback";
+}
+function answer(pick, btn){
+  if(answered) return; answered = true;
+  var q = QS[qi];
+  var good = (pick === q.ans);
+  if(good) score += 10;
+  var btns = $("opts").children;
+  for(var i=0;i<btns.length;i++){
+    btns[i].disabled = true;
+    if(btns[i].textContent === q.ans) btns[i].classList.add("right");
+  }
+  if(!good) btn.classList.add("wrong");
+  var fb = $("fb");
+  fb.className = "feedback show " + (good ? "good" : "bad");
+  fb.innerHTML = "<div>" + (good ? "✅ 答对了！" : "❌ 答错了，正确答案是「"+q.ans+"」") + "</div>" +
+    (q.exp ? '<div class="exp">📖 ' + q.exp + "</div>" : "");
+  $("score").textContent = "得分 " + score;
+  setTimeout(next, 2000);
+}
+function next(){
+  qi++;
+  if(qi >= QS.length){ end(); return; }
+  render();
+  window.scrollTo(0,0);
+}
+function end(){
+  $("game").classList.add("hidden");
+  var e = $("end"); e.classList.remove("hidden");
+  var pct = Math.round(score / (QS.length*10) * 100);
+  var msg = pct>=90 ? "🌟 太厉害了！" : pct>=60 ? "👍 不错，继续加油！" : "💪 多练练会更好的！";
+  e.innerHTML = '<div class="result"><h2>'+msg+'</h2><div class="big">'+score+'分</div><p>共 '+QS.length+' 题，答对 '+(score/10)+' 题</p><div class="btnrow" style="margin-top:14px;"><button class="btn primary" onclick="location.reload()">🔄 再来一轮</button></div></div>';
+  window.scrollTo(0,0);
+}
+$("btnSkip").onclick = function(){ next(); };
+render();
+</script>
+</body>
+</html>

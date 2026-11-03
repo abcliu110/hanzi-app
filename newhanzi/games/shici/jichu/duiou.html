@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>对偶/对仗</title><style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;
+--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--red:#b85a52;}
+@media (prefers-color-scheme:dark){:root{--bg:#1a211c;--card:#243028;--surface:#202a23;--ink:#e6eee4;
+--muted:#9aa79b;--accent:#6fa87d;--accent-deep:#8fc49c;--accent-soft:#2c3d31;--line:#33402f;--red:#d98a80;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.6}
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 40px}
+.proto-badge{display:inline-block;font-size:13px;background:var(--accent-soft);color:var(--accent-deep);
+border:1px solid var(--line);border-radius:20px;padding:4px 12px;margin-bottom:8px}
+h1{font-size:22px;margin:6px 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 12px}
+.scorebar{display:flex;justify-content:space-between;align-items:center;margin:10px 0;font-weight:bold}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
+.q{font-size:20px;font-weight:bold;margin-bottom:6px}
+.hint{color:var(--muted);font-size:14px;margin-bottom:12px}
+.opts{display:grid;gap:10px;margin-top:12px}
+button.opt{min-height:56px;font-size:18px;border-radius:12px;border:2px solid var(--line);
+background:var(--surface);color:var(--ink);cursor:pointer;padding:10px}
+button.opt:active{transform:scale(.98)}
+button.opt.right{border-color:var(--accent);background:var(--accent-soft)}
+button.opt.wrong{border-color:var(--red);opacity:.6}
+.btnrow{display:flex;gap:10px;margin-top:14px}
+button.btn{flex:1;min-height:56px;font-size:17px;border-radius:12px;border:2px solid var(--accent);
+background:var(--accent);color:#fff;cursor:pointer;font-weight:bold}
+button.btn.ghost{background:var(--card);color:var(--accent-deep);border-color:var(--line)}
+.fb{min-height:28px;margin-top:10px;font-weight:bold}
+.fb.ok{color:var(--accent-deep)} .fb.no{color:var(--red)}
+.bigchar{font-size:72px;text-align:center;margin:8px 0;font-weight:bold}
+.poem{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0;font-size:19px}
+.poem .ln{margin:6px 0}
+button.zibtn{font-size:19px;min-width:48px;min-height:48px;border-radius:8px;border:1px solid var(--line);
+background:var(--card);color:var(--ink);margin:1px;padding:4px 6px;cursor:pointer}
+button.zibtn.hit{background:var(--accent);color:#fff;border-color:var(--accent-deep)}
+.end{text-align:center;padding:30px 10px}
+.end .sc{font-size:44px;font-weight:bold;color:var(--accent-deep)}
+.koujue{background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:15px}
+</style></head>
+<body>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../shici.html" style="text-decoration:none;font-size:15px;color:var(--accent-deep);font-weight:bold;white-space:nowrap;">← 返回</a><h1 style="font-size:20px;margin:0;">⚖️ 对偶对仗</h1></div><div class="wrap">
+<p class="sub">上句多取自《声律启蒙》《笠翁对韵》，4 选 1。答对 +10 分。</p>
+<div class="scorebar"><span id="qtag">第 1 题</span><span>得分 <b id="score">0</b></span></div>
+<div id="stage"></div>
+<div class="btnrow">
+<button class="btn ghost" id="btnSkip">下一题 →</button>
+</div>
+<div class="end" id="end" style="display:none">
+<div class="sc" id="finalScore">0</div>
+<p id="finalMsg"></p>
+<button class="btn" id="btnAgain">🔄 再来一轮</button>
+</div>
+<script>
+var PAIRS = [["云", "雨"], ["雪", "风"], ["天", "地"], ["日", "月"], ["山", "水"], ["花", "鸟"], ["来", "去"], ["上", "下"], ["左", "右"], ["古", "今"], ["春", "秋"], ["昼", "夜"], ["明", "暗"], ["红", "绿"], ["青", "黄"], ["高", "低"], ["远", "近"], ["轻", "重"], ["贫", "富"], ["贵", "贱"], ["喜", "悲"], ["爱", "憎"], ["清", "浊"], ["深", "浅"], ["浓", "淡"], ["饱", "饥"], ["劳", "逸"], ["动", "静"], ["开", "阖"], ["晨", "昏"], ["雷", "电"], ["霜", "露"], ["松", "竹"], ["梅", "兰"], ["桃", "李"], ["荷", "菊"], ["江", "湖"], ["河", "海"], ["岭", "峦"], ["峰", "壑"], ["城", "郭"], ["巷", "街"], ["舟", "车"], ["马", "牛"], ["琴", "瑟"], ["剑", "刀"], ["笔", "墨"], ["诗", "酒"], ["茶", "饭"], ["衣", "冠"], ["寒", "暑"], ["旱", "涝"], ["盈", "亏"], ["离", "合"], ["始", "终"], ["首", "尾"], ["东", "西"], ["南", "北"], ["大", "小"], ["多", "少"], ["晚照", "晴空"], ["来鸿", "去燕"], ["宿鸟", "鸣虫"], ["三尺", "六钧"], ["岭北", "江东"], ["清暑", "广寒"], ["两岸", "一园"], ["晓烟", "春雨"], ["杨柳", "杏花"], ["两鬓", "一蓑"], ["风霜", "烟雨"], ["途次", "溪边"], ["早行", "晚钓"], ["白叟", "黄童"], ["江风", "海雾"], ["牧子", "渔翁"], ["颜巷", "阮途"], ["冀北", "辽东"], ["池中", "门外"], ["濯足", "打头"], ["女子", "男儿"], ["眉纤", "气壮"], ["额下", "胸中"], ["山花", "海树"], ["赤日", "苍穹"], ["雷隐", "雾蒙"], ["日下", "天中"], ["风高", "雨霁"], ["秋月", "晚霞"], ["牛女", "参商"], ["十月", "三冬"], ["塞边", "江上"], ["寒霜", "朔雪"], ["雨伯", "雷公"], ["烟楼", "雪洞"], ["月殿", "天宫"], ["腊屐", "渔篷"], ["过江", "入竹"], ["千尺", "万竿"], ["宫花", "禁柳"], ["塞雁", "江龙"], ["拾翠", "题红"], ["庄周", "吕望"], ["北牖", "南檐"], ["鹤舞", "凤翔"], ["玉笛", "紫箫"], ["青春", "白昼"], ["古柏", "苍松"], ["垂钓", "荷锄"], ["晨昏", "夏冬"]];
+
+var order = shuffle(PAIRS.slice()), qi = 0, score = 0, lock = false;
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function $(id){return document.getElementById(id);}
+function nextQ(){
+  if(qi >= order.length){ endGame(); return; }
+  lock = false;
+  var p = order[qi], L = p[0].length;
+  var pool = shuffle(PAIRS.filter(function(x){return x[0]!==p[0] && x[1].length===L && x[1]!==p[1];})).slice(0,3).map(function(x){return x[1];});
+  var opts = shuffle([p[1]].concat(pool));
+  var h = '<div class="card"><div class="q">「'+p[0]+'」对什么？</div>'
+    + '<div class="hint">对偶要求：字数相等、意思相关、词性相对。上句多取自《声律启蒙》《笠翁对韵》。</div><div class="opts">';
+  opts.forEach(function(o){ h += '<button class="opt" data-a="'+o+'">'+o+'</button>'; });
+  h += '</div><div class="fb" id="fb"></div></div>';
+  $('stage').innerHTML = h;
+  $('qtag').textContent = '第 ' + (qi+1) + ' / ' + order.length + ' 题';
+  $('stage').querySelectorAll('.opt').forEach(function(b){
+    b.onclick = function(){
+      if(lock) return; lock = true;
+      var fb = $('fb');
+      if(b.getAttribute('data-a') === p[1]){
+        b.classList.add('right'); score += 10;
+        fb.className = 'fb ok'; fb.textContent = '✓ 对上了！+10分';
+      } else {
+        b.classList.add('wrong'); fb.className = 'fb no';
+        fb.textContent = '✗ 正确答案是「'+p[1]+'」';
+        $('stage').querySelectorAll('.opt').forEach(function(x){ if(x.getAttribute('data-a')===p[1]) x.classList.add('right'); });
+      }
+      $('score').textContent = score;
+      setTimeout(function(){ qi++; nextQ(); }, 1300);
+    };
+  });
+}
+function endGame(){
+  $('stage').style.display='none'; $('btnSkip').style.display='none';
+  $('end').style.display='block';
+  $('finalScore').textContent = score + ' 分';
+  $('finalMsg').textContent = '共 '+order.length+' 题，'+(score>=order.length*8?'对联小状元！':score>=order.length*5?'不错，继续加油！':'多读《声律启蒙》，语感会越来越好。');
+}
+$('btnSkip').onclick = function(){ if($('stage').style.display==='none')return; qi++; nextQ(); };
+$('btnAgain').onclick = function(){ location.reload(); };
+nextQ();
+
+</script></body></html>
