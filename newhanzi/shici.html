@@ -122,6 +122,9 @@ function vHome(){
     return '<div class="sc-card" data-go="'+s.id+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></div>';
   }).join('') + '</div>';
   h += '<a class="sc-card" href="quiz/index.html?tab=shici" target="_top" style="display:block;text-decoration:none;margin-top:12px"><h3>🎮 互动练习</h3><p>8种玩法：选择、判断、标注、配对、找错、改写……把诗词知识玩成闯关</p></a>';
+  h += '<div class="sc-card" style="margin-top:12px"><h3>🎮 诗词互动游戏</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
+    '<a href="games/shici/feihua.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;">🌸 飞花令人机对战</a>' +
+    '</div></div>';
   h += '<button class="sc-backbtn" data-go="poems">📜 诗库（全部'+D.poems.length+'首）</button>';
   listEl.innerHTML = h; showList();
   listEl.querySelectorAll('[data-go]').forEach(function(el){

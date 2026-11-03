@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>句子成分拖拽标注 · 互动原型</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --leaf:#9ed0ad;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+    --leaf:#4d7a5c;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.proto-head h1{margin:0 0 6px;font-size:20px}
+.proto-head .meta{margin:0;font-size:13px;color:var(--muted)}
+.proto-head .note{display:inline-block;margin-top:8px;font-size:12px;background:var(--accent-soft);
+  color:var(--accent-deep);border-radius:8px;padding:2px 10px}
+.round-tag{font-size:14px;color:var(--muted);margin:4px 0 10px}
+.words{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 18px}
+.word{position:relative;min-width:76px;min-height:64px;padding:10px 14px;font-size:22px;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;color:var(--ink);cursor:pointer}
+.word .badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:12px;
+  background:var(--accent);color:#fff;border-radius:8px;padding:1px 10px;white-space:nowrap;display:none}
+.word.tagged{border-color:var(--accent)}
+.word.tagged .badge{display:block}
+.word.ok{border-color:var(--green);background:var(--accent-soft)}
+.word.bad{border-color:var(--red);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.sec-title{font-size:15px;color:var(--muted);margin:14px 0 8px}
+.labels{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.label{min-height:52px;padding:10px 18px;font-size:18px;border-radius:12px;cursor:pointer;
+  background:var(--card);border:2px solid var(--line);color:var(--ink)}
+.label.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.label.used{opacity:.35}
+.legend{font-size:13px;color:var(--muted);background:var(--card);border:1px dashed var(--line);
+  border-radius:10px;padding:8px 12px;margin:6px 0 14px}
+.btnrow{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;min-height:56px;font-size:18px;border-radius:14px;border:0;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:16px;display:none}
+.feedback.show{display:block}
+.feedback.good{background:var(--accent-soft);border:1px solid var(--accent)}
+.feedback.badfb{background:var(--card);border:1px solid var(--red)}
+.feedback .exp{margin-top:8px;font-size:15px;color:var(--muted)}
+.scorebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.score{font-size:16px;font-weight:700;color:var(--accent-deep)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="proto-head">
+    <h1>🏷️ 句子成分拖拽标注</h1>
+    <p class="meta">知识点：句子成分（主谓宾定状补）· 抄自：蒙特梭利语法符号 GetWorksheet #37 + MARS 拖拽句图 #16（yufa.md）<br>
+    手机端用「点标签→点词」代替拖拽（Twinkl #5 的点选标注思路）</p>
+    <span class="note">原型待核对 · 不进 app</span>
+  </div>
+
+  <div class="scorebar">
+    <div class="round-tag" id="roundTag">第 1 / 3 句</div>
+    <div class="score" id="score">得分 0</div>
+  </div>
+
+  <div class="sec-title">① 点下面的词（会打上你选中的标签）</div>
+  <div class="words" id="words"></div>
+
+  <div class="sec-title">② 先选一个标签</div>
+  <div class="labels" id="labels"></div>
+  <div class="legend">💡 蒙特梭利小提示：主语多是"谁/什么"（名词性），谓语是"做什么"（动词性）。先找"谁"，再找"做什么"，剩下的就好分了。</div>
+
+  <div class="btnrow">
+    <button class="btn ghost" id="btnReset">↺ 重选</button>
+    <button class="btn primary" id="btnCheck">检查答案</button>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <div class="btnrow" id="nextRow" style="display:none">
+    <button class="btn primary" id="btnNext">下一句 →</button>
+  </div>
+</div>
+
+<script>
+var ROUNDS = [
+  {sent:["小鸟","唱","歌"], tags:["主语","谓语","宾语"],
+   answer:{"小鸟":"主语","唱":"谓语","歌":"宾语"},
+   exp:"小鸟（谁）→主语；唱（做什么）→谓语；歌（唱什么）→宾语。"},
+  {sent:["我","把","苹果","吃","了"], tags:["主语","把字","宾语","谓语","助词"],
+   answer:{"我":"主语","把":"把字","苹果":"宾语","吃":"谓语","了":"助词"},
+   exp:"把字句里'把＋宾语'提前：'把'是介词，只起标记作用，不算谓语；真正的谓语是'吃'。"},
+  {sent:["他","认真地","写","字"], tags:["主语","状语","谓语","宾语"],
+   answer:{"他":"主语","认真地":"状语","写":"谓语","字":"宾语"},
+   exp:"'认真地'修饰动词'写'，回答'怎么写的'→状语。记住：'地'字后面的常常是状语。"}
+];
+var ri = 0, selLabel = null, assign = {}, score = 0, locked = false;
+
+function $(id){ return document.getElementById(id); }
+
+function render(){
+  locked = false; selLabel = null; assign = {};
+  var r = ROUNDS[ri];
+  $("roundTag").textContent = "第 " + (ri+1) + " / " + ROUNDS.length + " 句";
+  $("fb").className = "feedback"; $("fb").innerHTML = "";
+  $("nextRow").style.display = "none";
+  var w = $("words"); w.innerHTML = "";
+  r.sent.forEach(function(word, i){
+    var b = document.createElement("button");
+    b.className = "word"; b.type = "button";
+    b.innerHTML = '<span class="badge"></span><span class="wt">' + word + "</span>";
+    b.onclick = function(){ tapWord(i); };
+    w.appendChild(b);
+  });
+  var l = $("labels"); l.innerHTML = "";
+  r.tags.forEach(function(t){
+    var b = document.createElement("button");
+    b.className = "label"; b.type = "button"; b.textContent = t;
+    b.onclick = function(){ tapLabel(t, b); };
+    l.appendChild(b);
+  });
+  refreshBadges();
+}
+
+function tapLabel(t, el){
+  if(locked) return;
+  selLabel = (selLabel === t) ? null : t;
+  var els = $("labels").children;
+  for(var i=0;i<els.length;i++) els[i].classList.remove("sel");
+  if(selLabel) el.classList.add("sel");
+}
+
+function tapWord(i){
+  if(locked) return;
+  if(assign[i] !== undefined){ delete assign[i]; }
+  else if(selLabel){
+    // 一个标签只能用一次：先清掉之前用它的词
+    for(var k in assign){ if(assign[k] === selLabel) delete assign[k]; }
+    assign[i] = selLabel;
+  }
+  refreshBadges();
+}
+
+function refreshBadges(){
+  var ws = $("words").children;
+  for(var i=0;i<ws.length;i++){
+    var badge = ws[i].querySelector(".badge");
+    if(assign[i] !== undefined){
+      ws[i].classList.add("tagged"); badge.textContent = assign[i];
+    }else{
+      ws[i].classList.remove("tagged"); badge.textContent = "";
+    }
+    ws[i].classList.remove("ok"); ws[i].classList.remove("bad");
+  }
+  var used = {};
+  for(var k in assign) used[assign[k]] = 1;
+  var ls = $("labels").children, r = ROUNDS[ri];
+  for(var j=0;j<ls.length;j++){
+    ls[j].classList.toggle("used", !!used[r.tags[j]]);
+  }
+}
+
+function check(){
+  if(locked) return;
+  var r = ROUNDS[ri], ws = $("words").children;
+  var keys = Object.keys(assign);
+  if(keys.length < r.sent.length){
+    showFb(false, "还有词没贴标签，再想想～", "");
+    return;
+  }
+  var allOk = true;
+  for(var i=0;i<r.sent.length;i++){
+    var ok = assign[i] === r.answer[r.sent[i]];
+    ws[i].classList.add(ok ? "ok" : "bad");
+    if(!ok) allOk = false;
+  }
+  locked = true;
+  if(allOk){
+    score += 10;
+    $("score").textContent = "得分 " + score;
+    showFb(true, "✅ 全对！＋10 分", r.exp);
+  }else{
+    showFb(false, "❌ 有贴错的，再看看", r.exp);
+  }
+  $("nextRow").style.display = "flex";
+  $("btnNext").textContent = (ri < ROUNDS.length - 1) ? "下一句 →" : "再来一轮 ↺";
+}
+
+function showFb(good, title, exp){
+  var fb = $("fb");
+  fb.className = "feedback show " + (good ? "good" : "badfb");
+  fb.innerHTML = "<div>" + title + "</div>" +
+    (exp ? '<div class="exp">📖 ' + exp + "</div>" : "");
+}
+
+$("btnCheck").onclick = check;
+$("btnReset").onclick = function(){ if(!locked) render(); };
+$("btnNext").onclick = function(){
+  ri++;
+  if(ri >= ROUNDS.length){ ri = 0; score = 0; $("score").textContent = "得分 0"; }
+  render();
+  window.scrollTo(0,0);
+};
+render();
+</script>
+</body>
+</html>

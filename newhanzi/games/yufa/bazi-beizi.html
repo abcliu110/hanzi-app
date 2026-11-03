@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>把字句↔被字句变形机 · 互动原型</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --leaf:#9ed0ad;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+    --leaf:#4d7a5c;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.proto-head h1{margin:0 0 6px;font-size:20px}
+.proto-head .meta{margin:0;font-size:13px;color:var(--muted)}
+.proto-head .note{display:inline-block;margin-top:8px;font-size:12px;background:var(--accent-soft);
+  color:var(--accent-deep);border-radius:8px;padding:2px 10px}
+.sec-title{font-size:15px;color:var(--muted);margin:18px 0 8px}
+.demo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center}
+.blocks{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0;min-height:64px}
+.blk{padding:10px 16px;font-size:22px;border-radius:12px;background:var(--accent-soft);
+  border:2px solid var(--accent);color:var(--ink)}
+.blk.key{background:var(--accent);color:#fff;border-color:var(--accent-deep)}
+.formula{font-size:14px;color:var(--muted);margin:8px 0}
+.btnrow{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;min-height:56px;font-size:18px;border-radius:14px;border:0;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.tip{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);
+  border-radius:10px;padding:10px 12px;margin-top:12px}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+.qcard .stem{font-size:20px;margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{min-height:56px;font-size:18px;text-align:left;padding:10px 14px;border-radius:12px;cursor:pointer;
+  background:var(--surface);border:2px solid var(--line);color:var(--ink)}
+.opt.ok{border-color:var(--green);background:var(--accent-soft)}
+.opt.bad{border-color:var(--red);animation:shake .3s}
+.opt:disabled{opacity:.9;cursor:default}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.qfb{margin-top:10px;font-size:15px;color:var(--muted);display:none}
+.qfb.show{display:block}
+.qfb .why{margin-top:6px}
+.score{font-size:16px;font-weight:700;color:var(--accent-deep);text-align:right;margin-top:6px}
+.done{background:var(--accent-soft);border:1px solid var(--accent);border-radius:14px;
+  padding:18px;text-align:center;margin-top:16px;font-size:18px;display:none}
+.done.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="proto-head">
+    <h1>🔄 把字句 ↔ 被字句变形机</h1>
+    <p class="meta">知识点：把字句/被字句互换 · 抄自：香港教育城《一话两说》#9 + 61me 三步操作法 #10 + eChineseLearning 纸条换位 #11（yufa.md）</p>
+    <span class="note">原型待核对 · 不进 app</span>
+  </div>
+
+  <div class="sec-title">① 先看变形：点按钮，词语块自己"搬家"</div>
+  <div class="demo">
+    <div class="formula" id="formula">把字句公式：谁 ＋ 把 ＋ 什么 ＋ 怎么样</div>
+    <div class="blocks" id="blocks"></div>
+    <div class="btnrow">
+      <button class="btn primary" id="btnSwap">变成被字句 →</button>
+    </div>
+  </div>
+  <div class="tip">💡 61me 口诀：圈动词 → 问"谁干的 / 谁挨着" → 重排。"把"像举手说"是我干的"，"被"像指着自己说"这事发生在我身上"（eChineseLearning #11）。</div>
+
+  <div class="sec-title">② 练 5 道（含 1 个陷阱题）</div>
+  <div id="quiz"></div>
+  <div class="score" id="score">得分 0 / 50</div>
+  <div class="done" id="done"></div>
+</div>
+
+<script>
+function $(id){ return document.getElementById(id); }
+
+/* ---------- 变形演示（FLIP 动画） ---------- */
+var isBa = true;
+var BA  = [{t:"我",k:0},{t:"把",k:1},{t:"苹果",k:0},{t:"吃了",k:0}];
+var BEI = [{t:"苹果",k:0},{t:"被",k:1},{t:"我",k:0},{t:"吃了",k:0}];
+
+function renderBlocks(){
+  var box = $("blocks"); box.innerHTML = "";
+  (isBa ? BA : BEI).forEach(function(b){
+    var d = document.createElement("div");
+    d.className = "blk" + (b.k ? " key" : "");
+    d.textContent = b.t;
+    box.appendChild(d);
+  });
+  $("formula").textContent = isBa
+    ? "把字句公式：谁 ＋ 把 ＋ 什么 ＋ 怎么样"
+    : "被字句公式：什么 ＋ 被 ＋ 谁 ＋ 怎么样";
+  $("btnSwap").textContent = isBa ? "变成被字句 →" : "← 变回把字句";
+}
+
+$("btnSwap").onclick = function(){
+  var box = $("blocks");
+  var old = {}, cur = box.children, s, r;
+  for(s=0;s<cur.length;s++){ r = cur[s].getBoundingClientRect(); old[cur[s].textContent] = r; }
+  isBa = !isBa;
+  renderBlocks();
+  var nk = box.children;
+  for(var j=0;j<nk.length;j++){
+    (function(el){
+      var r2 = el.getBoundingClientRect(), o = old[el.textContent];
+      if(o){
+        var dx = o.left - r2.left, dy = o.top - r2.top;
+        if(dx || dy){
+          el.animate(
+            [{transform:"translate("+dx+"px,"+dy+"px)"},{transform:"translate(0,0)"}],
+            {duration:600, easing:"cubic-bezier(.3,.7,.3,1)"}
+          );
+        }
+      }else{
+        el.animate([{opacity:0},{opacity:1}],{duration:400});
+      }
+    })(nk[j]);
+  }
+};
+renderBlocks();
+
+/* ---------- 5 道练习 ---------- */
+var QS = [
+  {stem:"我把作业写完了。", opts:["作业被我写完了。","我被作业写完了。","作业把我写完了。"], a:0,
+   why:"'作业'是被处置的对象，提到'被'前面；'我'是动作发出者，放在'被'后面。"},
+  {stem:"妈妈把房间打扫干净了。", opts:["妈妈被房间打扫干净了。","房间被妈妈打扫干净了。","房间把妈妈打扫干净了。"], a:1,
+   why:"'房间'挨了打扫→被字句主语；'妈妈'干的→'被'后面。"},
+  {stem:"他把玻璃打碎了。", opts:["玻璃把他打碎了。","他被玻璃打碎了。","玻璃被他打碎了。"], a:2,
+   why:"谁挨着？玻璃。谁干的？他。所以'玻璃被他打碎了'。"},
+  {stem:"老师把试卷发下来了。", opts:["试卷被老师发下来了。","老师被试卷发下来了。","试卷把老师发下来了。"], a:0,
+   why:"'试卷'是被发的东西→主语；'老师'发出动作→'被'后面。"},
+  {stem:"哥哥喜欢打篮球。（陷阱题）", opts:["打篮球被哥哥喜欢了。","喜欢被哥哥打篮球了。","这句不能改"], a:2,
+   why:"'喜欢'是心理动词，没有'处置'动作，不能硬改成被字句！61me #10 说：第五天就放这种题，看你会不会上当。"}
+];
+var qi = 0, qscore = 0;
+
+function renderQ(){
+  var box = $("quiz"); box.innerHTML = "";
+  $("done").className = "done";
+  if(qi >= QS.length){
+    $("score").textContent = "得分 " + qscore + " / 50";
+    var d = $("done");
+    d.className = "done show";
+    d.innerHTML = "🏁 练完啦！得分 " + qscore + " / 50 分<br>" +
+      (qscore === 50 ? "🎉 满分！陷阱题都没骗到你！" : "陷阱题（第5题）最容易错，记住：没有处置动作的句不能改。") +
+      '<div class="btnrow"><button class="btn primary" id="btnAgain">再来一轮</button></div>';
+    $("btnAgain").onclick = function(){ qi = 0; qscore = 0; renderQ(); window.scrollTo(0, document.body.scrollHeight); };
+    return;
+  }
+  var q = QS[qi];
+  var card = document.createElement("div");
+  card.className = "qcard";
+  var h = '<div class="stem">第 ' + (qi+1) + ' 题：把下面这句改成被字句<br>「' + q.stem + '」</div><div class="opts">';
+  q.opts.forEach(function(o, i){
+    h += '<button class="opt" type="button" data-i="' + i + '">' + o + "</button>";
+  });
+  h += '</div><div class="qfb" id="qfb"></div>';
+  card.innerHTML = h;
+  box.appendChild(card);
+  var btns = card.querySelectorAll(".opt");
+  for(var i=0;i<btns.length;i++){
+    btns[i].onclick = (function(b){
+      return function(){ answerQ(b, q); };
+    })(btns[i]);
+  }
+}
+
+function answerQ(btn, q){
+  var card = btn.parentNode.parentNode;
+  var btns = card.querySelectorAll(".opt");
+  for(var i=0;i<btns.length;i++) btns[i].disabled = true;
+  var pick = parseInt(btn.getAttribute("data-i"), 10);
+  var fb = card.querySelector(".qfb");
+  if(pick === q.a){
+    btn.classList.add("ok");
+    qscore += 10;
+    fb.innerHTML = "✅ 答对了！＋10 分<div class='why'>📖 " + q.why + "</div>";
+  }else{
+    btn.classList.add("bad");
+    btns[q.a].classList.add("ok");
+    fb.innerHTML = "❌ 再想想<div class='why'>📖 " + q.why + "</div>";
+  }
+  fb.className = "qfb show";
+  $("score").textContent = "得分 " + qscore + " / 50";
+  var nb = document.createElement("div");
+  nb.className = "btnrow";
+  nb.innerHTML = '<button class="btn primary" type="button">下一题 →</button>';
+  card.appendChild(nb);
+  nb.querySelector("button").onclick = function(){ qi++; renderQ(); };
+}
+renderQ();
+</script>
+</body>
+</html>

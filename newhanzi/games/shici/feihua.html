@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>飞花令人机对战 · 原型</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--green:#3f8e6b;--blue:#4a7a8c;--red:#b85a52;--leaf:#9ed0ad}
+@media (prefers-color-scheme:dark){:root{--bg:#1a211c;--card:#243028;--surface:#1f2923;--ink:#e6eee4;--muted:#9aab9c;--accent:#6fa87d;--accent-deep:#8fbf9a;--accent-soft:#2a3a30;--line:#354339;--leaf:#4d7a5c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:17px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.proto-title{font-size:19px;font-weight:800;color:var(--accent-deep)}
+.proto-src{font-size:12px;color:var(--muted);margin-top:4px}
+.proto-badge{display:inline-block;font-size:12px;background:var(--accent-soft);color:var(--accent-deep);border-radius:999px;padding:2px 10px;margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.kw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.kw-btn{min-height:64px;font-size:26px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.kw-btn.sel{border-color:var(--accent);background:var(--accent-soft)}
+.btn{display:block;width:100%;min-height:56px;font-size:18px;font-weight:700;border-radius:14px;border:0;background:var(--accent);color:#fff;cursor:pointer;margin:8px 0}
+.btn-ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.log{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;margin:10px 0}
+.msg{border-radius:12px;padding:8px 12px;max-width:92%}
+.msg.user{align-self:flex-end;background:var(--accent-soft);color:var(--ink)}
+.msg.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--line)}
+.msg .who{font-size:12px;color:var(--muted)}
+.msg .info{font-size:12px;color:var(--muted);margin-top:2px}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1;font-size:17px;padding:12px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.input-row button{min-height:52px;padding:0 18px;font-size:17px;font-weight:700;border-radius:12px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+.scorebar{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.hidden{display:none}
+.verse-list{font-size:14px;color:var(--muted)}
+.verse-list li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="proto-head">
+    <div class="proto-title">🌸 飞花令人机对战</div>
+    <div class="proto-src">玩法抄自：飞花小令（开源 github.com/kuriko1023/fhl）+ 飞花令AI对诗（CSDN 纯前端教程）</div>
+    <div class="proto-badge">原型待核对 · 未进 App</div>
+  </div>
+
+  <div id="screen-pick" class="card">
+    <h3 style="margin:0 0 6px">选一个字开局</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px">你一句、AI 一句，轮流说含这个字的诗句，共 5 轮。"水"字含水/江/河/湖/海/雨/雪都算。</p>
+    <div class="kw-grid" id="kwGrid"></div>
+    <button class="btn" id="btnStart">开战！</button>
+  </div>
+
+  <div id="screen-play" class="hidden">
+    <div class="scorebar"><span id="roundLab">第 1/5 轮</span><span id="scoreLab">得分 0</span></div>
+    <div class="log" id="log"></div>
+    <div class="tip" id="tip">在下面输入一句含"<b id="kwShow"></b>"的诗句，点"出句"。</div>
+    <div class="input-row">
+      <input id="verseInput" placeholder="输入一句诗，如：举头望明月" autocomplete="off">
+      <button id="btnSend">出句</button>
+    </div>
+    <button class="btn btn-ghost" id="btnSkip">跳过这一轮</button>
+  </div>
+
+  <div id="screen-end" class="card hidden">
+    <h3 style="margin:0 0 6px">对战结束</h3>
+    <p id="finalScore" style="font-size:22px;font-weight:800;color:var(--accent-deep)"></p>
+    <ul class="verse-list" id="verseList"></ul>
+    <button class="btn" id="btnAgain">再来一局</button>
+  </div>
+</div>
+<script>
+var POEMS = [
+ {t:"静夜思",a:"李白",lines:["床前明月光","疑是地上霜","举头望明月","低头思故乡"]},
+ {t:"春晓",a:"孟浩然",lines:["春眠不觉晓","处处闻啼鸟","夜来风雨声","花落知多少"]},
+ {t:"登鹳雀楼",a:"王之涣",lines:["白日依山尽","黄河入海流","欲穷千里目","更上一层楼"]},
+ {t:"望庐山瀑布",a:"李白",lines:["日照香炉生紫烟","遥看瀑布挂前川","飞流直下三千尺","疑是银河落九天"]},
+ {t:"早发白帝城",a:"李白",lines:["朝辞白帝彩云间","千里江陵一日还","两岸猿声啼不住","轻舟已过万重山"]},
+ {t:"枫桥夜泊",a:"张继",lines:["月落乌啼霜满天","江枫渔火对愁眠","姑苏城外寒山寺","夜半钟声到客船"]},
+ {t:"绝句",a:"杜甫",lines:["迟日江山丽","春风花草香","泥融飞燕子","沙暖睡鸳鸯"]},
+ {t:"江雪",a:"柳宗元",lines:["千山鸟飞绝","万径人踪灭","孤舟蓑笠翁","独钓寒江雪"]},
+ {t:"咏柳",a:"贺知章",lines:["碧玉妆成一树高","万条垂下绿丝绦","不知细叶谁裁出","二月春风似剪刀"]},
+ {t:"出塞",a:"王昌龄",lines:["秦时明月汉时关","万里长征人未还","但使龙城飞将在","不教胡马度阴山"]},
+ {t:"送元二使安西",a:"王维",lines:["渭城朝雨浥轻尘","客舍青青柳色新","劝君更尽一杯酒","西出阳关无故人"]},
+ {t:"黄鹤楼送孟浩然之广陵",a:"李白",lines:["故人西辞黄鹤楼","烟花三月下扬州","孤帆远影碧空尽","唯见长江天际流"]},
+ {t:"望天门山",a:"李白",lines:["天门中断楚江开","碧水东流至此回","两岸青山相对出","孤帆一片日边来"]},
+ {t:"独坐敬亭山",a:"李白",lines:["众鸟高飞尽","孤云独去闲","相看两不厌","只有敬亭山"]},
+ {t:"山行",a:"杜牧",lines:["远上寒山石径斜","白云生处有人家","停车坐爱枫林晚","霜叶红于二月花"]},
+ {t:"泊秦淮",a:"杜牧",lines:["烟笼寒水月笼沙","夜泊秦淮近酒家","商女不知亡国恨","隔江犹唱后庭花"]},
+ {t:"江南春",a:"杜牧",lines:["千里莺啼绿映红","水村山郭酒旗风","南朝四百八十寺","多少楼台烟雨中"]},
+ {t:"晓出净慈寺送林子方",a:"杨万里",lines:["毕竟西湖六月中","风光不与四时同","接天莲叶无穷碧","映日荷花别样红"]},
+ {t:"村居",a:"高鼎",lines:["草长莺飞二月天","拂堤杨柳醉春烟","儿童散学归来早","忙趁东风放纸鸢"]},
+ {t:"雪梅",a:"卢梅坡",lines:["梅雪争春未肯降","骚人阁笔费评章","梅须逊雪三分白","雪却输梅一段香"]},
+ {t:"逢雪宿芙蓉山主人",a:"刘长卿",lines:["日暮苍山远","天寒白屋贫","柴门闻犬吠","风雪夜归人"]}
+];
+var KW = {月:["月"],花:["花"],山:["山"],水:["水","江","河","湖","海","雨","雪","泉","瀑","溪","波","浪","潮"],风:["风"],雪:["雪"]};
+var TOTAL = 5;
+var kw = "月", round = 1, score = 0, usedAI = {}, userVerses = [];
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function matchKw(line,k){return KW[k].some(function(c){return line.indexOf(c)>=0;});}
+function bankFor(k){
+  var r=[];
+  POEMS.forEach(function(p){p.lines.forEach(function(l){if(matchKw(l,k))r.push({v:l,t:p.t,a:p.a});});});
+  return r;
+}
+var $=function(id){return document.getElementById(id);};
+
+Object.keys(KW).forEach(function(k,i){
+  var b=document.createElement("button");
+  b.className="kw-btn"+(i===0?" sel":"");b.textContent=k;
+  b.onclick=function(){kw=k;var bs=$("kwGrid").children;for(var j=0;j<bs.length;j++)bs[j].classList.remove("sel");b.classList.add("sel");};
+  $("kwGrid").appendChild(b);
+});
+$("btnStart").onclick=function(){
+  round=1;score=0;usedAI={};userVerses=[];
+  $("screen-pick").classList.add("hidden");$("screen-end").classList.add("hidden");
+  $("screen-play").classList.remove("hidden");
+  $("kwShow").textContent=kw;$("log").innerHTML="";
+  aiSay("我是 AI 小诗童，"+"“"+kw+"”字开局，你先出句吧！","");
+  updateBar();$("verseInput").focus();
+};
+function updateBar(){$("roundLab").textContent="第 "+round+"/"+TOTAL+" 轮";$("scoreLab").textContent="得分 "+score;}
+function addMsg(who,text,info){
+  var d=document.createElement("div");d.className="msg "+who;
+  d.innerHTML='<div class="who">'+(who==="user"?"你":"🤖 AI 小诗童")+'</div><div>'+esc(text)+'</div>'+(info?'<div class="info">'+esc(info)+'</div>':"");
+  $("log").appendChild(d);$("log").scrollTop=$("log").scrollHeight;
+}
+function aiSay(t,i){addMsg("ai",t,i);}
+$("btnSend").onclick=function(){
+  var v=$("verseInput").value.trim().replace(/，。！？、；：""''.,!?;:""]/g,"");
+  if(v.length<5){$("tip").innerHTML="太短啦，写一句完整的诗句（含“"+esc(kw)+"”）。";return;}
+  if(!matchKw(v,kw)){$("tip").innerHTML="这句里没有“"+esc(kw)+"”（水字：水/江/河/湖/海/雨/雪都算），换一句试试。";return;}
+  if(userVerses.indexOf(v)>=0){$("tip").innerHTML="这句你已经出过啦，换一句新的。";return;}
+  userVerses.push(v);score++;
+  addMsg("user",v,"第"+round+"轮 · +1");
+  $("verseInput").value="";updateBar();
+  $("tip").innerHTML="好句！AI 正在想下一句……";
+  setTimeout(aiTurn,700);
+};
+$("btnSkip").onclick=function(){
+  addMsg("user","（跳过）","");
+  setTimeout(aiTurn,400);
+};
+function aiTurn(){
+  var bank=bankFor(kw).filter(function(x){return !usedAI[x.v];});
+  if(bank.length===0){aiSay("哎呀，我的“"+kw+"”字诗句用完了，你赢了！","");return endGame();}
+  var pick=bank[Math.floor(Math.random()*bank.length)];
+  usedAI[pick.v]=1;
+  aiSay(pick.v,"——"+pick.a+"《"+pick.t+"》");
+  round++;
+  if(round>TOTAL){setTimeout(endGame,900);}else{updateBar();$("tip").innerHTML='轮到你了，含"<b>'+esc(kw)+'</b>"的诗句。';}
+}
+function endGame(){
+  $("screen-play").classList.add("hidden");$("screen-end").classList.remove("hidden");
+  var s=score>=5?"🌟 诗仙转世！":score>=3?"👏 很厉害！":"💪 多背几首再来战！";
+  $("finalScore").textContent="你得了 "+score+" / "+TOTAL+" 分 "+s;
+  var msgs=$("log").querySelectorAll(".msg");
+  var h="";
+  msgs.forEach(function(m){h+="<li>"+m.querySelector("div:nth-child(2)").textContent+"</li>";});
+  $("verseList").innerHTML=h;
+}
+$("btnAgain").onclick=function(){
+  $("screen-end").classList.add("hidden");$("screen-play").classList.add("hidden");
+  $("screen-pick").classList.remove("hidden");
+};
+$("verseInput").addEventListener("keydown",function(e){if(e.key==="Enter")$("btnSend").click();});
+</script>
+</body>
+</html>

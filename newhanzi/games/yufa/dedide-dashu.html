@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>的地得打地鼠 · 互动原型</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --leaf:#9ed0ad;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+    --leaf:#4d7a5c;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.proto-head h1{margin:0 0 6px;font-size:20px}
+.proto-head .meta{margin:0;font-size:13px;color:var(--muted)}
+.proto-head .note{display:inline-block;margin-top:8px;font-size:12px;background:var(--accent-soft);
+  color:var(--accent-deep);border-radius:8px;padding:2px 10px}
+.hud{display:flex;gap:10px;margin-bottom:14px}
+.hud .pill{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:8px;font-size:16px;font-weight:700}
+.hud .pill small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+#time.low{color:var(--red)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:22px 14px;text-align:center;min-height:300px}
+.sentence{font-size:26px;margin:6px 0 4px;line-height:2}
+.sentence .blank{display:inline-block;min-width:56px;border-bottom:3px solid var(--accent);
+  color:var(--accent-deep);font-weight:700;text-align:center}
+.sentence .blank.fill{border-bottom-color:var(--green)}
+.hintline{font-size:13px;color:var(--muted);min-height:24px;margin-bottom:6px}
+.holes{display:flex;gap:14px;justify-content:center;margin-top:18px}
+.hole{width:96px;height:96px;border-radius:50%;font-size:40px;cursor:pointer;
+  background:var(--surface);border:3px solid var(--line);color:var(--ink);
+  box-shadow:0 4px 0 var(--line)}
+.hole:active{transform:translateY(3px);box-shadow:none}
+.hole.pop{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.hole.right{border-color:var(--green);background:var(--accent-soft)}
+.hole.wrong{border-color:var(--red);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.center{text-align:center;margin-top:16px}
+.btn{min-height:60px;min-width:200px;font-size:20px;border-radius:14px;border:0;cursor:pointer;
+  font-weight:700;background:var(--accent);color:#fff;padding:12px 30px}
+.result{background:var(--accent-soft);border:1px solid var(--accent);border-radius:14px;
+  padding:18px;text-align:center;font-size:18px;display:none;margin-top:14px}
+.result.show{display:block}
+.koujue{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);
+  border-radius:10px;padding:10px 12px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="proto-head">
+    <h1>🐹 的地得打地鼠</h1>
+    <p class="meta">知识点：的/地/得辨析 · 抄自：Wordwall Whack-a-mole 打地鼠模板 #15（guoji.md）＋ Wayground 的地得限时闯关 #15（yufa.md）</p>
+    <span class="note">原型待核对 · 不进 app</span>
+  </div>
+
+  <div class="hud">
+    <div class="pill"><small>⏱ 时间</small><span id="time">60</span></div>
+    <div class="pill"><small>⭐ 得分</small><span id="score">0</span></div>
+    <div class="pill"><small>🔥 连击</small><span id="streak">0</span></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="sentence" id="sentence">点"开始"后，地鼠洞里会冒出"的 / 地 / 得"，<br>看句子选对的打下去！</div>
+    <div class="hintline" id="hint"></div>
+    <div class="holes" id="holes" style="display:none">
+      <button class="hole" type="button" data-w="的">的</button>
+      <button class="hole" type="button" data-w="地">地</button>
+      <button class="hole" type="button" data-w="得">得</button>
+    </div>
+    <div class="center" id="startRow">
+      <button class="btn" id="btnStart" type="button">开始 ▶</button>
+    </div>
+  </div>
+  <div class="result" id="result"></div>
+
+  <div class="koujue">💡 新东方儿歌口诀（#17）："的地得，不一样，用法分别记心上：<b>的</b>后面跟名词，<b>地</b>后面跟动词，<b>得</b>后面跟形容补结果。"</div>
+</div>
+
+<script>
+function $(id){ return document.getElementById(id); }
+/* [句子模板, 空白处答案] —— __ 处填答案 */
+var DATA = [
+  ["他跑__很快", "得"],
+  ["美丽__花", "的"],
+  ["认真__写字", "地"],
+  ["唱歌唱__很好听", "得"],
+  ["飞快__奔跑", "地"],
+  ["可爱__小狗", "的"],
+  ["他说__很慢", "得"],
+  ["高兴__跳起来", "得"],
+  ["慢慢__走", "地"],
+  ["红红__苹果", "的"],
+  ["妈妈笑__很开心", "得"],
+  ["大声__朗读", "地"],
+  ["清清__河水", "的"],
+  ["拼命__追赶", "地"],
+  ["热__满头大汗", "得"],
+  ["蔚蓝__天空", "的"]
+];
+var HINTS = {"的":"的＋名词（什么样的东西）","地":"地＋动词（怎么做的）","得":"动词＋得＋怎么样（结果）"};
+
+var timeLeft = 60, score = 0, streak = 0, timer = null, playing = false, qi = 0, order = [];
+
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function start(){
+  timeLeft = 60; score = 0; streak = 0; qi = 0; playing = true;
+  order = shuffle(DATA.slice());
+  $("result").className = "result";
+  $("startRow").style.display = "none";
+  $("holes").style.display = "flex";
+  updateHud();
+  nextQ();
+  timer = setInterval(function(){
+    timeLeft--;
+    $("time").textContent = timeLeft;
+    $("time").classList.toggle("low", timeLeft <= 10);
+    if(timeLeft <= 0) end();
+  }, 1000);
+}
+
+function updateHud(){
+  $("time").textContent = timeLeft;
+  $("score").textContent = score;
+  $("streak").textContent = streak;
+}
+
+function nextQ(){
+  if(qi >= order.length){ order = shuffle(DATA.slice()); qi = 0; }
+  var q = order[qi++];
+  var html = q[0].replace("__", '<span class="blank" id="blank">？</span>');
+  $("sentence").innerHTML = html;
+  $("hint").textContent = "";
+  var holes = $("holes").children;
+  // 洞顺序打乱
+  var ws = shuffle(["的","地","得"]);
+  for(var i=0;i<holes.length;i++){
+    holes[i].setAttribute("data-w", ws[i]);
+    holes[i].textContent = ws[i];
+    holes[i].className = "hole pop";
+  }
+  $("stage").dataset.a = q[1];
+}
+
+function hit(btn){
+  if(!playing) return;
+  var w = btn.getAttribute("data-w"), a = $("stage").dataset.a;
+  if(w === a){
+    btn.classList.add("right");
+    $("blank").textContent = a;
+    $("blank").classList.add("fill");
+    streak++;
+    score += 10 + Math.min(streak - 1, 5) * 2;
+    $("hint").textContent = "✅ " + HINTS[a];
+    updateHud();
+    setTimeout(nextQ, 650);
+  }else{
+    btn.classList.add("wrong");
+    streak = 0;
+    $("hint").textContent = "❌ 再想想：" + HINTS[a].split("（")[0] + "……";
+    updateHud();
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 400);
+  }
+}
+
+function end(){
+  playing = false;
+  clearInterval(timer);
+  $("holes").style.display = "none";
+  $("startRow").style.display = "block";
+  $("btnStart").textContent = "再来一次 ↺";
+  $("sentence").innerHTML = "时间到！";
+  var r = $("result");
+  r.className = "result show";
+  var best = 0;
+  try{
+    best = parseInt(localStorage.getItem("dedide_best") || "0", 10);
+    if(score > best){ best = score; localStorage.setItem("dedide_best", String(best)); }
+  }catch(e){}
+  r.innerHTML = "🏁 本次得分 <b>" + score + "</b> 分<br>历史最佳：" + best + " 分" +
+    (score >= 150 ? "<br>🎉 的地得小达人！" : "<br>多练几次，记住口诀再来挑战！");
+}
+
+$("btnStart").onclick = start;
+var holes = $("holes").children;
+for(var i=0;i<holes.length;i++){
+  holes[i].onclick = (function(b){ return function(){ hit(b); }; })(holes[i]);
+}
+</script>
+</body>
+</html>
