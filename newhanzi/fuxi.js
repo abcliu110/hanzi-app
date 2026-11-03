@@ -80,6 +80,33 @@
       loadSrs: function () { return load(SK, {}); } };
   })();
 
+  /* 星星（与 today-task.js、quiz/engine.js 同款 helper，保持一致，勿单改一处）：
+     每日每种来源最多 1 颗，轻量，不做上瘾机制。 */
+  window.NHZStars = window.NHZStars || (function () {
+    var K = 'nhz_stars';
+    function load() {
+      try { var v = JSON.parse(localStorage.getItem(K) || 'null'); return v && typeof v === 'object' ? v : {}; }
+      catch (e) { return {}; }
+    }
+    function save(d) { try { localStorage.setItem(K, JSON.stringify(d)); } catch (e) {} }
+    function today() {
+      var d = new Date();
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+    function award(src) {
+      var d = load(), t = today();
+      d.days = d.days || {};
+      d.days[t] = d.days[t] || {};
+      if (d.days[t][src]) return false;
+      d.days[t][src] = 1;
+      d.total = (d.total || 0) + 1;
+      save(d);
+      return true;
+    }
+    function total() { return load().total || 0; }
+    return { award: award, total: total, today: today };
+  })();
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -331,6 +358,10 @@
         }
       }
       render();
+      /* 复习完成记星：刚答的是到期/回炉卡，且本轮呈现队列已无到期/回炉卡（每日最多 1 颗） */
+      if ((seg === 'due' || seg === 'retry') && !document.querySelector('.fx-card[data-seg="due"], .fx-card[data-seg="retry"]')) {
+        if (window.NHZStars) window.NHZStars.award('review');
+      }
     } else if (act === 'clear') {
       window.NHZReview.clearWrong(card.getAttribute('data-wrong'));
       lastNote = '已从错题本清除。';

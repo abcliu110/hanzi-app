@@ -115,6 +115,33 @@ window.NHZReview = window.NHZReview || (function () {
     loadWrong: function () { return load(WK, []); },
     loadSrs: function () { return load(SK, {}); } };
 })();
+
+/* 星星（与 today-task.js、fuxi.js 同款 helper，保持一致，勿单改一处）：
+   每日每种来源最多 1 颗，轻量，不做上瘾机制。 */
+window.NHZStars = window.NHZStars || (function () {
+  var K = 'nhz_stars';
+  function load() {
+    try { var v = JSON.parse(localStorage.getItem(K) || 'null'); return v && typeof v === 'object' ? v : {}; }
+    catch (e) { return {}; }
+  }
+  function save(d) { try { localStorage.setItem(K, JSON.stringify(d)); } catch (e) {} }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+  function award(src) {
+    var d = load(), t = today();
+    d.days = d.days || {};
+    d.days[t] = d.days[t] || {};
+    if (d.days[t][src]) return false;
+    d.days[t][src] = 1;
+    d.total = (d.total || 0) + 1;
+    save(d);
+    return true;
+  }
+  function total() { return load().total || 0; }
+  return { award: award, total: total, today: today };
+})();
 function wbLoad() {
   try { return JSON.parse(localStorage.getItem(WB_KEY)) || {}; }
   catch (e) { return {}; }
@@ -277,6 +304,8 @@ function nextQ() {
 
 /* ---------- 结算 ---------- */
 function renderDone() {
+  /* 测验完成记星（每日最多 1 颗，不改结算显示） */
+  if (window.NHZStars) window.NHZStars.award('quiz');
   var secs = Math.round((Date.now() - S.startT) / 1000);
   var mm = Math.floor(secs / 60), ss = secs % 60;
   var acc = S.list.length ? Math.round(S.correct / S.list.length * 100) : 0;
