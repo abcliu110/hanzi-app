@@ -50,6 +50,71 @@ var cur = null; /* 当前题的临时交互状态 */
 
 /* ---------- 错题本 ---------- */
 var WB_KEY = 'nhz_quiz_wrong';
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进统一错题本并安排明天复习；答对复习项 -> 推进间隔。
+   静默失败，不影响答题反馈；不碰 quiz 自有错题本 nhz_quiz_wrong 的逻辑。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
 function wbLoad() {
   try { return JSON.parse(localStorage.getItem(WB_KEY)) || {}; }
   catch (e) { return {}; }
@@ -182,6 +247,19 @@ function finishQuestion(ok, expHtml) {
     S.streak = 0;
     if (S.mode !== 'wrong') wbAdd(S.tab, item._m, item._q);
   }
+  /* 错题打通：单题可表述的模式（choice/judge/blank/spot/rewrite）答错进统一错题本，
+     答对复习项推进间隔；不改反馈与计分，不碰 quiz 自有错题本。tag/order/match 无单题答案文本，暂不接入。 */
+  (function () {
+    var q = item._q, m = item._m, rec = null;
+    if (m === 'choice') rec = { q: q.q, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'judge') rec = { q: q.q, options: ['正确', '错误'], answer: q.a ? '正确' : '错误', 解析: q.exp || '' };
+    else if (m === 'blank') rec = { q: q.s, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'spot') rec = { q: q.s + ' ' + q.prompt, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'rewrite') rec = { q: q.from + ' → ' + q.target, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    if (rec && rec.q && rec.answer != null) NHZReview.record({
+      q: rec.q, options: rec.options, answer: rec.answer, 解析: rec.解析, src: '练习',
+      point: (S.title || TAB_NAMES[S.tab] || '') + ' · ' + (MODES[m] ? MODES[m].name : m) }, ok);
+  })();
   var fb = $('qfb');
   fb.innerHTML = '<div class="qz-fb ' + (ok ? 'ok' : 'no') + '">' +
     '<div class="qz-fb-t">' + (ok ? '✅ 答对了！' : '❌ 答错了，别灰心') + '</div>' +

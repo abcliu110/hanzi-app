@@ -18,6 +18,70 @@
   var bankData = window.NHZ_GRAMMAR_BANK || {};
   var bankState = {};
   var bankQuizData = {};
+  /* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+     答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+  window.NHZReview = window.NHZReview || (function () {
+    var WK = 'nhz_wrong', SK = 'nhz_srs';
+    var IV = [1, 2, 4, 7, 15, 30];
+    function load(k, fb) {
+      try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+      catch (e) { return fb; }
+    }
+    function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function hash(s) {
+      var h = 0;
+      for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+      return 'q' + (h < 0 ? -h : h);
+    }
+    function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+    function record(it, correct) {
+      if (!it || !it.q) return;
+      var id = idOf(it);
+      var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+      if (correct) {
+        if (srs[id]) {
+          var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+          srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+          save(SK, srs);
+        }
+      } else {
+        var found = false;
+        for (var i = 0; i < wrong.length; i++) {
+          if (wrong[i].id === id) {
+            wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+              解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+            found = true; break;
+          }
+        }
+        if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+          解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+        save(WK, wrong);
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+        save(SK, srs);
+      }
+    }
+    function review(id, remembered) {
+      var srs = load(SK, {}), now = Date.now();
+      if (!srs[id]) return false;
+      if (remembered) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+      } else {
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      }
+      save(SK, srs);
+      return true;
+    }
+    function clearWrong(id) {
+      var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+      for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+      save(WK, nw);
+      if (srs[id]) { delete srs[id]; save(SK, srs); }
+    }
+    return { record: record, review: review, clearWrong: clearWrong,
+      loadWrong: function () { return load(WK, []); },
+      loadSrs: function () { return load(SK, {}); } };
+  })();
   /* 导航已移除，固定显示语法 */
 
   var listEl = document.getElementById('ywlist');
@@ -445,6 +509,9 @@
         bbtns[bq.answer].classList.add('right');
         bfb.innerHTML = '❌ 再想想。' + (bq['解析'] ? esc(bq['解析']) : '');
       }
+      /* 错题打通：答错进统一错题本（答对复习项推进间隔），不改反馈与计分 */
+      NHZReview.record({ q: bq.q, options: bq.options, answer: bq.options[bq.answer] || '',
+        解析: bq['解析'] || '', src: '语法', point: st2 ? st2.name : '' }, boi === bq.answer);
       if (bankBox && st2) bankBox.querySelector('.bank-head').textContent = bankHeadHtml(bid2);
       return;
     }
