@@ -81,7 +81,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
   var quizData = {};
   var currentItems = {};
   var MODS = [
-    {id:'pianmu', icon:'📜', t:'古文篇目', d:'12篇 · 论语选读、寓言故事、名家短篇'},
+    {id:'pianmu', icon:'📜', t:'古文篇目', d:'50篇 · 论语、寓言、史记、世说、唐宋八大家'},
     {id:'xuci', icon:'🔤', t:'虚词', d:'18个点 · 用法、例句、辨析、题库'},
     {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
     {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式'},
@@ -99,9 +99,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     {id:'zongbiao', icon:'📊', t:'汇总总表', d:'按分类的字表总汇'}
   ];
   var SECTIONS = [
-    {id:'论语选读', icon:'📖', t:'论语选读', d:'4 篇 · 孔子的话，学与思'},
-    {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'6 篇 · 小故事，大道理'},
-    {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'2 篇 · 陋室铭、爱莲说'}
+    {id:'论语选读', icon:'📖', t:'论语选读', d:'6 篇 · 孔子的话，学与思'},
+    {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'13 篇 · 小故事，大道理'},
+    {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'4 篇 · 陋室铭、爱莲说、桃花源记'},
+    {id:'史记选读', icon:'📚', t:'史记选读', d:'6 篇 · 鸿门宴、完璧归赵、破釜沉舟'},
+    {id:'世说新语', icon:'💬', t:'世说新语', d:'5 篇 · 咏雪、陈太丘、管宁割席'},
+    {id:'唐宋八大家', icon:'🖋️', t:'唐宋八大家', d:'7 篇 · 师说、小石潭记、马说'},
+    {id:'先秦散文', icon:'🏛️', t:'先秦散文', d:'6 篇 · 孟子庄子荀子、左传战国策'},
+    {id:'魏晋散文', icon:'🎋', t:'魏晋散文', d:'3 篇 · 出师表、陈情表、兰亭集序'}
   ];
   var navEl = document.getElementById('gwnav');
   var listEl = document.getElementById('gwlist');
