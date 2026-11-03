@@ -217,6 +217,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yw-detail-head h2{font-size:24px;letter-spacing:2px;margin-bottom:6px}
 .yw-detail-head .yw-kj-lg{font-size:15px;color:var(--accent-deep);font-weight:600}
 .yw-detail-body{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.yw-detail-body .yw-body{display:block !important}
 /* ---- 语文知识库面板网格 ---- */
 .yw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 18px}
 .yw-grid .yw-item{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;
