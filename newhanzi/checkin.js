@@ -50,9 +50,12 @@
         ? '<span style="color:var(--accent-deep);font-weight:bold">✅ 今日已打卡</span>'
         : '<button type="button" id="ckBtn" style="background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:15px;font-weight:bold;color:var(--ink);cursor:pointer">今日打卡</button>') +
       '</div>' +
-      '<div style="display:flex;align-items:center;gap:10px;padding:10px 2px">' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)">' +
       '<span style="flex:1"><b style="font-size:15px">📊 家长周报</b> <span style="opacity:.75">本周学习一页汇总</span></span>' +
-      '<a href="weekly.html" style="color:var(--accent-deep);font-weight:bold;text-decoration:none">查看 →</a></div>';
+      '<a href="weekly.html" style="color:var(--accent-deep);font-weight:bold;text-decoration:none">查看 →</a></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:10px 2px">' +
+      '<span style="flex:1"><b style="font-size:15px">📅 每日一卡</b> <span style="opacity:.75">今日一字 / 一诗</span></span>' +
+      '<a href="share.html" style="color:var(--accent-deep);font-weight:bold;text-decoration:none">查看 →</a></div>';
     var btn = document.getElementById('ckBtn');
     if (btn) btn.addEventListener('click', function () {
       var d = loadCk();
