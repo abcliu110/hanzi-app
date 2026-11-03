@@ -72,13 +72,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 a.chip { text-decoration: none; }
 .bs-mean {
   display: block; margin: 14px auto 0; max-width: 92%;
-  font-size: 14px; color: #1a56db; background: #eef4ff;
-  border: 1px solid #cfe0fa; border-radius: 10px;
+  font-size: 14px; color: var(--accent-deep); background: var(--accent-soft);
+  border: 1px solid var(--line); border-radius: 10px;
   padding: 8px 12px; text-decoration: none; line-height: 1.7;
-}
-@media (prefers-color-scheme: dark) {
-  /* 深色下原来的亮蓝底会刺眼，改成深蓝底 + 浅蓝字 */
-  .bs-mean { color: #a8c8ff; background: #1d2c44; border-color: #2e4a7a; }
 }
 .speak {
   margin-top: 14px; font-size: 16px; border: 1px solid var(--line);
@@ -252,7 +248,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yuwen-banner {
   display: flex; align-items: center; gap: 12px;
   max-width: 720px; margin: 12px auto 0; padding: 12px 16px;
-  background: linear-gradient(135deg, #2b7cd3, #6a4fd0);
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
   border-radius: 14px; text-decoration: none; color: #fff;
 }
 .yuwen-banner .yb-icon { font-size: 30px; }
@@ -262,15 +258,11 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yuwen-banner .rgo { color: #fff; }
 .score {
   margin-top: 12px; padding: 14px; border-radius: 10px; text-align: center;
-  background: #fff8ef; border: 1px dashed #e8a33d;
+  background: var(--accent-soft); border: 1px dashed var(--accent);
 }
-@media (prefers-color-scheme: dark) {
-  .score { background: #3a2f18; border-color: #6b551f; }
-  .score-tips { color: #d8c49a; }
-}
-.score-num { font-size: 28px; font-weight: 700; color: var(--accent); }
-.score-stars { color: #f5a623; font-size: 18px; letter-spacing: 3px; margin: 4px 0; }
-.score-tips { font-size: 14px; color: #8a6d4b; line-height: 1.8; }
+.score-num { font-size: 28px; font-weight: 700; color: var(--accent-deep); }
+.score-stars { color: var(--accent); font-size: 18px; letter-spacing: 3px; margin: 4px 0; }
+.score-tips { font-size: 14px; color: var(--muted); line-height: 1.8; }
 
 /* 护眼补充：系统开了“减弱动态效果”时，不做进度条等过渡动画 */
 @media (prefers-reduced-motion: reduce) {
@@ -278,32 +270,32 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 }
 
 /* 图解课堂 */
-.yw-analogy{background:#fff8e1;border-left:4px solid #ffb300;padding:8px 12px;margin:0 0 10px;font-size:14px;border-radius:0 8px 8px 0}
-.yw-diagram{margin:0 0 10px;overflow-x:auto;background:#fafafa;border-radius:8px;padding:8px}
+.yw-analogy{background:var(--accent-soft);border-left:4px solid var(--accent);padding:8px 12px;margin:0 0 10px;font-size:14px;border-radius:0 8px 8px 0}
+.yw-diagram{margin:0 0 10px;overflow-x:auto;background:var(--surface);border-radius:8px;padding:8px}
 .yw-diagram svg{max-width:100%;height:auto;display:block;margin:0 auto}
-.yw-anim{margin:0 0 10px;background:#f3e5f5;border-radius:8px;padding:10px}
+.yw-anim{margin:0 0 10px;background:var(--accent-soft);border-radius:8px;padding:10px}
 .yw-anim-tokens{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.yw-anim-tokens .tok{padding:6px 10px;background:#fff;border:2px solid #ddd;border-radius:8px;font-size:16px;transition:all .3s}
-.yw-anim-tokens .tok.on{background:#e1bee7;border-color:#8e24aa;transform:scale(1.1);font-weight:700}
-.yw-anim-note{font-size:14px;color:#4a148c;min-height:20px;margin-bottom:8px}
-.yw-anim-ctrl button{margin-right:8px;padding:6px 14px;border:none;border-radius:6px;background:#8e24aa;color:#fff;font-size:14px}
-.yw-quiz{margin:10px 0 0;border-top:1px dashed #ddd;padding-top:10px}
+.yw-anim-tokens .tok{padding:6px 10px;background:var(--card);border:2px solid var(--line);border-radius:8px;font-size:16px;transition:all .3s}
+.yw-anim-tokens .tok.on{background:var(--leaf);border-color:var(--accent);transform:scale(1.05);font-weight:700}
+.yw-anim-note{font-size:14px;color:var(--accent-deep);min-height:20px;margin-bottom:8px}
+.yw-anim-ctrl button{margin-right:8px;padding:6px 14px;border:none;border-radius:6px;background:var(--accent-deep);color:#fff;font-size:14px}
+.yw-quiz{margin:10px 0 0;border-top:1px dashed var(--line);padding-top:10px}
 .quiz-q{margin-bottom:12px}
 .quiz-t{font-weight:700;margin-bottom:6px;font-size:14px}
 .quiz-opts{display:flex;flex-wrap:wrap;gap:6px}
-.quiz-opts button{padding:6px 12px;border:2px solid #ddd;background:#fff;border-radius:6px;font-size:14px}
-.quiz-opts button.right{border-color:#4caf50;background:#e8f5e9}
-.quiz-opts button.wrong{border-color:#f44336;background:#ffebee}
-.quiz-fb{font-size:13px;margin-top:6px;color:#555}
-.yw-badge{font-size:11px;background:linear-gradient(135deg,#8e24aa,#e91e63);color:#fff;padding:2px 8px;border-radius:10px;margin-left:8px;flex-shrink:0}
-.yw-sub{font-size:12px;color:#888;margin-left:8px;flex-shrink:0}
+.quiz-opts button{padding:6px 12px;border:2px solid var(--line);background:var(--card);border-radius:6px;font-size:14px}
+.quiz-opts button.right{border-color:var(--green);background:var(--accent-soft)}
+.quiz-opts button.wrong{border-color:var(--red);background:#f3e4e2}
+.quiz-fb{font-size:13px;margin-top:6px;color:var(--muted)}
+.yw-badge{font-size:11px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;margin-left:8px;flex-shrink:0}
+.yw-sub{font-size:12px;color:var(--muted);margin-left:8px;flex-shrink:0}
 
 /* 首页图解语法展示区 */
 .gram-showcase{margin:12px 0;padding:0 12px}
 .gs-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700;font-size:16px}
-.gs-head a{font-size:13px;color:#8e24aa;text-decoration:none;font-weight:400}
+.gs-head a{font-size:13px;color:var(--accent-deep);text-decoration:none;font-weight:400}
 .gs-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-.gs-card{flex:0 0 160px;background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-decoration:none;color:#222}
+.gs-card{flex:0 0 160px;background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--line);text-decoration:none;color:var(--ink)}
 .gs-card .gs-sym{width:40px;height:40px;margin-bottom:6px}
 .gs-card h4{margin:0 0 4px;font-size:15px}
 .gs-card .gs-sub{font-size:11px;color:#888;margin-bottom:6px}
@@ -316,24 +308,24 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yw-searchbox{padding:12px 16px}
 .yw-searchbox input{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:10px;font-size:15px;box-sizing:border-box}
 .yw-step{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
-.yw-stepnum{width:24px;height:24px;border-radius:50%;background:#2b2b2b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.yw-stepnum{width:24px;height:24px;border-radius:50%;background:var(--accent-deep);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 .yw-steptitle{font-weight:700;font-size:16px}
 #panel-yuwen,#panel-logic{padding-bottom:24px}
 
-/* 原型级视觉：关键词标红 */
-.yw-analogy b, .yw-exp b{color:#c62828}
+/* 原型级视觉：关键词强调（护眼红棕，不用高饱和纯红） */
+.yw-analogy b, .yw-exp b{color:var(--red)}
 .yw-analogy{line-height:1.8;font-size:15px}
 /* 课程卡片质感 */
-.yw-item{background:#fff;border-radius:12px;margin:0 16px 12px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden}
+.yw-item{background:var(--card);border-radius:12px;margin:0 16px 12px;border:1px solid var(--line);overflow:hidden}
 .yw-head{width:100%;text-align:left;background:none;border:none;padding:14px 16px;display:flex;align-items:center;gap:8px;cursor:pointer}
 .yw-name{font-weight:700;font-size:16px}
-.yw-sub{color:#888;font-size:13px;flex:1}
-.yw-arrow{color:#aaa;transition:transform .2s}
+.yw-sub{color:var(--muted);font-size:13px;flex:1}
+.yw-arrow{color:var(--muted);transition:transform .2s}
 .yw-item.open .yw-arrow{transform:rotate(180deg)}
 .yw-body{display:none;padding:0 16px 16px}
 .yw-item.open .yw-body{display:block}
-.ghead{margin:16px 16px 8px;font-weight:700;font-size:15px;color:#555;display:flex;justify-content:space-between;align-items:center}
-.gcount{font-size:12px;color:#999;font-weight:400}
+.ghead{margin:16px 16px 8px;font-weight:700;font-size:15px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.gcount{font-size:12px;color:var(--muted);font-weight:400}
 
 /* ========== 首页全量改版：手机 / 平板 / 桌面 ========== */
 .page-home { font-size: 16px; }
@@ -545,4 +537,72 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 
 @media (min-width: 1440px) {
   .page-home .listwrap { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ========== 子页共用：字卡 / 语法 / 部首 / 古诗 / 实验 ========== */
+.page-sub .topbar.nav {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border-bottom: 1px solid var(--line);
+}
+.page-sub .topbar.nav #navtitle,
+.page-sub .topbar.nav > span:last-child {
+  font-weight: 700; font-size: 16px;
+}
+.page-sub .wrap,
+.page-sub .listwrap {
+  max-width: 760px;
+}
+.page-sub .hero {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.page-sub .hero .pinyin { color: var(--accent-deep); }
+.page-sub section.card {
+  background: var(--surface);
+}
+.page-sub .controls {
+  background: var(--bg);
+}
+.page-sub .warn {
+  background: var(--accent-soft);
+  border-color: var(--line);
+  color: var(--ink);
+}
+@media (min-width: 768px) {
+  .page-sub .wrap,
+  .page-sub .listwrap,
+  .page-sub .controls,
+  .page-sub .pp-sec {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .page-sub .controls { padding-left: 24px; padding-right: 24px; }
+  .page-sub .listwrap { padding-left: 24px; padding-right: 24px; }
+  .page-sub .wrap { padding-left: 24px; padding-right: 24px; }
+}
+@media (min-width: 1200px) {
+  .page-sub .wrap,
+  .page-sub .listwrap,
+  .page-sub .controls,
+  .page-sub .pp-sec {
+    max-width: 1080px;
+  }
+  .page-sub .wrap {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .page-sub .wrap > .hero {
+    position: sticky; top: 72px; grid-column: 1; grid-row: 1 / span 20;
+  }
+  .page-sub .wrap > section.card,
+  .page-sub .wrap > .loading,
+  .page-sub .wrap > .err,
+  .page-sub .wrap > .src-note {
+    grid-column: 2;
+  }
 }

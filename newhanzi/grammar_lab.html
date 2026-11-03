@@ -6,37 +6,45 @@
 <title>语法实验室 · newhanzi</title>
 <link rel="stylesheet" href="zika.css">
 <style>
-.lab-hero{background:linear-gradient(135deg,#6a1b9a,#ab47bc);color:#fff;padding:24px 16px;border-radius:0 0 20px 20px;margin-bottom:16px}
+.lab-hero{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;padding:24px 16px;border-radius:0 0 20px 20px;margin-bottom:16px}
 .lab-hero h1{margin:0 0 8px;font-size:22px}
 .lab-hero p{margin:0;opacity:.9;font-size:14px}
 .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 24px}
-.lab-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer;text-align:center}
+.lab-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;text-align:center;color:var(--ink)}
+.lab-card:active{background:var(--accent-soft)}
 .lab-card .ic{font-size:36px;margin-bottom:8px}
 .lab-card h3{margin:0 0 4px;font-size:16px}
-.lab-card p{margin:0;font-size:12px;color:#888}
+.lab-card p{margin:0;font-size:12px;color:var(--muted)}
 .lab-page{display:none;padding:16px;max-width:640px;margin:0 auto}
 .lab-page.active{display:block}
 .sym-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.sym-btn{border:2px solid #ddd;background:#fff;border-radius:8px;padding:8px;cursor:pointer;text-align:center;min-width:64px}
+.sym-btn{border:2px solid var(--line);background:var(--card);border-radius:8px;padding:8px;cursor:pointer;text-align:center;min-width:64px;color:var(--ink)}
 .sym-btn svg{width:36px;height:36px;display:block;margin:0 auto 4px}
-.sym-btn.sel{border-color:#8e24aa;background:#f3e5f5}
-.word-tok{display:inline-block;padding:8px 14px;margin:4px;background:#fff;border:2px solid #ddd;border-radius:8px;font-size:17px;cursor:pointer}
-.word-tok.done{background:#e8f5e9;border-color:#4caf50}
-.word-tok .badge{display:block;font-size:11px;color:#666;margin-top:2px}
-.drop-zone{min-height:60px;border:2px dashed #aaa;border-radius:8px;padding:8px;margin:12px 0;background:#fafafa}
+.sym-btn.sel{border-color:var(--accent);background:var(--accent-soft)}
+.word-tok{display:inline-block;padding:8px 14px;margin:4px;background:var(--card);border:2px solid var(--line);border-radius:8px;font-size:17px;cursor:pointer}
+.word-tok.done{background:var(--accent-soft);border-color:var(--green)}
+.word-tok .badge{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.drop-zone{min-height:60px;border:2px dashed var(--line);border-radius:8px;padding:8px;margin:12px 0;background:var(--surface)}
 .drop-zone .word-tok{cursor:default}
-.quiz-btn{display:block;width:100%;margin:6px 0;padding:10px;border:2px solid #ddd;background:#fff;border-radius:8px;font-size:15px;text-align:left}
-.quiz-btn.right{border-color:#4caf50;background:#e8f5e9}
-.quiz-btn.wrong{border-color:#f44336;background:#ffebee}
+.quiz-btn{display:block;width:100%;margin:6px 0;padding:10px;border:2px solid var(--line);background:var(--card);border-radius:8px;font-size:15px;text-align:left;color:var(--ink)}
+.quiz-btn.right{border-color:var(--green);background:var(--accent-soft)}
+.quiz-btn.wrong{border-color:var(--red);background:#f3e4e2}
 .fb{margin:10px 0;padding:10px;border-radius:8px;font-size:14px}
-.fb.ok{background:#e8f5e9;color:#2e7d32}
-.fb.no{background:#ffebee;color:#c62828}
-.back-btn{display:inline-block;margin-bottom:12px;color:#6a1b9a;text-decoration:none;font-size:15px}
-.tree-node{margin:8px 0;padding:10px;background:#f5f5f5;border-radius:8px}
+.fb.ok{background:var(--accent-soft);color:var(--accent-deep)}
+.fb.no{background:#f3e4e2;color:var(--red)}
+.back-btn{display:inline-block;margin-bottom:12px;color:var(--accent-deep);text-decoration:none;font-size:15px}
+.tree-node{margin:8px 0;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 .tree-node .q{font-weight:700;margin-bottom:8px}
+@media (min-width:768px){
+  .lab-grid{max-width:920px;margin:0 auto;grid-template-columns:repeat(4,1fr)}
+  .lab-hero{max-width:920px;margin:0 auto 16px;border-radius:20px}
+}
+@media (min-width:1200px){
+  .lab-page{max-width:880px}
+}
 </style>
 </head>
-<body>
+<body class="page-sub page-lab">
 <header class="topbar nav">
   <a href="index.html" class="back">← 返回</a>
   <span id="navtitle">语法实验室</span>
@@ -67,14 +75,14 @@
   <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🎩 符号标注大冒险</h2>
   <p style="color:#666">给整句话的每个词戴上正确的符号帽</p>
-  <div style="background:#fff8e1;border-left:4px solid #ffb300;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
+  <div style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
     <b>先想一想</b>：蒙特梭利教室里，孩子把符号实物摆在每个词的上方，这叫 Symbolizing。先点一个词，再点它的符号帽——戴对了留下，戴错了弹回来。
   </div>
   <div id="sym-progress" style="font-weight:700;margin-bottom:8px"></div>
   <div id="sym-sent" style="margin:16px 0"></div>
   <div class="sym-grid" id="sym-opts"></div>
   <div style="margin-top:12px">
-    <button class="quiz-btn" id="sym-check" style="display:inline-block;width:auto;padding:10px 24px;background:#c62828;color:#fff;border-color:#c62828">检查</button>
+    <button class="quiz-btn" id="sym-check" style="display:inline-block;width:auto;padding:10px 24px;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
     <button class="quiz-btn" id="sym-next" style="display:inline-block;width:auto;padding:10px 24px">下一句 →</button>
   </div>
   <div class="fb" id="sym-fb" style="display:none"></div>
@@ -89,7 +97,7 @@
   <div class="drop-zone" id="baju-drop"><span style="color:#aaa">点下方词块，按顺序拼句…</span></div>
   <div id="baju-words"></div>
   <div class="fb" id="baju-fb" style="display:none"></div>
-  <button class="quiz-btn" id="baju-check" style="text-align:center;background:#6a1b9a;color:#fff">检查</button>
+  <button class="quiz-btn" id="baju-check" style="text-align:center;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
   <button class="quiz-btn" id="baju-reset" style="text-align:center">重来</button>
 </div>
 
@@ -195,7 +203,7 @@ function renderSymSent(){
   s.querySelectorAll('.word-tok').forEach(function(t){
     t.addEventListener('click', function(){
       s.querySelectorAll('.word-tok').forEach(function(x){x.style.borderColor='#ddd';});
-      t.style.borderColor = '#8e24aa';
+      t.style.borderColor = 'var(--accent)';
       s.dataset.sel = t.getAttribute('data-i');
     });
   });
@@ -217,13 +225,13 @@ function placeSym(symName, btn){
   var slot = s.querySelector('.sym-slot[data-i="'+i+'"]');
   if(symName === correct){
     slot.innerHTML = '<svg viewBox="0 0 30 30" width="36" height="36">'+SYMS.filter(function(x){return x.n===symName;})[0].svg+'</svg>';
-    slot.style.border = '2px solid #4caf50';
+    slot.style.border = '2px solid #3f8e6b';
     slot.style.background = '#e8f5e9';
     symPlaced[i] = true;
     symScore += 10; $('sym-score').textContent = symScore;
   } else {
     /* 弹回动画 */
-    slot.style.border = '2px solid #f44336';
+    slot.style.border = '2px solid #b85a52';
     setTimeout(function(){ slot.style.border='2px dashed #ccc'; }, 400);
     var fb = $('sym-fb'); fb.style.display='block';
     fb.className='fb no'; fb.textContent='❌ 「'+word+'」不是'+symName+'，弹回来了';
@@ -347,7 +355,7 @@ function renderDede(){
   }
   var q = DEDE_QS[dedeIdx];
   var h = '<div class="tree-node"><div class="q">'+(dedeIdx+1)+'. '+q.s+'</div>';
-  var colors = ['#4caf50','#ff9800','#1976d2'];
+  var colors = ['#3f8e6b','#b8893d','#4a7a8c'];
   q.opts.forEach(function(op,oi){
     h += '<button class="quiz-btn" data-oi="'+oi+'" style="border-color:'+colors[oi]+'">'+op+'</button>';
   });
