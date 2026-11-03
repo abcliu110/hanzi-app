@@ -192,7 +192,7 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
   display: flex; align-items: center; justify-content: center;
 }
 .rpy { font-size: 16px; font-weight: 600; min-width: 64px; }
-.rmeta { font-size: 13px; color: var(--muted); flex: 1; }
+.rmeta { font-size: 13px; color: var(--muted); flex: 1; white-space: nowrap; }
 .rgo { color: var(--muted); font-size: 20px; }
 .noresult { text-align: center; color: var(--muted); padding: 60px 20px; }
 #rail {
