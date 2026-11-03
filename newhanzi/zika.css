@@ -841,3 +841,6 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .svg-green{fill:var(--green)} .svg-green-s{stroke:var(--green)}
 .svg-deep{fill:var(--accent-deep)} .svg-deep-s{stroke:var(--accent-deep)}
 .svg-panel{fill:var(--surface)}
+
+/* 内容分型标签 */
+.yw-typetag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:bold;color:var(--tc,#3d5a40);background:color-mix(in srgb,var(--tc,#3d5a40) 12%,transparent);border:1px solid color-mix(in srgb,var(--tc,#3d5a40) 30%,transparent);margin-bottom:8px}

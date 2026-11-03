@@ -76,17 +76,35 @@
     }
   }
 
-  function itemHtml(it, idx) {
+  /* 内容分型：规律型/辨析型/程序型（CONTENT_PATTERNS.md v2.0） */
+  function itemType(it, catName) {
+    if (/病句/.test(catName || '')) return '程序';
+    if (/关联词|虚词/.test(catName || '')) return '辨析';
+    return '规律';
+  }
+  var TYPE_LABEL = { '规律': '规律型', '辨析': '辨析型', '程序': '程序型' };
+  var TYPE_COLOR = { '规律': '#3d5a40', '辨析': '#5a4a7a', '程序': '#7a5a3a' };
+
+  function itemHtml(it, idx, catName) {
     var body = '';
     var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
     var step = 0;
+    var tp = itemType(it, catName);
+    /* 型标签 */
+    body += '<div class="yw-typetag" style="--tc:' + TYPE_COLOR[tp] + '">' + TYPE_LABEL[tp] + '</div>';
     function stepHead(title, right){
       step++;
       return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span>'+
         (right ? '<span class="yw-stepright">'+right+'</span>' : '')+'</div>';
     }
-    /* 1. 打个比方 */
-    if (it['类比']) body += stepHead('打个比方','蒙特梭利语法符号') +
+    /* 按型定的节标题 */
+    var T = {
+      '规律': { analogy: '💡 啊哈现象', rule: '一句话', ex: '例组', bad: '病例' },
+      '辨析': { analogy: '💡 啊哈现象', rule: '辨析对照', ex: '分水岭例句', bad: '天坑病例' },
+      '程序': { analogy: '💡 啊哈现象', rule: '步骤卡', ex: '全程演示', bad: '易错诊所' }
+    }[tp];
+    /* 1. 啊哈现象（类比） */
+    if (it['类比']) body += stepHead(T.analogy,'蒙特梭利语法符号') +
       '<div class="yw-analogy">' + it['类比'] + '</div>';
     /* 2. 看图说话 */
     if (it['图示']) body += stepHead('看图说话','符号标注 Symbolizing') +
@@ -113,9 +131,9 @@
         '<div class="game-area"></div>' +
         '<div class="game-fb"></div></div>';
     }
-    /* 4. 规则一句话 */
+    /* 4. 规则/对照/步骤 */
     if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
-      body += stepHead('规则一句话');
+      body += stepHead(T.rule);
       if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
     if (it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
     if (it['例子'] && it['例子'].length) {
@@ -283,7 +301,7 @@
       html += '<div class="ghead" id="ywc-' + ci + '">' + esc(c.name) +
         '<span class="gcount">' + items.length + '条</span></div>' +
         '<div class="yw-grid">' +
-        items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii); }).join('') +
+        items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii, c.name); }).join('') +
         '</div>';
     });
     listEl.innerHTML = html ||
