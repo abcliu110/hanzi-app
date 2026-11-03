@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body class="page-home">
-<!-- 首页：品牌 + 今日学习 + 6面板 -->
+<!-- 首页：品牌 + 今日学习 + 7面板 -->
 <div id="view-home" class="home-view">
   <div class="brand"><h1>识字星球</h1><p>护眼学习</p></div>
   <div class="today">
@@ -39,6 +39,10 @@
     <button class="panel" type="button" data-m="shici">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 28A14 14 0 1120 8a11 11 0 0016 20z"/></svg>
       <b>古诗词</b><div class="prog"><i style="width:20%"></i></div><div class="prog-tx">120 首</div>
+    </button>
+    <button class="panel" type="button" data-m="guwen">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10c6-3 12-3 16 0 4-3 10-3 16 0v28c-6-3-12-3-16 0-4-3-10-3-16 0z"/><path d="M24 10v28"/></svg>
+      <b>古文</b><div class="prog"><i style="width:10%"></i></div><div class="prog-tx">12 篇</div>
     </button>
     <button class="panel" type="button" data-m="lab">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6h8M22 6v12l-10 18a4 4 0 003.5 6h17a4 4 0 003.5-6L26 18V6"/><path d="M16 30h16"/></svg>
@@ -103,6 +107,10 @@
     <div id="panel-shici" class="panel-frame" style="display:none">
       <iframe src="shici.html" title="古诗词"></iframe>
     </div>
+
+    <div id="panel-guwen" class="panel-frame" style="display:none">
+      <iframe src="guwen.html" title="古文"></iframe>
+    </div>
   </div>
 </div>
 
@@ -121,10 +129,12 @@
                 logic: document.getElementById('panel-logic'),
                 lab: document.getElementById('panel-lab'),
                 bushou: document.getElementById('panel-bushou'),
-                shici: document.getElementById('panel-shici')};
+                shici: document.getElementById('panel-shici'),
+                guwen: document.getElementById('panel-guwen')};
   var titles = {shizi:['识字','3500 常用字'], yuwen:['语法','句子 / 修辞 / 病句'],
     logic:['逻辑','推理 / 判断'], lab:['实验','动手 / 观察'],
-    bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','120 首 / 常识卡']};
+    bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','120 首 / 常识卡'],
+    guwen:['古文','文言 / 寓言 / 名篇']};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function lessonHtml(it){
