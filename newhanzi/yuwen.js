@@ -218,11 +218,14 @@
         (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
       '</span>' +
       '<span class="yw-arrow">▾</span></button>' +
-      '<div class="yw-body">' + body + '</div></div>';
+      '<div class="yw-body" data-idx="' + idx + '">' + body + '</div></div>';
   }
 
-  function showDetail(rec) {
+  function showDetail(rec, headEl) {
     var it = rec.it;
+    // 把 body 节点直接搬到详情区（避免 innerHTML 复制导致 ID 重复）
+    var itemEl = headEl.closest('.yw-item');
+    var bodyEl = itemEl ? itemEl.querySelector('.yw-body') : null;
     listEl.style.display = 'none';
     controlsEl.style.display = 'none';
     detailEl.style.display = 'block';
@@ -233,7 +236,8 @@
       '<div class="yw-detail-head"><span class="yw-ico-lg">' + rec.icon + '</span>' +
       '<div><h2>' + esc(it.name || '') + '</h2>' +
       (it['口诀'] ? '<p class="yw-kj-lg">' + esc(it['口诀']) + '</p>' : '') + '</div></div>' +
-      '<div class="yw-detail-body">' + rec.body + '</div>';
+      '<div class="yw-detail-body" id="ywDetailBody"></div>';
+    if (bodyEl) document.getElementById('ywDetailBody').appendChild(bodyEl);
     document.getElementById('ywBack').addEventListener('click', hideDetail);
     document.getElementById('ywHome').addEventListener('click', function(){
       if (window.self !== window.top) { window.top.location.href = 'index.html'; }
@@ -243,6 +247,13 @@
   }
 
   function hideDetail() {
+    // 把 body 节点搬回列表
+    var bodyEl = document.querySelector('#ywDetailBody .yw-body');
+    if (bodyEl) {
+      var idx = bodyEl.getAttribute('data-idx');
+      var itemEl = listEl.querySelector('.yw-head[data-idx="' + idx + '"]');
+      if (itemEl) itemEl.closest('.yw-item').appendChild(bodyEl);
+    }
     detailEl.style.display = 'none';
     detailEl.innerHTML = '';
     listEl.style.display = '';
@@ -302,12 +313,12 @@
     window.scrollTo(0, 0);
   });
 
-  listEl.addEventListener('click', function (e) {
+  document.addEventListener('click', function (e) {
     var h = e.target.closest('.yw-head');
-    if (h) {
+    if (h && listEl.style.display !== 'none') {
       var idx = h.getAttribute('data-idx');
       var rec = currentItems[idx];
-      if (rec) showDetail(rec);
+      if (rec) showDetail(rec, h);
       return;
     }
 
