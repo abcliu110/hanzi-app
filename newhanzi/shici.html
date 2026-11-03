@@ -734,19 +734,37 @@ function openPoem(order){
   if(!p){ vHome(); return; }
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><div class="sc-typetag" style="--tc:'+SC_TYPE_COLOR['材料']+'">'+SC_TYPE_LABEL['材料']+'</div><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
-  h += '<div class="sc-lines">'+p.lines.map(function(l){return '<p>'+esc(l)+'</p>';}).join('')+'</div>';
+  /* 逐句锚点：每句可点，点击滚动到对应讲解 */
+  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+esc(l)+'</p>';}).join('')+'</div>';
   /* 名篇精讲赏析 */
   try{
     var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
     if(sx){
       h += '<div class="sc-card" style="margin-top:12px"><h3>📜 背景</h3><p>'+esc(sx.bg)+'</p></div>';
-      h += '<div class="sc-card" style="margin-top:8px"><h3>🔍 逐句讲</h3>'+sx.zj.map(function(z){return '<p>'+esc(z)+'</p>';}).join('')+'</div>';
+      h += '<div class="sc-card" style="margin-top:8px"><h3>🔍 逐句讲</h3>'+sx.zj.map(function(z,zi){return '<p class="sc-zj" id="sczj-'+zi+'">'+esc(z)+'</p>';}).join('')+'</div>';
       h += '<div class="sc-card" style="margin-top:8px"><h3>✨ 艺术特色</h3><p>'+esc(sx.ys)+'</p></div>';
     }
   }catch(e){}
   h += '<button class="sc-backbtn" id="scback">← 返回</button>';
   detEl.innerHTML = h; showDetail();
   document.getElementById('scback').addEventListener('click', function(){ showList(); });
+  /* 逐句锚点点击事件 */
+  try{
+    var lineEls = detEl.querySelectorAll('.sc-line');
+    for(var li=0; li<lineEls.length; li++){
+      (function(el, idx){
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', function(){
+          var target = document.getElementById('sczj-'+idx);
+          if(target){
+            target.scrollIntoView({behavior:'smooth', block:'center'});
+            target.style.background = '#fff8e1';
+            setTimeout(function(){ target.style.background = ''; }, 2000);
+          }
+        });
+      })(lineEls[li], li);
+    }
+  }catch(e){}
   try{ history.replaceState(null,'','#poem-'+order); }catch(e){}
 }
 
