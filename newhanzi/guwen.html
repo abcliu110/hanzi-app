@@ -7,9 +7,13 @@
 <link rel="stylesheet" href="zika.css">
 <style>
 .gw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-.gw-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);cursor:pointer}
+.gw-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);cursor:pointer;align-self:start}
 .gw-card h3{margin:0 0 6px;font-size:18px}
 .gw-card p{margin:0;color:var(--muted);font-size:14px}
+.gw-navgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.gw-navgrid>*{align-self:start}
+@media(min-width:768px){.gw-navgrid{grid-template-columns:1fr 1fr 1fr}}
+@media(min-width:1200px){.gw-navgrid{grid-template-columns:1fr 1fr 1fr 1fr}}
 .gw-item{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
 .gw-item:active{background:var(--accent-soft)}
 .gw-ititle{font-size:18px;font-weight:bold}
@@ -21,10 +25,17 @@
 .gw-sec{margin:20px 0 6px;font-size:17px;font-weight:bold}
 .gw-yuanwen{font-family:Georgia,"Songti SC","SimSun",serif;font-size:19px;line-height:1.9;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
 .gw-p{font-size:16px;line-height:1.8;padding:0 4px}
+.gw-eg{font-family:Georgia,"Songti SC","SimSun",serif;font-size:17px;line-height:1.9;padding:0 4px;margin:8px 0}
 .gw-words{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
 .gw-word{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);font-size:15px}
 .gw-word b{color:var(--accent-deep)}
+.gw-tag{display:inline-block;background:var(--accent-soft);color:var(--accent-deep);font-size:12px;border-radius:8px;padding:1px 7px;margin-left:6px}
+.gw-input{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-size:16px;margin:8px 0}
+.gw-filterbtn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:15px;cursor:pointer;margin:0 8px 8px 0}
+.gw-filterbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
 .gw-src{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,.gw-item:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body class="page-sub page-guwen">
@@ -34,32 +45,71 @@
   <span></span>
 </header>
 <main class="listwrap">
-  <div id="gwlist"></div>
+  <div id="gwnav"></div>
+  <div id="gwlist" style="display:none"></div>
   <div id="gwdetail" style="display:none"></div>
+  <div id="gwmlist" style="display:none"></div>
+  <div id="gwmdetail" style="display:none"></div>
   <p class="gw-src" id="gwsrc">原文为公有领域古代文献；导读、译意、重点字词为本应用原创讲解。</p>
 </main>
 <script src="data/guwen.js"></script>
+<script src="data/guwen_knowledge.js"></script>
 <script>
 (function(){
   var D = window.NHZ_GUWEN || {texts: []};
+  var K = window.NHZ_GUWEN_KNOWLEDGE || {byId: {}};
+  var MODS = [
+    {id:'pianmu', icon:'📜', t:'古文篇目', d:'12篇 · 论语选读、寓言故事、名家短篇'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'18个 · 用法、例句、辨析'},
+    {id:'shici', icon:'📝', t:'实词', d:'120个 · 含55个初中优先'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式'},
+    {id:'tongjia', icon:'🔁', t:'通假', d:'16例 · 通假字读本字'},
+    {id:'guyin', icon:'⚖️', t:'古今异义', d:'16例 · 古今意思大不同'},
+    {id:'duoyi', icon:'🌿', t:'一词多义', d:'12字 · 一字多义看语境'},
+    {id:'huoyong', icon:'🔄', t:'词类活用', d:'按类型 · 换词性换意思'},
+    {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
+    {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
+    {id:'wenhua', icon:'🏺', t:'文化常识', d:'器物、度量衡、历法、节日、地理'},
+    {id:'songdu', icon:'🔊', t:'诵读', d:'篇目积累、断句、语感'},
+    {id:'fanyi', icon:'🔍', t:'翻译方法', d:'直译为主、留换删补调'},
+    {id:'meiti', icon:'🎬', t:'视频动画图示', d:'只外链嵌入 · 不照搬'},
+    {id:'gaopinci', icon:'⭐', t:'篇目高频字', d:'小学14篇与初中篇目重点字'},
+    {id:'zongbiao', icon:'📊', t:'汇总总表', d:'按分类的字表总汇'}
+  ];
   var SECTIONS = [
     {id:'论语选读', icon:'📖', t:'论语选读', d:'4 篇 · 孔子的话，学与思'},
     {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'6 篇 · 小故事，大道理'},
     {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'2 篇 · 陋室铭、爱莲说'}
   ];
+  var navEl = document.getElementById('gwnav');
   var listEl = document.getElementById('gwlist');
   var detEl = document.getElementById('gwdetail');
+  var mlistEl = document.getElementById('gwmlist');
+  var mdetEl = document.getElementById('gwmdetail');
+  var curMod = null, curFilter = '', curJr = false;
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hideAll(){
+    navEl.style.display='none'; listEl.style.display='none'; detEl.style.display='none';
+    mlistEl.style.display='none'; mdetEl.style.display='none';
+  }
+  function showNav(){
+    hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<div class="gw-navgrid">' + MODS.map(function(m){
+      return '<div class="gw-card" data-mod="'+esc(m.id)+'"><h3>'+m.icon+' '+esc(m.t)+'</h3><p>'+esc(m.d)+'</p></div>';
+    }).join('') + '</div>';
+    navEl.innerHTML = h;
+  }
   function showSections(){
-    detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<div class="gw-grid">' + SECTIONS.map(function(s){
+    hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
+    h += '<div class="gw-grid">' + SECTIONS.map(function(s){
       return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></div>';
     }).join('') + '</div>';
     h += '<button class="gw-backbtn" data-go="全部">📜 全部篇目（共'+D.texts.length+'篇）</button>';
     listEl.innerHTML = h;
   }
   function showList(cat){
-    detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0);
+    hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var items = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
     var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
     h += items.map(function(t, i){
@@ -70,7 +120,7 @@
   }
   function showDetail(idx){
     var t = D.texts[idx]; if(!t) return;
-    listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0);
+    hideAll(); detEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__back">← 回篇目</button>';
     h += '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
     h += '<div class="gw-sec">📖 原文</div><div class="gw-yuanwen">'+esc(t.原文)+'</div>';
@@ -82,19 +132,97 @@
     detEl.innerHTML = h;
     detEl.dataset.back = t.cat;
   }
+  function modById(id){ return K.byId[id] || null; }
+  function entryTitle(e){
+    var h = esc(e.t);
+    if(e.jr) h += '<span class="gw-tag">初中优先</span>';
+    return h;
+  }
+  function renderMItems(){
+    var mod = modById(curMod); if(!mod) return;
+    var box = document.getElementById('gwMItems'); if(!box) return;
+    var q = curFilter.trim();
+    var list = (mod.entries || []).filter(function(e){
+      if(curJr && !e.jr) return false;
+      if(!q) return true;
+      var hay = (e.t || '') + (e.sub || '') + (e.ps || []).join(' ');
+      return hay.indexOf(q) !== -1;
+    });
+    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的条目。</p>'; return; }
+    box.innerHTML = list.map(function(e){
+      var idx = (mod.entries || []).indexOf(e);
+      var meta = e.sub ? '<div class="gw-imeta">'+esc(e.sub)+'</div>' : '';
+      return '<div class="gw-item" data-midx="'+idx+'"><div class="gw-ititle">'+entryTitle(e)+'</div>'+meta+'</div>';
+    }).join('');
+  }
+  function showMList(id){
+    curMod = id; curFilter = ''; curJr = false;
+    var mod = modById(id);
+    hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
+    var meta = MODS.filter(function(m){return m.id===id;})[0] || {t:id, d:''};
+    var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
+    h += '<div class="gw-head"><h2>'+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    if(!mod){ h += '<p class="gw-p">本子模块内容正在补充。</p>'; mlistEl.innerHTML = h; return; }
+    if(mod.intro) h += '<p class="gw-p">'+esc(mod.intro)+'</p>';
+    if(id==='shici'){
+      h += '<input class="gw-input" id="gwSearch" placeholder="搜索实词或义项…">';
+      h += '<button class="gw-filterbtn" id="gwJrBtn">只看初中优先</button>';
+    }
+    h += '<div id="gwMItems"></div>';
+    mlistEl.innerHTML = h;
+    var inp = document.getElementById('gwSearch');
+    if(inp) inp.addEventListener('input', function(){ curFilter = inp.value; renderMItems(); });
+    var jb = document.getElementById('gwJrBtn');
+    if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
+    renderMItems();
+  }
+  function showMDetail(idx){
+    var mod = modById(curMod); if(!mod) return;
+    var e = (mod.entries || [])[idx]; if(!e) return;
+    hideAll(); mdetEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<button class="gw-backbtn" data-go="__mlist">← 回列表</button>';
+    h += '<div class="gw-head"><h2>'+entryTitle(e)+'</h2>' + (e.sub ? '<div class="gw-meta">'+esc(e.sub)+'</div>' : '') + '</div>';
+    (e.ps || []).forEach(function(p){ h += '<p class="gw-p">'+esc(p)+'</p>'; });
+    if(e.items && e.items.length){
+      h += '<div class="gw-words">'+e.items.map(function(w){
+        return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
+      }).join('')+'</div>';
+    }
+    if(e.li && e.li.length){
+      h += '<div class="gw-sec">例句</div>' + e.li.map(function(s){ return '<p class="gw-eg">'+esc(s)+'</p>'; }).join('');
+    }
+    if(e.hun) h += '<div class="gw-sec">辨析</div><p class="gw-p">'+esc(e.hun)+'</p>';
+    if(e.links && e.links.length){
+      h += '<div class="gw-sec">链接</div>' + e.links.map(function(l){
+        return '<a class="gw-linkbtn" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t)+'</a><p class="gw-p">'+esc(l.note || '')+'</p>';
+      }).join('');
+    }
+    if(e.note) h += '<p class="gw-src">'+esc(e.note)+'</p>';
+    mdetEl.innerHTML = h;
+  }
   document.addEventListener('click', function(e){
+    var card = e.target.closest('[data-mod]');
+    if(card){
+      var mid = card.getAttribute('data-mod');
+      if(mid==='pianmu') showSections(); else showMList(mid);
+      return;
+    }
     var go = e.target.closest('[data-go]');
     if(go){
       var g = go.getAttribute('data-go');
-      if(g==='__sections') showSections();
+      if(g==='__nav') showNav();
+      else if(g==='__sections') showSections();
       else if(g==='__back') showList(detEl.dataset.back || '全部');
+      else if(g==='__mlist') showMList(curMod);
       else showList(g);
       return;
     }
+    var mi = e.target.closest('[data-midx]');
+    if(mi){ showMDetail(parseInt(mi.getAttribute('data-midx'), 10)); return; }
     var it = e.target.closest('.gw-item');
-    if(it) showDetail(parseInt(it.getAttribute('data-idx'), 10));
+    if(it && it.hasAttribute('data-idx')) showDetail(parseInt(it.getAttribute('data-idx'), 10));
   });
-  showSections();
+  showNav();
 })();
 </script>
 </body>
