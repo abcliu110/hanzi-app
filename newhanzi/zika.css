@@ -207,6 +207,16 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 }
 #rail button:active { color: var(--accent); font-weight: 700; }
 
+/* ---- 语文详情页 ---- */
+.yw-back{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 18px;
+  font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink);margin-bottom:16px}
+.yw-back:hover{border-color:var(--accent);color:var(--accent-deep)}
+.yw-detail-head{display:flex;align-items:center;gap:16px;background:var(--surface);
+  border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.yw-detail-head .yw-ico-lg{font-size:48px}
+.yw-detail-head h2{font-size:24px;letter-spacing:2px;margin-bottom:6px}
+.yw-detail-head .yw-kj-lg{font-size:15px;color:var(--accent-deep);font-weight:600}
+.yw-detail-body{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
 /* ---- 语文知识库面板网格 ---- */
 .yw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 18px}
 .yw-grid .yw-item{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;

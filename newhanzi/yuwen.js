@@ -10,6 +10,7 @@
   ];
   var DATA = {};
   var active = 'grammar';
+  var currentItems = {};
   var animData = {};
   var quizData = {};
   var gameData = {};
@@ -17,16 +18,10 @@
   var bankData = window.NHZ_GRAMMAR_BANK || {};
   var bankState = {};
   var bankQuizData = {};
-  /* 支持 ?tab=logic 直接进逻辑学 */
-  try {
-    var mm = location.search.match(/[?&]tab=([a-z]+)/);
-    if (mm && mm[1]) {
-      var valid = MODULES.some(function (m) { return m.key === mm[1]; });
-      if (valid) active = mm[1];
-    }
-  } catch (e) {}
+  /* 导航已移除，固定显示语法 */
 
   var listEl = document.getElementById('ywlist');
+  var detailEl = document.getElementById('ywdetail');
   var tabsEl = document.getElementById('ywtabs');
   var stdEl = document.getElementById('ywstd');
   var qEl = document.getElementById('yq');
@@ -212,8 +207,9 @@
     }
     var iconMap = {'名词':'🔺','动词':'🔴','形容词':'🔷','数词':'🔢','量词':'📏','代词':'➕','副词':'⚡','介词':'🔗','连词':'⛓️','助词':'📌','语气词':'💬','叹词':'❗','主语':'👤','谓语':'🏃','宾语':'🎯','定语':'🏷️','状语':'📍','补语':'➕','比喻':'🪞','拟人':'🧍','夸张':'🎈','排比':'📚','对偶':'⚖️','反复':'🔁','设问':'❓','反问':'‼️'};
     var icon = iconMap[it.name] || '📖';
+    currentItems[idx] = {it: it, body: body, icon: icon};
     return '<div class="yw-item">' +
-      '<button class="yw-head"><span class="yw-ico">' + icon + '</span><span class="yw-name">' + esc(it.name || '') + '</span>' +
+      '<button class="yw-head" data-idx="' + idx + '"><span class="yw-ico">' + icon + '</span><span class="yw-name">' + esc(it.name || '') + '</span>' +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
       (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
       '<span class="yw-badges">' +
@@ -223,6 +219,35 @@
       '</span>' +
       '<span class="yw-arrow">▾</span></button>' +
       '<div class="yw-body">' + body + '</div></div>';
+  }
+
+  function showDetail(rec) {
+    var it = rec.it;
+    listEl.style.display = 'none';
+    controlsEl.style.display = 'none';
+    detailEl.style.display = 'block';
+    detailEl.innerHTML =
+      '<div style="display:flex;gap:10px;margin-bottom:16px">' +
+      '<button class="yw-back" id="ywBack">← 返回列表</button>' +
+      '<button class="yw-back" id="ywHome">🏠 主页</button></div>' +
+      '<div class="yw-detail-head"><span class="yw-ico-lg">' + rec.icon + '</span>' +
+      '<div><h2>' + esc(it.name || '') + '</h2>' +
+      (it['口诀'] ? '<p class="yw-kj-lg">' + esc(it['口诀']) + '</p>' : '') + '</div></div>' +
+      '<div class="yw-detail-body">' + rec.body + '</div>';
+    document.getElementById('ywBack').addEventListener('click', hideDetail);
+    document.getElementById('ywHome').addEventListener('click', function(){
+      if (window.self !== window.top) { window.top.location.href = 'index.html'; }
+      else { window.location.href = 'index.html'; }
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function hideDetail() {
+    detailEl.style.display = 'none';
+    detailEl.innerHTML = '';
+    listEl.style.display = '';
+    controlsEl.style.display = '';
+    window.scrollTo(0, 0);
   }
 
   function render() {
@@ -260,6 +285,7 @@
   }
 
   function syncTabs() {
+    if (!tabsEl) return;
     tabsEl.innerHTML = MODULES.map(function (m) {
       var n = DATA[m.key] ? DATA[m.key].categories.reduce(function (a, c) { return a + c.items.length; }, 0) : 0;
       return '<button class="tab' + (m.key === active ? ' active' : '') + '" data-m="' + m.key + '">' +
@@ -267,7 +293,7 @@
     }).join('');
   }
 
-  tabsEl.addEventListener('click', function (e) {
+  if (tabsEl) tabsEl.addEventListener('click', function (e) {
     var t = e.target.closest('.tab');
     if (!t) return;
     active = t.getAttribute('data-m');
@@ -278,7 +304,12 @@
 
   listEl.addEventListener('click', function (e) {
     var h = e.target.closest('.yw-head');
-    if (h) { h.parentElement.classList.toggle('open'); return; }
+    if (h) {
+      var idx = h.getAttribute('data-idx');
+      var rec = currentItems[idx];
+      if (rec) showDetail(rec);
+      return;
+    }
 
     /* 动画播放器 */
     var ab = e.target.closest('[data-aid]');
