@@ -68,7 +68,10 @@
     }
     if (dim['六书'] && dim['六书'].value) chips += '<span class="chip">' + esc(dim['六书'].value) + '</span>';
     h += '<div class="hero"><div class="bigzi">' + esc(r.zi) + '</div>' +
-      (dim['读音'] ? '<div class="pinyin">' + esc(String(dim['读音']['拼音'] || '').replace(/,/g, '、')) + '</div>' : '') +
+      (function(){
+        var py = (dim['读音'] && dim['读音']['拼音']) || ((window.NHZ_PINYIN||{})[r.zi]) || '';
+        return py ? '<div class="pinyin">' + esc(String(py).replace(/,/g, '、')) + '</div>' : '';
+      })() +
       '<div class="chips">' + chips + '</div>' +
       // 偏旁部首直达部首库（只显示归属；语义解读在部首详情页，避免对假借字误断）
       (bsEntry
