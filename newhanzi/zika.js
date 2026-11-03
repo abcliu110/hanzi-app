@@ -122,6 +122,14 @@
         (pd.sound ? '<br>' + esc(pd.sound) : '') +
         (pd.note ? '<div class="ex">' + esc(pd.note) + '</div>' : ''));
     }
+    /* 看笔顺（词条型形块区）：笔顺维与组件数据格式一致，直接接线，不改数据格式 */
+    var bs = dim['笔顺'];
+    var hasBS = bs && bs.strokes && bs.medians &&
+      bs.strokes.length > 0 && bs.strokes.length === bs.medians.length;
+    if (hasBS) {
+      zx += '<div class="kv"><div class="k">看笔顺</div><div class="v"><div id="bishunBox"></div>' +
+        '<div class="ex">共 ' + bs.strokes.length + ' 笔，毛笔一笔一笔写给你看。</div></div></div>';
+    }
     h += sec('字长什么样', '结构', zx);
 
     /* 4. 别认错（形近字 + 易错提示） */
@@ -176,6 +184,19 @@
     h += '<div class="src-note">数据来源：通用规范汉字表 · Unihan · 《说文解字》· hanzi-writer-data · CC-CEDICT</div>';
 
     app.innerHTML = h;
+
+    /* 看笔顺挂载：形块区容器已随 innerHTML 生成，有数据且组件已加载时挂载并播一次 */
+    try {
+      var bsBox = document.getElementById('bishunBox');
+      if (bsBox && window.NHZStrokePlayer && dim['笔顺'] &&
+          dim['笔顺'].strokes && dim['笔顺'].medians) {
+        var sp = window.NHZStrokePlayer.mount(bsBox, {
+          strokes: dim['笔顺'].strokes,
+          medians: dim['笔顺'].medians
+        });
+        sp.play();
+      }
+    } catch (e) {}
 
     /* 交互 wiring */
     document.getElementById('speakBtn').onclick = function () {
