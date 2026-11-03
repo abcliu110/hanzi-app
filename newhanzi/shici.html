@@ -268,13 +268,13 @@ function vZilian(preZi){
       if(ls.length) hits.push({p:p, ls:ls.slice(0,3)});
     });
     if(!hits.length){ box.innerHTML = '<div class="sc-know"><p>“'+esc(zi)+'”在诗库里没有出现，换个字试试。</p></div>'; return; }
-    var shown = hits.slice(0,8);
+    var shown = hits.slice(0,20);
     box.innerHTML = '<div class="sc-know"><h3>含“'+esc(zi)+'”的诗句（'+hits.length+'首）</h3>' + shown.map(function(hh){
       var lines = hh.ls.map(function(l){
         return '<div class="sc-hitline">'+esc(l).split(esc(zi)).join('<mark>'+esc(zi)+'</mark>')+'</div>';
       }).join('');
       return '<div style="margin:10px 0 4px"><span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span><span style="font-size:12px;color:var(--xzq-muted,#8a8578)"> '+esc(hh.p.author)+'</span></div>' + lines;
-    }).join('') + (hits.length>8?'<p style="font-size:13px;color:var(--xzq-muted,#8a8578)">还有 '+(hits.length-8)+' 首，在诗库里搜“'+esc(zi)+'”查看</p>':'') + '</div>';
+    }).join('') + (hits.length>20?'<p style="font-size:13px;color:var(--xzq-muted,#8a8578)">还有 '+(hits.length-20)+' 首，在诗库里搜“'+esc(zi)+'”查看</p>':'') + '</div>';
     box.querySelectorAll('.sc-worklink').forEach(function(a){
       a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
     });
