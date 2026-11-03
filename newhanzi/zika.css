@@ -755,3 +755,13 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .page-sub:has(.topbar[style*="display: none"]) .listwrap {
   padding-top: 8px;
 }
+
+/* SVG 动画图解：护眼配色，随亮/暗模式自动切换（fill/stroke 用 class，不用硬编码色值） */
+.svg-ink{fill:var(--ink)} .svg-ink-s{stroke:var(--ink)}
+.svg-muted{fill:var(--muted)} .svg-muted-s{stroke:var(--muted)}
+.svg-accent{fill:var(--accent)} .svg-accent-s{stroke:var(--accent)}
+.svg-red{fill:var(--red)} .svg-red-s{stroke:var(--red)}
+.svg-blue{fill:var(--blue)} .svg-blue-s{stroke:var(--blue)}
+.svg-green{fill:var(--green)} .svg-green-s{stroke:var(--green)}
+.svg-deep{fill:var(--accent-deep)} .svg-deep-s{stroke:var(--accent-deep)}
+.svg-panel{fill:var(--surface)}

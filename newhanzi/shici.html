@@ -129,22 +129,22 @@ function vHome(){
   });
 }
 
-var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活']];
+var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活'],['jilu','🎥','纪录片·实拍']];
 
 function svgSisheng(){
   var rows = [
-    ['平','M60,22 L210,22','平坦 → 平','#f5c518'],
-    ['上','M60,34 L210,12','上扬 → 仄','#e06c5a'],
-    ['去','M60,12 L210,34','下降 → 仄','#e06c5a'],
-    ['入','M60,23 L130,23','短促截断 → 仄','#e06c5a']
+    ['平','M60,22 L210,22','平坦 → 平','svg-accent-s'],
+    ['上','M60,34 L210,12','上扬 → 仄','svg-red-s'],
+    ['去','M60,12 L210,34','下降 → 仄','svg-red-s'],
+    ['入','M60,23 L130,23','短促截断 → 仄','svg-red-s']
   ];
   var s = '<svg viewBox="0 0 320 152">';
   rows.forEach(function(r,i){
     var y = i*38;
-    s += '<text x="10" y="'+(y+27)+'" font-size="17" fill="#e8e4d8">'+r[0]+'</text>';
-    s += '<path d="'+r[1]+'" transform="translate(0,'+y+')" stroke="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
-    if(i===3) s += '<line x1="130" y1="'+(y+16)+'" x2="130" y2="'+(y+30)+'" stroke="'+r[3]+'" stroke-width="3" stroke-linecap="round"/>';
-    s += '<text x="312" y="'+(y+28)+'" font-size="12" fill="#8a8578" text-anchor="end">'+r[2]+'</text>';
+    s += '<text x="10" y="'+(y+27)+'" font-size="17" class="svg-ink">'+r[0]+'</text>';
+    s += '<path d="'+r[1]+'" transform="translate(0,'+y+')" class="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    if(i===3) s += '<line x1="130" y1="'+(y+16)+'" x2="130" y2="'+(y+30)+'" class="'+r[3]+'" stroke-width="3" stroke-linecap="round"/>';
+    s += '<text x="312" y="'+(y+28)+'" font-size="12" text-anchor="end" class="svg-muted">'+r[2]+'</text>';
   });
   return s + '</svg>';
 }
@@ -152,13 +152,13 @@ function svgYayun(){
   var lines = ['床前明月光，','疑是地上霜。','举头望明月，','低头思故乡。'];
   var s = '<svg viewBox="0 0 320 136">';
   lines.forEach(function(ln,i){
-    s += '<text x="16" y="'+(30+i*26)+'" font-size="16" fill="#e8e4d8">'+ln+'</text>';
+    s += '<text x="16" y="'+(30+i*26)+'" font-size="16" class="svg-ink">'+ln+'</text>';
   });
   [0,1,3].forEach(function(i){
-    s += '<rect x="76" y="'+(30+i*26-18)+'" width="26" height="25" rx="6" fill="none" stroke="#f5c518" stroke-width="2"/>';
+    s += '<rect x="76" y="'+(30+i*26-18)+'" width="26" height="25" rx="6" fill="none" stroke-width="2" class="svg-accent-s"/>';
   });
-  s += '<text x="122" y="56" font-size="13" fill="#f5c518">韵脚都有 ang 的尾巴</text>';
-  s += '<text x="122" y="108" font-size="13" fill="#8a8578">“月”不押韵</text>';
+  s += '<text x="122" y="56" font-size="13" class="svg-accent">韵脚都有 ang 的尾巴</text>';
+  s += '<text x="122" y="108" font-size="13" class="svg-muted">“月”不押韵</text>';
   return s + '</svg>';
 }
 function svgZhandui(){
@@ -166,27 +166,27 @@ function svgZhandui(){
     var s = '';
     for(var i=0;i<5;i++){
       var x = 56 + i*26, isP = pat[i]==='P';
-      s += '<circle cx="'+x+'" cy="'+y+'" r="9" fill="'+(isP?'#f5c518':'#1c1c1e')+'" stroke="#f5c518" stroke-width="1.5"/>';
+      s += '<circle cx="'+x+'" cy="'+y+'" r="9" class="svg-accent-s '+(isP?'svg-accent':'svg-panel')+'" stroke-width="1.5"/>';
     }
     return s;
   }
   var s = '<svg viewBox="0 0 320 138">';
-  s += '<text x="6" y="30" font-size="12" fill="#8a8578">上句</text>' + dots(25,'ZZPPZ');
-  s += '<text x="6" y="66" font-size="12" fill="#8a8578">下句</text>' + dots(61,'PPZZP');
-  s += '<text x="196" y="50" font-size="12" fill="#f5c518">对：平仄相反</text><text x="196" y="66" font-size="12" fill="#8a8578">像照镜子</text>';
-  s += '<text x="6" y="102" font-size="12" fill="#8a8578">下联</text>' + dots(97,'PPZZP');
-  s += '<text x="196" y="92" font-size="12" fill="#f5c518">粘：平仄相同</text><text x="196" y="108" font-size="12" fill="#8a8578">像胶水粘住</text>';
-  s += '<text x="6" y="130" font-size="11" fill="#8a8578">●＝平　○＝仄</text>';
+  s += '<text x="6" y="30" font-size="12" class="svg-muted">上句</text>' + dots(25,'ZZPPZ');
+  s += '<text x="6" y="66" font-size="12" class="svg-muted">下句</text>' + dots(61,'PPZZP');
+  s += '<text x="196" y="50" font-size="12" class="svg-accent">对：平仄相反</text><text x="196" y="66" font-size="12" class="svg-muted">像照镜子</text>';
+  s += '<text x="6" y="102" font-size="12" class="svg-muted">下联</text>' + dots(97,'PPZZP');
+  s += '<text x="196" y="92" font-size="12" class="svg-accent">粘：平仄相同</text><text x="196" y="108" font-size="12" class="svg-muted">像胶水粘住</text>';
+  s += '<text x="6" y="130" font-size="11" class="svg-muted">●＝平　○＝仄</text>';
   return s + '</svg>';
 }
 function svgDuizhang(){
   var s = '<svg viewBox="0 0 340 118">';
-  s += '<text x="20" y="30" font-size="16" fill="#e8e4d8">两个黄鹂鸣翠柳，</text>';
-  s += '<text x="20" y="62" font-size="16" fill="#e8e4d8">一行白鹭上青天。</text>';
+  s += '<text x="20" y="30" font-size="16" class="svg-ink">两个黄鹂鸣翠柳，</text>';
+  s += '<text x="20" y="62" font-size="16" class="svg-ink">一行白鹭上青天。</text>';
   [[0,2,'数量'],[2,4,'鸟名'],[4,5,'动作'],[5,6,'颜色'],[6,7,'景物']].forEach(function(b){
     var cx = 20 + (b[0]+b[1])/2*16;
-    s += '<line x1="'+cx+'" y1="36" x2="'+cx+'" y2="48" stroke="#f5c518" stroke-width="1.2"/>';
-    s += '<text x="'+cx+'" y="94" font-size="11" fill="#f5c518" text-anchor="middle">'+b[2]+'</text>';
+    s += '<line x1="'+cx+'" y1="36" x2="'+cx+'" y2="48" stroke-width="1.2" class="svg-accent-s"/>';
+    s += '<text x="'+cx+'" y="94" font-size="11" text-anchor="middle" class="svg-accent">'+b[2]+'</text>';
   });
   return s + '</svg>';
 }
@@ -194,20 +194,20 @@ function svgJueju(){
   var s = '<svg viewBox="0 0 320 88">';
   ['起','承','转','合'].forEach(function(w,i){
     var x = 12 + i*78;
-    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/>';
-    s += '<text x="'+(x+33)+'" y="39" font-size="20" fill="#f5c518" text-anchor="middle">'+w+'</text>';
+    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" stroke-width="1.5" class="svg-panel svg-accent-s"/>';
+    s += '<text x="'+(x+33)+'" y="39" font-size="20" text-anchor="middle" class="svg-accent">'+w+'</text>';
   });
-  s += '<text x="160" y="76" font-size="12" fill="#8a8578" text-anchor="middle">四句一首 · 五绝20字 · 七绝28字</text>';
+  s += '<text x="160" y="76" font-size="12" text-anchor="middle" class="svg-muted">四句一首 · 五绝20字 · 七绝28字</text>';
   return s + '</svg>';
 }
 function svgLvshi(){
   var s = '<svg viewBox="0 0 320 152">';
   [['首联',0],['颔联',1],['颈联',1],['尾联',0]].forEach(function(r,i){
-    var y = 8 + i*36, st = r[1] ? '#f5c518' : '#8a8578';
-    s += '<text x="8" y="'+(y+22)+'" font-size="13" fill="#e8e4d8">'+r[0]+'</text>';
-    s += '<rect x="52" y="'+y+'" width="100" height="28" rx="6" fill="#1c1c1e" stroke="'+st+'" stroke-width="1.5"/>';
-    s += '<rect x="160" y="'+y+'" width="100" height="28" rx="6" fill="#1c1c1e" stroke="'+st+'" stroke-width="1.5"/>';
-    if(r[1]) s += '<text x="268" y="'+(y+20)+'" font-size="12" fill="#f5c518">对仗</text>';
+    var y = 8 + i*36, st = r[1] ? 'svg-accent' : 'svg-muted';
+    s += '<text x="8" y="'+(y+22)+'" font-size="13" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="52" y="'+y+'" width="100" height="28" rx="6" class="svg-panel '+st+'" stroke-width="1.5"/>';
+    s += '<rect x="160" y="'+y+'" width="100" height="28" rx="6" class="svg-panel '+st+'" stroke-width="1.5"/>';
+    if(r[1]) s += '<text x="268" y="'+(y+20)+'" font-size="12" class="svg-accent">对仗</text>';
   });
   return s + '</svg>';
 }
@@ -215,18 +215,18 @@ function svgCidiao(){
   var s = '<svg viewBox="0 0 320 108">';
   [['小令','≤58字 · S',58],['中调','59–90字 · M',90],['长调','≥91字 · L',130]].forEach(function(r,i){
     var y = 10 + i*32, w = Math.round(r[2]/130*180);
-    s += '<text x="8" y="'+(y+18)+'" font-size="13" fill="#e8e4d8">'+r[0]+'</text>';
-    s += '<rect x="52" y="'+y+'" width="'+w+'" height="22" rx="6" fill="#f5c518" opacity="0.85"/>';
-    s += '<text x="'+(60+w)+'" y="'+(y+17)+'" font-size="12" fill="#8a8578">'+r[1]+'</text>';
+    s += '<text x="8" y="'+(y+18)+'" font-size="13" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="52" y="'+y+'" width="'+w+'" height="22" rx="6" opacity="0.85" class="svg-accent"/>';
+    s += '<text x="'+(60+w)+'" y="'+(y+17)+'" font-size="12" class="svg-muted">'+r[1]+'</text>';
   });
   return s + '</svg>';
 }
 function svgAnimSisheng(){
   var rows = [
-    ['平','M60,22 L210,22','平坦 → 平','#f5c518'],
-    ['上','M60,34 L210,12','上扬 → 仄','#e06c5a'],
-    ['去','M60,12 L210,34','下降 → 仄','#e06c5a'],
-    ['入','M60,23 L130,23','短促截断 → 仄','#e06c5a']
+    ['平','M60,22 L210,22','平坦 → 平','svg-accent-s'],
+    ['上','M60,34 L210,12','上扬 → 仄','svg-red-s'],
+    ['去','M60,12 L210,34','下降 → 仄','svg-red-s'],
+    ['入','M60,23 L130,23','短促截断 → 仄','svg-red-s']
   ];
   var s = '<svg viewBox="0 0 320 184">';
   rows.forEach(function(r,i){
@@ -236,18 +236,18 @@ function svgAnimSisheng(){
     var kA = i*0.25, kB = (i+1)*0.25;
     var kt = '0;'+Math.max(0.001,kA-0.03).toFixed(3)+';'+(kA+0.03).toFixed(3)+';'+(kB-0.03).toFixed(3)+';'+Math.min(0.999,kB+0.03).toFixed(3)+';1';
     s += '<g transform="translate(0,'+y+')">';
-    s += '<path d="'+r[1]+'" stroke="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"/>';
-    if(i===3) s += '<line x1="130" y1="16" x2="130" y2="30" stroke="'+r[3]+'" stroke-width="3" stroke-linecap="round" opacity="0.55"/>';
-    s += '<circle r="6" fill="#ffffff">'
+    s += '<path d="'+r[1]+'" class="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"/>';
+    if(i===3) s += '<line x1="130" y1="16" x2="130" y2="30" class="'+r[3]+'" stroke-width="3" stroke-linecap="round" opacity="0.55"/>';
+    s += '<circle r="6" class="svg-deep">'
       + '<animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" keyPoints="'+kp.join(';')+'" keyTimes="0;0.25;0.5;0.75;1" path="'+r[1]+'"/>'
       + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/>'
       + '</circle>';
     s += '</g>';
-    s += '<text x="10" y="'+(y+27)+'" font-size="17" fill="#8a8578">'+r[0]
-      + '<animate attributeName="fill" values="#8a8578;#8a8578;#f5c518;#f5c518;#8a8578;#8a8578" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
-    s += '<text x="312" y="'+(y+28)+'" font-size="12" fill="#8a8578" text-anchor="end">'+r[2]+'</text>';
+    s += '<text x="10" y="'+(y+27)+'" font-size="17" class="svg-accent">'+r[0]
+      + '<animate attributeName="opacity" values="0.35;0.35;1;1;0.35;0.35" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+    s += '<text x="312" y="'+(y+28)+'" font-size="12" text-anchor="end" class="svg-muted">'+r[2]+'</text>';
   });
-  s += '<text x="160" y="172" font-size="12" fill="#8a8578" text-anchor="middle">白点依次走过四条线，注意每条线的走向</text>';
+  s += '<text x="160" y="172" font-size="12" text-anchor="middle" class="svg-muted">白点依次走过四条线，注意每条线的走向</text>';
   return s + '</svg>';
 }
 function svgAnimPingze(){
@@ -258,20 +258,20 @@ function svgAnimPingze(){
     ['四句','PPZZZPP','对句相对']
   ];
   var s = '<svg viewBox="0 0 320 156">';
-  s += '<text x="10" y="16" font-size="12" fill="#f5c518">●＝平</text>';
-  s += '<text x="66" y="16" font-size="12" fill="#e06c5a">○＝仄</text>';
-  s += '<text x="140" y="16" font-size="12" fill="#8a8578">七绝 · 平起首句押韵式</text>';
+  s += '<text x="10" y="16" font-size="12" class="svg-accent">●＝平</text>';
+  s += '<text x="66" y="16" font-size="12" class="svg-red">○＝仄</text>';
+  s += '<text x="140" y="16" font-size="12" class="svg-muted">七绝 · 平起首句押韵式</text>';
   rows.forEach(function(r,i){
     var cy = 36 + i*32;
-    s += '<text x="8" y="'+(cy+4)+'" font-size="11" fill="#8a8578">'+r[0]+'</text>';
+    s += '<text x="8" y="'+(cy+4)+'" font-size="11" class="svg-muted">'+r[0]+'</text>';
     for(var j=0;j<7;j++){
       var x = 48 + j*28, isP = r[1][j]==='P';
-      s += '<circle cx="'+x+'" cy="'+cy+'" r="8" fill="'+(isP?'#f5c518':'#1c1c1e')+'" stroke="'+(isP?'#f5c518':'#e06c5a')+'" stroke-width="2"/>';
+      s += '<circle cx="'+x+'" cy="'+cy+'" r="8" class="'+(isP?'svg-accent':'svg-panel')+'" class="'+(isP?'svg-accent':'svg-red')+'" stroke-width="2"/>';
     }
-    var nc = (i===2) ? '#8a8578' : '#f5c518';
-    s += '<text x="236" y="'+(cy+4)+'" font-size="11" fill="'+nc+'">'+r[2]+'</text>';
+    var nc = (i===2) ? 'svg-muted' : 'svg-accent';
+    s += '<text x="236" y="'+(cy+4)+'" font-size="11" class="'+nc+'">'+r[2]+'</text>';
   });
-  s += '<rect x="36" y="21" width="192" height="30" rx="8" fill="none" stroke="#f5c518" stroke-width="1.5" opacity="0.85">'
+  s += '<rect x="36" y="21" width="192" height="30" rx="8" fill="none" stroke-width="1.5" opacity="0.85" class="svg-accent-s">'
     + '<animate attributeName="y" values="21;53;85;117;21" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/></rect>';
   return s + '</svg>';
 }
@@ -279,14 +279,14 @@ function svgAnimDuizhang(){
   var x0 = 104;
   var groups = [[0,2,'数量'],[2,4,'鸟名'],[4,5,'动作'],[5,6,'颜色'],[6,7,'景物']];
   var s = '<svg viewBox="0 0 320 136">';
-  s += '<text x="56" y="32" font-size="12" fill="#8a8578">出句</text>';
-  s += '<text x="'+x0+'" y="32" font-size="16" fill="#e8e4d8">两个黄鹂鸣翠柳，</text>';
-  s += '<text x="56" y="64" font-size="12" fill="#8a8578">对句</text>';
-  s += '<text x="'+x0+'" y="64" font-size="16" fill="#e8e4d8">一行白鹭上青天。</text>';
+  s += '<text x="56" y="32" font-size="12" class="svg-muted">出句</text>';
+  s += '<text x="'+x0+'" y="32" font-size="16" class="svg-ink">两个黄鹂鸣翠柳，</text>';
+  s += '<text x="56" y="64" font-size="12" class="svg-muted">对句</text>';
+  s += '<text x="'+x0+'" y="64" font-size="16" class="svg-ink">一行白鹭上青天。</text>';
   for(var i=0;i<7;i++){
     var cx = x0 + 8 + i*16;
     var k1 = (i*0.85/7).toFixed(3), k2 = ((i*0.85+0.45)/7).toFixed(3);
-    s += '<line x1="'+cx+'" y1="38" x2="'+cx+'" y2="52" stroke="#f5c518" stroke-width="1.5" stroke-dasharray="4 3" opacity="0">'
+    s += '<line x1="'+cx+'" y1="38" x2="'+cx+'" y2="52" stroke-width="1.5" stroke-dasharray="4 3" opacity="0" class="svg-accent-s">'
       + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+k1+';'+k2+';1" dur="7s" repeatCount="indefinite"/>'
       + '<animate attributeName="stroke-dashoffset" from="14" to="0" dur="1.2s" repeatCount="indefinite"/>'
       + '</line>';
@@ -294,27 +294,27 @@ function svgAnimDuizhang(){
   groups.forEach(function(b){
     var cx = x0 + 8*(b[0]+b[1]);
     var t = ((b[1]-1)*0.85+0.45)/7;
-    s += '<text x="'+cx+'" y="94" font-size="11" fill="#f5c518" text-anchor="middle" opacity="0">'+b[2]
+    s += '<text x="'+cx+'" y="94" font-size="11" class="svg-accent" text-anchor="middle" opacity="0">'+b[2]
       + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+t.toFixed(3)+';'+(t+0.06).toFixed(3)+';1" dur="7s" repeatCount="indefinite"/></text>';
   });
-  s += '<text x="160" y="120" font-size="12" fill="#f5c518" text-anchor="middle" opacity="0">字数相等 · 词性相对 · 平仄相对'
+  s += '<text x="160" y="120" font-size="12" class="svg-accent" text-anchor="middle" opacity="0">字数相等 · 词性相对 · 平仄相对'
     + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.85;0.92;1" dur="7s" repeatCount="indefinite"/></text>';
   return s + '</svg>';
 }
 function svgAnimQicheng(){
   var ws = [['起','开头点题'],['承','承接铺展'],['转','转折变化'],['合','收束点睛']];
   var s = '<svg viewBox="0 0 320 96">';
-  s += '<line x1="40" y1="31" x2="280" y2="31" stroke="#4a4a4a" stroke-width="2"/>';
+  s += '<line x1="40" y1="31" x2="280" y2="31" stroke-width="2" class="svg-muted-s"/>';
   [82,160,238].forEach(function(cx){
-    s += '<polygon points="'+cx+',26 '+cx+',36 '+(cx+8)+',31" fill="#f5c518"/>';
+    s += '<polygon points="'+cx+',26 '+cx+',36 '+(cx+8)+',31" class="svg-accent"/>';
   });
-  s += '<circle r="5" fill="#f5c518"><animateMotion dur="2.4s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
-  s += '<circle r="5" fill="#f5c518" opacity="0.6"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
+  s += '<circle r="5" class="svg-accent"><animateMotion dur="2.4s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
+  s += '<circle r="5" opacity="0.6" class="svg-accent"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
   ws.forEach(function(w,i){
     var x = 12 + i*78;
-    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/>';
-    s += '<text x="'+(x+33)+'" y="39" font-size="20" fill="#f5c518" text-anchor="middle">'+w[0]+'</text>';
-    s += '<text x="'+(x+33)+'" y="80" font-size="11" fill="#8a8578" text-anchor="middle">'+w[1]+'</text>';
+    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" stroke-width="1.5" class="svg-panel svg-accent-s"/>';
+    s += '<text x="'+(x+33)+'" y="39" font-size="20" text-anchor="middle" class="svg-accent">'+w[0]+'</text>';
+    s += '<text x="'+(x+33)+'" y="80" font-size="11" text-anchor="middle" class="svg-muted">'+w[1]+'</text>';
   });
   return s + '</svg>';
 }
@@ -328,22 +328,22 @@ function svgAnimCipai(){
     ['惊起一滩鸥鹭',6]
   ];
   var s = '<svg viewBox="0 0 320 210">';
-  s += '<text x="160" y="20" font-size="14" fill="#e8e4d8" text-anchor="middle">《如梦令》· 长短句</text>';
+  s += '<text x="160" y="20" font-size="14" text-anchor="middle" class="svg-ink">《如梦令》· 长短句</text>';
   lines.forEach(function(ln,i){
     var y = 34 + i*26;
-    s += '<text x="8" y="'+(y+14)+'" font-size="13" fill="#e8e4d8">'+ln[0]+'</text>';
+    s += '<text x="8" y="'+(y+14)+'" font-size="13" class="svg-ink">'+ln[0]+'</text>';
     var ns = (typeof ln[1]==='number') ? [ln[1]] : ln[1];
     var bx = 104;
     ns.forEach(function(n,k){
       var w = n*20;
-      s += '<rect x="'+bx+'" y="'+y+'" width="0" height="18" rx="5" fill="#f5c518" opacity="0.85">'
+      s += '<rect x="'+bx+'" y="'+y+'" width="0" height="18" rx="5" opacity="0.85" class="svg-accent">'
         + '<animate attributeName="width" from="0" to="'+w+'" dur="0.7s" begin="'+(0.3+i*0.35+k*0.2).toFixed(2)+'s" fill="freeze"/></rect>';
       bx += w + 10;
     });
     var total = (typeof ln[1]==='number') ? ln[1]+'字' : '3+3字';
-    s += '<text x="'+(bx+2)+'" y="'+(y+14)+'" font-size="12" fill="#8a8578">'+total+'</text>';
+    s += '<text x="'+(bx+2)+'" y="'+(y+14)+'" font-size="12" class="svg-muted">'+total+'</text>';
   });
-  s += '<text x="160" y="202" font-size="12" fill="#8a8578" text-anchor="middle">长短句：参差错落，依曲填词</text>';
+  s += '<text x="160" y="202" font-size="12" text-anchor="middle" class="svg-muted">长短句：参差错落，依曲填词</text>';
   return s + '</svg>';
 }
 function svgTangshiFenqi(){
@@ -354,18 +354,18 @@ function svgTangshiFenqi(){
     ['晚唐',231,300,['李商隐','杜牧','温庭筠']]
   ];
   var s = '<svg viewBox="0 0 320 148">';
-  s += '<text x="160" y="18" font-size="14" fill="#e8e4d8" text-anchor="middle">唐诗分期 · 618–907</text>';
-  s += '<line x1="20" y1="66" x2="300" y2="66" stroke="#4a4a4a" stroke-width="2"/>';
-  s += '<text x="20" y="58" font-size="11" fill="#8a8578" text-anchor="middle">618</text>';
-  s += '<text x="300" y="58" font-size="11" fill="#8a8578" text-anchor="middle">907</text>';
+  s += '<text x="160" y="18" font-size="14" text-anchor="middle" class="svg-ink">唐诗分期 · 618–907</text>';
+  s += '<line x1="20" y1="66" x2="300" y2="66" stroke-width="2" class="svg-muted-s"/>';
+  s += '<text x="20" y="58" font-size="11" text-anchor="middle" class="svg-muted">618</text>';
+  s += '<text x="300" y="58" font-size="11" text-anchor="middle" class="svg-muted">907</text>';
   segs.forEach(function(g,i){
     var cx = Math.round((g[1]+g[2])/2);
-    if(i>0) s += '<line x1="'+g[1]+'" y1="60" x2="'+g[1]+'" y2="72" stroke="#4a4a4a" stroke-width="2"/>';
-    var col = g[0]==='盛唐' ? '#f5c518' : '#e8e4d8';
-    s += '<circle cx="'+cx+'" cy="66" r="4" fill="'+col+'"/>';
-    s += '<text x="'+cx+'" y="48" font-size="13" fill="'+col+'" text-anchor="middle">'+g[0]+'</text>';
+    if(i>0) s += '<line x1="'+g[1]+'" y1="60" x2="'+g[1]+'" y2="72" stroke-width="2" class="svg-muted-s"/>';
+    var col = g[0]==='盛唐' ? 'svg-accent' : 'svg-ink';
+    s += '<circle cx="'+cx+'" cy="66" r="4" class="'+col+'"/>';
+    s += '<text x="'+cx+'" y="48" font-size="13" class="'+col+'" text-anchor="middle">'+g[0]+'</text>';
     g[3].forEach(function(p,j){
-      s += '<text x="'+cx+'" y="'+(92+j*18)+'" font-size="12" fill="#9a9a9a" text-anchor="middle">'+p+'</text>';
+      s += '<text x="'+cx+'" y="'+(92+j*18)+'" font-size="12" text-anchor="middle" class="svg-muted">'+p+'</text>';
     });
   });
   return s + '</svg>';
@@ -379,26 +379,26 @@ function svgPingshuiyun(){
     ['十三元','元原'],['十四寒','寒山'],['十五删','删关']
   ];
   var s = '<svg viewBox="0 0 320 162">';
-  s += '<text x="160" y="20" font-size="14" fill="#e8e4d8" text-anchor="middle">平水韵 · 上平十五韵</text>';
+  s += '<text x="160" y="20" font-size="14" text-anchor="middle" class="svg-ink">平水韵 · 上平十五韵</text>';
   yun.forEach(function(y,i){
     var col = i%3, row = Math.floor(i/3);
     var x = 6 + col*104, yy = 46 + row*25;
-    s += '<rect x="'+x+'" y="'+(yy-18)+'" width="100" height="23" rx="5" fill="none" stroke="#4a4a4a" stroke-width="1"/>';
-    s += '<text x="'+(x+6)+'" y="'+yy+'" font-size="13" fill="#f5c518">'+y[0]+'</text>';
-    s += '<text x="'+(x+56)+'" y="'+yy+'" font-size="13" fill="#e8e4d8">'+y[1]+'</text>';
+    s += '<rect x="'+x+'" y="'+(yy-18)+'" width="100" height="23" rx="5" fill="none" stroke-width="1" class="svg-muted-s"/>';
+    s += '<text x="'+(x+6)+'" y="'+yy+'" font-size="13" class="svg-accent">'+y[0]+'</text>';
+    s += '<text x="'+(x+56)+'" y="'+yy+'" font-size="13" class="svg-ink">'+y[1]+'</text>';
   });
   return s + '</svg>';
 }
 function svgLiupai(){
   var s = '<svg viewBox="0 0 320 150">';
-  s += '<text x="80" y="28" font-size="16" fill="#f5c518" text-anchor="middle">唐诗</text>';
-  s += '<text x="240" y="28" font-size="16" fill="#f5c518" text-anchor="middle">宋词</text>';
-  s += '<circle cx="80" cy="36" r="3" fill="#f5c518"/>';
-  s += '<circle cx="240" cy="36" r="3" fill="#f5c518"/>';
-  s += '<line x1="80" y1="36" x2="40" y2="62" stroke="#4a4a4a" stroke-width="1.5"/>';
-  s += '<line x1="80" y1="36" x2="120" y2="62" stroke="#4a4a4a" stroke-width="1.5"/>';
-  s += '<line x1="240" y1="36" x2="200" y2="62" stroke="#4a4a4a" stroke-width="1.5"/>';
-  s += '<line x1="240" y1="36" x2="280" y2="62" stroke="#4a4a4a" stroke-width="1.5"/>';
+  s += '<text x="80" y="28" font-size="16" text-anchor="middle" class="svg-accent">唐诗</text>';
+  s += '<text x="240" y="28" font-size="16" text-anchor="middle" class="svg-accent">宋词</text>';
+  s += '<circle cx="80" cy="36" r="3" class="svg-accent"/>';
+  s += '<circle cx="240" cy="36" r="3" class="svg-accent"/>';
+  s += '<line x1="80" y1="36" x2="40" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="80" y1="36" x2="120" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="240" y1="36" x2="200" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="240" y1="36" x2="280" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
   var ps = [
     ['田园',40,['王维','孟浩然']],
     ['边塞',120,['高适','岑参']],
@@ -406,10 +406,10 @@ function svgLiupai(){
     ['豪放',280,['苏轼','辛弃疾']]
   ];
   ps.forEach(function(p){
-    s += '<text x="'+p[1]+'" y="80" font-size="14" fill="#e8e4d8" text-anchor="middle">'+p[0]+'</text>';
-    s += '<line x1="'+p[1]+'" y1="88" x2="'+p[1]+'" y2="96" stroke="#4a4a4a" stroke-width="1"/>';
+    s += '<text x="'+p[1]+'" y="80" font-size="14" text-anchor="middle" class="svg-ink">'+p[0]+'</text>';
+    s += '<line x1="'+p[1]+'" y1="88" x2="'+p[1]+'" y2="96" stroke-width="1" class="svg-muted-s"/>';
     p[2].forEach(function(po,j){
-      s += '<text x="'+p[1]+'" y="'+(110+j*20)+'" font-size="12" fill="#9a9a9a" text-anchor="middle">'+po+'</text>';
+      s += '<text x="'+p[1]+'" y="'+(110+j*20)+'" font-size="12" text-anchor="middle" class="svg-muted">'+po+'</text>';
     });
   });
   return s + '</svg>';
@@ -435,7 +435,7 @@ function knowSVG(g){
 function vKnow(){
   setTitle('诗词常识');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += '<div class="sc-know"><p>12大模块、108张卡，讲解都是我自己写的，配着例子看。🎬 是延伸视频，📊 是图解资料。</p></div>';
+  h += '<div class="sc-know"><p>13大模块、112张卡，讲解都是我自己写的，配着例子看。🎬 是延伸视频，📊 是图解资料。</p></div>';
   KNOW_MODS.forEach(function(mm){
     var cards = D.knowledge.filter(function(k){ return k.m===mm[0]; });
     if(!cards.length) return;

@@ -33,6 +33,8 @@
 .fb.ok{background:var(--accent-soft);color:var(--accent-deep)}
 .fb.no{background:#f3e4e2;color:var(--red)}
 .back-btn{display:inline-block;margin-bottom:12px;color:var(--accent-deep);text-decoration:none;font-size:15px}
+.lab-anim{margin:14px 0}
+.lab-anim svg{max-width:100%;height:auto;display:block;margin:0 auto}
 .tree-node{margin:8px 0;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 .tree-node .q{font-weight:700;margin-bottom:8px}
 @media (min-width:768px){
@@ -81,6 +83,7 @@
   <div style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
     <b>先想一想</b>：蒙特梭利教室里，孩子把符号实物摆在每个词的上方，这叫 Symbolizing。先点一个词，再点它的符号帽——戴对了留下，戴错了弹回来。
   </div>
+  <div class="lab-anim" id="lab-anim-symbols"></div>
   <div id="sym-progress" style="font-weight:700;margin-bottom:8px"></div>
   <div id="sym-sent" style="margin:16px 0"></div>
   <div class="sym-grid" id="sym-opts"></div>
@@ -97,6 +100,7 @@
   <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🤏 把字句拼装</h2>
   <p>口诀 <b>S把OVC</b>：按顺序点词块，拼出正确的把字句</p>
+  <div class="lab-anim" id="lab-anim-baju"></div>
   <div class="drop-zone" id="baju-drop"><span style="color:#aaa">点下方词块，按顺序拼句…</span></div>
   <div id="baju-words"></div>
   <div class="fb" id="baju-fb" style="display:none"></div>
@@ -108,6 +112,7 @@
   <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>⏱️ 了着过决策树</h2>
   <p>三问决策：完成了吗？经历过吗？持续着吗？</p>
+  <div class="lab-anim" id="lab-anim-le"></div>
   <div id="le-q"></div>
 </div>
 
@@ -115,6 +120,7 @@
   <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🎯 的地得射击</h2>
   <p>看准位置，一击即中！</p>
+  <div class="lab-anim" id="lab-anim-dede"></div>
   <div id="dede-q"></div>
 </div>
 
@@ -122,6 +128,164 @@
 (function(){
 'use strict';
 var $ = function(id){return document.getElementById(id);};
+
+/* ---- 动画图解（SMIL，护眼配色，随主题切换） ---- */
+function svgLabSymbols(){
+  var syms = [
+    ['名词','tri','svg-muted'],
+    ['形容词','tri','svg-blue'],
+    ['代词','tri','svg-accent'],
+    ['动词','circ','svg-red'],
+    ['副词','circS','svg-accent'],
+    ['介词','arch','svg-green'],
+    ['连词','rect','svg-red'],
+    ['感叹词','bang','svg-accent']
+  ];
+  var s = '<svg viewBox="0 0 320 200">';
+  s += '<text x="160" y="18" font-size="14" text-anchor="middle" class="svg-ink">蒙特梭利语法符号 · 八顶帽子</text>';
+  syms.forEach(function(sm,i){
+    var col = i%4, row = Math.floor(i/4);
+    var cx = 40 + col*80;
+    var cy = row===0 ? 58 : 128;
+    var ly = row===0 ? 94 : 164;
+    var t1 = (i*0.09).toFixed(3), t2 = (i*0.09+0.04).toFixed(3);
+    var shape = '';
+    if(sm[1]==='tri') shape = '<polygon points="'+cx+','+(cy-14)+' '+(cx+14)+','+(cy+10)+' '+(cx-14)+','+(cy+10)+'" class="'+sm[2]+'"/>';
+    else if(sm[1]==='circ') shape = '<circle cx="'+cx+'" cy="'+cy+'" r="12" class="'+sm[2]+'"/>';
+    else if(sm[1]==='circS') shape = '<circle cx="'+cx+'" cy="'+cy+'" r="7" class="'+sm[2]+'"/>';
+    else if(sm[1]==='arch') shape = '<path d="M'+(cx-13)+','+(cy+8)+' A15,15 0 0,1 '+(cx+13)+','+(cy+8)+'" fill="none" class="'+sm[2]+'-s" stroke-width="5" stroke-linecap="round"/>';
+    else if(sm[1]==='rect') shape = '<rect x="'+(cx-13)+'" y="'+(cy-6)+'" width="26" height="12" rx="3" class="'+sm[2]+'"/>';
+    else shape = '<text x="'+cx+'" y="'+(cy+10)+'" font-size="26" text-anchor="middle" class="'+sm[2]+'">!</text>';
+    s += '<g opacity="0">'
+      + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+t1+';'+t2+';1" dur="10s" repeatCount="indefinite"/>'
+      + shape
+      + '<text x="'+cx+'" y="'+ly+'" font-size="12" text-anchor="middle" class="svg-muted">'+sm[0]+'</text>'
+      + '</g>';
+  });
+  s += '<text x="160" y="192" font-size="12" text-anchor="middle" class="svg-muted">形状记词性：一看形状就知道它是谁</text>';
+  return s + '</svg>';
+}
+
+/* 2. 把字句：词块滑动变成被字句 */
+
+function svgLabBaju(){
+  var words = [
+    ['我',40,120],['把',40,24],['苹果',64,-96],['吃',40,0],['了',40,0]
+  ];
+  var s = '<svg viewBox="0 0 320 160">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">把字句 ↔ 被字句：词块大挪移</text>';
+  var x = 32;
+  var kt = '0;0.32;0.42;0.62;0.72;1';
+  words.forEach(function(w){
+    var wd = w[1], dx = w[2];
+    var cx = x + wd/2;
+    var hl = (w[0]==='把');
+    s += '<g><animateTransform attributeName="transform" type="translate" values="0,0;'+dx+',0;'+dx+',0;0,0" keyTimes="0;0.35;0.65;1" dur="8s" repeatCount="indefinite"/>';
+    s += '<rect x="'+x+'" y="44" width="'+wd+'" height="40" rx="8" class="svg-panel '+(hl?'svg-accent-s':'svg-muted-s')+'" stroke-width="'+(hl?2:1)+'"/>';
+    if(hl){
+      s += '<text x="'+cx+'" y="70" font-size="18" class="svg-accent" text-anchor="middle">把'
+        + '<animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+      s += '<text x="'+cx+'" y="70" font-size="18" class="svg-accent" text-anchor="middle" opacity="0">被'
+        + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+    } else {
+      s += '<text x="'+cx+'" y="70" font-size="18" text-anchor="middle" class="svg-ink">'+w[0]+'</text>';
+    }
+    s += '</g>';
+    x += wd + 8;
+  });
+  s += '<text x="160" y="128" font-size="13" class="svg-accent" text-anchor="middle">把字句：我主动处置苹果 🖐'
+    + '<animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="128" font-size="13" class="svg-accent" text-anchor="middle" opacity="0">被字句：苹果被我处置'
+    + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="150" font-size="12" text-anchor="middle" class="svg-muted">S把OVC：主语→把→宾语→动词→补语</text>';
+  return s + '</svg>';
+}
+
+/* 3. "了"：时间线小人从"没吃"走到"吃了" */
+
+function svgLabLe(){
+  var s = '<svg viewBox="0 0 320 190">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">了：动作完成的哨声</text>';
+  s += '<line x1="30" y1="100" x2="290" y2="100" stroke-width="2" class="svg-muted-s"/>';
+  /* 左：没吃（满碗） */
+  s += '<ellipse cx="60" cy="100" rx="16" ry="6" fill="none" stroke-width="2" class="svg-muted-s"/>';
+  s += '<circle cx="54" cy="93" r="2.5" class="svg-ink"/><circle cx="61" cy="91" r="2.5" class="svg-ink"/><circle cx="67" cy="94" r="2.5" class="svg-ink"/>';
+  s += '<text x="60" y="126" font-size="13" text-anchor="middle" class="svg-muted">没吃</text>';
+  /* 右：吃了（空碗） */
+  s += '<ellipse cx="260" cy="100" rx="16" ry="6" fill="none" stroke-width="2" class="svg-accent-s"/>';
+  s += '<text x="260" y="126" font-size="13" text-anchor="middle" class="svg-accent">吃了</text>';
+  /* 小人走路 */
+  s += '<g opacity="0">'
+    + '<animate attributeName="opacity" values="0;1;1;1;0;0" keyTimes="0;0.05;0.8;0.9;0.95;1" dur="6s" repeatCount="indefinite"/>'
+    + '<animateMotion dur="6s" repeatCount="indefinite" path="M30,96 L290,96"/>'
+    + '<circle cx="0" cy="-16" r="5" class="svg-accent"/>'
+    + '<line x1="0" y1="-11" x2="0" y2="4" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="-6" y1="-4" x2="6" y2="-4" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="0" y1="4" x2="-6" y2="16" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="0" y1="4" x2="6" y2="16" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '</g>';
+  /* 了闪一下 */
+  s += '<text x="262" y="52" font-size="36" class="svg-accent" text-anchor="middle" opacity="0">了'
+    + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.72;0.8;0.92;0.97;1" dur="6s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="168" font-size="12" text-anchor="middle" class="svg-muted">小人从"没吃"走到"吃了" → 动作完成，"了"闪一下</text>';
+  return s + '</svg>';
+}
+
+/* 4. 的 / 地 / 得：三姐妹站位 */
+
+function svgLabDede(){
+  var rows = [
+    ['美丽','的','svg-green','花','修饰名词 · 白勺的'],
+    ['认真','地','svg-accent','听','修饰动词 · 土也地'],
+    ['跑','得','svg-blue','快','补充结果 · 双人得']
+  ];
+  var s = '<svg viewBox="0 0 320 205">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">的 / 地 / 得：三姐妹站位</text>';
+  rows.forEach(function(r,i){
+    var y = 58 + i*40;
+    var bx = r[0].length===1 ? 44 : 58;
+    s += '<text x="20" y="'+y+'" font-size="17" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="'+bx+'" y="'+(y-18)+'" width="32" height="30" rx="6" class="'+r[2]+'"/>';
+    s += '<text x="'+(bx+16)+'" y="'+(y+4)+'" font-size="17" text-anchor="middle" class="svg-deep">'+r[1]+'</text>';
+    s += '<text x="'+(bx+40)+'" y="'+y+'" font-size="17" class="svg-ink">'+r[3]+'</text>';
+    s += '<text x="'+(bx+78)+'" y="'+y+'" font-size="12" class="svg-muted">'+r[4]+'</text>';
+  });
+  s += '<rect x="12" y="36" width="296" height="38" rx="8" fill="none" stroke-width="2" class="svg-accent-s">'
+    + '<animate attributeName="y" values="36;76;116;36" keyTimes="0;0.33;0.66;1" dur="9s" repeatCount="indefinite"/></rect>';
+  s += '<text x="160" y="192" font-size="12" text-anchor="middle" class="svg-muted">口诀：白勺的贴名词，土也地跟动词，得后补结果</text>';
+  return s + '</svg>';
+}
+
+/* 5. 了 / 着 / 过：三问决策 */
+
+function svgLabLezheguo(){
+  var nodes = [
+    ['完成了吗？','了','svg-accent'],
+    ['经历过吗？','过','svg-red'],
+    ['还在持续吗？','着','svg-blue']
+  ];
+  var s = '<svg viewBox="0 0 320 175">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">了 / 着 / 过：三问决策</text>';
+  nodes.forEach(function(n,i){
+    var x = 16 + i*100;
+    var t = (0.06 + i*0.3).toFixed(3), t2 = (0.10 + i*0.3).toFixed(3);
+    var t3 = (0.30 + i*0.3).toFixed(3), t4 = (0.36 + i*0.3).toFixed(3);
+    s += '<g opacity="0.3">'
+      + '<animate attributeName="opacity" values="0.3;0.3;1;1;0.3;0.3" keyTimes="0;'+t+';'+t2+';'+t3+';'+t4+';1" dur="9s" repeatCount="indefinite"/>'
+      + '<rect x="'+x+'" y="46" width="88" height="60" rx="10" class="svg-panel '+n[2]+'-s" stroke-width="2"/>'
+      + '<text x="'+(x+44)+'" y="68" font-size="11" text-anchor="middle" class="svg-muted">'+n[0]+'</text>'
+      + '<text x="'+(x+44)+'" y="98" font-size="26" class="'+n[2]+'" text-anchor="middle">'+n[1]+'</text>'
+      + '</g>';
+  });
+  [108,208].forEach(function(ax){
+    s += '<polygon points="'+ax+',70 '+ax+',82 '+(ax+8)+',76" class="svg-muted"/>';
+  });
+  s += '<text x="160" y="140" font-size="12" text-anchor="middle" class="svg-muted">三问选一：完成→了，经历→过，持续→着</text>';
+  s += '<text x="160" y="160" font-size="12" text-anchor="middle" class="svg-muted">顺序固定，先问"完成了吗"</text>';
+  return s + '</svg>';
+}
+
+
 
 /* 页面切换 */
 document.querySelectorAll('[data-lab]').forEach(function(c){
@@ -379,6 +543,11 @@ function renderDede(){
     });
   });
 }
+/* 动画图解初始化 */
+$('lab-anim-symbols').innerHTML = svgLabSymbols();
+$('lab-anim-baju').innerHTML = svgLabBaju();
+$('lab-anim-le').innerHTML = svgLabLezheguo() + svgLabLe();
+$('lab-anim-dede').innerHTML = svgLabDede();
 })();
 </script>
 </body>

@@ -17,6 +17,18 @@
     return 'zika.html?zi=' + encodeURIComponent(z);
   }
 
+  /* 动画图解挂载表：部首名 → anim.js 里的函数名（对不上就不显示） */
+  var EVO_ANIM = { '马': 'bsAnimEvoMa', '鱼': 'bsAnimEvoYu', '日': 'bsAnimEvoRi', '车': 'bsAnimEvoChe' };
+  var BIAN_ANIM = { '氵': '氵', '扌': '扌', '亻': '亻', '忄': '忄' };
+  var LIUSHU_ANIM = { '木': 'bsAnimXiangxing', '亻': 'bsAnimHuiyi', '氵': 'bsAnimXingsheng' };
+  function animHtml(fn, arg) {
+    try {
+      if (typeof window[fn] !== 'function') return '';
+      var s = arg === undefined ? window[fn]() : window[fn](arg);
+      return '<div class="bs-anim">' + s + '</div>';
+    } catch (e) { return ''; }
+  }
+
   function itemHtml(r, i) {
     var head_sub = r.meaning || (r.shuowen ? '《说文解字》有说解' : '暂无释义');
     var html = '<div class="yw-item bs-item" data-i="' + i + '">' +
@@ -28,14 +40,23 @@
       '<span class="bs-arrow">▾</span></div>' +
       '<div class="bs-body">';
 
-    if (r.bianti) html += '<div class="bs-sec"><h4>变体</h4><div class="bs-sem">' + esc(r.bianti) + '</div></div>';
+    if (r.bianti) {
+      html += '<div class="bs-sec"><h4>变体</h4><div class="bs-sem">' + esc(r.bianti) + '</div>';
+      if (BIAN_ANIM[r.bushou]) html += animHtml('bsAnimBian', BIAN_ANIM[r.bushou]);
+      html += '</div>';
+    }
     if (r.shuowen) {
       html += '<div class="bs-sec"><h4>《说文解字》</h4><div class="bs-shuowen">「' + esc(r.shuowen) + '」' +
         (r.shuowen_url ? ' <a href="' + esc(r.shuowen_url) + '" target="_blank" rel="noopener">汉典原文 ↗</a>' : '') +
         '</div></div>';
     }
     if (r.evo) {
-      html += '<div class="bs-sec"><h4>字形演变</h4><div class="bs-sem">🦴 ' + esc(r.evo) + '</div></div>';
+      html += '<div class="bs-sec"><h4>字形演变</h4><div class="bs-sem">🦴 ' + esc(r.evo) + '</div>';
+      if (EVO_ANIM[r.bushou]) html += animHtml(EVO_ANIM[r.bushou]);
+      html += '</div>';
+    }
+    if (LIUSHU_ANIM[r.bushou]) {
+      html += '<div class="bs-sec"><h4>六书示意</h4>' + animHtml(LIUSHU_ANIM[r.bushou]) + '</div>';
     }
     if (r.semantic) html += '<div class="bs-sec"><h4>语义场</h4><div class="bs-sem">' + esc(r.semantic) + '</div></div>';
     if (r.examples && r.examples.length) {
