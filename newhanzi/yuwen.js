@@ -13,6 +13,7 @@
   var currentItems = {};
   var animData = {};
   var quizData = {};
+  var quizRecorded = {}; /* 动手练/小测只记首次作答（反馈仍可重答，不改反馈） */
   var gameData = {};
   /* 按点分文件的语法题库（如名词 200 道），yuwen.html 以 <script> 引入，file:// 下也能用 */
   var bankData = window.NHZ_GRAMMAR_BANK || {};
@@ -535,6 +536,14 @@
         qb.classList.add('wrong');
         btns[q.answer].classList.add('right');
         fb.innerHTML = '❌ 再想想。' + (q['解析'] ? esc(q['解析']) : '');
+      }
+      /* 错题打通（动手练/小测）：只记首次作答，不改反馈与计分 */
+      if (!quizRecorded[qid]) {
+        quizRecorded[qid] = true;
+        var qbody = qbox.closest('.yw-body');
+        var qrec = qbody ? currentItems[qbody.getAttribute('data-idx')] : null;
+        NHZReview.record({ q: q.q, options: q.options, answer: q.options[q.answer] || '',
+          解析: q['解析'] || '', src: '语法', point: qrec ? qrec.it.name : '' }, oi === q.answer);
       }
       return;
     }
