@@ -7,80 +7,121 @@
 <link rel="stylesheet" href="zika.css">
 <link rel="manifest" href="manifest.webmanifest">
 </head>
-<body>
-<header class="topbar">
-  <h1>识字星球 <span class="badge">new</span></h1>
-  <div class="progress-line">
-    <span id="learnedCount">已学 0 / 3500</span>
-    <div class="pbar"><div id="pfill"></div></div>
-  </div>
-</header>
-
-<div class="today-panel">
-  <div class="tstat"><span class="tnum" id="stTotal">0</span><span class="tlabel">总进度 <i>/ 3500</i></span></div>
-  <div class="tstat"><span class="tnum" id="stToday">0</span><span class="tlabel">今日新字</span></div>
-  <div class="tstat"><span class="tnum" id="stReview">0</span><span class="tlabel">待复习</span></div>
-</div>
-
-<div class="main-tabs" id="mainTabs">
-  <button class="mtab active" data-m="shizi">📖 识字</button>
-  <button class="mtab" data-m="yuwen">📚 语法</button>
-  <button class="mtab" data-m="logic">🧠 逻辑</button>
-  <button class="mtab" data-m="lab">🧪 实验</button>
-  <button class="mtab" data-m="bushou">🧩 部首</button>
-  <button class="mtab" data-m="shici">📜 古诗词</button>
-</div>
-
-<div id="panel-shizi">
-
-<div class="controls" id="controls">
-  <div class="searchbox">
-    <input id="q" type="text" placeholder="搜汉字 / 拼音，如：头 / tou" autocomplete="off">
-  </div>
-  <div class="tabrow">
-    <div class="tabs" id="tabs">
-      <button class="tab" data-v="py">按拼音</button>
-      <button class="tab" data-v="bu">按部首</button>
-      <button class="tab" data-v="st">按笔画</button>
+<body class="page-home">
+<div class="app-shell">
+  <aside class="side-nav" aria-label="主导航">
+    <div class="side-brand">
+      <strong>识字星球</strong>
+      <span>护眼学习</span>
     </div>
-    <button class="chip-toggle" id="onlyNew">只看未学</button>
+    <nav class="side-tabs" id="sideTabs">
+      <button class="mtab active" type="button" data-m="shizi">识字</button>
+      <button class="mtab" type="button" data-m="yuwen">语法</button>
+      <button class="mtab" type="button" data-m="logic">逻辑</button>
+      <button class="mtab" type="button" data-m="bushou">部首</button>
+      <button class="mtab" type="button" data-m="shici">古诗词</button>
+      <button class="mtab" type="button" data-m="lab">实验</button>
+    </nav>
+    <button class="side-cta" type="button" id="btnContinueSide">继续识字</button>
+  </aside>
+
+  <div class="app-main">
+    <header class="home-top">
+      <div class="home-brand">
+        <h1>识字星球 <span class="badge">new</span></h1>
+        <p class="home-sub">每天认识几个字</p>
+      </div>
+      <div class="home-top-actions">
+        <button type="button" class="chip-soft" id="reviewChip">复习 0</button>
+        <button type="button" class="btn-cta" id="btnContinue">继续识字</button>
+      </div>
+    </header>
+
+    <section class="hero-card" aria-label="学习进度">
+      <div class="hero-head">
+        <span>今日学习</span>
+        <span id="heroPct">完成度 0%</span>
+      </div>
+      <div class="hero-body">
+        <div class="hero-main">
+          <span class="hero-num" id="stTotal">0</span>
+          <span class="hero-cap" id="learnedCount">已学 0 / 3500</span>
+        </div>
+        <div class="hero-stats">
+          <div><b id="stToday">0</b><span>今日新字</span></div>
+          <div><b id="stReview">0</b><span>待复习</span></div>
+        </div>
+      </div>
+      <div class="pbar hero-pbar"><div id="pfill"></div></div>
+      <button type="button" class="hero-cta" id="btnContinueHero">继续识字</button>
+    </section>
+
+    <div class="main-tabs module-grid" id="mainTabs">
+      <button class="mtab active" type="button" data-m="shizi"><i></i>识字</button>
+      <button class="mtab" type="button" data-m="yuwen"><i></i>语法</button>
+      <button class="mtab" type="button" data-m="logic"><i></i>逻辑</button>
+      <button class="mtab" type="button" data-m="lab"><i></i>实验</button>
+      <button class="mtab" type="button" data-m="bushou"><i></i>部首</button>
+      <button class="mtab" type="button" data-m="shici"><i></i>古诗词</button>
+    </div>
+
+    <div id="panel-shizi" class="panel-shizi">
+      <div class="shizi-board">
+        <div class="controls" id="controls">
+          <div class="browse-head">
+            <h2 class="browse-title">浏览字库</h2>
+            <div class="tabs" id="tabs">
+              <button class="tab" type="button" data-v="py">拼音</button>
+              <button class="tab" type="button" data-v="bu">部首</button>
+              <button class="tab" type="button" data-v="st">笔画</button>
+            </div>
+          </div>
+          <div class="searchbox">
+            <input id="q" type="text" placeholder="搜汉字 / 拼音，如：头 / tou" autocomplete="off">
+          </div>
+          <div class="tabrow">
+            <span class="browse-hint">点右侧索引可快速跳转</span>
+            <button class="chip-toggle" type="button" id="onlyNew">只看未学</button>
+          </div>
+        </div>
+        <div class="list-area">
+          <main class="listwrap">
+            <div id="list"></div>
+          </main>
+          <nav id="rail" aria-label="快速索引"></nav>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-yuwen" class="panel-frame" style="display:none">
+      <iframe src="yuwen.html" title="语法"></iframe>
+    </div>
+
+    <div id="panel-logic" class="panel-logic" style="display:none">
+      <div id="logiclist"></div>
+    </div>
+
+    <div id="panel-lab" class="panel-frame" style="display:none">
+      <iframe src="grammar_lab.html" title="实验"></iframe>
+    </div>
+
+    <div id="panel-bushou" class="panel-frame" style="display:none">
+      <iframe src="bushou.html" title="部首"></iframe>
+    </div>
+
+    <div id="panel-shici" class="panel-frame" style="display:none">
+      <iframe src="shici.html" title="古诗词"></iframe>
+    </div>
   </div>
-</div>
-
-<main class="listwrap">
-  <div id="list"></div>
-</main>
-<nav id="rail" aria-label="快速索引"></nav>
-</div><!-- /panel-shizi -->
-
-<div id="panel-yuwen" style="display:none">
-  <!-- 语法主入口统一为正式版 yuwen.html；proto-yuwen.html 仅为图解课堂原型，改由 yuwen.html 内链接进入，不再是主入口 -->
-  <iframe src="yuwen.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
-</div>
-
-<div id="panel-logic" style="display:none">
-  <div id="logiclist"></div>
-</div>
-
-<div id="panel-lab" style="display:none">
-  <iframe src="grammar_lab.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
-</div>
-
-<div id="panel-bushou" style="display:none">
-  <iframe src="bushou.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
-</div>
-
-<div id="panel-shici" style="display:none">
-  <iframe src="shici.html" style="width:100%;height:calc(100vh - 140px);border:none;display:block"></iframe>
 </div>
 
 <script src="data/index.js"></script>
 <script src="yuwen/data.js"></script>
 <script src="index.js"></script>
 <script>
-/* 主 Tab 切换：识字 / 语法 / 逻辑 */
+/* 主 Tab 切换：识字 / 语法 / 逻辑 等 */
 (function(){
-  var tabs = document.querySelectorAll('#mainTabs .mtab');
+  var tabs = document.querySelectorAll('.mtab');
   var panels = {shizi: document.getElementById('panel-shizi'),
                 yuwen: document.getElementById('panel-yuwen'),
                 logic: document.getElementById('panel-logic'),
@@ -89,7 +130,6 @@
                 shici: document.getElementById('panel-shici')};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  /* 逻辑课渲染（复用六步格式） */
   function lessonHtml(it){
     var b='', step=0;
     function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
@@ -111,29 +151,54 @@
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
   }
 
-  tabs.forEach(function(t){
-    t.addEventListener('click', function(){
-      tabs.forEach(function(x){x.classList.remove('active');});
-      t.classList.add('active');
-      var m = t.getAttribute('data-m');
-      for(var k in panels) panels[k].style.display = (k===m?'block':'none');
-      if(m==='logic' && !panels.logic.dataset.done){
-        var D = (window.NHZ_YUWEN||{}).logic;
-        var el = document.getElementById('logiclist');
-        if(D&&el){
-          var h='';
-          D.categories.forEach(function(c){
-            h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
-              c.items.map(lessonHtml).join('');
-          });
-          el.innerHTML = h;
-        }
-        panels.logic.dataset.done='1';
+  function activate(m){
+    tabs.forEach(function(x){
+      x.classList.toggle('active', x.getAttribute('data-m') === m);
+    });
+    for(var k in panels) panels[k].style.display = (k===m?'block':'none');
+    if(m==='logic' && !panels.logic.dataset.done){
+      var D = (window.NHZ_YUWEN||{}).logic;
+      var el = document.getElementById('logiclist');
+      if(D&&el){
+        var h='';
+        D.categories.forEach(function(c){
+          h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
+            c.items.map(lessonHtml).join('');
+        });
+        el.innerHTML = h;
       }
-      window.scrollTo(0,0);
+      panels.logic.dataset.done='1';
+    }
+    window.scrollTo(0,0);
+  }
+
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ activate(t.getAttribute('data-m')); });
+  });
+
+  function goContinue(){
+    var rows = document.querySelectorAll('#list .row');
+    for(var i=0;i<rows.length;i++){
+      if(!rows[i].querySelector('.done')){ location.href = rows[i].getAttribute('href'); return; }
+    }
+    var q = document.getElementById('q');
+    if(q){ q.focus(); q.scrollIntoView({block:'center'}); }
+  }
+  ['btnContinue','btnContinueHero','btnContinueSide','reviewChip'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', function(){
+      if(id==='reviewChip'){
+        var only = document.getElementById('onlyNew');
+        activate('shizi');
+        if(only && !only.classList.contains('on')) only.click();
+        return;
+      }
+      activate('shizi');
+      goContinue();
     });
   });
-  /* 手风琴 + 小测 */
+
   document.addEventListener('click', function(e){
     var h = e.target.closest('.yw-head');
     if(h){ h.parentElement.classList.toggle('open'); return; }
@@ -150,7 +215,6 @@
 })();
 </script>
 <script>
-/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
 if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
   window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 }

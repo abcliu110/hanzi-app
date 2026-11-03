@@ -4,7 +4,8 @@
 (function () {
   'use strict';
 
-  var TONE_COLORS = { 1: '#e5484d', 2: '#2f9e6e', 3: '#2b7cd3', 4: '#8e4ec6', 5: '#8a8177' };
+  /* 护眼：降低饱和，避免高亮紫/鲜红刺眼 */
+  var TONE_COLORS = { 1: '#b85a52', 2: '#3f8e6b', 3: '#4a7a8c', 4: '#6d7a5c', 5: '#6b7566' };
   var LS_LEARNED = 'nhz_learned';
   var LS_VIEW = 'nhz_view';
 
@@ -44,11 +45,16 @@
     var today = todayStr();
     var nToday = 0;
     keys.forEach(function (z) { if (learned[z] === today) nToday++; });
+    var review = n - nToday;
     document.getElementById('learnedCount').textContent = '已学 ' + n + ' / 3500';
     document.getElementById('pfill').style.width = (n / 3500 * 100).toFixed(1) + '%';
     document.getElementById('stTotal').textContent = n;
     document.getElementById('stToday').textContent = nToday;
-    document.getElementById('stReview').textContent = n - nToday; // 学过但不是今天学的
+    document.getElementById('stReview').textContent = review;
+    var pctEl = document.getElementById('heroPct');
+    if (pctEl) pctEl.textContent = '完成度 ' + (n / 3500 * 100).toFixed(1) + '%';
+    var chip = document.getElementById('reviewChip');
+    if (chip) chip.textContent = '复习 ' + review;
   }
 
   function rowHtml(e) {
