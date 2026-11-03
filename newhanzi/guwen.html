@@ -161,6 +161,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     var t = D.texts[idx]; if(!t) return;
     hideAll(); detEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__back">← 回篇目</button>';
+    h += typeTag('材料');
     h += '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
     h += '<div class="gw-sec">📖 原文</div><div class="gw-yuanwen">'+esc(t.原文)+'</div>';
     h += '<div class="gw-sec">💡 导读</div><p class="gw-p">'+esc(t.导读)+'</p>';
@@ -209,20 +210,48 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
       btns[i].classList.toggle('on', btns[i].getAttribute('data-bank-filter').split('|')[1]===st.filter);
     }
   }
-  /* ---------- 点渲染（语法模块渲染顺序） ---------- */
-  function itemHtml(it, idx, icon){
+  /* 内容分型：8型（CONTENT_PATTERNS.md v2.0），按子模块id映射 */
+  function itemType(modId){
+    var m = modId || '';
+    if(m==='xuci' || m==='guyin') return '辨析';
+    if(m==='shici' || m==='duoyi' || m==='gaopinci') return '词条';
+    if(m==='yufa' || m==='huoyong') return '规律';
+    if(m==='songdu' || m==='fanyi') return '程序';
+    if(m==='lishi') return '故事';
+    if(m==='tongjia' || m==='wenxue' || m==='wenhua' || m==='meiti' || m==='zongbiao') return '清单';
+    return '规律';
+  }
+  var TYPE_LABEL = { '规律':'规律型', '辨析':'辨析型', '程序':'程序型', '词条':'词条型', '故事':'故事型', '清单':'清单型', '材料':'材料型' };
+  var TYPE_COLOR = { '规律':'#3d5a40', '辨析':'#5a4a7a', '程序':'#7a5a3a', '词条':'#4a7a59', '故事':'#8a5a44', '清单':'#5a6a7a', '材料':'#7a6a3d' };
+  function typeTag(tp){
+    return '<div class="yw-typetag" style="--tc:' + TYPE_COLOR[tp] + '">' + TYPE_LABEL[tp] + '</div>';
+  }
+  /* ---------- 点渲染（语法模块渲染顺序 + 按型节标题） ---------- */
+  function itemHtml(it, idx, icon, modId){
     var body = '';
     var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
     var step = 0;
+    var tp = itemType(modId);
+    /* 型标签 */
+    body += typeTag(tp);
     function stepHead(title){
       step++;
       return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span></div>';
     }
-    if(it['类比']) body += stepHead('打个比方') + '<div class="yw-analogy">' + it['类比'] + '</div>';
+    /* 按型定的节标题（内容零删减，只换标题） */
+    var T = {
+      '规律': { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' },
+      '辨析': { analogy:'💡 啊哈现象', rule:'辨析对照', ex:'分水岭例句', bad:'天坑病例' },
+      '词条': { analogy:'💡 啊哈现象', rule:'释义精讲', ex:'例组', bad:'易错诊所' },
+      '程序': { analogy:'💡 啊哈现象', rule:'步骤卡', ex:'全程演示', bad:'易错诊所' },
+      '故事': { analogy:'💡 啊哈现象', rule:'时间轴', ex:'关键节点', bad:'易错诊所' },
+      '清单': { analogy:'💡 啊哈现象', rule:'一览', ex:'例组', bad:'易错诊所' }
+    }[tp] || { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' };
+    if(it['类比']) body += stepHead(T.analogy) + '<div class="yw-analogy">' + it['类比'] + '</div>';
     if(it['图示']) body += stepHead('看图说话') + '<div class="yw-diagram">' + it['图示'] + '</div>';
     /* 规则一句话 */
     if(it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)){
-      body += stepHead('规则一句话');
+      body += stepHead(T.rule);
       if(it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
       if(it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
       if(it['例子'] && it['例子'].length){
@@ -346,7 +375,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
     if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的知识点，换个词试试。</p>'; return; }
     box.innerHTML = '<div class="yw-grid">' + list.map(function(it){
       var idx = (cat.items || []).indexOf(it);
-      return itemHtml(it, curMod+'_'+idx, meta.icon);
+      return itemHtml(it, curMod+'_'+idx, meta.icon, curMod);
     }).join('') + '</div>';
   }
   function showMList(id, keepFilter){

@@ -65,6 +65,8 @@
 .sc-zrow input{flex:1;font-size:18px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;max-width:120px}
 .sc-zrow button{font-size:15px;padding:10px 18px;border-radius:10px;border:1px solid var(--accent-deep);background:var(--accent-deep);color:#fff;cursor:pointer}
 .sc-worklink{color:var(--accent-deep);cursor:pointer}
+/* 内容分型标签（复用yuwen.js配色体系） */
+.sc-typetag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:bold;color:var(--tc,#3d5a40);background:color-mix(in srgb,var(--tc,#3d5a40) 12%,transparent);border:1px solid color-mix(in srgb,var(--tc,#3d5a40) 30%,transparent);margin-bottom:8px}
 @media (min-width:768px){
   .sc-grid{grid-template-columns:repeat(3,1fr);max-width:920px;margin:0 auto}
   .sc-imgrid{grid-template-columns:repeat(8,1fr);max-width:920px;margin:0 auto}
@@ -143,6 +145,31 @@ function vHome(){
 }
 
 var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活'],['jilu','🎥','纪录片·实拍'],['jichu','🌱','诗歌基础'],['yixiang','🌙','意象'],['cixi','🎶','词'],['shangxifa','🔬','赏析方法'],['gelv3','📐','格律深化'],['chuangzuo','✍️','创作入门']];
+
+/* 内容分型：8型（CONTENT_PATTERNS.md v2.0），按模块m+标题细分 */
+function knowType(m, t){
+  var title = t || '';
+  /* 程序型：方法/步骤类 */
+  if (/shangxifa|chuangzuo|dufa|yingyong/.test(m)) return '程序';
+  /* 故事型：历史/典故叙事 */
+  if (/diangu|shishi/.test(m)) return '故事';
+  /* 清单型：速查参考 */
+  if (/ticai|wenhua|liupai|jilu/.test(m)) return '清单';
+  /* 模式型：词牌格式/格律模式 */
+  if (/cipai/.test(m)) return '模式';
+  if (m === 'cixi' && /浣溪沙|菩萨蛮|如梦令|水调歌头|虞美人|双调|单调|^\S+：\d+/.test(title)) return '模式';
+  /* 辨析型：易混对比 */
+  if (m === 'shoufa' && /与|结合|比兴/.test(title)) return '辨析';
+  if (m === 'cixi' && /豪放|婉约|派|令|慢词/.test(title)) return '辨析';
+  /* 动画模块保持原样 */
+  if (/donghua/.test(m)) return '动画';
+  /* 默认规律型 */
+  return '规律';
+}
+var SC_TYPE_LABEL = { '规律':'规律型', '辨析':'辨析型', '程序':'程序型', '模式':'模式型', '故事':'故事型', '清单':'清单型', '材料':'材料型', '动画':'动画' };
+var SC_TYPE_COLOR = { '规律':'#3d5a40', '辨析':'#5a4a7a', '程序':'#7a5a3a', '模式':'#4a6a7a', '故事':'#8a5a44', '清单':'#6b7566', '材料':'#4a7a59', '动画':'#b8860b' };
+/* 按型的例句区标题 */
+var SC_EX_TITLE = { '规律':'📜 例句', '辨析':'⚖️ 分水岭例句', '程序':'🎬 全程演示', '模式':'📐 模式实例', '故事':'📖 故事', '清单':'📋 一览', '材料':'📜 原文', '动画':'🎬 动画' };
 
 function svgSisheng(){
   var rows = [
@@ -454,16 +481,16 @@ function vKnow(){
     if(!cards.length) return;
     h += '<div class="sc-kmod">'+mm[1]+' '+mm[2]+'（'+cards.length+'）</div>';
     cards.forEach(function(k){
-      h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
+      var tp = knowType(k.m, k.t);
+      h += '<div class="sc-know"><div class="sc-typetag" style="--tc:'+SC_TYPE_COLOR[tp]+'">'+SC_TYPE_LABEL[tp]+'</div><h3>'+esc(k.t)+'</h3>';
       var svg = knowSVG(k.g);
       if(svg) h += '<div class="sc-svg">'+svg+'</div>';
       var dHtml = escD(k.d);
-      /* 解释与例句分开样式：匹配 <b>📜 例句...</b> */
+      /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
       var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
       if (parts.length > 1) {
-        var titleMatch = dHtml.match(/<b>(📜 例句.*?)<\/b>/);
-        var title = titleMatch ? titleMatch[1] : '📜 例句';
-        h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+title+'</b>'+parts[1]+'</div>';
+        var exTitle = SC_EX_TITLE[tp] || '📜 例句';
+        h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+exTitle+'</b>'+parts[1]+'</div>';
       } else {
         h += '<p>'+dHtml+'</p>';
       }
@@ -706,7 +733,7 @@ function openPoem(order){
   var p = poemByOrder(order);
   if(!p){ vHome(); return; }
   setTitle(p.title);
-  var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
+  var h = '<div class="sc-detail-head"><div class="sc-typetag" style="--tc:'+SC_TYPE_COLOR['材料']+'">'+SC_TYPE_LABEL['材料']+'</div><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l){return '<p>'+esc(l)+'</p>';}).join('')+'</div>';
   /* 名篇精讲赏析 */
   try{

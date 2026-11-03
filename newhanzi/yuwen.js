@@ -78,8 +78,9 @@
 
   /* 内容分型：规律型/辨析型/程序型（CONTENT_PATTERNS.md v2.0） */
   function itemType(it, catName) {
-    if (/病句/.test(catName || '')) return '程序';
-    if (/关联词|虚词/.test(catName || '')) return '辨析';
+    var cn = catName || '';
+    if (/病句|逻辑错误|阅读方法|题型|答题|审题|立意|选材|结构|语言|翻译|诵读|赏析|创作|读法|应用/.test(cn)) return '程序';
+    if (/关联词|虚词|辨析|文体|古今异义|手法/.test(cn)) return '辨析';
     return '规律';
   }
   var TYPE_LABEL = { '规律': '规律型', '辨析': '辨析型', '程序': '程序型' };
