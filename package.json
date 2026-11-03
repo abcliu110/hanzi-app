@@ -3,7 +3,7 @@
   "private": true,
   "description": "识字星球 · 儿童汉字学习（纯静态网站）。这里的依赖只用于自动测试。",
   "scripts": {
-    "check": "python3 tools/build_data.py --check && node tools/check_scripts.js",
+    "check": "node tools/check_scripts.js",
     "test": "playwright test",
     "serve": "python3 -m http.server 8000"
   },

@@ -12,7 +12,7 @@ module.exports = defineConfig({
   // 已经自己起了服务器时：PW_NO_SERVER=1 npx playwright test
   webServer: process.env.PW_NO_SERVER ? undefined : {
     command: `python3 -m http.server ${PORT} --bind 127.0.0.1`,
-    url: `http://127.0.0.1:${PORT}/index.html`,
+    url: `http://127.0.0.1:${PORT}/newhanzi/index.html`,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000
   }
