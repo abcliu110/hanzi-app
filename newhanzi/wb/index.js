@@ -38,4 +38,5 @@ window.NHZ_WB_INDEX = {
   "不但…而且…": "gl_budan",
   "只有…才…": "gl_zhiyou",
   "无论…都…": "gl_wulun",
+  "既…又…": "gl_jiyou",
 };
