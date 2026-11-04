@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""语法白板引擎自测（第 1 期新原语 E1–E14 + review 模板）。
+"""语法白板引擎自测（第 1 期新原语 E1–E14 + review / trunk；第 2 期 morph）。
 
 用法：python3 tools/wb/selftest.py [--shot /tmp/selftest.png]
 检查：
@@ -44,7 +44,9 @@ NHZWB.add('_自测', { scenes: [
   { k: 'review', lv: 1, task: '给“小猫捉老鼠”加一个“的”', answer: '胖胖的小猫捉老鼠', ok: true, rule: '“的”后面跟名词。' },
   { k: 'mark', lv: 2, s: ['小猫', '捉', '老鼠'], gap: 30, m: [{ i: 0, role: 'zhu', note: '{t:zhu|term}', tag: '动手的' }, { i: 1, role: 'wei', hub: 1 }] },
   { k: 'trunk', lv: 2, core: ['小猫', '捉', '老鼠'], role: ['zhu', 'wei', 'bin'], grow: [{ q: '哪只？', ins: ['胖胖', '的'], before: 0, role: 'ding' }, { q: '几只？', ins: ['三只'], before: 0, role: 'ding', at: 'far', keep: 1, why: 'num' }, { q: '怎样？', ins: ['得', '很快'], after: 1, role: 'bu' }] },
-  { k: 'trunk', lv: 1, mode: 'prune', s: ['弟弟', '不', '喜欢', '吃', '香菜'], role: ['zhu', 'zhuang', 'wei', 'wei', 'bin'], keep: [{ i: 1, why: 'neg' }], tryCut: { i: 1, show: '弟弟喜欢吃香菜', say: '剪掉“不”，意思反了。' }, prune: { strike: 1 } }
+  { k: 'trunk', lv: 1, mode: 'prune', s: ['弟弟', '不', '喜欢', '吃', '香菜'], role: ['zhu', 'zhuang', 'wei', 'wei', 'bin'], keep: [{ i: 1, why: 'neg' }], tryCut: { i: 1, show: '弟弟喜欢吃香菜', say: '剪掉“不”，意思反了。' }, prune: { strike: 1 } },
+  { k: 'morph', lv: 2, from: [{ id: 'A', w: ['茂密的', '树林'], tag: '动手的' }, { id: 'h1', w: ['把'], hub: 1 }, { id: 'B', w: ['太阳'], tag: '被动手的' }, { id: 'V', w: ['遮住了'] }], to: ['B', { id: 'h2', w: ['被'], hub: 1 }, 'A', 'V'], ask: '谁搬到前面？', wrongTry: { drop: ['茂密的'], say: '“茂密的”丢了。' }, roleTo: { B: 'zhu' }, state: { a: '太阳亮亮的', b: '太阳被挡住了', ok: true } },
+  { k: 'morph', lv: 3, src: '自测', from: [{ id: 'P', w: ['在', '操场', '上'] }, { id: 'V', w: ['跑'] }, { id: 'O', w: ['步'] }], to: [{ w: ['把'], hub: 1 }, 'O', 'V', 'P'], ok: false, say: '不能说。' }
 ] });
 window.P = NHZWB.mount(document.getElementById('box'), '_自测');
 </script></body></html>"""
@@ -94,6 +96,10 @@ JS = r"""() => {
   const order = vis.filter(t => t.getAttribute('font-size') === '44').map(t => [t.getBoundingClientRect().left, t.textContent]).sort((a, b) => a[0] - b[0]).map(x => x[1]).join(' ');
   if (order !== '三只 小猫 捉 老鼠') out.push('trunk 收尾骨架应为「三只 小猫 捉 老鼠」，得「' + order + '」');
   P.seek(4, P.durations()[4] * .72);
+  /* morph：收尾语序、定语跟着名词走、失败后退回原样且 ✗ 收起 */
+  const order44 = i => { P.seek(i, P.durations()[i]); return [...P.svg.querySelectorAll('text')].filter(t => { let e = t; while (e && e !== P.svg) { if (e.style && (e.style.display === 'none' || e.style.opacity === '0')) return false; e = e.parentNode; } return t.getAttribute('font-size') === '44'; }).map(t => [t.getBoundingClientRect().left, t.textContent]).sort((a, b) => a[0] - b[0]).map(x => x[1]).join(' '); };
+  if (order44(6) !== '太阳 被 茂密的 树林 遮住了') out.push('morph 收尾应为「太阳 被 茂密的 树林 遮住了」，得「' + order44(6) + '」');
+  if (order44(7) !== '在 操场 上 跑 步') out.push('morph 失败后应退回原句，得「' + order44(7) + '」');
   P.seek(0, 9); if (P.svg.innerHTML.indexOf('主语（谁 / 什么）') < 0) out.push('E14：lv2 幕 tag 应显示「主语（谁 / 什么）」');
   P.seek(3, 99); if (P.svg.innerHTML.indexOf('>主语<') < 0) out.push('E14：|term 应显示「主语」');
   return out;

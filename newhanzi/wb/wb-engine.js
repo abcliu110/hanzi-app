@@ -14,6 +14,7 @@
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
+ *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
  */
 (function () {
@@ -793,6 +794,135 @@
       if (pr.strike) { var X = rest.map(function (b) { return b.x; }); formula(rest, X, t); }
       else place(rest, t, .8);
       return 2;
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
+  /* morph 变魔术（E15，设计 §5.2）：句式变换。名词短语整块移动（定语跟着走），弧线换位，原位留虚线空位；
+   * 先圈枢纽词（把 / 被）；变换失败就抖动打 ✗ 再退回；可选同学错改（只搬一半，丢下的词掉下去）与前后两格状态图。
+   * {k:'morph', lv, h, from:[{id:'A', w:['茂密的','树林'], tag:'动手的', np:1}, {id:'h1', w:['把'], hub:1}, …],
+   *  to:['B', {id:'h2', w:['被'], hub:1}, 'A', 'V'],        // 字符串 = 搬 from 里的块；新对象 = 新块从上方落入；from 里没出现在 to 的块淡出
+   *  read, hubSay, ask, moveSay, toSay, ok:true|false, okSay, say（失败时的原因，必填）, note（失败时写在句下的一句）, backSay,
+   *  wrongTry:{drop:['茂密的'], q, ask, say},                // 同学错改：同样变换但只搬中心语，drop 里的词掉在原处下方 → 错误圈 + ✗ → 退回
+   *  roleTo:{B:'zhu'}, roleSay,                               // 可选：变换后画成分线（位置），与上方 tag（角色）对照
+   *  state:{a:'杯子好好的', b:'杯子碎了', ok, say}, gap:true, end}
+   * 排版：块内间距 0.14 字号、块间 36（layG），每一步构建时算好；块的 tag / 外框挂在块上随块移动。 */
+  TPL.morph = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var size = d.size || 44, y = d.y || (d.h ? 296 : 270), GI = Math.round(size * .14), GX = d.gap || 36, lv = c.lv;
+    var row = new Row(c, { size: size, y: y }), CH = {}, nn = 0, all = [];
+    function chunkOf(sp) {
+      if (typeof sp === 'string') { if (!CH[sp]) throw new Error('morph：to 里找不到块 ' + sp); return CH[sp]; }
+      if (sp.id && CH[sp.id]) return CH[sp.id];
+      var ch = { id: sp.id || ('_n' + (nn++)), hub: !!sp.hub, tag: sp.tag, np: sp.np !== undefined ? !!sp.np : sp.w.length > 1, dx: 0, deco: [] };
+      ch.words = sp.w.map(function (w) { var b = row.mk(w, null, { ch: ch, vis: 0, dy: 0 }); all.push(b); return b; });
+      ch.head = ch.words[ch.words.length - 1]; CH[ch.id] = ch; return ch;
+    }
+    var from = d.from.map(chunkOf), to = d.to.map(chunkOf);
+    function layout(chs, omit) {
+      var ws = [], gaps = [], list = [];
+      chs.forEach(function (ch) { var w2 = ch.words.filter(function (b) { return !omit || omit.indexOf(b.w) < 0; }); w2.forEach(function (b, j) { list.push(b); ws.push(b.wd); gaps.push(j < w2.length - 1 ? GI : GX); }); });
+      return { list: list, X: layG(ws, gaps, W / 2) };
+    }
+    function txt(chs) { return chs.map(function (ch) { return ch.words.map(function (b) { return b.w; }).join(''); }).join(''); }
+    function span(ch) { var a = ch.words[0], b = ch.head; return [a.x, b.x + b.wd]; }
+    /* 把整行排成 chs 的样子：在场的块平移（左移走上弧、右移走下弧），新块落入，不在场的淡出；omit 里的词掉到原处下方 */
+    function arrange(chs, t0, o) {
+      o = o || {}; var d0 = o.d0 || 1.1, L = layout(chs, o.omit), on = {}, moved = [];
+      L.list.forEach(function (b, i) {
+        var x = L.X[i]; on[b.id] = 1;
+        if (!b.g) { row.create(b, x, t0 + d0 - .3, true); b.vis = 1; if (b.ch.hub) c.into(b.g, function () { c.hub(x + b.wd / 2, y - 14, b.wd + 26, 70, t0 + d0 + .3); }); return; }
+        if (!b.vis) { c.key(b.g, 'opacity', t0 + d0 - .3, 1, { d: .4 }); b.vis = 1; }
+        if (b.x !== x || b.dy) {
+          var arc = b.dy ? 0 : (x < b.x ? 64 : -44);
+          if (moved.indexOf(b.ch) < 0) moved.push(b.ch);
+          c.move(b.g, { t: t0, x: x - b.x0c, y: 0, d: d0, arc: arc }); b.x = x; b.dy = 0;
+        }
+      });
+      all.forEach(function (b) {
+        if (on[b.id] || !b.g || !b.vis) return;
+        if (o.omit && o.omit.indexOf(b.w) >= 0) { c.move(b.g, { t: t0 + .2, x: b.x - b.x0c, y: 72, d: .7 }); b.dy = 72; }
+        else { c.key(b.g, 'opacity', t0, 0, { d: .5 }); b.vis = 0; }
+      });
+      /* 块上挂的 tag / 外框跟着中心语走 */
+      from.concat(to).forEach(function (ch) {
+        if (!ch.deco.length) return; var ndx = ch.head.x - ch.head.x0c;
+        if (ndx === ch.dx) return;
+        ch.deco.forEach(function (g) { c.move(g, { t: t0, x: ndx, d: d0, arc: ndx < ch.dx ? 64 : -44 }); }); ch.dx = ndx;
+      });
+      return { d: d0 + .8, moved: moved };
+    }
+    var ok = d.ok !== false, wt = d.wrongTry, failMk;
+    /* 1 读原句：整块描框（叙事灰）、上方角色标签 */
+    q.beat(d.read || txt(from) + '。', function (t) {
+      var L = layout(from);
+      L.list.forEach(function (b, i) { row.create(b, L.X[i], t + i * .25); b.vis = 1; });
+      var t1 = t + L.list.length * .25 + .3;
+      from.forEach(function (ch) {
+        var sp = span(ch);
+        if (ch.np) { ch.frame = c.dash(sp[0] - 10, y - size * 1.05, sp[1] - sp[0] + 20, size * 1.42, t1, GRAY, { sw: 2, dash: '6 5', rx: 12 }); ch.deco.push(ch.frame); }
+        if (ch.tag) ch.deco.push(c.tag((sp[0] + sp[1]) / 2, y - 76, ch.tag, t1 + .3));
+      });
+      return L.list.length * .25 + 1.2;
+    });
+    /* 2 圈出枢纽词 */
+    var hubs = from.filter(function (ch) { return ch.hub; });
+    if (hubs.length) q.beat(d.hubSay || ('先圈出“' + hubs.map(function (ch) { return txt([ch]); }).join('、') + '”。'), function (t) {
+      hubs.forEach(function (ch, k) { var b = ch.words[0]; c.into(b.g, function () { c.hub(b.x0c + b.wd / 2, y - 14, b.wd + 26, 70, t + k * .4); }); }); return hubs.length * .4 + .6;
+    });
+    /* 3 同学错改：只搬中心语，丢下的词掉在原处 */
+    if (wt) {
+      var lost = [], lostMk = [];
+      q.beat(wt.q || '一位同学这样搬：', function (t) {
+        from.forEach(function (ch) { if (ch.frame) c.key(ch.frame, 'opacity', t, 0, { d: .3 }); });
+        return arrange(to, t, { omit: wt.drop }).d;
+      });
+      q.beat(wt.say, function (t) {
+        all.forEach(function (b) { if (b.dy && b.vis) lost.push(b); });
+        lost.forEach(function (b) { c.into(b.g, function () { lostMk.push(c.ring(b.x0c + b.wd / 2, y - 14, b.wd + 30, 66, t, BAD), c.cross(b.x0c + b.wd + 34, y - 30, t + .5)); }); });
+        return 1.4;
+      }, { ask: wt.ask || '这样搬对吗？' });
+      q.beat(wt.backSay || '退回去，整块一起搬。', function (t) {
+        lostMk.forEach(function (g) { c.key(g, 'opacity', t, 0, { d: .3 }); });
+        var r = arrange(from, t, { d0: .9 });
+        from.forEach(function (ch) { if (ch.frame) c.key(ch.frame, 'opacity', t + .9, 1, { d: .3 }); });
+        return r.d;
+      });
+    }
+    /* 4 变换：整块弧线换位，原位留虚线空位 */
+    var res;
+    q.beat(d.moveSay || '整块搬过去。', function (t) {
+      var before = {}; from.forEach(function (ch) { before[ch.id] = span(ch); });
+      res = arrange(to, t);
+      if (d.gap !== false) res.moved.forEach(function (ch) {
+        var sp = before[ch.id]; if (!sp) return;
+        c.gap((sp[0] + sp[1]) / 2, y, sp[1] - sp[0] + 16, t + .15, { size: size, phi: lv >= 2, sub: lv >= 2 ? '' : '？', until: t + res.d + .6 });
+      });
+      return res.d + .6;
+    }, { ask: d.ask || false });
+    /* 5 读新句 → ✓，或抖动 ✗ 再退回 */
+    var last = function () { var L = layout(to); return L.X[L.X.length - 1] + L.list[L.list.length - 1].wd; };
+    q.beat(d.toSay || txt(to) + '。', function () { return 1; });
+    if (ok) q.beat(d.okSay || '意思没变，能说。', function (t) { c.check(Math.min(W - 40, last() + 50), y - 14, t); return .8; });
+    else {
+      q.beat(d.say, function (t) {
+        all.forEach(function (b) { if (b.vis && b.g) c.shake(b.g, t, .9, 9, 4); });
+        failMk = c.cross(Math.min(W - 40, last() + 50), y - 14, t + .7);
+        if (d.note) wrap(c, d.note, W / 2, y + 96, W - 200, 28, INK, t + 1);
+        return 1.8;
+      }, { ask: d.judgeAsk || '能这么说吗？' });
+      q.beat(d.backSay || '退回原来的样子。', function (t) { c.key(failMk, 'opacity', t, 0, { d: .3 }); return arrange(from, t, { d0: .9 }).d; });
+    }
+    /* 6 可选：变换后的成分线（位置）对照上方角色标签 */
+    if (d.roleTo) q.beat(d.roleSay || null, function (t) {
+      var k = 0; for (var id in d.roleTo) { var ch = CH[id], sp = span(ch); (function (ch, sp, kind) { var g = c.role(kind, sp[0], sp[1], y, t + k * .4, { size: size }); })(ch, sp, d.roleTo[id]); k++; }
+      return k * .4 + .6;
+    });
+    /* 7 可选：前后两格状态图 */
+    if (d.state) q.beat(d.state.say || null, function (t) {
+      c.state2(W / 2, y + 170, d.state.a, d.state.b, t);
+      if (d.state.ok === false) c.cross(W / 2 + 370, y + 170, t + 2); else if (d.state.ok) c.check(W / 2 + 370, y + 170, t + 2);
+      return 2.4;
     });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
