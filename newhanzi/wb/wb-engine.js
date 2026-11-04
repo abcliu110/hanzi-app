@@ -13,6 +13,7 @@
  *   fix    病句：圈错 → 说原因 → 改对     link   两个分句 + 关联词 + 关系箭头
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
+ *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
  */
 (function () {
@@ -368,7 +369,7 @@
       return 1.8;
     });
     if (d.rel) q.beat(d.relSay || ('前后关系：' + d.rel + '。'), function (t) {
-      c.arrow(xa, y + 50, xb, y + 50, -80, t, BLUE);
+      if (d.back) c.arrow(xb, y + 50, xa, y + 50, 80, t, BLUE); else c.arrow(xa, y + 50, xb, y + 50, -80, t, BLUE);
       c.T(W / 2, y + 150, d.rel, { size: 32, color: BLUE, bold: 1 }, t + .7, .8);
       return 1.6;
     }, { ask: d.ask });
