@@ -7,4 +7,5 @@ window.NHZ_WB_INDEX = {
   "量词": "liangci",
   "代词": "daici",
   "副词": "fuci",
+  "介词": "jieci",
 };
