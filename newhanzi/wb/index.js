@@ -32,4 +32,5 @@ window.NHZ_WB_INDEX = {
   "因果复句": "yinguo_fuju",
   "假设复句": "jiashe_fuju",
   "条件复句": "tiaojian_fuju",
+  "因为…所以…": "gl_yinwei",
 };
