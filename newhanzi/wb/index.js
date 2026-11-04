@@ -14,4 +14,5 @@ window.NHZ_WB_INDEX = {
   "叹词": "tanci",
   "离合词": "liheci",
   "并列式": "binglieshi",
+  "偏正式": "pianzhengshi",
 };
