@@ -11,4 +11,5 @@ window.NHZ_WB_INDEX = {
   "连词": "lianci",
   "助词": "zhuci",
   "语气词": "yuqici",
+  "叹词": "tanci",
 };
