@@ -40,4 +40,4 @@
 - 例句全部自编，≤ 15 字。累计 99/99，`complete: true`。
 
 ## 下一步
-嵌入场景（缺 L3 回炉批 6）：`python3 tools/wb/embed_l3.py 了/着/过 …`，见 `yufa-l3-buqi.md`。
+已嵌入场景（缺 L3 回炉批 6，见 `yufa-l3-buqi.md`）。内容稿整体待负责人审。

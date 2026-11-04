@@ -15,7 +15,7 @@
 | A2b | P1 | 69e90d0e / 876c7b21 / 8ff8f14f（三线讲解） | 同类问题扫描命中：占位符 9、截断 8、英文义项 2，另需逐字过半句类；完成后把机械扫描接入 CI | ✅ 158 字重写+CI 检查，见执行日志 |
 | A3 | P2 | docs/anim/jiaojie/yufa-l3-buqi.md 断点 | 语法白板缺 L3 回炉 批 4：修辞格 8 项（草稿齐；嵌入脚本 embed.py 未入库，需重写） | ✅ 见执行日志 |
 | A4 | P2 | 同上 | 批 5：常见病句 20 项（草稿齐） | ✅ 见执行日志 |
-| A5 | P2 | yufa-neirong-08-l3-huilian.md / yufa-l3-buqi.md | 批次 9：虚词精讲 16 项先写 L3+回练草稿进 l3-huilian.json（src 必须可核），再嵌入场景（批 6） | 待做 |
+| A5 | P2 | yufa-neirong-08-l3-huilian.md / yufa-l3-buqi.md | 批次 9：虚词精讲 16 项先写 L3+回练草稿进 l3-huilian.json（src 必须可核），再嵌入场景（批 6） | ✅ 见执行日志 |
 | A6 | P2 | yufa-l3-buqi.md「已知」 | 「介词」场景旧幕第 4 幕标签为空 | ✅ 见执行日志 |
 | A7 | P2 | gaijin/README.md 进度 | 逻辑区：按 `point` 过滤直达（quiz engine.js） | 待做 |
 | A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | ✅ 见执行日志 |
@@ -77,4 +77,5 @@
 - A6 · 227315c1 · 介词第 4 幕补 tab「引出对象」；lint 0、check_wb 700/1100 过、baseline 9 幕一致
 - A3 · 5545da64 · 修辞格 8 项补 L3+回练（R4 44→36）；新增 tools/wb/embed_l3.py；lint 0、check_wb 全过、基线其余 635 幕一致
 - A4 · cf8873cc · 病句 20 项补 L3+回练（R4 36→16）；lint 0、check_wb 全过、基线其余 590 幕一致
-- A5（草稿）· 本提交 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
+- A5（草稿）· 1e37d706 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
+- A5（嵌入）· 本提交 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
