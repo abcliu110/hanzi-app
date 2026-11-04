@@ -98,4 +98,5 @@ window.NHZ_WB_INDEX = {
   "哪/那": "xc_nana",
   "不/没": "xc_bumei",
   "还是/或者": "xc_haishi",
+  "又/再辨析": "xc_youzai",
 };
