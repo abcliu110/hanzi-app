@@ -4,8 +4,13 @@
 
   var DATA = (window.NHZ_BUSHOU || []).slice();
   var listEl = document.getElementById('bslist');
+  var detailEl = document.getElementById('bsdetail');
   var qEl = document.getElementById('bq');
+  var controlsEl = document.getElementById('bscontrols');
+  var ppsecEl = document.getElementById('ppsec');
   var filter = 'all';
+  /* 当前在详情页展示的列表项（body 节点被搬走，返回时搬回） */
+  var detailItemEl = null;
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -99,13 +104,50 @@
       n++;
     });
     listEl.innerHTML = html || '<div class="noresult">没找到相关部首，换个词试试</div>';
-
-    Array.prototype.forEach.call(listEl.querySelectorAll('.bs-head'), function (h) {
-      h.addEventListener('click', function () {
-        h.parentElement.classList.toggle('open');
-      });
-    });
   }
+
+  /* 独立详情视图（对标 yuwen.js showDetail）：把 body 节点直接搬到详情区，避免复制导致 ID 重复 */
+  function showDetail(headEl) {
+    var itemEl = headEl.closest('.bs-item');
+    var bodyEl = itemEl ? itemEl.querySelector('.bs-body') : null;
+    if (!itemEl || !bodyEl) return;
+    detailItemEl = itemEl;
+    listEl.style.display = 'none';
+    if (controlsEl) controlsEl.style.display = 'none';
+    if (ppsecEl) ppsecEl.style.display = 'none';
+    detailEl.style.display = 'block';
+    var charHtml = headEl.querySelector('.bs-char').innerHTML;
+    var infoHtml = headEl.querySelector('.bs-info').innerHTML;
+    detailEl.innerHTML =
+      '<div style="margin:6px 0 14px"><button class="yw-back" id="bsBack">← 返回列表</button></div>' +
+      '<div class="bs-detail-head"><span class="bs-char">' + charHtml + '</span>' +
+      '<div class="bs-info">' + infoHtml + '</div></div>' +
+      '<div id="bsDetailBody"></div>';
+    document.getElementById('bsDetailBody').appendChild(bodyEl);
+    document.getElementById('bsBack').addEventListener('click', hideDetail);
+    window.scrollTo(0, 0);
+  }
+
+  function hideDetail() {
+    /* 把 body 节点搬回原列表项 */
+    var bodyEl = document.querySelector('#bsDetailBody .bs-body');
+    if (bodyEl && detailItemEl) detailItemEl.appendChild(bodyEl);
+    detailItemEl = null;
+    detailEl.style.display = 'none';
+    detailEl.innerHTML = '';
+    listEl.style.display = '';
+    if (controlsEl) controlsEl.style.display = '';
+    if (ppsecEl) ppsecEl.style.display = '';
+    window.scrollTo(0, 0);
+  }
+
+  /* 列表标题点击 → 进入独立详情页（事件委托，render 后无需重绑） */
+  listEl.addEventListener('click', function (e) {
+    var h = e.target.closest('.bs-head');
+    if (h && listEl.style.display !== 'none') {
+      showDetail(h);
+    }
+  });
 
   var t = null;
   qEl.addEventListener('input', function () {
@@ -125,21 +167,18 @@
   document.getElementById('navtitle').textContent = '偏旁部首（' + DATA.length + '）';
   render();
 
-  /* 直达：bushou.html?b=氵 → 自动展开并滚动到该部首 */
+  /* 直达：bushou.html?b=氵 → 自动进入该部首的详情页 */
   (function () {
     var m = /[?&]b=([^&]+)/.exec(location.search);
     if (!m) return;
     var target = decodeURIComponent(m[1]);
-    var el = listEl.querySelector('.bs-item');
     // render 后按 bushou 查找
     var items = listEl.querySelectorAll('.bs-item');
     for (var i = 0; i < items.length; i++) {
       var head = items[i].querySelector('.bs-char');
       if (head && head.textContent === target) {
-        items[i].classList.add('open');
-        setTimeout(function (t) {
-          t.scrollIntoView({ block: 'start' });
-        }, 60, items[i]);
+        var h = items[i].querySelector('.bs-head');
+        if (h) setTimeout(function (hh) { showDetail(hh); }, 60, h);
         break;
       }
     }

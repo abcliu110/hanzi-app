@@ -378,6 +378,7 @@
     stdEl.textContent = d['标准'] || '';
 
     var html = '';
+    var visCats = []; /* 顶部模块索引 chips：只收录过滤后仍可见的分类 */
     d.categories.forEach(function (c, ci) {
       var items = c.items;
       if (q) {
@@ -390,14 +391,29 @@
         });
         if (!items.length) return;
       }
+      visCats.push({ ci: ci, name: c.name, n: items.length });
       html += '<div class="ghead" id="ywc-' + ci + '">' + esc(c.name) +
         '<span class="gcount">' + items.length + '条</span></div>' +
         '<div class="yw-grid">' +
         items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii, c.name); }).join('') +
         '</div>';
     });
+    if (visCats.length) {
+      html = '<div class="sc-chips">' + visCats.map(function (vc) {
+        return '<button class="sc-chip" data-cidx="' + vc.ci + '">' +
+          esc(vc.name) + '（' + vc.n + '）</button>';
+      }).join('') + '</div>' + html;
+    }
     listEl.innerHTML = html ||
       '<div class="noresult">没找到相关知识点，换个词试试</div>';
+
+    /* chips 点击：滚动到对应分类（对标 shici.html knowmod chips） */
+    Array.prototype.forEach.call(listEl.querySelectorAll('.sc-chip[data-cidx]'), function (el) {
+      el.addEventListener('click', function () {
+        var tg = document.getElementById('ywc-' + el.getAttribute('data-cidx'));
+        if (tg) tg.scrollIntoView();
+      });
+    });
 
     var top = controlsEl.offsetHeight;
     Array.prototype.forEach.call(listEl.querySelectorAll('.ghead'), function (h) {

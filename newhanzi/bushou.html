@@ -37,6 +37,9 @@
 .bs-filter{display:flex;gap:8px;padding:0 16px 8px}
 .bs-filter .chip{font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
 .bs-filter .chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+/* 独立详情页：列表只显示标题，点进详情看全文（对标古诗词列表明细标准） */
+#bsdetail .bs-body{display:block;padding:4px 16px 16px}
+.bs-detail-head{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 6px}
 .bs-know{margin:12px 16px 0;background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--ink);line-height:1.8}
 .bs-know-title{font-weight:700;font-size:15px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
 .bs-know-toggle{font-size:12px;color:var(--accent-deep);font-weight:400}
@@ -94,6 +97,7 @@
 
 <main class="listwrap">
   <div id="bslist"></div>
+  <div id="bsdetail" style="display:none"></div>
 </main>
 
 <section class="pp-sec" id="ppsec">

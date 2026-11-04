@@ -250,8 +250,12 @@
       var el = document.getElementById('logiclist');
       if(D&&el){
         var h='';
-        D.categories.forEach(function(c){
-          h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
+        /* 顶部模块索引 chips：点击跳转到对应分类 */
+        h += '<div class="sc-chips">'+D.categories.map(function(c,ci){
+          return '<button type="button" class="sc-chip" data-cat="'+ci+'">'+esc(c.name)+'（'+c.items.length+'）</button>';
+        }).join('')+'</div>';
+        D.categories.forEach(function(c,ci){
+          h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
             c.items.map(lessonHtml).join('');
         });
         h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;">🎮 学完去闯关：逻辑大闯关 →</a>';
@@ -334,6 +338,12 @@
       loadSrs: function () { return load(SK, {}); } };
   })();
   document.addEventListener('click', function(e){
+    var chip = e.target.closest('#panel-logic .sc-chip');
+    if(chip){
+      var tg = document.getElementById('logic-cat-'+chip.getAttribute('data-cat'));
+      if(tg) tg.scrollIntoView();
+      return;
+    }
     var h = e.target.closest('.yw-head');
     if(h){ h.parentElement.classList.toggle('open'); return; }
     var ab = e.target.closest('[data-aid]');

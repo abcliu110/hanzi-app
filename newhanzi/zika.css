@@ -863,3 +863,8 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yw-exg{margin:10px 0}
 .yw-exg b{display:block;margin:0 16px 4px;font-size:14px}
 .yw-summary{margin:14px 16px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.8}
+
+/* 顶部模块索引 chips（对标 shici.html .sc-chips 标准，语法/古文等列表页共用） */
+.sc-chips{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
+.sc-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink);font-family:inherit}
+.sc-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
