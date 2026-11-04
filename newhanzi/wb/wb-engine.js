@@ -647,6 +647,28 @@
     if (d.rule) q.beat(d.rule, function (t) { c.T(W / 2, 520, d.rule, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
 
+  /* ---------- 公共：词块行 Row（trunk / morph / nest 共用；第 2 期从 trunk 抽出，行为与原 trunk 内联代码逐行等价） ----------
+   * 词块组：每个词块是独立 <g>（字 + 可选成分线，括号类挂在组里随块移动）。
+   * 构建时排版：xs 由调用方用 lay / layG 算好（textW 估宽，不调用 getBBox）。
+   * 平移：place 对已画的块按新排版 move，对新块 create（可从上方落入）。
+   * Row(c, {size, y})：mk(w, role, ex) 建块记录；create(b, x0, t0, drop) 画块；place(L, X, t0, d0, drop) 排到 X。 */
+  function Row(c, o) { this.c = c; this.size = o.size || 44; this.y = o.y; this.B = []; }
+  Row.prototype.mk = function (w, role, ex) { var b = { w: w, role: role || null, id: this.B.length }; for (var k in (ex || {})) b[k] = ex[k]; b.wd = textW(w, this.size); this.B.push(b); return b; };
+  Row.prototype.create = function (b, x0, t0, drop) {
+    var c = this.c, size = this.size, y = this.y;
+    b.g = c.G(function () { b.tx = c.T(x0 + b.wd / 2, y, b.w, { size: size }, t0, .4); if (b.role) c.role(b.role, x0, x0 + b.wd, y, t0 + .4, { size: size }); });
+    b.x0c = x0; b.x = x0;
+    if (drop) { c.key(b.g, 'transform', t0, [0, 0], { d: .6, from: [0, -70], ease: 1 }); c.key(b.g, 'opacity', t0, 1, { d: .4, from: 0 }); }
+    return b;
+  };
+  Row.prototype.place = function (L, X, t0, d0, drop) {
+    var self = this, c = this.c;
+    L.forEach(function (b, i) { if (!b.g) self.create(b, X[i], drop ? t0 + .6 : t0 + i * .25, drop); else if (b.x !== X[i]) { c.move(b.g, { t: t0, x: X[i] - b.x0c, d: d0 }); b.x = X[i]; } });
+    return X;
+  };
+  /* layG：每两块之间的间距可不同（gaps[i] 为第 i 块与第 i+1 块之间），返回每块 x0 */
+  function layG(ws, gaps, cx) { var tot = 0, i; for (i = 0; i < ws.length; i++) tot += ws[i] + (i < ws.length - 1 ? gaps[i] : 0); var x = cx - tot / 2, out = []; for (i = 0; i < ws.length; i++) { out.push(x); x += ws[i] + (gaps[i] || 0); } return out; }
+
   /* trunk 抽骨架（E15，设计 §5.1）：先生长（扩句），再修剪（缩句）。
    * 生长：{k:'trunk', mode:'grow+prune'|'grow', core:['小猫','捉','老鼠'], role:['zhu','wei','bin'],
    *        grow:[{q:'哪只小猫？', ins:['胖胖','的'], before:0, role:'ding', say, at:'far', keep, why, cutOk}], formula:true, ask}
@@ -657,8 +679,8 @@
   TPL.trunk = function (c, q, d) {
     if (d.h) heading(c, q, d.h, d.sub);
     var size = d.size || 44, GX = d.gap || 34, y = d.y || (d.h ? 286 : 266), fy = y + 92, lv = c.lv, TT = window.NHZWB_TERMS || {};
-    var CUE = { '的': 1, '地': 1, '得': 1 }, B = [], pr = d.prune || {};
-    function mk(w, role, ex) { var b = { w: w, role: role || null, id: B.length }; for (var k in (ex || {})) b[k] = ex[k]; b.cue = !b.role && !!CUE[w]; b.wd = textW(w, size); B.push(b); return b; }
+    var CUE = { '的': 1, '地': 1, '得': 1 }, pr = d.prune || {}, row = new Row(c, { size: size, y: y });
+    function mk(w, role, ex) { var b = row.mk(w, role, ex); b.cue = !b.role && !!CUE[w]; return b; }
     var seq, mode = d.mode || (d.grow ? 'grow+prune' : 'prune');
     if (d.core) seq = d.core.map(function (w, i) { return mk(w, (d.role || [])[i], { core: 1, ci: i }); });
     else seq = d.s.map(function (w, i) { var r = (d.role || [])[i]; return mk(w, CUE[w] && !r ? null : r, { core: r === 'zhu' || r === 'wei' || r === 'bin', ci: i }); });
@@ -672,11 +694,6 @@
       return X;
     }
     function subjEnd(L) { for (var i = 0; i < L.length; i++) if (L[i].role === 'zhu' && L[i].core) { var j = i; while (L[j + 1] && L[j + 1].cue && L[j + 1].own === L[i]) j++; return L[j + 1] ? j : -1; } return -1; }
-    function create(b, x0, t0, drop) {
-      b.g = c.G(function () { b.tx = c.T(x0 + b.wd / 2, y, b.w, { size: size }, t0, .4); if (b.role) c.role(b.role, x0, x0 + b.wd, y, t0 + .4, { size: size }); });
-      b.x0c = x0; b.x = x0;
-      if (drop) { c.key(b.g, 'transform', t0, [0, 0], { d: .6, from: [0, -70], ease: 1 }); c.key(b.g, 'opacity', t0, 1, { d: .4, from: 0 }); }
-    }
     function formula(L, X, t0) {
       if (d.formula === false) return;
       var g = c.G(function () {
@@ -706,8 +723,7 @@
       else c.move(bar, { t: t0, x: bx - bar.x0c, d: d0 });
     }
     function place(L, t0, d0, drop) {
-      owners(L); var X = xs(L);
-      L.forEach(function (b, i) { if (!b.g) create(b, X[i], drop ? t0 + .6 : t0 + i * .25, drop); else if (b.x !== X[i]) { c.move(b.g, { t: t0, x: X[i] - b.x0c, d: d0 }); b.x = X[i]; } });
+      owners(L); var X = row.place(L, xs(L), t0, d0, drop);
       barAt(L, X, t0, d0); formula(L, X, t0 + (drop ? 1 : .2) + (d0 || 0));
       return X;
     }
