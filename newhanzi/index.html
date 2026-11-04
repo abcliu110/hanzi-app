@@ -367,7 +367,7 @@
       var steps = logicAnimData[aid];
       var box = document.getElementById(aid);
       if(!steps || !box) return;
-      var toks = box.querySelectorAll('.tok');
+      var tokBox = box.querySelector('.yw-anim-tokens');
       var note = box.querySelector('.yw-anim-note');
       var cur = parseInt(box.getAttribute('data-cur') || '0', 10);
       var playBtn = box.querySelector('[data-act="play"]');
@@ -375,11 +375,12 @@
       if(box._animTimer){ clearInterval(box._animTimer); box._animTimer = null; }
       if(playBtn) playBtn.disabled = false;
       function showStep(i){
+        /* 每一步换成该步自己的词块（原来只显示 steps[0]，后面几步的小前提、结论等词块永远不出现）；比上一步新出现的词块高亮 */
         box.setAttribute('data-cur', i);
-        var hi = toks.length ? Math.min(i, toks.length - 1) : 0;
-        for(var k = 0; k < toks.length; k++){
-          toks[k].classList.toggle('on', k === hi);
-        }
+        var prev = i > 0 ? (steps[i-1].tokens || []) : [];
+        tokBox.innerHTML = (steps[i].tokens || []).map(function(t){
+          return '<span class="tok'+(prev.indexOf(t) < 0 ? ' on' : '')+'">'+esc(t)+'</span>';
+        }).join('');
         note.textContent = steps[i].note || '';
       }
       if(act === 'step'){
