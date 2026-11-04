@@ -74,4 +74,5 @@ window.NHZ_WB_INDEX = {
   "主谓搭配不当": "bj_zhuwei",
   "动宾搭配不当": "bj_dongbin",
   "把字句": "gj_bazi",
+  "被字句": "gj_beizi",
 };
