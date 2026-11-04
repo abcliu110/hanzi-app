@@ -401,7 +401,7 @@
     if (visCats.length) {
       html = '<div class="sc-chips">' + visCats.map(function (vc) {
         return '<button class="sc-chip" data-cidx="' + vc.ci + '">' +
-          esc(vc.name) + '（' + vc.n + '）</button>';
+          esc(vc.name) + '</button>';
       }).join('') + '</div>' + html;
     }
     listEl.innerHTML = html ||
