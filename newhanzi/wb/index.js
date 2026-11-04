@@ -40,4 +40,5 @@ window.NHZ_WB_INDEX = {
   "无论…都…": "gl_wulun",
   "既…又…": "gl_jiyou",
   "不是…而是…": "gl_bushi",
+  "先…然后…": "gl_xian",
 };
