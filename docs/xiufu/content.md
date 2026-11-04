@@ -1,8 +1,10 @@
 # 内容修复记录（content agent，2026-11-04）
 
 提交（均已推到 abc/master，CI 绿）：
-- f4f67e1c→rebase 后见 git log：年级数据 grade_map
-- 古诗库重建、古文分级、CI 内容校验（tools/content/check_content.js，由 tools/check_scripts.js 调用）
+- 7cd28d05 年级数据 grade_map
+- 77c61776 古诗库重建
+- 2b109aca 古文分级
+- 4e2a9cb0 CI 内容校验（tools/content/check_content.js，由 tools/check_scripts.js 调用）
 
 ## 1. 古诗库（newhanzi/data/shici.js · shangxi.js · shiju.js）
 - 构建：`python3 tools/content/build_shici.py`（幂等）；篇目源 `tools/content/shici_xiaoxue.json`。
@@ -12,7 +14,7 @@
 - 版本修正：望庐山瀑布→七绝（五古版留作拓展“望庐山瀑布水二首·其一”）；独坐敬亭山→“众鸟高飞尽”（原“其二”去志书注释留作拓展，标存疑）；马诗→其五（其一留作拓展）；悯农标题其一/其二对调纠正；凉州词“春光”→“春风”、芙蓉楼“连天/入湖”→“连江/入吴”、别董大“十里”→“千里”、渭城曲→送元二使安西“柳色新”。
 - 删除重复《杜少府之任蜀州》(#69)，名句卡引用改到 #117；shiju 重建；赏析标题/逐句前缀同步。
 - 拓展篇目：标点据 chinese-poetry 原始数据恢复（tools/content/cp_punct.json，88 首），其余按上下句恢复；异体按 tools/content/variants.json 清洗；白门前、独坐敬亭山去校勘/志书注释。
-- 新增 70 首（无赏析，字段 sx=待补）：
+- 补齐的 77 首（新条目 70 首 + 原条目改成课本版本 7 首；无赏析的标 sx=待补，共 73 首）：
 - 1上：咏鹅、江南、画、古朗月行（节选）、风
 - 1下：池上、小池、画鸡
 - 2上：梅花、小儿垂钓、望庐山瀑布、夜宿山寺、敕勒歌
