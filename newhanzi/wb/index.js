@@ -72,4 +72,5 @@ window.NHZ_WB_INDEX = {
   "约数矛盾": "bj_yueshu",
   "否定失当": "bj_fouding",
   "主谓搭配不当": "bj_zhuwei",
+  "动宾搭配不当": "bj_dongbin",
 };
