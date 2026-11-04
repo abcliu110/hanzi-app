@@ -6,3 +6,4 @@ __pycache__/
 .cache/
 exports/
 *.draft.json
+build/
