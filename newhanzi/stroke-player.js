@@ -49,12 +49,96 @@
     return { x: last[0], y: last[1], dx: 0 };
   }
 
+  // 数据纠偏：部分字数据的中线点列是倒着存的（从收笔点走向起笔点），
+  // 长斜笔（撇/捺）还有左右镜像的斜度。播放器在绘制前按笔形纠正，
+  // 只改播放用的点列与轮廓路径，不改原始数据文件。
+  // 规则（以 3500 字 33959 笔实测校准）：折笔以相邻段最大转角 >50° 判定；
+  // 长对角笔（长>500、横竖跨度均>100、非折笔、位置明显偏左/右）斜度与所在
+  // 侧不符时，沿该笔包围盒中心 x 镜像点列与轮廓；方向：折笔按整体走向与
+  // 首段判定，横笔按左右，直笔上行按左右与长度判定（提类短笔保留），
+  // 下行一律保留。镜像时轮廓与中线用同一中心变换，对齐关系不变。
+  function maxTurn(pts) {
+    var mx = 0;
+    for (var i = 1; i < pts.length - 1; i++) {
+      var ax = pts[i][0] - pts[i - 1][0], ay = pts[i][1] - pts[i - 1][1];
+      var bx = pts[i + 1][0] - pts[i][0], by = pts[i + 1][1] - pts[i][1];
+      var d = (ax * bx + ay * by) / ((Math.sqrt(ax * ax + ay * ay) || 1) * (Math.sqrt(bx * bx + by * by) || 1));
+      var ang = Math.acos(Math.max(-1, Math.min(1, d))) * 180 / Math.PI;
+      if (ang > mx) mx = ang;
+    }
+    return mx;
+  }
+  function mirrorPathX(d, cx) {
+    var toks = d.match(/[MLQCZ]|-?\d*\.?\d+/g) || [];
+    var out = [], cmd = '', pair = 0, coord = 0;
+    function pairsFor(c) { return c === 'M' || c === 'L' ? 1 : c === 'Q' ? 2 : c === 'C' ? 3 : 0; }
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i];
+      if (/[MLQCZ]/.test(t)) { cmd = t; pair = 0; coord = 0; out.push(t); }
+      else if (coord === 0) { out.push(String(2 * cx - parseFloat(t))); coord = 1; }
+      else {
+        out.push(t); coord = 0; pair++;
+        if (pair >= pairsFor(cmd)) { pair = 0; if (cmd === 'M') cmd = 'L'; }
+      }
+    }
+    return out.join(' ');
+  }
+  function correctStroke(med, path, charCX, charW) {
+    var L0 = polyLen(med);
+    var xs = med.map(function (p) { return p[0]; });
+    var cx0 = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2;
+    var dx0 = med[med.length - 1][0] - med[0][0], dy0 = med[med.length - 1][1] - med[0][1];
+    var bent0 = maxTurn(med) > 50;
+    var m = med, p = path;
+    if (!bent0 && L0 > 500 && Math.abs(dx0) > 100 && Math.abs(dy0) > 100) {
+      var slantUp = dx0 * dy0 < 0;
+      var isLeft = cx0 < charCX - 0.15 * charW;
+      var isRight = cx0 > charCX + 0.15 * charW;
+      if ((isLeft && !slantUp) || (isRight && slantUp)) {
+        m = med.map(function (pt) { return [2 * cx0 - pt[0], pt[1]]; });
+        p = mirrorPathX(path, cx0);
+      }
+    }
+    var L = polyLen(m);
+    var dx = m[m.length - 1][0] - m[0][0], dy = m[m.length - 1][1] - m[0][1];
+    var f = pointAt(m, 0.12 * L);
+    var Fdx = f.x - m[0][0], Fdy = f.y - m[0][1];
+    var bent = maxTurn(m) > 50;
+    var flip = false;
+    if (bent) {
+      if (Math.abs(dy) < 0.35 * Math.abs(dx)) flip = dx < 0;
+      else if (dy <= 0) flip = (Fdy > 0.3 * Math.abs(Fdx)) || (Fdy < -0.7 * Math.abs(Fdx));
+    } else if (Math.abs(dy) < 0.35 * Math.abs(dx)) flip = dx < 0;
+    else if (dy < 0) {
+      if (dx < 0) flip = true;
+      else flip = (L < 300) || (L > 500) || (Math.abs(dx) < 0.5 * Math.abs(dy));
+    }
+    if (flip) m = m.slice().reverse();
+    return { med: m, path: p };
+  }
+
   function mount(container, data, opts) {
     opts = opts || {};
     var speed = opts.speed || 1;
     var strokes = (data && data.strokes) || [];
     var medians = (data && data.medians) || [];
     var n = Math.min(strokes.length, medians.length);
+    if (n > 0) {
+      var xMin = 1e9, xMax = -1e9;
+      for (var ci = 0; ci < n; ci++) {
+        for (var cj = 0; cj < medians[ci].length; cj++) {
+          if (medians[ci][cj][0] < xMin) xMin = medians[ci][cj][0];
+          if (medians[ci][cj][0] > xMax) xMax = medians[ci][cj][0];
+        }
+      }
+      var charCX = (xMin + xMax) / 2, charW = xMax - xMin;
+      var fixedMeds = [], fixedPaths = [];
+      for (var fi = 0; fi < n; fi++) {
+        var fx = correctStroke(medians[fi], strokes[fi], charCX, charW);
+        fixedMeds.push(fx.med); fixedPaths.push(fx.path);
+      }
+      medians = fixedMeds; strokes = fixedPaths;
+    }
     var wrap = el('div', { 'class': 'nhz-sp' }, container);
     var svg = svgEl('svg', { 'class': 'nhz-sp-svg', viewBox: '0 0 1024 1024', role: 'img', 'aria-label': '笔顺动画' }, wrap);
     if (opts.grid !== false) {
