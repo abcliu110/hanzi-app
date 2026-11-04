@@ -79,4 +79,5 @@ window.NHZ_WB_INDEX = {
   "是…的句": "gj_shide",
   "比较句": "gj_bijiao",
   "双重否定": "gj_shuangfou",
+  "歧义句": "gj_qiyi",
 };
