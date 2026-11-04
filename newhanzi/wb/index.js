@@ -71,4 +71,5 @@ window.NHZ_WB_INDEX = {
   "重复啰嗦": "bj_chongfu",
   "约数矛盾": "bj_yueshu",
   "否定失当": "bj_fouding",
+  "主谓搭配不当": "bj_zhuwei",
 };
