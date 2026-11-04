@@ -68,4 +68,5 @@ window.NHZ_WB_INDEX = {
   "指代不明": "bj_zhidai",
   "前后矛盾": "bj_qianhou",
   "并列概念交叉": "bj_binglie",
+  "重复啰嗦": "bj_chongfu",
 };
