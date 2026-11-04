@@ -398,22 +398,8 @@
         items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii, c.name); }).join('') +
         '</div>';
     });
-    if (visCats.length) {
-      html = '<div class="sc-chips">' + visCats.map(function (vc) {
-        return '<button class="sc-chip" data-cidx="' + vc.ci + '">' +
-          esc(vc.name) + '</button>';
-      }).join('') + '</div>' + html;
-    }
     listEl.innerHTML = html ||
       '<div class="noresult">没找到相关知识点，换个词试试</div>';
-
-    /* chips 点击：滚动到对应分类（对标 shici.html knowmod chips） */
-    Array.prototype.forEach.call(listEl.querySelectorAll('.sc-chip[data-cidx]'), function (el) {
-      el.addEventListener('click', function () {
-        var tg = document.getElementById('ywc-' + el.getAttribute('data-cidx'));
-        if (tg) tg.scrollIntoView();
-      });
-    });
 
     var top = controlsEl.offsetHeight;
     Array.prototype.forEach.call(listEl.querySelectorAll('.ghead'), function (h) {
