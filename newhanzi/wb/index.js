@@ -78,4 +78,5 @@ window.NHZ_WB_INDEX = {
   "存现句": "gj_cunxian",
   "是…的句": "gj_shide",
   "比较句": "gj_bijiao",
+  "双重否定": "gj_shuangfou",
 };
