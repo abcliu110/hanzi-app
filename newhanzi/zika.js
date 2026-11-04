@@ -70,7 +70,11 @@
     h += '<div class="hero"><div class="bigzi">' + esc(r.zi) + '</div>' +
       (function(){
         var py = (dim['读音'] && dim['读音']['拼音']) || ((window.NHZ_PINYIN||{})[r.zi]) || '';
-        return py ? '<div class="pinyin">' + esc(String(py).replace(/,/g, '、')) + '</div>' : '';
+        /* 罕用读音（古音、专名等）保留但标注，不和常用读音并列 */
+        var rare = dim['读音'] && dim['读音']['罕用读音'];
+        return py ? '<div class="pinyin">' + esc(String(py).replace(/,/g, '、')) +
+          (rare ? ' <span class="py-rare" style="font-size:14px;color:var(--muted);font-weight:400;">（古音/罕用：' +
+            esc(String(rare).replace(/,/g, '、')) + '）</span>' : '') + '</div>' : '';
       })() +
       '<div class="chips">' + chips + '</div>' +
       // 偏旁部首直达部首库（只显示归属；语义解读在部首详情页，避免对假借字误断）
