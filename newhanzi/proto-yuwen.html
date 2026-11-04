@@ -6,9 +6,7 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="data:," />
     <title>语法图解课堂原型</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet" />
+    <!-- 不依赖 Google Fonts（国内/离线会失败），只用系统字体 -->
     <style>
       :root{
         --bg:#e4eedf; --bg2:#dce8d7; --card:#f2f6ee; --ink:#2c3328; --ink2:#6b7566; --line:#d5dfd0;
@@ -31,9 +29,9 @@
       }
       *{box-sizing:border-box}
       html{-webkit-text-size-adjust:100%}
-      body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65}
+      body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;line-height:1.65}
       .wrap{max-width:880px;margin:0 auto;padding:20px 16px 64px}
-      h1,h2,h3{font-family:"Noto Serif SC","Noto Sans SC",serif;line-height:1.3}
+      h1,h2,h3{font-family:"Songti SC","STSong","Noto Serif CJK SC","SimSun",serif;line-height:1.3}
       button{font-family:inherit;cursor:pointer}
       .hidden{display:none!important}
 
@@ -183,7 +181,7 @@
       .tree-q .yn button.picked-yes{border-color:var(--ok);background:var(--ok-soft)}
       .tree-q .yn button.picked-no{border-color:var(--ink2);background:var(--bg2)}
       .tree-result{border-radius:12px;padding:16px;text-align:center;font-size:16px}
-      .tree-result .big{font-size:34px;font-weight:900;font-family:"Noto Serif SC",serif}
+      .tree-result .big{font-size:34px;font-weight:900;font-family:"Songti SC","STSong","Noto Serif CJK SC","SimSun",serif}
 
       /* 的地得 */
       .de-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:9px;font-size:17.5px}
@@ -201,7 +199,7 @@
       <!-- 列表视图 -->
       <div id="view-list">
         <div class="intro">
-          <a href="yuwen.html" class="back">← 返回语法</a>
+          <a href="yuwen.html" class="back">← 返回语法</a> <a href="index.html" target="_top" class="back home-link">🏠 首页</a>
           <h1>语法图解课堂</h1>
           <p>基础语法不再背定义。这一版把全球搜集来的创新教法做成可操作的原型：<b>词类变成看得见的符号</b>、<b>句子成分画成骨架图</b>、<b>造句变成拼积木</b>。点任意一条，进入它的图解课堂。</p>
           <div class="method-strip">
