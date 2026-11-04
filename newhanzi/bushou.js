@@ -56,7 +56,8 @@
         '</div></div>';
     }
     if (r['图示']) {
-      html += '<div class="bs-sec"><h4>看图说话</h4><div class="yw-diagram">' + r['图示'] + '</div></div>';
+      html += '<div class="bs-sec"><h4>看图说话</h4><div class="yw-diagram">' + r['图示'] +
+        '<div style="text-align:center;margin-top:8px;"><button class="back" style="padding:8px 16px;font-size:14px;" onclick="var d=this.closest(\'.yw-diagram\');var s=d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播动画</button></div></div></div>';
     }
     if (r.evo) {
       html += '<div class="bs-sec"><h4>字形演变</h4><div class="bs-sem">🦴 ' + esc(r.evo) + '</div>';
