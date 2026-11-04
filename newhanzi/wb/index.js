@@ -95,4 +95,5 @@ window.NHZ_WB_INDEX = {
   "以/已": "xc_yiyi",
   "像/象": "xc_xiangxiang",
   "必须/必需": "xc_bixu",
+  "哪/那": "xc_nana",
 };
