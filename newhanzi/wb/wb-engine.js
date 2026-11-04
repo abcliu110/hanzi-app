@@ -27,8 +27,8 @@
    *   层 judge（对错）：ok bad
    *   层 story（叙事）：ink gray acc cmp */
   var PAL = {
-    ink: '#2c3328', gray: '#a3aa9c', acc: '#c46a2b', cmp: '#4a7a8c', line: '#d5dfd0',
-    ok: '#3f8e6b', bad: '#b85a52',
+    ink: '#2c3328', gray: '#a3aa9c', acc: '#a8642f', cmp: '#8c6d3a', line: '#d5dfd0',
+    ok: '#0f8c8c', bad: '#8f1d3f',
     role: '#4f5d7a',
     noun: '#26221c', adj: '#274b8f', pron: '#7b4ba8', verb: '#c22f2f', adv: '#e07b24', prep: '#3d8a4f',
     conj: '#d96a9b', interj: '#c9a227', tagc: '#6b7566'
@@ -172,7 +172,8 @@
     var s = this; return this.G(function () { s.R('line', [x - 18, y - 18, x + 18, y + 18], { stroke: BAD, strokeWidth: 6 }, t0, .25); s.R('line', [x + 18, y - 18, x - 18, y + 18], { stroke: BAD, strokeWidth: 6 }, t0 + .25, .25); });
   };
   Ctx.prototype.under = function (x1, x2, y, t0, col) { return this.R('line', [x1, y, x2, y], { stroke: col || ACC, strokeWidth: 4 }, t0, .4); };
-  Ctx.prototype.ring = function (x, y, w, h, t0, col) { return this.R('ellipse', [x, y, w, h], { stroke: col || BAD, strokeWidth: 3.5 }, t0, .6); };
+  /* 圈：缺省叙事强调色（错误圈必须显式传 BAD 并同时打 ✗，设计 §3.1 规则 4） */
+  Ctx.prototype.ring = function (x, y, w, h, t0, col) { return this.R('ellipse', [x, y, w, h], { stroke: col || ACC, strokeWidth: 3.5 }, t0, .6); };
   Ctx.prototype.box = function (x, y, w, h, t0, o) { return this.R('rectangle', [x, y, w, h], o || {}, t0, .6); };
   /* ---------- 第 1 期新增原语（设计 §7.1 E2–E13）：只被新模板 / 新的可选参数调用，旧路径不变 ---------- */
   /* E2 move：关键帧位移，不在 t0 前隐藏（区别于 slide）。kf：[{t, x, y, d, arc}]，x/y 为相对初始位置的偏移 */
@@ -548,7 +549,7 @@
         var A = c.card(xa, y, p.a, t, { size: 38 }), B = c.card(xb, y, p.b, t + .5, { size: 38 });
         var k = p.kind, la = xa + A.w / 2 + 10, lb = xb - B.w / 2 - 10;
         if (k === '并列') { c.arrow(la, y, lb, y, 0, t + 1.1, BLUE); c.arrow(lb, y + 8, la, y + 8, 0, t + 1.5, BLUE); }
-        else if (k === '修饰' || k === '支配') c.arrow(la, y, lb, y, k === '修饰' ? 0 : 40, t + 1.1, k === '修饰' ? BLUE : '#c22f2f');
+        else if (k === '修饰' || k === '支配') c.arrow(la, y, lb, y, k === '修饰' ? 0 : 40, t + 1.1, k === '修饰' ? BLUE : INK);
         else if (k === '补充') c.arrow(lb, y - 10, la, y - 10, 50, t + 1.1, ACC);
         else if (k === '陈述') c.R('line', [mid, y - 40, mid, y + 40], { stroke: INK, strokeWidth: 4 }, t + 1.1, .3);
         if (p.r) c.T(mid, y - 48, p.r, { size: 28, color: ACC }, t + 1.3, .4);
