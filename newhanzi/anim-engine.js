@@ -48,19 +48,20 @@ const AnimEngine = (function() {
     svg += `<animate attributeName="opacity" values="1;0" dur="0.4s" begin="${t}s" fill="freeze"/></text>`;
     t += 0.5;
     
-    // 部件散开
+    // 部件散开（错开时间，避免初始重叠）
     parts.forEach((p, i) => {
       const x = centerX + (p.dx || 0);
       const y = centerY + (p.dy || 0);
-      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.3s" begin="${t}s" fill="freeze"/>`;
+      const bt = t + i * 0.4; // 每个部件错开0.4秒出现
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.3s" begin="${bt}s" fill="freeze"/>`;
       svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="36" fill="${p.color || C.green}">${esc(p.text)}`;
-      svg += `<animateTransform attributeName="transform" type="translate" values="0,0;${p.dx||0},${p.dy||0}" dur="0.8s" begin="${t}s" fill="freeze"/></text>`;
+      svg += `<animateTransform attributeName="transform" type="translate" values="0,0;${p.dx||0},${p.dy||0}" dur="0.8s" begin="${bt}s" fill="freeze"/></text>`;
       if (p.label) {
         svg += `<text x="${x}" y="${y+40}" text-anchor="middle" font-size="13" fill="${C.muted}">${esc(p.label)}</text>`;
       }
       svg += `</g>`;
     });
-    t += 1.2;
+    t += 1.2 + parts.length * 0.4;
     
     // 合回
     svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="48" fill="${C.ink}" opacity="0">${esc(fullText)}`;
