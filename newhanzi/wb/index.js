@@ -20,4 +20,5 @@ window.NHZ_WB_INDEX = {
   "补充式": "buchongshi",
   "主语": "zhuyu",
   "谓语": "weiyu",
+  "宾语": "binyu",
 };
