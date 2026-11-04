@@ -134,7 +134,10 @@
 
     /* 图示（机制图） */
     if (r['图示']) {
-      h += sec('看图说话', '机制图', '<div class="yw-diagram">' + r['图示'] + '</div>');
+      /* 重播：克隆替换 svg，SMIL 时间线从 0 重新开始（与 yuwen.js 同法） */
+      h += sec('看图说话', '机制图', '<div class="yw-diagram">' + r['图示'] +
+        '<div style="text-align:center;margin-top:8px;"><button type="button" class="back replay-btn" style="padding:8px 16px;font-size:14px;" data-replay ' +
+        'onclick="var d=this.closest(\'.yw-diagram\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>');
     }
 
     /* 4. 别认错（形近字 + 易错提示） */
@@ -217,7 +220,16 @@
   /* ---- 入口：单字数据走 data/zika/<字>.js，经 <script> 动态加载（file:// 可用） ---- */
   function main() {
     var m = /[?&]zi=([^&]+)/.exec(location.search);
-    var zi = m ? decodeURIComponent(m[1]) : '';
+    var zi = '';
+    if (m) {
+      try { zi = decodeURIComponent(m[1]); }
+      catch (e) {
+        // 畸形编码（如 ?zi=%E0%A4）会抛 URIError，不能让页面卡在“加载中”
+        document.getElementById('app').innerHTML =
+          '<div class="err">链接里的汉字编码不对，打不开这张字卡。<a href="index.html">回首页选字</a></div>';
+        return;
+      }
+    }
     if (!zi) {
       document.getElementById('app').innerHTML =
         '<div class="err">没有指定汉字，<a href="index.html">回首页选字</a></div>';
