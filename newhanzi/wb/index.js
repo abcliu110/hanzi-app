@@ -75,4 +75,5 @@ window.NHZ_WB_INDEX = {
   "动宾搭配不当": "bj_dongbin",
   "把字句": "gj_bazi",
   "被字句": "gj_beizi",
+  "存现句": "gj_cunxian",
 };
