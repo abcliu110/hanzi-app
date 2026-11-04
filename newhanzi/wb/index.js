@@ -24,4 +24,5 @@ window.NHZ_WB_INDEX = {
   "定语": "dingyu",
   "状语": "zhuangyu",
   "补语": "buyu",
+  "趋向补语引申义": "quxiangbuyu",
 };
