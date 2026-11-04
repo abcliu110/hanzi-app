@@ -346,18 +346,13 @@
     detailEl.style.display = 'block';
     detailEl.innerHTML =
       '<div style="display:flex;gap:10px;margin-bottom:16px">' +
-      '<button class="yw-back" id="ywBack">← 返回列表</button>' +
-      '<button class="yw-back" id="ywHome">🏠 主页</button></div>' +
+      '<button class="yw-back" id="ywBack">← 返回列表</button></div>' +
       '<div class="yw-detail-head"><span class="yw-ico-lg">' + rec.icon + '</span>' +
       '<div><h2>' + esc(it.name || '') + '</h2>' +
       (it['口诀'] ? '<p class="yw-kj-lg">' + esc(it['口诀']) + '</p>' : '') + '</div></div>' +
       '<div class="yw-detail-body" id="ywDetailBody"></div>';
     if (bodyEl) document.getElementById('ywDetailBody').appendChild(bodyEl);
     document.getElementById('ywBack').addEventListener('click', hideDetail);
-    document.getElementById('ywHome').addEventListener('click', function(){
-      if (window.self !== window.top) { window.top.location.href = 'index.html'; }
-      else { window.location.href = 'index.html'; }
-    });
     window.scrollTo(0, 0);
   }
 

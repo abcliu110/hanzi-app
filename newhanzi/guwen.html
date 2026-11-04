@@ -506,18 +506,13 @@ window.NHZReview = window.NHZReview || (function () {
     hideAll(); mdetEl.style.display='block'; window.scrollTo(0,0);
     mdetEl.innerHTML =
       '<div style="display:flex;gap:10px;margin-bottom:16px">' +
-      '<button class="gw-backbtn" style="margin:0" id="gwMBack">← 回列表</button>' +
-      '<button class="gw-backbtn" style="margin:0" id="gwMHome">🏠 主页</button></div>' +
+      '<button class="gw-backbtn" style="margin:0" id="gwMBack">← 回列表</button></div>' +
       '<div class="yw-detail-head"><span class="yw-ico-lg">'+rec.icon+'</span>' +
       '<div><h2>'+esc(it.name || '')+'</h2>' +
       (it['口诀'] ? '<p class="yw-kj-lg">'+esc(it['口诀'])+'</p>' : '') + '</div></div>' +
       '<div class="yw-detail-body" id="gwDetailBody"></div>';
     if(bodyEl) document.getElementById('gwDetailBody').appendChild(bodyEl);
     document.getElementById('gwMBack').addEventListener('click', hideMDetail);
-    document.getElementById('gwMHome').addEventListener('click', function(){
-      if(window.self !== window.top){ window.top.location.href = 'index.html'; }
-      else{ window.location.href = 'index.html'; }
-    });
   }
   function hideMDetail(){
     var bodyEl = document.querySelector('#gwDetailBody .yw-body');
