@@ -181,7 +181,7 @@
 
 ### 7.1 入库与交付
 - 每做完一项（一个语法点）就 commit + push 到 `master`，提交信息写「语法白板：<名称>」，同时更新本文 §11 进度表。
-- 提交前必须：`node tools/wb/check_wb.js <名称>` 0 错误（每幕若干时间点渲染、无报错、无出框）；`node tools/check_scripts.js` 通过；亲眼看总览截图。
+- 提交前必须：`python3 tools/wb/check_wb.py <名称>` 0 错误（每幕若干时间点渲染、无报错、无出框）；`node tools/check_scripts.js` 通过；亲眼看总览截图。
 - 不改写历史、不强推、不新建分支；推送前先 `git pull --rebase`。
 - 不提交截图、`node_modules`、环境文件。
 
@@ -223,7 +223,7 @@
 | `newhanzi/wb/wb-engine.js` | 播放器 + 模板动作，挂 `window.NHZWB` |
 | `newhanzi/wb/index.js` | 语法点名称 → 场景文件（`window.NHZ_WB_INDEX`） |
 | `newhanzi/wb/s/<id>.js` | 每个语法点一份场景数据（`NHZWB.add(名称, {...})`） |
-| `tools/wb/check_wb.js` | Playwright 渲染检查 + 总览截图（截图不入库） |
+| `tools/wb/check_wb.py` | Playwright 渲染检查 + 总览截图（截图不入库） |
 
 ### 11.2 接入
 - 语法详情页（`yuwen.js` `itemHtml`）在「一句话」之前插入「🎬 白板动画」一节；点「▶ 播放」时才按需 `<script>` 注入 rough.js、引擎和该点场景（与题库同法，`file://` 可用）。

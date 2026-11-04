@@ -23,6 +23,21 @@
      <script> 注入在 file:// 下同样可用。 */
   var bankIndex = window.NHZ_GRAMMAR_BANK_INDEX || {};
   var bankLoading = {};
+  /* 按顺序注入 <script>（file:// 可用），已加载的跳过 */
+  var loadedJs = {};
+  function loadScripts(list, cb) {
+    var i = 0;
+    (function next(ok) {
+      if (!ok) return cb(false);
+      if (i >= list.length) return cb(true);
+      var src = list[i++];
+      if (loadedJs[src]) return next(true);
+      var sc = document.createElement('script'); sc.src = src;
+      sc.onload = function () { loadedJs[src] = 1; next(true); };
+      sc.onerror = function () { next(false); };
+      document.body.appendChild(sc);
+    })(true);
+  }
   function hasBank(name) {
     return !!((bankData[name] && bankData[name].questions && bankData[name].questions.length) || bankIndex[name]);
   }
@@ -246,6 +261,12 @@
       '辨析': { analogy: '💡 啊哈现象', rule: '辨析对照', ex: '分水岭例句', bad: '天坑病例' },
       '程序': { analogy: '💡 啊哈现象', rule: '一句话', ex: '全程演示', bad: '易错诊所' }
     }[tp];
+    /* 0. 白板动画（规范 docs/anim/baiban-yufa-guifan.md）：点播放时才加载 rough.js / 引擎 / 本点场景 */
+    var wbIdx = window.NHZ_WB_INDEX || {};
+    if (wbIdx[it.name]) {
+      body += stepHead('🎬 白板动画', '先看再学') +
+        '<div class="yw-wb" data-wb="' + esc(it.name) + '"><button type="button" class="back yw-wb-start" data-wb-start="1">▶ 播放白板动画</button></div>';
+    }
     /* 4. 规则/对照/步骤 */
     if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
       body += stepHead(T.rule);
@@ -495,6 +516,20 @@
       return;
     }
 
+    /* 白板动画：按需加载脚本后挂载 */
+    var wbs = e.target.closest('[data-wb-start]');
+    if (wbs) {
+      e.stopPropagation();
+      var wbox = wbs.closest('[data-wb]'), wname = wbox.getAttribute('data-wb');
+      wbs.disabled = true; wbs.textContent = '加载中…';
+      var wfile = (window.NHZ_WB_INDEX || {})[wname];
+      loadScripts(['wb/rough.js', 'wb/wb-engine.js', 'wb/s/' + wfile + '.js'], function (ok) {
+        if (!ok || !window.NHZWB || !window.NHZWB.has(wname)) { wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
+        var p = window.NHZWB.mount(wbox, wname);
+        if (p) p.play();
+      });
+      return;
+    }
     /* 动画播放器 */
     var ab = e.target.closest('[data-aid]');
     if (ab) {
