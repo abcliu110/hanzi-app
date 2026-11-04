@@ -825,6 +825,10 @@ function vKnow(){
     cards.forEach(function(k){
       var tp = knowType(k.m, k.t);
       h += '<div class="sc-know"><div class="sc-typetag" style="--tc:'+SC_TYPE_COLOR[tp]+'">'+SC_TYPE_LABEL[tp]+'</div><h3>'+esc(k.t)+'</h3>';
+      /* 学前先看：仅当有真实前置时显示 */
+      if(k['前置知识'] && k['前置知识'].length){
+        h += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+k['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
+      }
       var svg = knowSVG(k.g);
       if(svg) h += '<div class="sc-svg">'+svg+'</div>';
       var dHtml = escD(k.d);
