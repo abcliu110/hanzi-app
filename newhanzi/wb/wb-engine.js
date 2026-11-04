@@ -20,14 +20,29 @@
   'use strict';
   var NS = 'http://www.w3.org/2000/svg';
   var W = 1200, H = 560;
-  var INK = '#2c3328', GRAY = '#a3aa9c', ACC = '#c46a2b', OK = '#3f8e6b', BAD = '#b85a52', BLUE = '#4a7a8c', LINE = '#d5dfd0';
+  /* E0 色板 PAL：全部颜色只在这里定义，场景只写语义键（设计 §3.3）。
+   * 分层（check_wb.py --lint R5 按此注释里的层名做跨层 ΔE≥20 检查，名词▲与正文墨写死豁免）：
+   *   层 cls（词类）：noun adj pron verb adv prep conj interj tagc
+   *   层 role（成分）：role
+   *   层 judge（对错）：ok bad
+   *   层 story（叙事）：ink gray acc cmp */
+  var PAL = {
+    ink: '#2c3328', gray: '#a3aa9c', acc: '#c46a2b', cmp: '#4a7a8c', line: '#d5dfd0',
+    ok: '#3f8e6b', bad: '#b85a52',
+    role: '#4f5d7a',
+    noun: '#26221c', adj: '#274b8f', pron: '#7b4ba8', verb: '#c22f2f', adv: '#e07b24', prep: '#3d8a4f',
+    conj: '#d96a9b', interj: '#c9a227', tagc: '#6b7566'
+  };
+  var INK = PAL.ink, GRAY = PAL.gray, ACC = PAL.acc, OK = PAL.ok, BAD = PAL.bad, BLUE = PAL.cmp, LINE = PAL.line, ROLE = PAL.role;
   var FONT = '"LXGW WenKai","Kaiti SC","STKaiti","KaiTi","Noto Serif CJK SC","Songti SC",serif';
   var SYM = {
-    noun: ['名词', '#26221c', 'tri'], adj: ['形容词', '#274b8f', 'tri'], pron: ['代词', '#7b4ba8', 'tri'],
-    verb: ['动词', '#c22f2f', 'circle'], adv: ['副词', '#e07b24', 'circle-sm'], prep: ['介词', '#3d8a4f', 'crescent'],
-    conj: ['连词', '#d96a9b', 'bar'], interj: ['叹词', '#c9a227', 'excl'],
-    num: ['数词', '#6b7566', 'tag'], quant: ['量词', '#6b7566', 'tag'], aux: ['助词', '#6b7566', 'tag'], part: ['语气词', '#6b7566', 'tag']
+    noun: ['名词', PAL.noun, 'tri'], adj: ['形容词', PAL.adj, 'tri'], pron: ['代词', PAL.pron, 'tri'],
+    verb: ['动词', PAL.verb, 'circle'], adv: ['副词', PAL.adv, 'circle-sm'], prep: ['介词', PAL.prep, 'crescent'],
+    conj: ['连词', PAL.conj, 'bar'], interj: ['叹词', PAL.interj, 'excl'],
+    num: ['数词', PAL.tagc, 'tag'], quant: ['量词', PAL.tagc, 'tag'], aux: ['助词', PAL.tagc, 'tag'], part: ['语气词', PAL.tagc, 'tag']
   };
+  /* E10 语义色键 → 色值。兼容期：旧场景的 '#rrggbb' 原样通过（--lint 报 R1 警告）。 */
+  function C(v, dflt) { if (!v) return dflt; if (String(v).charAt(0) === '#') return v; return PAL[v] || dflt; }
   var REG = {};
   var CPS = 3.5;          /* 旁白每秒字数（三四年级慢速档） */
   var THINK = 4;          /* 先猜停顿秒数 */
@@ -38,6 +53,18 @@
   function P(t, t0, d) { return cl((t - t0) / (d || 1e-6)); }
   function len(s) { return String(s || '').replace(/[，。、；：！？“”‘’（）《》…—\s,.!?;:()]/g, '').length; }
   function sayDur(s) { return s ? len(s) / CPS + 0.6 : 0; }
+  /* E14 术语占位：{t:键} 按幕的 lv 替换（L1「谁（主语）」，L2「主语（谁）」，L3「主语」）；
+   * {t:键|term} 只要术语，{t:键|kid} 只要儿童名，{t:键|short} 术语简称（主），{t:键|ks} 儿童简称（谁）。
+   * 术语表在 wb/terms.js（window.NHZWB_TERMS）；没有占位符的旧文本原样返回。 */
+  function term(s, lv) {
+    if (typeof s !== 'string' || s.indexOf('{t:') < 0) return s;
+    var TT = window.NHZWB_TERMS || {};
+    return s.replace(/\{t:([a-z]+)(?:\|(term|kid|short|ks))?\}/g, function (m0, k, f) {
+      var e = TT[k]; if (!e) return m0;
+      if (f === 'term') return e.t; if (f === 'kid') return e.kid; if (f === 'short') return e.s || e.t; if (f === 'ks') return e.k || e.kid;
+      return lv >= 3 ? e.t : lv === 2 ? e.t + '（' + e.kid + '）' : e.kid + '（' + e.t + '）';
+    });
+  }
   function textW(s, size) { var w = 0; String(s).split('').forEach(function (c) { w += /[\x00-\xff]/.test(c) ? size * .55 : size; }); return w; }
 
   /* ---------- 绘制上下文（每幕重建一次 DOM，之后只按 t 改属性） ---------- */
@@ -73,7 +100,7 @@
   };
   /* 手写字：从左到右揭开 */
   Ctx.prototype.T = function (x, y, s, o, t0, d) {
-    o = o || {}; t0 = t0 || 0;
+    o = o || {}; t0 = t0 || 0; s = term(s, this.lv);
     var size = o.size || 34, anchor = o.anchor || 'middle', w = textW(s, size);
     var g = this.E('g', {});
     var tx = this.E('text', { x: x, y: y, 'font-size': size, fill: o.color || INK, 'text-anchor': anchor, 'font-family': FONT, 'font-weight': o.bold ? 700 : 400 }, g);
@@ -87,9 +114,56 @@
     g.tx = tx; g.w = w; g.x0 = x0; g.x1 = x0 + w; g.cx = x0 + w / 2; g.y = y; g.size = size; g.base = o.color || INK;
     return g;
   };
-  Ctx.prototype.fade = function (g, t0, d, out) { this.add(function (t) { var q = P(t, t0, d || .5); g.style.opacity = out ? 1 - q : q; }); };
+  /* E1 属性时间线：每个元素每个属性只有一个求值器（在第一次写关键帧时注册），
+   * 取 t 之前最后一个关键帧并插值；多次 recolor / fade / move 不再互相覆盖（修设计 §2.4）。
+   * 关键帧 {t, v, d, from, arc}：从 from（缺省为上一帧终值或初值）到 v，用时 d（0 为瞬变）；arc 为弧线抬高像素（只对 transform）。
+   * prop：fill（属性）、opacity（样式）、display（样式，v 为真显示）、transform（v=[dx,dy]，可叠加 shake）。 */
+  function tlEval(tr, t) {
+    var k = tr.k, n = 0, i;
+    while (n < k.length && k[n].t <= t) n++;
+    if (n === 0) return k.length && k[0].from !== undefined ? k[0].from : tr.init;
+    var f = k[n - 1], prev = tr.init;
+    for (i = 0; i < n - 1; i++) prev = k[i].v;
+    var a = f.from !== undefined ? f.from : prev;
+    if (!f.d || typeof f.v === 'string' || typeof f.v === 'boolean') return f.v;
+    var q = P(t, f.t, f.d);
+    if (f.ease) q = ease(q);
+    if (typeof f.v === 'number') return a + (f.v - a) * q;
+    var v = [a[0] + (f.v[0] - a[0]) * q, a[1] + (f.v[1] - a[1]) * q];
+    if (f.arc) v[1] -= f.arc * Math.sin(Math.PI * q);
+    return v;
+  }
+  function tlApply(el, prop, v, tr, t) {
+    if (prop === 'fill') el.setAttribute('fill', v);
+    else if (prop === 'opacity') el.style.opacity = v;
+    else if (prop === 'display') el.style.display = v ? '' : 'none';
+    else if (prop === 'transform') {
+      var dx = v[0], dy = v[1];
+      (tr.sh || []).forEach(function (h) { if (t >= h.t && t < h.t + h.d) { var q = (t - h.t) / h.d; dx += h.A * Math.sin(2 * Math.PI * h.f * (t - h.t)) * (1 - q); } });
+      el.setAttribute('transform', 'translate(' + Math.round(dx * 100) / 100 + ',' + Math.round(dy * 100) / 100 + ')');
+    }
+  }
+  Ctx.prototype.track = function (el, prop, init) {
+    el._tl = el._tl || {};
+    var tr = el._tl[prop];
+    if (!tr) {
+      tr = el._tl[prop] = { k: [], init: init !== undefined ? init : (prop === 'transform' ? [0, 0] : prop === 'opacity' ? 1 : prop === 'display' ? true : el.getAttribute('fill')) };
+      this.add(function (t) { tlApply(el, prop, tlEval(tr, t), tr, t); });
+    }
+    return tr;
+  };
+  Ctx.prototype.key = function (el, prop, t0, v, o) {
+    o = o || {}; var tr = this.track(el, prop, o.init);
+    var kf = { t: t0, v: v, d: o.d || 0, from: o.from, arc: o.arc, ease: o.ease }, j = tr.k.length;
+    while (j > 0 && tr.k[j - 1].t > t0) j--;
+    tr.k.splice(j, 0, kf);
+    return el;
+  };
+  /* 构建时读某元素某属性在 t 的值（排版接力用） */
+  Ctx.prototype.at = function (el, prop, t) { var tr = el._tl && el._tl[prop]; return tr ? tlEval(tr, t) : (prop === 'transform' ? [0, 0] : prop === 'opacity' ? 1 : null); };
+  Ctx.prototype.fade = function (g, t0, d, out) { return this.key(g, 'opacity', t0, out ? 0 : 1, { d: d || .5, from: out ? 1 : 0 }); };
   Ctx.prototype.show = function (g, a, b) { this.add(function (t) { g.style.display = (t >= a && (b === undefined || t < b)) ? '' : 'none'; }); };
-  Ctx.prototype.recolor = function (g, t0, col) { var self = this; this.add(function (t) { g.tx.setAttribute('fill', t >= t0 ? col : g.base); }); };
+  Ctx.prototype.recolor = function (g, t0, col) { return this.key(g.tx, 'fill', t0, C(col, col), { init: g.base }); };
   Ctx.prototype.slide = function (g, x0, y0, x1, y1, t0, d) {
     this.add(function (t) { var q = ease(P(t, t0, d || .9)); g.setAttribute('transform', 'translate(' + (x0 + (x1 - x0) * q) + ',' + (y0 + (y1 - y0) * q) + ')'); g.style.display = t < t0 ? 'none' : ''; });
   };
@@ -100,6 +174,87 @@
   Ctx.prototype.under = function (x1, x2, y, t0, col) { return this.R('line', [x1, y, x2, y], { stroke: col || ACC, strokeWidth: 4 }, t0, .4); };
   Ctx.prototype.ring = function (x, y, w, h, t0, col) { return this.R('ellipse', [x, y, w, h], { stroke: col || BAD, strokeWidth: 3.5 }, t0, .6); };
   Ctx.prototype.box = function (x, y, w, h, t0, o) { return this.R('rectangle', [x, y, w, h], o || {}, t0, .6); };
+  /* ---------- 第 1 期新增原语（设计 §7.1 E2–E13）：只被新模板 / 新的可选参数调用，旧路径不变 ---------- */
+  /* E2 move：关键帧位移，不在 t0 前隐藏（区别于 slide）。kf：[{t, x, y, d, arc}]，x/y 为相对初始位置的偏移 */
+  Ctx.prototype.move = function (g, kfs) { var s = this; [].concat(kfs).forEach(function (k) { s.key(g, 'transform', k.t, [k.x || 0, k.y || 0], { d: k.d === undefined ? .8 : k.d, arc: k.arc, ease: 1 }); }); return g; };
+  /* E12 shake：确定性摇晃 dx = A·sin(2π·f·(t−t0))·(1−q) */
+  Ctx.prototype.shake = function (g, t0, d, A, f) { var tr = this.track(g, 'transform'); tr.sh = (tr.sh || []).concat([{ t: t0, d: d || .8, A: A || 10, f: f || 4 }]); return g; };
+  /* E11 sink：下沉并淡出；strike：删除线（保留可读） */
+  Ctx.prototype.sink = function (g, t0, d) { var p = this.at(g, 'transform', t0); this.key(g, 'transform', t0, [p[0], p[1] + 46], { d: d || .8, ease: 1 }); this.key(g, 'opacity', t0, 0, { d: d || .8, from: 1 }); return g; };
+  Ctx.prototype.strike = function (x0, x1, y, t0) { return this.R('line', [x0 - 4, y, x1 + 4, y], { stroke: GRAY, strokeWidth: 3.5, roughness: .6 }, t0, .4); };
+  /* 在指定组里画（括号类成分线挂在词块上随块移动） */
+  Ctx.prototype.into = function (g, fn) { var o = this.cur; this.cur = g; try { return fn(); } finally { this.cur = o; } };
+  /* E2 chunk：把若干已画的组绑成一个可移动单元 */
+  Ctx.prototype.chunk = function (gs) { var g = this.E('g', {}); gs.forEach(function (x) { g.appendChild(x); }); return g; };
+  /* E2 lay：构建时排版（不调用 getBBox）。ws：每块宽，返回每块 x0 */
+  function lay(ws, gap, cx) { var tot = ws.reduce(function (a, b) { return a + b; }, 0) + gap * Math.max(0, ws.length - 1), x = cx - tot / 2, out = []; ws.forEach(function (w) { out.push(x); x += w + gap; }); return out; }
+  /* E7 成分线 role(kind)：主 ═ 谓 ＿ 宾 ～ 定（）状〔〕补〈〉 主谓界 ‖；颜色固定成分墨。size 为字号，y 为基线 */
+  Ctx.prototype.role = function (kind, x0, x1, y, t0, o) {
+    o = o || {}; var s = this, size = o.size || 44, yl = y + 16, op = { stroke: ROLE, strokeWidth: 3, roughness: .6, bowing: .5 };
+    var top = y - size * .92, bot = y + size * .22, mid = (top + bot) / 2;
+    return this.G(function () {
+      if (kind === 'zhu') { s.R('line', [x0, yl, x1, yl], op, t0, .35); s.R('line', [x0, yl + 7, x1, yl + 7], op, t0 + .2, .35); }
+      else if (kind === 'wei') s.R('line', [x0, yl + 3, x1, yl + 3], op, t0, .4);
+      else if (kind === 'bin') {
+        var wl = size * .5, n = Math.max(2, Math.round((x1 - x0) / wl)), st = (x1 - x0) / n, d = 'M' + x0 + ' ' + (yl + 4);
+        for (var i = 0; i < n; i++) d += ' q' + (st / 4) + ' -6 ' + (st / 2) + ' 0 t' + (st / 2) + ' 0';
+        s.R('path', [d], op, t0, .5);
+      } else if (kind === 'ding') {
+        s.R('path', ['M' + (x0 - 3) + ' ' + top + ' Q' + (x0 - 15) + ' ' + mid + ' ' + (x0 - 3) + ' ' + bot], op, t0, .25);
+        s.R('path', ['M' + (x1 + 3) + ' ' + top + ' Q' + (x1 + 15) + ' ' + mid + ' ' + (x1 + 3) + ' ' + bot], op, t0 + .25, .25);
+      } else if (kind === 'zhuang') {
+        s.R('linearPath', [[[x0 - 3, top], [x0 - 12, top + 9], [x0 - 12, bot - 9], [x0 - 3, bot]]], op, t0, .25);
+        s.R('linearPath', [[[x1 + 3, top], [x1 + 12, top + 9], [x1 + 12, bot - 9], [x1 + 3, bot]]], op, t0 + .25, .25);
+      } else if (kind === 'bu') {
+        s.R('linearPath', [[[x0 - 3, top], [x0 - 14, mid], [x0 - 3, bot]]], op, t0, .25);
+        s.R('linearPath', [[[x1 + 3, top], [x1 + 14, mid], [x1 + 3, bot]]], op, t0 + .25, .25);
+      } else if (kind === 'bar') {
+        s.R('line', [x0 - 3, top - 4, x0 - 3, bot + 6], op, t0, .2); s.R('line', [x0 + 3, top - 4, x0 + 3, bot + 6], op, t0 + .15, .2);
+      }
+    });
+  };
+  /* 虚线框（不走 rough 画出动画，用淡入）：gap / guard / tag 共用 */
+  Ctx.prototype.dash = function (x, y, w, h, t0, col, o) {
+    o = o || {}; var g = this.E('g', {});
+    this.E('rect', { x: x, y: y, width: w, height: h, rx: o.rx === undefined ? 10 : o.rx, fill: 'none', stroke: col, 'stroke-width': o.sw || 2.5, 'stroke-dasharray': o.dash || '8 6' }, g);
+    this.key(g, 'opacity', t0, 1, { d: .4, from: 0 });
+    if (o.until !== undefined) this.key(g, 'opacity', o.until, 0, { d: .4 });
+    return g;
+  };
+  /* E3 gap：虚线空位框，可带 ∅ 与下标字母；until 时收起 */
+  Ctx.prototype.gap = function (cx, y, w, t0, o) {
+    o = o || {}; var size = o.size || 44, g = this.dash(cx - w / 2, y - size * 1.02, w, size * 1.3, t0, GRAY, { until: o.until }), s = this;
+    if (o.phi || o.sub) this.into(g, function () { var tx = s.E('text', { x: cx, y: y - 4, 'text-anchor': 'middle', 'font-size': size * .7, fill: GRAY, 'font-family': FONT }); tx.textContent = (o.phi ? '∅' : '') + (o.sub || ''); });
+    return g;
+  };
+  /* E4 hub：枢纽圈（强调色实线椭圆，不带 ✗）；guard：保护标签（强调色虚线框 +「不能剪」） */
+  Ctx.prototype.hub = function (cx, cy, w, h, t0) { return this.R('ellipse', [cx, cy, w, h], { stroke: ACC, strokeWidth: 3 }, t0, .6); };
+  Ctx.prototype.guard = function (x0, x1, y, t0, o) {
+    o = o || {}; var size = o.size || 44, g = this.dash(x0 - 10, y - size * 1.05, x1 - x0 + 20, size * 1.4, t0, ACC, { sw: 2.5 }), s = this;
+    this.into(g, function () { var tx = s.E('text', { x: (x0 + x1) / 2, y: y - size * 1.05 - 10, 'text-anchor': 'middle', 'font-size': 22, fill: ACC, 'font-family': FONT }); tx.textContent = o.label || '不能剪'; });
+    return g;
+  };
+  /* E8 tag：语义角色文字标签（叙事墨小字 + 虚线小框），画在词块上方第 2 行 */
+  Ctx.prototype.tag = function (cx, y, s0, t0) {
+    var s = term(s0, this.lv), w = textW(s, 22) + 18, g = this.dash(cx - w / 2, y - 24, w, 34, t0, INK, { sw: 1.6, dash: '5 4', rx: 6 }), self = this;
+    this.into(g, function () { var tx = self.E('text', { x: cx, y: y, 'text-anchor': 'middle', 'font-size': 22, fill: INK, 'font-family': FONT }); tx.textContent = s; });
+    return g;
+  };
+  /* E6 stair：台阶线一行。cuts 为切分处 x，label 居中写结构名 */
+  Ctx.prototype.stair = function (x0, x1, y, cuts, label, t0) {
+    var s = this; return this.G(function () {
+      s.R('line', [x0, y, x1, y], { stroke: ROLE, strokeWidth: 2.6, roughness: .5 }, t0, .4);
+      (cuts || []).forEach(function (x, i) { s.R('line', [x, y - 12, x, y + 12], { stroke: ROLE, strokeWidth: 2.6, roughness: .4 }, t0 + .4 + i * .1, .15); });
+      if (label) s.T((x0 + x1) / 2, y + 34, label, { size: 26, color: ROLE }, t0 + .5, .4);
+    });
+  };
+  /* E13 pic：情境卡（文字；线条图标待 Q22）；state2：前后两格状态图 */
+  Ctx.prototype.pic = function (cx, cy, w, h, s, t0, o) {
+    o = o || {}; var self = this; return this.G(function () { self.R('rectangle', [cx - w / 2, cy - h / 2, w, h], { stroke: o.color || INK, strokeWidth: 2 }, t0, .5); wrap(self, s, cx, cy + 8, w - 24, o.size || 26, o.color || INK, t0 + .3); });
+  };
+  Ctx.prototype.state2 = function (cx, cy, a, b, t0) {
+    var self = this, w = 260, h = 90; return this.G(function () { self.pic(cx - 190, cy, w, h, a, t0); self.arrow(cx - 50, cy, cx + 50, cy, 0, t0 + .8, INK); self.pic(cx + 190, cy, w, h, b, t0 + 1.4); });
+  };
   /* 弧形箭头 */
   Ctx.prototype.arrow = function (x1, y1, x2, y2, bend, t0, col) {
     var s = this, mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - (bend || 0);
@@ -157,7 +312,7 @@
   function Seq(cx, t0) { this.c = cx; this.t = t0 || .3; this.cues = []; }
   /* say：旁白；draw(t0) 返回画的时长；ask：先停 THINK 秒（字幕显示 “想一想……”） */
   Seq.prototype.beat = function (say, draw, opt) {
-    opt = opt || {};
+    opt = opt || {}; say = term(say, this.c.lv);
     if (opt.ask) { this.cues.push([this.t, opt.ask === true ? '想一想……' : opt.ask + '想一想……']); this.c.think(this.t); this.t += THINK; }
     if (say) this.cues.push([this.t, say]);
     var dd = draw ? (draw(this.t) || 0) : 0;
@@ -207,7 +362,7 @@
   };
   /* 自动折行文字（按宽度） */
   function wrap(c, s, cx, y, maxw, size, col, t0) {
-    var lines = [], cur = '';
+    var lines = [], cur = ''; s = term(s, c.lv);
     String(s).split('').forEach(function (ch) { if (textW(cur + ch, size) > maxw && cur) { lines.push(cur); cur = ch; } else cur += ch; });
     if (cur) lines.push(cur);
     lines.forEach(function (ln, i) { c.T(cx, y + i * size * 1.3, ln, { size: size, color: col }, t0 + i * .4, .5); });
@@ -245,16 +400,20 @@
   TPL.mark = function (c, q, d) {
     if (d.h) heading(c, q, d.h, d.sub);
     var y = d.y || 300, toks;
-    q.beat(d.say || d.s.join(''), function (t) { toks = c.sentence(y, d.s, t, { size: d.size || 46 }); return d.s.length * .3 + .4; });
+    q.beat(d.say || d.s.join(''), function (t) { toks = c.sentence(y, d.s, t, d.gap === undefined ? { size: d.size || 46 } : { size: d.size || 46, gap: d.gap }); return d.s.length * .3 + .4; });
     (d.m || []).forEach(function (m, k) {
       q.beat(m.say, function (t) {
         var idx = [].concat(m.i), a = toks[idx[0]], b = toks[idx[idx.length - 1]], cx = (a.x0 + b.x1) / 2;
         if (m.sym) c.sym(m.sym, cx, y - 58, m.small ? 9 : 13, t);
-        if (m.u) c.under(a.x0 - 4, b.x1 + 4, y + 16, t, m.col);
-        if (m.ring) c.ring(cx, y - 14, b.x1 - a.x0 + 40, 76, t, m.col || ACC);
-        if (m.col) idx.forEach(function (j) { c.recolor(toks[j].g, t, m.col); });
-        if (m.note) c.T(cx, y + (m.u ? 62 : 58) + (m.row || 0) * 34, m.note, { size: 24, color: m.col || ACC }, t + .4, .6);
-        if (m.up) c.T(cx, y - (m.sym ? 100 : 70), m.up, { size: 24, color: m.col || ACC }, t + .3, .6);
+        var mc = C(m.col);
+        if (m.u) c.under(a.x0 - 4, b.x1 + 4, y + 16, t, mc);
+        if (m.role) c.role(m.role, a.x0, b.x1, y, t, { size: d.size || 46 });
+        if (m.hub) c.hub(cx, y - 14, b.x1 - a.x0 + 40, 76, t);
+        if (m.ring) c.ring(cx, y - 14, b.x1 - a.x0 + 40, 76, t, mc || ACC);
+        if (m.col) idx.forEach(function (j) { c.recolor(toks[j].g, t, mc); });
+        if (m.tag) c.tag(cx, y - (m.sym ? 120 : 76), m.tag, t + .2);
+        if (m.note) c.T(cx, y + (m.u || m.role ? 62 : 58) + (m.row || 0) * 34, m.note, { size: 24, color: m.role && !m.col ? ROLE : mc || ACC }, t + .4, .6);
+        if (m.up) c.T(cx, y - (m.sym ? 100 : 70), m.up, { size: 24, color: mc || ACC }, t + .3, .6);
         return .9;
       }, { ask: k === 0 && d.ask ? d.ask : false });
     });
@@ -262,8 +421,8 @@
     (d.arrows || []).forEach(function (a) {
       q.beat(a.say, function (t) {
         var A = toks[a.f], B = toks[a.t];
-        c.arrow(A.cx, y - 50, B.cx, y - 50, a.bend || 70, t, a.col);
-        if (a.note) c.T((A.cx + B.cx) / 2, y - 50 - (a.bend || 70) / 2 - 18, a.note, { size: 24, color: a.col || ACC }, t + .6, .6);
+        c.arrow(A.cx, y - 50, B.cx, y - 50, a.bend || 70, t, C(a.col));
+        if (a.note) c.T((A.cx + B.cx) / 2, y - 50 - (a.bend || 70) / 2 - 18, a.note, { size: 24, color: C(a.col, ACC) }, t + .6, .6);
         return 1;
       });
     });
@@ -446,9 +605,51 @@
     if (d.tip) q.beat(d.tip, function (t) { wrap(c, d.tip, W / 2, 380, W - 160, 30, INK, t); return 1.6; });
   };
 
+  /* review（E15，回练幕纯观看版，设计 §5.5）：
+   * {task:'题目', answer:'同学的答案', ok:false, diff:{miss:'丢的片段'} | {extra:'多的片段'} | {bad:'错的片段'},
+   *  good:'正确答案', rule:'一句话规则', why:'可选：错在哪的旁白', ask:'可选'}
+   * 出题 → 同学的答案卡 → 想一想「改对了吗？」→ ✓/✗ → 错色圈出问题处 → 写出正确答案 → 规则 */
+  TPL.review = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var y0 = d.h ? 170 : 120, ya = y0 + 120, yg = ya + 140, size = 40, ga, gg;
+    q.beat(d.taskSay || ('题目：' + d.task + '。'), function (t) { c.T(70, y0, '题目', { size: 26, color: GRAY, anchor: 'start' }, t, .3); wrap(c, d.task, W / 2 + 30, y0, W - 260, 32, INK, t + .3); return 1.6; });
+    q.beat(d.ansSay || ('一位同学这样写：' + d.answer + '。'), function (t) {
+      var w = Math.min(W - 160, textW(d.answer, size) + 80);
+      c.box(W / 2 - w / 2, ya - 52, w, 76, t, { stroke: GRAY, strokeWidth: 2 });
+      c.T(W / 2 - w / 2 + 6, ya - 62, '同学的答案', { size: 22, color: GRAY, anchor: 'start' }, t + .2, .4);
+      ga = c.T(W / 2, ya, d.answer, { size: size }, t + .5, 1.2); return 1.8;
+    });
+    q.beat(d.ok ? (d.verdict || '改对了。') : (d.verdict || '没改对。'), function (t) {
+      if (d.ok) c.check(ga.x1 + 70, ya - 14, t); else c.cross(ga.x1 + 70, ya - 14, t); return .8;
+    }, { ask: d.ask || '这位同学改对了吗？' });
+    if (!d.ok) {
+      var df = d.diff || {};
+      q.beat(d.why || (df.miss ? '丢了“' + df.miss + '”。' : df.extra ? '多了“' + df.extra + '”。' : df.bad ? '“' + df.bad + '”用错了。' : '这里不对。'), function (t) {
+        if (df.extra || df.bad) {
+          var seg = df.extra || df.bad, i = d.answer.indexOf(seg);
+          if (i >= 0) c.ring(ga.x0 + textW(d.answer.slice(0, i), size) + textW(seg, size) / 2, ya - 14, textW(seg, size) + 36, 70, t, BAD);
+        } else if (df.miss) {
+          var j = d.good.indexOf(df.miss), x = ga.x0 + textW(d.good.slice(0, Math.max(0, j)), size);
+          c.R('linearPath', [[[x - 12, ya + 22], [x, ya + 6], [x + 12, ya + 22]]], { stroke: BAD, strokeWidth: 4 }, t, .3);
+          c.T(x, ya + 56, df.miss + '？', { size: 26, color: BAD }, t + .3, .5);
+        }
+        return 1.2;
+      });
+    }
+    if (d.good && !d.ok) q.beat(d.goodSay || ('应该是：' + d.good + '。'), function (t) {
+      gg = c.T(W / 2, yg, d.good, { size: size }, t, 1.3);
+      var seg = (d.diff || {}).miss || d.fixed;
+      if (seg) { var i = d.good.indexOf(seg); if (i >= 0) c.under(gg.x0 + textW(d.good.slice(0, i), size) - 2, gg.x0 + textW(d.good.slice(0, i + seg.length), size) + 2, yg + 14, t + 1.3); }
+      c.check(gg.x1 + 70, yg - 14, t + 1.5); return 2.1;
+    });
+    if (d.rule) q.beat(d.rule, function (t) { c.T(W / 2, 520, d.rule, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
+  /* E9：种子 = 20261104 + 原始序号 × 1000（原始序号 = 该幕在 scenes 数组里的位置，与档位过滤无关） */
   function buildScene(svg, sc, idx) {
     var c = new Ctx(svg, 20261104 + idx * 1000), q = new Seq(c, .3);
+    c.lv = sc.lv || 1;
     if (!TPL[sc.k]) throw new Error('未知模板 ' + sc.k);
     TPL[sc.k](c, q, sc);
     return { c: c, cues: q.cues, dur: q.t + .8 };
@@ -551,6 +752,6 @@
     has: function (name) { return !!REG[name]; },
     mount: function (el, name) { css(); return mount(el, name); },
     names: function () { return Object.keys(REG); },
-    SYM: SYM, W: W, H: H
+    SYM: SYM, W: W, H: H, PAL: PAL, term: term, TPL: TPL
   };
 })();
