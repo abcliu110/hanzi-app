@@ -12,4 +12,5 @@ window.NHZ_WB_INDEX = {
   "助词": "zhuci",
   "语气词": "yuqici",
   "叹词": "tanci",
+  "离合词": "liheci",
 };
