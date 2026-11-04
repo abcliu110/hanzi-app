@@ -177,34 +177,57 @@ const AnimEngine = (function() {
   }
 
   /**
-   * 原语5：显现序列 (sequence)
-   * 用于：5种补语、9种"之"用法、13组关联词
-   * 数据：{items: [{title, color, text}], summary}
+   * 原语5：显现序列 (sequence) v2 - 增强版（2026-11-04）
+   * 用于：诗词/古文/部首知识卡、补语、"之"用法、关联词
+   * 数据：{items: [{title, color, text, wrong}], summary}
+   * - title 16px加粗；wrong 可选，显示 ✗ 红色错误对比
+   * - 要点间虚线连接线，显示逻辑流；序号圆点；总结卡片化
    */
   function sequence(data) {
     const {items, summary} = data;
-    const h = 60 + items.length * 60;
+    const h = 70 + items.length * 70;
     let svg = `<svg viewBox="0 0 640 ${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
-    
+
+    // 连接线（虚线，显示逻辑流）
+    if (items.length > 1) {
+      const lineTop = 55;
+      const lineBottom = 40 + (items.length - 1) * 70 + 25;
+      svg += `<line x1="32" y1="${lineTop}" x2="32" y2="${lineBottom}" stroke="${C.muted}" stroke-width="2" stroke-dasharray="6,4" opacity="0">`;
+      svg += `<animate attributeName="opacity" values="0;0.5" dur="0.5s" begin="0.4s" fill="freeze"/></line>`;
+    }
+
     items.forEach((item, i) => {
-      const y = 40 + i * 60;
-      const t = 0.5 + i * 0.7;
+      const y = 50 + i * 70;
+      const t = 0.6 + i * 0.8;
       const color = item.color || [C.green, C.blue, C.yellow, C.red][i % 4];
-      
-      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.3s" begin="${t}s" fill="freeze"/>`;
-      svg += `<rect x="20" y="${y-25}" width="600" height="50" rx="8" fill="${color}22" stroke="${color}" stroke-width="1"/>`;
-      svg += `<text x="40" y="${y-5}" text-anchor="start" font-size="14" fill="${color}" font-weight="bold">${esc(item.title)}</text>`;
-      svg += `<text x="40" y="${y+18}" text-anchor="start" font-size="13" fill="${C.ink}">${esc(item.text)}</text>`;
+
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.4s" begin="${t}s" fill="freeze"/>`;
+      // 序号圆点
+      svg += `<circle cx="32" cy="${y}" r="12" fill="${color}"/>`;
+      svg += `<text x="32" y="${y+5}" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">${i+1}</text>`;
+      // 卡片
+      const cardH = item.wrong ? 58 : 50;
+      svg += `<rect x="52" y="${y-28}" width="568" height="${cardH}" rx="10" fill="${color}14" stroke="${color}" stroke-width="1.5"/>`;
+      // 标题（16px加粗）
+      svg += `<text x="70" y="${y-4}" text-anchor="start" font-size="16" fill="${color}" font-weight="bold">${esc(item.title)}</text>`;
+      // 正文
+      svg += `<text x="70" y="${y+18}" text-anchor="start" font-size="13" fill="${C.ink}">${esc(item.text)}</text>`;
+      // 错误对比
+      if (item.wrong) {
+        svg += `<text x="70" y="${y+36}" text-anchor="start" font-size="12" fill="${C.red}">✗ ${esc(item.wrong)}</text>`;
+      }
       svg += `</g>`;
     });
-    
+
     if (summary) {
-      const y = 40 + items.length * 60;
-      const t = 0.5 + items.length * 0.7;
-      svg += `<text x="320" y="${y}" text-anchor="middle" font-size="14" fill="${C.ink}" opacity="0">${esc(summary)}`;
-      svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="${t}s" fill="freeze"/></text>`;
+      const y = 50 + items.length * 70;
+      const t = 0.6 + items.length * 0.8;
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.5s" begin="${t}s" fill="freeze"/>`;
+      svg += `<rect x="52" y="${y-22}" width="568" height="36" rx="8" fill="${C.ink}0d" stroke="${C.ink}" stroke-width="1" stroke-dasharray="5,3"/>`;
+      svg += `<text x="320" y="${y+2}" text-anchor="middle" font-size="14" fill="${C.ink}" font-weight="bold">💡 ${esc(summary)}</text>`;
+      svg += `</g>`;
     }
-    
+
     svg += `</svg>`;
     return svg;
   }
