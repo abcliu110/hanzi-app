@@ -225,7 +225,9 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yw-detail-body{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
 .yw-detail-body .yw-body{display:block !important}
 /* ---- 语文知识库面板网格 ---- */
-.yw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 18px}
+.yw-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
+.yw-grid .yw-head>*{max-width:100%}
+@media (max-width:480px){.yw-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .yw-grid .yw-item{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;
   box-shadow:0 2px 6px rgba(44,51,40,.06);transition:transform .15s,box-shadow .15s,border-color .15s;margin:0}
 .yw-grid .yw-item:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(44,51,40,.10);border-color:var(--accent)}
@@ -388,7 +390,9 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .home-view .today .t-fill{display:block;height:100%;background:#fff;border-radius:3px}
 .home-view .today .t-side{text-align:right;font-size:12px;line-height:1.7;opacity:.95;white-space:nowrap}
 .home-view .today .t-side b{font-size:16px}
-.home-view .panels{display:grid;grid-template-columns:repeat(3,200px);gap:22px;justify-content:center}
+.home-view .panels{display:grid;grid-template-columns:repeat(3,minmax(0,200px));gap:22px;justify-content:center}
+/* 手机窄屏：三列等分收窄，不横向溢出（390px 实测曾宽到 517px） */
+@media (max-width:480px){.home-view .panels{gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}.home-view .panel{padding:18px 6px 14px;min-width:0}.home-view .panel b{letter-spacing:1px;font-size:16px}}
 .home-view .panel{position:relative;border:1px solid var(--line);border-radius:18px;padding:26px 10px 20px;
   text-align:center;cursor:pointer;font-family:inherit;background:var(--surface);
   box-shadow:0 2px 8px rgba(44,51,40,.07);
