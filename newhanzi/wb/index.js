@@ -44,4 +44,5 @@ window.NHZ_WB_INDEX = {
   "一…就…": "gl_yijiu",
   "既然…就…": "gl_jiran",
   "即使…也…": "gl_jishi",
+  "除非…才…": "gl_chufei",
 };
