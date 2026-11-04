@@ -13,4 +13,5 @@ window.NHZ_WB_INDEX = {
   "语气词": "yuqici",
   "叹词": "tanci",
   "离合词": "liheci",
+  "并列式": "binglieshi",
 };
