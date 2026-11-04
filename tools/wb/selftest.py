@@ -68,7 +68,25 @@ JS = r"""() => {
     P.seek(i, 0); P.seek(i, d * .6); const a = P.svg.innerHTML; P.seek(i, 0); P.seek(i, d * .6);
     if (a !== P.svg.innerHTML) out.push('第' + (i + 1) + '幕不确定');
   }
-  P.seek(0, 9); if (P.svg.innerHTML.indexOf('主语（谁）') < 0) out.push('E14：lv2 幕 tag 应显示「主语（谁）」');
+  /* E9 三档 */
+  try { localStorage.removeItem('nhz_wb_lv'); } catch (e) {}
+  NHZWB.add('_档位', { scenes: [ { k: 'title', t: '档' }, { k: 'steps', items: ['一'], tab: 'a' }, { k: 'steps', lv: 2, items: ['二'], tab: 'b' }, { k: 'steps', lv: 3, src: '待核', items: ['三'], tab: 'c' }, { k: 'end', kj: '完' } ] });
+  const bx = document.createElement('div'); document.body.appendChild(bx);
+  let Q = NHZWB.mount(bx, '_档位');
+  const ntab = () => bx.querySelectorAll('.wb-tabs button').length;
+  if (Q.level() !== 2 || ntab() !== 4) out.push('默认应为「中」且 4 幕：' + Q.level() + '/' + ntab());
+  if (!/还有 1 幕/.test(bx.querySelector('.wb-more').textContent)) out.push('提示「深一点还有 1 幕」缺失');
+  bx.querySelector('.wb-lv [data-lv="1"]').click();
+  if (ntab() !== 3 || localStorage.getItem('nhz_wb_lv') !== '1') out.push('浅档应 3 幕并存档：' + ntab());
+  bx.querySelector('.wb-lv [data-lv="3"]').click();
+  if (ntab() !== 5) out.push('深档应 5 幕：' + ntab());
+  if (bx.querySelector('.wb-tabs button:nth-child(4)').textContent.indexOf('4 c') !== 0) out.push('标签序号应按可见幕计');
+  Q.destroy(); Q = NHZWB.mount(bx, '_档位');
+  if (Q.level() !== 3) out.push('重新挂载应记住档位');
+  const hb = [...bx.querySelectorAll('.wb-lv button')].map(b => b.getBoundingClientRect().height);
+  if (hb.some(h => h < 44)) out.push('档位按钮高度 < 44：' + hb);
+  Q.destroy(); bx.remove(); try { localStorage.removeItem('nhz_wb_lv'); } catch (e) {}
+  P.seek(0, 9); if (P.svg.innerHTML.indexOf('主语（谁 / 什么）') < 0) out.push('E14：lv2 幕 tag 应显示「主语（谁 / 什么）」');
   P.seek(3, 99); if (P.svg.innerHTML.indexOf('>主语<') < 0) out.push('E14：|term 应显示「主语」');
   return out;
 }"""

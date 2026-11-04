@@ -523,7 +523,7 @@
       var wbox = wbs.closest('[data-wb]'), wname = wbox.getAttribute('data-wb');
       wbs.disabled = true; wbs.textContent = '加载中…';
       var wfile = (window.NHZ_WB_INDEX || {})[wname];
-      loadScripts(['wb/rough.js', 'wb/wb-engine.js', 'wb/s/' + wfile + '.js'], function (ok) {
+      loadScripts(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + wfile + '.js'], function (ok) {
         if (!ok || !window.NHZWB || !window.NHZWB.has(wname)) { wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
         var p = window.NHZWB.mount(wbox, wname);
         if (p) p.play();

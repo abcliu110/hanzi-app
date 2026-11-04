@@ -44,6 +44,7 @@
   /* E10 语义色键 → 色值。兼容期：旧场景的 '#rrggbb' 原样通过（--lint 报 R1 警告）。 */
   function C(v, dflt) { if (!v) return dflt; if (String(v).charAt(0) === '#') return v; return PAL[v] || dflt; }
   var REG = {};
+  var LVN = ['浅', '中', '深'];
   var CPS = 3.5;          /* 旁白每秒字数（三四年级慢速档） */
   var THINK = 4;          /* 先猜停顿秒数 */
 
@@ -667,14 +668,21 @@
     var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', name + ' 白板动画');
     var cap = document.createElement('div'); cap.className = 'wb-cap';
     var ctl = document.createElement('div'); ctl.className = 'wb-ctl';
-    ctl.innerHTML = '<button type="button" class="wb-play">▶ 播放</button><input type="range" class="wb-bar" min="0" max="1000" value="0" aria-label="进度"><label class="wb-tts"><input type="checkbox" checked> 朗读</label>';
-    board.appendChild(svg); board.appendChild(cap); el.appendChild(tabs); el.appendChild(board); el.appendChild(ctl);
+    ctl.innerHTML = '<button type="button" class="wb-play">▶ 播放</button><input type="range" class="wb-bar" min="0" max="1000" value="0" aria-label="进度">' +
+      '<span class="wb-lv" role="group" aria-label="难度">' + LVN.map(function (n, k) { return '<button type="button" data-lv="' + (k + 1) + '" aria-pressed="false">' + n + '</button>'; }).join('') + '</span>' +
+      '<label class="wb-tts"><input type="checkbox" checked> 朗读</label>';
+    var more = document.createElement('div'); more.className = 'wb-more';
+    board.appendChild(svg); board.appendChild(cap); el.appendChild(tabs); el.appendChild(board); el.appendChild(ctl); el.appendChild(more);
     var pb = ctl.querySelector('.wb-play'), bar = ctl.querySelector('.wb-bar'), tts = ctl.querySelector('.wb-tts input');
     try { if (localStorage.getItem('nhz_wb_mute') === '1') tts.checked = false; } catch (e) {}
     tts.onchange = function () { try { localStorage.setItem('nhz_wb_mute', tts.checked ? '0' : '1'); } catch (e) {} if (!tts.checked) hush(); };
 
     var S = -1, t = 0, playing = false, last = 0, scene = null, spoken = -1, raf = 0;
     var scenes = spec.scenes;
+    /* E9 档位：1 浅（lv≤1）2 中（lv≤2，默认）3 深（全部）；title / end 任何档位都显示。S 始终是原始序号 */
+    var LVL = 2; try { var sv = parseInt(localStorage.getItem('nhz_wb_lv'), 10); if (sv >= 1 && sv <= 3) LVL = sv; } catch (e) {}
+    var vis = [];
+    function visOf(lv) { var o = []; scenes.forEach(function (sc, i) { if (sc.k === 'title' || sc.k === 'end' || (sc.lv || 1) <= lv) o.push(i); }); return o; }
     function hush() { try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {} }
     function speak(s) {
       if (!tts.checked) return;
@@ -683,7 +691,7 @@
     function load(i) {
       S = i; while (svg.firstChild) svg.removeChild(svg.firstChild);
       scene = buildScene(svg, scenes[i], i); spoken = -1;
-      Array.prototype.forEach.call(tabs.children, function (b, k) { b.classList.toggle('on', k === i); });
+      Array.prototype.forEach.call(tabs.children, function (b) { b.classList.toggle('on', +b.getAttribute('data-i') === i); });
     }
     function render() {
       var tt = reduce && !playing ? scene.dur : t;
@@ -698,29 +706,50 @@
       if (!playing) return;
       t = Math.min(scene.dur, t + (ts - last) / 1000); last = ts; render();
       if (t >= scene.dur) {
-        if (S < scenes.length - 1) { load(S + 1); t = 0; render(); }
+        var nx = vis[vis.indexOf(S) + 1];
+        if (nx !== undefined) { load(nx); t = 0; render(); }
         else { stop('↻ 重播'); return; }
       }
       raf = requestAnimationFrame(loop);
     }
     function play() {
-      if (S === scenes.length - 1 && t >= scene.dur) { load(0); t = 0; }
+      if (S === vis[vis.length - 1] && t >= scene.dur) { load(vis[0]); t = 0; }
       playing = true; spoken = -1; pb.textContent = '❚❚ 暂停'; last = performance.now(); raf = requestAnimationFrame(loop);
     }
     pb.onclick = function () { if (playing) stop(); else play(); };
     bar.oninput = function () { t = bar.value / 1000 * scene.dur; spoken = -1; hush(); render(); };
     svg.addEventListener('click', function () { if (playing) stop(); else play(); });
-    scenes.forEach(function (sc, i) {
-      var b = document.createElement('button'); b.type = 'button';
-      b.textContent = (i + 1) + ' ' + (sc.tab || sc.h || sc.t || '');
-      b.onclick = function () { stop(); load(i); t = 0; render(); };
-      tabs.appendChild(b);
+    function setLv(lv, keep) {
+      LVL = lv; vis = visOf(lv);
+      if (!keep) { try { localStorage.setItem('nhz_wb_lv', String(lv)); } catch (e) {} }
+      Array.prototype.forEach.call(ctl.querySelectorAll('.wb-lv button'), function (b) { var on = +b.getAttribute('data-lv') === lv; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      tabs.innerHTML = '';
+      vis.forEach(function (i, n) {
+        var sc = scenes[i], b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-i', i);
+        b.textContent = (n + 1) + ' ' + (sc.tab || sc.h || sc.t || '');
+        b.onclick = function () { stop(); load(i); t = 0; render(); };
+        tabs.appendChild(b);
+      });
+      var hid = scenes.length - vis.length;
+      more.textContent = hid ? '深一点还有 ' + hid + ' 幕' + (lv < 3 ? '（选「' + LVN[lv] + '」' + (lv === 1 ? '或「深」' : '') + '可看）' : '') : '';
+      more.style.display = hid ? '' : 'none';
+    }
+    ctl.querySelector('.wb-lv').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var lv = +b.getAttribute('data-lv'); if (lv === LVL) return;
+      stop(); setLv(lv);
+      if (vis.indexOf(S) < 0) { load(vis[0]); t = 0; } else Array.prototype.forEach.call(tabs.children, function (x) { x.classList.toggle('on', +x.getAttribute('data-i') === S); });
+      render();
     });
     document.addEventListener('visibilitychange', function () { if (document.hidden && playing) stop(); });
-    load(0); render();
+    setLv(LVL, true);
+    load(vis[0]); render();
     var api = {
       play: play, pause: function () { stop(); },
+      /* seek / seekRaw / durations 都按原始序号（与档位无关），供验收脚本用 */
       seek: function (i, sec) { if (S !== i) load(i); t = sec; render(); return scene.dur; },
+      seekRaw: function (i, sec) { return api.seek(i, sec); },
+      visible: function () { return vis.slice(); }, level: function () { return LVL; }, name: name,
       durations: function () { return scenes.map(function (sc, i) { var s = document.createElementNS(NS, 'svg'); return buildScene(s, sc, i).dur; }); },
       scene: function () { return S; }, el: el, svg: svg,
       destroy: function () { stop(); el.innerHTML = ''; }
@@ -743,6 +772,10 @@
       '.wb-ctl{display:flex;align-items:center;gap:12px;margin-top:8px}' +
       '.wb-ctl .wb-play{min-height:44px;min-width:104px;border:2px solid var(--accent-deep,#3d5a40);background:var(--accent,#4a7a59);color:#fff;border-radius:12px;padding:8px 16px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}' +
       '.wb-ctl .wb-bar{flex:1;min-height:44px;accent-color:var(--accent,#4a7a59)}' +
+      '.wb-ctl .wb-lv{display:inline-flex;border:1.5px solid var(--line,#d5dfd0);border-radius:12px;overflow:hidden}' +
+      '.wb-ctl .wb-lv button{min-height:44px;min-width:48px;border:0;border-right:1px solid var(--line,#d5dfd0);background:var(--surface,#f8faf5);color:var(--ink,#2c3328);font-size:16px;cursor:pointer;font-family:inherit}' +
+      '.wb-ctl .wb-lv button:last-child{border-right:0}.wb-ctl .wb-lv button.on{background:var(--accent-deep,#3d5a40);color:#fff}' +
+      '.wb-more{margin-top:6px;font-size:14px;color:var(--muted,#6b7566);text-align:right}' +
       '.wb-ctl .wb-tts{font-size:15px;color:var(--muted,#6b7566);display:flex;align-items:center;gap:4px;min-height:44px}' +
       '@media (prefers-color-scheme:dark){.wb-board{border-color:#3a4237}}';
     document.head.appendChild(st);
@@ -753,6 +786,6 @@
     has: function (name) { return !!REG[name]; },
     mount: function (el, name) { css(); return mount(el, name); },
     names: function () { return Object.keys(REG); },
-    SYM: SYM, W: W, H: H, PAL: PAL, term: term, TPL: TPL
+    SYM: SYM, W: W, H: H, PAL: PAL, term: term, TPL: TPL, LV: LVN
   };
 })();
