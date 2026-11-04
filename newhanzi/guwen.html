@@ -184,6 +184,7 @@ window.NHZReview = window.NHZReview || (function () {
   var mlistEl = document.getElementById('gwmlist');
   var mdetEl = document.getElementById('gwmdetail');
   var curMod = null, curFilter = '', curJr = false;
+  var lastTextList = '全部'; /* 篇目详情返回用：记住从哪个篇目列表进来（全部或分类） */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function catById(id){
     for(var i=0;i<K.categories.length;i++) if(K.categories[i].id===id) return K.categories[i];
@@ -218,6 +219,7 @@ window.NHZReview = window.NHZReview || (function () {
     listEl.innerHTML = h;
   }
   function showList(cat){
+    lastTextList = cat;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var items = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
     var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
@@ -239,7 +241,7 @@ window.NHZReview = window.NHZReview || (function () {
       return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
     }).join('')+'</div>';
     detEl.innerHTML = h;
-    detEl.dataset.back = t.cat;
+    detEl.dataset.back = lastTextList || t.cat;
   }
   /* ---------- 题库（语法模块 bank 机制，key 为点 key） ---------- */
   function bankFiltered(bid){
