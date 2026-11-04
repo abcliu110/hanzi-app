@@ -42,4 +42,7 @@ console.log(`检查了 ${n} 段脚本，${bad ? bad + " 处错误" : "全部通�
 /* 内容校验（古诗/赏析/年级表/古文分级）：tools/content/check_content.js */
 try { process.stdout.write(execFileSync(process.execPath, [path.join(__dirname, "content", "check_content.js")], { encoding: "utf8" })); }
 catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
+/* 语法白板内容稿校验：tools/content/check_yufa_neirong.js */
+try { process.stdout.write(execFileSync(process.execPath, [path.join(__dirname, "content", "check_yufa_neirong.js")], { encoding: "utf8" })); }
+catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
 process.exit(bad ? 1 : 0);
