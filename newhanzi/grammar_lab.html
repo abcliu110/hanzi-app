@@ -45,12 +45,14 @@
 @media (min-width:1200px){
   .lab-page{max-width:880px}
 }
+.lab-animbtn{margin-left:auto;padding:8px 14px;border-radius:20px;border:1px solid #d5dfd0;background:#f8faf5;color:#2c3328;font-size:14px;font-weight:bold;cursor:pointer}
 </style>
 </head>
 <body class="page-sub page-lab">
 <header class="topbar nav">
   <a href="index.html" target="_top" class="back">← 返回</a>
   <span>语法实验室</span>
+  <button class="lab-animbtn" id="btnAnimPause" type="button">⏸ 动画</button>
 </header>
 
 <div id="lab-home">
@@ -1118,6 +1120,27 @@ $('lab-anim-xuzi').innerHTML = svgLabXuzi();
 $('lab-anim-xiuci').innerHTML = svgLabXiuci();
 $('lab-anim-cuobie').innerHTML = svgLabCuobie();
 
+})();
+</script>
+<script>
+/* 实验页 SMIL 动效总开关：把字句词块、偏旁合体两个无限循环 SVG 动画没有暂停键，
+   且 prefers-reduced-motion 关不掉 SMIL；减弱时默认暂停 */
+(function () {
+  var paused = false;
+  try { paused = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+  function apply() {
+    document.querySelectorAll('svg').forEach(function (sv) {
+      try {
+        if (paused) { if (sv.pauseAnimations) sv.pauseAnimations(); }
+        else { if (sv.unpauseAnimations) sv.unpauseAnimations(); }
+      } catch (e) {}
+    });
+    var b = document.getElementById('btnAnimPause');
+    if (b) b.textContent = paused ? '▶ 动画' : '⏸ 动画';
+  }
+  var b = document.getElementById('btnAnimPause');
+  if (b) b.addEventListener('click', function () { paused = !paused; apply(); });
+  apply();
 })();
 </script>
 </body>
