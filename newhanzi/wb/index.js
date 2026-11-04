@@ -46,4 +46,5 @@ window.NHZ_WB_INDEX = {
   "即使…也…": "gl_jishi",
   "除非…才…": "gl_chufei",
   "比喻": "xc_biyu",
+  "拟人": "xc_niren",
 };
