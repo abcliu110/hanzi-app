@@ -15,4 +15,5 @@ window.NHZ_WB_INDEX = {
   "离合词": "liheci",
   "并列式": "binglieshi",
   "偏正式": "pianzhengshi",
+  "主谓式": "zhuweishi",
 };
