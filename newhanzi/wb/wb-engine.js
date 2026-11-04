@@ -1004,7 +1004,7 @@
         ord.forEach(function (n, j) {
           var lab = nestLabel(n.key, lv), say = (!two && d.say && d.say[j]) || ('“' + n.kids.map(function (kk) { return txt(kk); }).join('”和“') + '”装进一个盒子：' + lab + '。');
           q.beat(say, function (t) {
-            var ph = 8 + 12 * n.h, pv = 6 + 26 * n.h, x0 = X0(n.lo) - ph, x1 = X1(n.hi) + ph, top = y - size * .95 - pv, bot = y + size * .28 + pv;
+            var ph = 8 + 12 * n.h, pv = 6 + 32 * n.h, x0 = X0(n.lo) - ph, x1 = X1(n.hi) + ph, top = y - size * .95 - pv, bot = y + size * .28 + pv;
             c.R('rectangle', [x0, top, x1 - x0, bot - top], { stroke: ROLE, strokeWidth: 2.4, roughness: .7 }, t, .6);
             c.T((x0 + x1) / 2, bot - 5, lab, { size: 20, color: ROLE }, t + .5, .4);
             return 1.1;

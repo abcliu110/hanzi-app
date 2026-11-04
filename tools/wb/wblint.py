@@ -15,7 +15,9 @@ WB = os.path.join(ROOT, 'wb')
 # 已回炉、R1 / R7 按错误级检查的语法点（第 1 期：单句成分 7 项）
 STRICT = {'主语', '谓语', '宾语', '定语', '状语', '补语', '趋向补语引申义',
           # 第 2 期：高级句式逐项回炉后加入（被字句、话题句、兼语句的施事 / 受事 / 话题必须走 tag，R7 错误级）
-          '把字句', '被字句', '存现句', '是…的句', '比较句', '双重否定', '歧义句', '兼语句', '话题句', '给字被动'}
+          '把字句', '被字句', '存现句', '是…的句', '比较句', '双重否定', '歧义句', '兼语句', '话题句', '给字被动',
+          # 第 3 期：短语结构 5 项（nest）
+          '并列式', '偏正式', '主谓式', '动宾式', '补充式'}
 
 CLS_KEYS = {'noun', 'adj', 'pron', 'verb', 'adv', 'prep', 'conj', 'interj', 'tagc'}
 JUDGE_KEYS = {'ok', 'bad'}
@@ -198,6 +200,24 @@ def lint_item(name, spec, raw, terms, out):
                 if any(n in ws for n in NEG) and not g.get('keep'): E('R8', tag + ' 生长出的否定词「%s」必须标 keep' % ws)
                 if re.search('[%s][%s]' % (NUMS, QUANTS), ws) and not (g.get('keep') or g.get('cutOk')):
                     E('R8', tag + ' 数量词「%s」被剪须标 keep 或写 cutOk 理由' % ws)
+        # R14 nest：树合法（叶子按 0..n-1 连续）、层数 ≤ 4、结构键在 terms.js 里
+        if k == 'nest':
+            toks = sc.get('s') or []
+            trees = [r.get('tree') for r in sc.get('reads', [])] if sc.get('reads') else [sc.get('tree')]
+            for tr in trees:
+                leaves, keys = [], []
+                def hgt(t):
+                    if isinstance(t, (int, float)): leaves.append(int(t)); return 0
+                    if not isinstance(t, list) or len(t) < 3: raise ValueError('节点要 [结构键, 子, 子…]')
+                    keys.append(t[0]); return 1 + max(hgt(x) for x in t[1:])
+                try:
+                    h = hgt(tr)
+                    if h > 4: E('R14', tag + ' nest 树 %d 层，超过 4 层要拆幕' % h)
+                    if leaves != list(range(len(toks))): E('R14', tag + ' nest 叶子应为 0..%d 连续，得 %r' % (len(toks) - 1, leaves))
+                    for kk in keys:
+                        if terms is not None and kk not in terms: E('R14', tag + ' nest 结构键 %r 不在 terms.js' % kk)
+                except ValueError as e:
+                    E('R14', tag + ' nest 树不合法：%s' % e)
         # R10
         for s in strings(sc):
             for kk in re.findall(r'\{t:([a-z]+)', s):
