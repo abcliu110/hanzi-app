@@ -89,4 +89,5 @@ window.NHZ_WB_INDEX = {
   "做/作": "xc_zuozuo",
   "和/与": "xc_heyu",
   "把/被": "xc_babei",
+  "吗/呢/吧": "xc_manieba",
 };
