@@ -28,4 +28,5 @@ window.NHZ_WB_INDEX = {
   "并列复句": "binglie_fuju",
   "递进复句": "dijin_fuju",
   "选择复句": "xuanze_fuju",
+  "转折复句": "zhuanzhe_fuju",
 };
