@@ -34,16 +34,31 @@ const AnimEngine = (function() {
   /**
    * 原语1：拆/合 (split)
    * 用于：偏旁拆分、句子成分拆分
-   * 数据：{parts: [{text, color, dx, dy, label}], centerX, centerY}
+   * 数据：{whole, parts: [{text, color, dx, dy, label, strokes, bbox}], centerX, centerY}
+   * whole: 开头/结尾显示的整体（字卡里必须是汉字本身；不给时退回部件拼接，适用于“花+草=花草”这类词语）
    * parts: 部件列表，每个有文字、颜色、位移、标注
+   *   strokes/bbox（可选）：部件不能用文字显示时（扩展区/私用区部件、数据占位符），
+   *   用本字的笔画轮廓画出来。strokes 为 hanzi-writer 坐标（1024 格、y 轴向上）的 path，
+   *   bbox=[minX,minY,maxX,maxY] 为这些笔画的范围；此时 text 只作说明，不输出。
    */
+  function strokeGlyph(p, cx, cy, color) {
+    const [x0, y0, x1, y1] = p.bbox;
+    const s0 = 36 / 1024;                       // 与 36px 文字等大
+    const k = Math.min(1.8, 30 / (Math.max(x1 - x0, y1 - y0, 1) * s0)); // 小部件适当放大，最长边约 30px
+    const sc = +(s0 * k).toFixed(5);
+    const bx = (x0 + x1) / 2, by = (y0 + y1) / 2;
+    let g = `<g transform="translate(${cx},${cy - 13}) scale(${sc},${-sc}) translate(${-bx},${-by})" fill="${color}">`;
+    p.strokes.forEach(d => { g += `<path d="${d}"/>`; });
+    return g + `</g>`;
+  }
+
   function split(data) {
     const {parts, centerX = 320, centerY = 100} = data;
     let svg = `<svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
     let t = 0.5;
     
     // 原字（先显示，后淡出）
-    const fullText = parts.map(p => p.text).join('');
+    const fullText = data.whole != null ? data.whole : parts.map(p => p.text).join('');
     svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="48" fill="${C.ink}" id="fullChar">${esc(fullText)}`;
     svg += `<animate attributeName="opacity" values="1;0" dur="0.4s" begin="${t}s" fill="freeze"/></text>`;
     t += 0.5;
@@ -53,9 +68,15 @@ const AnimEngine = (function() {
       const x = centerX + (p.dx || 0);
       const y = centerY + (p.dy || 0);
       const bt = t + i * 0.4; // 每个部件错开0.4秒出现
+      const color = p.color || C.green;
+      const move = `<animateTransform attributeName="transform" type="translate" values="0,0;${p.dx||0},${p.dy||0}" dur="0.8s" begin="${bt}s" fill="freeze"/>`;
       svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.3s" begin="${bt}s" fill="freeze"/>`;
-      svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="36" fill="${p.color || C.green}">${esc(p.text)}`;
-      svg += `<animateTransform attributeName="transform" type="translate" values="0,0;${p.dx||0},${p.dy||0}" dur="0.8s" begin="${bt}s" fill="freeze"/></text>`;
+      if (p.strokes && p.strokes.length) {
+        svg += `<g>${move}${strokeGlyph(p, centerX, centerY, color)}</g>`;
+      } else {
+        svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="36" fill="${color}">${esc(p.text)}`;
+        svg += `${move}</text>`;
+      }
       if (p.label) {
         svg += `<text x="${x}" y="${y+40}" text-anchor="middle" font-size="13" fill="${C.muted}">${esc(p.label)}</text>`;
       }

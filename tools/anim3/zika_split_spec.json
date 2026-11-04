@@ -1,0 +1,11426 @@
+{
+ "三": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "二",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "业": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "④",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "一",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "一：数目"
+   }
+  ]
+ },
+ "两": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "一：数目"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "中": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "丨",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "么": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丿",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "厶",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "乓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丘",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "丶",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "习": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠃌",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "冫",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "互": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "彑",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "仆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "仍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "乃",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "从": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "人",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "人",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "付": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "寸",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "代": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "弋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "仪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "义",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "件": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "牛",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "价": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "介",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "任": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "壬",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "伐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "戈",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "休": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "人",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "众": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "人",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "人",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": -60
+   },
+   {
+    "text": "人",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "伞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "人",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "人：人"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "伟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "韦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "伯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "白",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "伴": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "半",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "位": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "立",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "佑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "右",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "佩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𫥞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "促": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "足",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "俐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "利",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "保": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "呆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "信": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "言",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "俱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "具",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "倒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "到",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "倔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "屈",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "偎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "畏",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "做": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "故",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "偷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "俞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "党": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "龸",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "兄",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "全": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "人",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "王",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "关": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丷",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "天",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "兼": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "䒑",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "strokes_idx": [
+     0,
+     1,
+     2
+    ]
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "strokes_idx": [
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   }
+  ]
+ },
+ "内": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "冂",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "人",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "再": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "冉",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "冗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "冖",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "几",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "凤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "几",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "又",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "刁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠃌",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60,
+    "strokes_idx": [
+     0
+    ]
+   },
+   {
+    "text": "㇀",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60,
+    "strokes_idx": [
+     1
+    ]
+   }
+  ]
+ },
+ "刑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "开",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "删": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "册",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "刨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "包",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "刻": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亥",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "剖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "咅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "剧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "居",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "劈": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辟",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "刀",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "务": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "夂",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "力",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "劣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "少",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "力",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "助": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "且",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "力",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "化": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠤎",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "匹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "匚",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "儿",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "匾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "匚",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "扁",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "华": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "化",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "十",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "卤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "⺊",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "龱",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "卯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠂎",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卩",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "去": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "厶",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "叁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "厶",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "大",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "三",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "反": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠂆",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "又",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "受": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "strokes_idx": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "text": "又",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "又：右手"
+   }
+  ]
+ },
+ "叶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "十",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "叼": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "吆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "幺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "合": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亼",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "同": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠔼",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "吏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "史",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "吝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "文",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "否": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "不",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "吮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "允",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "启": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "户",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "和": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "品": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "哗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "华",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "哥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "可",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "可",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "哦": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "我",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "哲": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "折",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "唁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "言",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "唆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "唉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "矣",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "唧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "即",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "售": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "隹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "唯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "隹",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "商": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "冏",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "冏"
+   }
+  ]
+ },
+ "啰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "罗",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "喉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "侯",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "喧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宣",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "嗓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "桑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "嘶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "斯",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "嘹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "口",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "器": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "吅",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "犬",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "吅",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "回": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "囗",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "团": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "囗",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "才",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "囤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "囗",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "屯",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "囱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "夂",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "夂：脚"
+   }
+  ]
+ },
+ "圃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "囗",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "甫",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "场": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠃓",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "均": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "匀",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "坐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "从",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "坛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "云",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "坯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丕",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "坷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "可",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "垛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朵",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "埂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "更",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "埃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "矣",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "城": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "成",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "堡": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "保",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "土",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "堪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甚",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "墓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "莫",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "土",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "墩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "敦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "壬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丿",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "士",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "壹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "士",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "冖",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "豆",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "备": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "夂",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "田",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "外": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "夕",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "多": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "夕",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "夕",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "太": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "大",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "丶",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "夯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "大",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "力",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "契": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "㓞",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "大",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "好": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "子",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "如": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "妄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亡",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "女",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "妓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "支",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "姚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "兆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "娄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "女",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "娱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "吴",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "媒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "女",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "某",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "学": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𭕄",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100,
+    "strokes_idx": [
+     0,
+     1,
+     2
+    ]
+   },
+   {
+    "text": "冖",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "子",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "宝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "宀",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "玉",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "家": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "宀",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "豕",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "寨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𡨄",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80,
+    "strokes_idx": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "将": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丬",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𪧷",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "尖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "小",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "大",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "属": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "尸",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "禹",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "履": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "尸",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "復",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "屹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "山",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "乞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "岖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "山",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "区",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "岭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "山",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "令",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "峦": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亦",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "山",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "巅": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "山",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "颠",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "帕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "巾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "白",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "帚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彐",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "冖",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "巾",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "帝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "巾",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "巾"
+   }
+  ]
+ },
+ "常": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𫩠",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "巾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "幕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "莫",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "巾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "平": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "干",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "丷",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "并": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丷",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "开",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "幸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "土",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𢆉",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "应": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "广"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "庚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "广"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "府": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "付",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "度": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "广"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "座": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "坐",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "廉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "兼",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "延": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "廴",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "廴：走"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "建": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "廴",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "聿",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "开": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "廾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "弃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠫓",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80,
+    "strokes_idx": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "text": "廾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "弟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丷",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𢎨",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "当": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "⺌",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "彐",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "录": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彐",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "氺",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "彤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丹",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "彡",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "径": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𢀖",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "很": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "艮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "徐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "余",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "必": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "心",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "丿",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "忽": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "勿",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "性": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "生",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "怯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "去",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "恕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "如",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "恨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "艮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "恬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "舌",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "恰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "合",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "惋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宛",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "惜": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "昔",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "惦": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "店",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "惩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "征",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "惶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "皇",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "愕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "咢",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "感": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "咸",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "愤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "贲",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "慧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彗",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "慨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "既",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "憔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "焦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "憨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "敢",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "心",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "懦": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "忄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "需",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "戌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "戊",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "一",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "成": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "戊",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "𠃌",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "战": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "占",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "戈",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "戚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "戊",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "尗",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "所": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "戶",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "斤",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "扑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "扔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "乃",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "扬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠃓",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "扭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "扳": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "反",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "少",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠠵",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "区",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抡": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "仑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "报": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠬝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "氐",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "抹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "末",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "主",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "半",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "犮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "㐌",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "幼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "发",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拴": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "全",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "拼": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "并",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "挎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夸",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "挑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "兆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "挪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "那",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "捌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "别",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "捎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "肖",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "捕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甫",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "损": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "员",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "捺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "奈",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "掂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "店",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "掏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "匋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "掘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "屈",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "探": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "罙",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "接": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "妾",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "掩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "奄",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "掰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "龵",
+    "color": "#4a7a59",
+    "dx": -140,
+    "dy": 0
+   },
+   {
+    "text": "分",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "手",
+    "color": "#b8892e",
+    "dx": 140,
+    "dy": 0
+   }
+  ]
+ },
+ "揍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "奏",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "揩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "皆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "撩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "撬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "毳",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "撵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "辇",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "擂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "扌",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "雷",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "整": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "敕",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "正",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "斟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "甚",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "斗",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "斧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "父",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "斤",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "斯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "其",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "斤",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "方": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亠",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "亠：头"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "旧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丨",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "日",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "明": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "月",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "映": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "央",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "春": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𡗗",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "日",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "晕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "军",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "景": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "京",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "晰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "析",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "晶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "日",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": -60
+   },
+   {
+    "text": "日",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "晾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "京",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "暮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "莫",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "日",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "最": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "日",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "取",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "期": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "其",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "月",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "朴": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "林": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "枝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "支",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "柑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甘",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "柒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "㲺",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "柠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "柱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "主",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "栏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "兰",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "株": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朱",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "桥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "乔",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "桦": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "华",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "桩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "庄",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "梆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "邦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "棋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "其",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "棕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宗",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "棠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𫩠",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "森": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": -60
+   },
+   {
+    "text": "木",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "椰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "耶",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "椿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "春",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "楷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "皆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "榄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "览",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "榔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "郎",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "榕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "容",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "榨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "窄",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "樟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "章",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "樱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "婴",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "橘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "矞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "橙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "登",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "檬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "木",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "蒙",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "次": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "冫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "欠",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "欺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "其",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "欠",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "款": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "欠",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "欠"
+   }
+  ]
+ },
+ "正": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "止",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "歼": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "歹",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "千",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "殃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "歹",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "央",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "汗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "干",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "汛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "汞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "工",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "水",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "江": {
+  "centerY": 100,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0,
+    "label": "氵（水）：和水有关"
+   },
+   {
+    "text": "工",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0,
+    "label": "工：表音"
+   }
+  ]
+ },
+ "沃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夭",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "没": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "殳",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "沥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "历",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "沫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "末",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "法": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "去",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "泞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "泥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "泰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𡗗",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "氺",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "泵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "水",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "洋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "羊",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "流": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "㐬",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "涝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "劳",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "涣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "奂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "涧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "间",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "涨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "张",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "涮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刷",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "淘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "匋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "淡": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "炎",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "淤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "於",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "渝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "俞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "渠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "洰",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "渤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "勃",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "渲": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宣",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "湃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "拜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "湖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "胡",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "溃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "贵",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "溉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "既",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "溯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朔",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "滇": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "真",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "滞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "带",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "漾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "羕",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "潜": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "替",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "潮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "氵",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "灯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "火",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "灰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠂇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "火",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "灸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "久",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "火",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "炮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "火",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "包",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "点": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "占",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "灬",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "烈": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "列",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "灬",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "热": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "执",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "灬",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "焊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "火",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "旱",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "焕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "火",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "奂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "然": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "灬",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "灬：火"
+   }
+  ]
+ },
+ "版": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "片",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "反",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "物": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "牛",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "勿",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "特": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "牛",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "寺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "牺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "牛",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "西",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "犁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "利",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "牛",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "狐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "瓜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "狮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "师",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "狰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "争",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "猎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "昔",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "猬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "胃",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "猿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "犭",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "袁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "玖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "久",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "玫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "攵",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "现": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "见",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "玷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "占",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "珍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "㐱",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "珠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朱",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "琅": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "良",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "琼": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "京",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "瑰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "王",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "鬼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "璧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辟",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "玉",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "瓢": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "票",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "瓜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "瓤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "襄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "瓜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "甥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "生",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "男",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "用": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "冂",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "冂：框"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "男": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "田",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "力",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "疙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "乞",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "疟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "疒：病"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "病": {
+  "centerY": 100,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0,
+    "label": "疒：病字旁"
+   },
+   {
+    "text": "丙",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0,
+    "label": "丙：表音"
+   }
+  ]
+ },
+ "痊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "全",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "痘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "豆",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "痢": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "利",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "瘩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "荅",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "瘪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "疒：病"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "瘸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "𦙲",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "癣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "疒",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "鲜",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "癸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "癶",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "天",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "登": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "癶",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "豆",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "百": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "白",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "盯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "盹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "屯",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "睐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "来",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "瞅": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "秋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "瞭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "瞳": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "目",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "童",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "知": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "矢",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "石": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丆",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "矾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "凡",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "砍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "欠",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "砚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "见",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "破": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "皮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "砾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "乐",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "硕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "页",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "碑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "卑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "碘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "典",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "碾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "石",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "展",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "票": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "覀",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "示",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "祷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "礻",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "寿",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "离": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "㐫",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "禸",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "禾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "丿",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "秆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "干",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "种": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "中",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "秤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "平",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "秧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "央",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "秸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "吉",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "穆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "禾",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "㣎",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "窿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "穴",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "隆",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "竣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "立",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "端": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "立",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "耑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "笙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "生",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "筏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "伐",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "箕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "其",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "算": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𥃲",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "管": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "官",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "箩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "罗",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "箫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "肃",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "篓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "娄",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "簸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "竹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𤿺",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "籽": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "子",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "粉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "分",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "粮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "良",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "粱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "米",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "米：米"
+   }
+  ]
+ },
+ "糟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "曹",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "糠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "康",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "糯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "米",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "需",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "索": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "糸",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "糸"
+   }
+  ]
+ },
+ "级": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "及",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "纫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "刃",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "经": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𢀖",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "结": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "吉",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "绕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尧",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "绘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "会",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "给": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "合",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "绚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "旬",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "络": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "各",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "绿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "录",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "咠",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "爰",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宾",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宿",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尞",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "缰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "纟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "畺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "网": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "冂",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "冂：框"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "罕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "㓁",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "干",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "罢": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "罒",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "去",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "羔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𦍌",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "灬",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "羚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "羊",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "令",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "羹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "羔",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "美",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "耀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "光",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "翟",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "老": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "耂",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "匕",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "考": {
+  "centerY": 100,
+  "parts": [
+   {
+    "text": "耂",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0,
+    "label": "耂：老字头"
+   },
+   {
+    "text": "丂",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0,
+    "label": "丂：表音"
+   }
+  ]
+ },
+ "耘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "耒",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "云",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "耙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "耒",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "巴",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "聆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "耳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "令",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "职": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "耳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "只",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "聚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "取",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "乑",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "肠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠃓",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "育": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠫓",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "月",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "肴": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "㐅",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "有",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "胀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "长",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "胁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "办",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "胡": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "古",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "月",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "胳": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "各",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "脂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "旨",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "脐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "齐",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "脸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "佥",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "腋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夜",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "腔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "空",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "膝": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "桼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "臊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "月",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "喿",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "舀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "爫",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "臼",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "舶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "舟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "白",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "船": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "舟",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "舟：船"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "艾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "乂",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "节": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "艹：草"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "芋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "于",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "芥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "介",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "花": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "化",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "芹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "斤",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "苗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "田",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "苞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "包",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "出",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "戊",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "末",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茧": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "虫",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茬": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "在",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "茵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "因",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "荔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "劦",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "荤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "军",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "菠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "波",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "菩": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "咅",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "萄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "匋",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "葛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "曷",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "葵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "癸",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "蓉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "容",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "蔗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "庶",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "藏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "臧",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "藐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "貌",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "藕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "耦",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "蘑": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "艹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "磨",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "虐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虍",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "虍：虎"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "蚌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丰",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蚓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "引",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蚣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "公",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蚤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "叉",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "虫",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "蚪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "斗",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蚯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "丘",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蛀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "主",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蛇": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "它",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蛤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "合",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夆",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜈": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "吴",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "延",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "廷",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "兑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "呙",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蜻": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "青",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蝌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "科",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蝎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "曷",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蝙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "扁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蝶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "枼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "螃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "旁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蟀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "率",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蟆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "莫",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蟋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "悉",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蠕": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "虫",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "需",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "行": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彳",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "亍",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "衙": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "彳",
+    "color": "#4a7a59",
+    "dx": -140,
+    "dy": 0
+   },
+   {
+    "text": "吾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "亍",
+    "color": "#b8892e",
+    "dx": 140,
+    "dy": 0
+   }
+  ]
+ },
+ "表": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "龶",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𧘇",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "袋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "代",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "衣",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "袖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "衤",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "由",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "裂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "列",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "衣",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "裤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "衤",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "库",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "褒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亠",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "保",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "𧘇",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100,
+    "strokes_idx": [
+     11,
+     12,
+     13,
+     14
+    ]
+   }
+  ]
+ },
+ "西": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "一",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "𠁤",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "誊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "龹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "言",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "誓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "折",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "言",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "计": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "十",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "讹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "化",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "评": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "平",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "诗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "寺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "话": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "舌",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "诫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "戒",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "诲": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "每",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "诽": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "非",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "调": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "周",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "谆": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "享",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "谎": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "荒",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "谚": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "彦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "谨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "讠",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "堇",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "豌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "豆",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "宛",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "豪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "豕",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "豕：猪"
+   }
+  ]
+ },
+ "豺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "豸",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "才",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "货": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "化",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "贝",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "质": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𠂆",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "贰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "弋",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "弋：箭"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "贸": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "贝",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "贝：海贝"
+   }
+  ]
+ },
+ "贺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "加",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "贝",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "贻": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "贝",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "台",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "赘": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "敖",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "贝",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "赡": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "贝",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "詹",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "赶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "走",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "干",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "越": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "走",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "戉",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "趾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "止",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "跃": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "夭",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "跛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "皮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "跤": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "交",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "跷": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尧",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "跺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "朵",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "踊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甬",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蹂": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "柔",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蹋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𦐇",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蹭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "曾",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "蹲": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "尊",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "躏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "𧾷",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "蔺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "躯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "身",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "区",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "轮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "车",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "仑",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "辗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "车",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "展",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "辨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辛",
+    "color": "#4a7a59",
+    "dx": -140,
+    "dy": 0
+   },
+   {
+    "text": "辛",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   }
+  ]
+ },
+ "辰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "厂",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0,
+    "label": "厂：山边"
+   },
+   {
+    "text": "◇",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0
+   }
+  ]
+ },
+ "辱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辰",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "寸",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "连": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "车",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "迢": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "召",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "通": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "甬",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "逞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "呈",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "速": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "束",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "逮": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "隶",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "道": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "辶",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "首",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "郁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "有",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "阝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "郭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "享",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "阝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "都": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "者",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "阝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "凶",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甘",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酥": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "禾",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "各",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "孝",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "酿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "酉",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "良",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "释": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "釆",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𠬤",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "里": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "一",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "一：数目"
+   }
+  ]
+ },
+ "量": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "旦",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "里",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "针": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "十",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "钓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "勺",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "钟": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "中",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "钱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "戋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "钾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "甲",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "铐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "考",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "铛": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "当",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "链": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "连",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "销": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "肖",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "锄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "助",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "锌": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "辛",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "锣": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "罗",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "锰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "孟",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "锹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "秋",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "镀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "度",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "镐": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "高",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "镰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "钅",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "廉",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "闪": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "门",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "人",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "问": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "门",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "闰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "门",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "王",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "阀": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "门",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "伐",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "限": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "阝",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "艮",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "隔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "阝",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "鬲",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "集": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "隹",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "木",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "雇": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "户",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "隹",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "雳": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "雨",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "历",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "雹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "雨",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "包",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "需": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "雨",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "而",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "震": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "雨",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "辰",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "靠": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "告",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "非",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "鞍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "革",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "安",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "韭": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "非",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "一",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "韵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "音",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "匀",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "顾": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "厄",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "页",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "颁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "分",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "页",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "饺": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "交",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "饿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "我",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馁": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "妥",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馅": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "臽",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馋": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "𫥎",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馍": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "莫",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馏": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "留",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "馒": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "饣",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "曼",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "驰": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "也",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "驱": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "区",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "驶": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "史",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "驹": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "句",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "驻": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "主",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "骗": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "马",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "扁",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "高": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "亠",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -100
+   },
+   {
+    "text": "口",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 0
+   },
+   {
+    "text": "冋",
+    "color": "#b8892e",
+    "dx": 0,
+    "dy": 100
+   }
+  ]
+ },
+ "鬓": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "髟",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "宾",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "魅": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "鬼",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "未",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "鲨": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "沙",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "鱼",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "鲫": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "鱼",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "即",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鳄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "鱼",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "咢",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鳖": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "敝",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "鱼",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "鳞": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "鱼",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "粦",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鸯": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "央",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "鸟",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "鸳": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "夗",
+    "color": "#4a7a59",
+    "dx": 0,
+    "dy": -80
+   },
+   {
+    "text": "鸟",
+    "color": "#4a7a8c",
+    "dx": 0,
+    "dy": 80
+   }
+  ]
+ },
+ "鸵": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "鸟",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "它",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鹉": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "武",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "鸟",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鹊": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "昔",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "鸟",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "鹿": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "◇",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": 0
+   },
+   {
+    "text": "比",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 0,
+    "label": "比：挨着"
+   }
+  ]
+ },
+ "麻": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "广",
+    "color": "#4a7a59",
+    "dx": -100,
+    "dy": -60
+   },
+   {
+    "text": "林",
+    "color": "#4a7a8c",
+    "dx": 100,
+    "dy": 60
+   }
+  ]
+ },
+ "黔": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "黑",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "今",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ },
+ "龄": {
+  "centerY": 120,
+  "parts": [
+   {
+    "text": "齿",
+    "color": "#4a7a59",
+    "dx": -120,
+    "dy": 0
+   },
+   {
+    "text": "令",
+    "color": "#4a7a8c",
+    "dx": 120,
+    "dy": 0
+   }
+  ]
+ }
+}
