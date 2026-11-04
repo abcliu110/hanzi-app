@@ -37,7 +37,7 @@ var MODES = {
   rewrite: { name: '句式改写', icon: '🔄', desc: '换个说法来表达' }
 };
 var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite'];
-var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验' };
+var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验', guwen: '古文' };
 
 /* ---------- 会话状态 ---------- */
 var S = {

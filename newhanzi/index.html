@@ -35,7 +35,11 @@
     </button>
     <button class="panel" type="button" data-m="yuwen">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8l8 8L20 36l-10 2 2-10z"/><path d="M28 12l8 8"/></svg>
-      <b>语法</b><div class="prog"><i style="width:12%"></i></div><div class="prog-tx">90 项</div>
+      <b>语法</b><div class="prog"><i style="width:12%"></i></div><div class="prog-tx">99 项</div>
+    </button>
+    <button class="panel" type="button" data-m="yuedu">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10c6-3 12-3 16 0 4-3 10-3 16 0v28c-6-3-12-3-16 0-4-3-10-3-16 0z"/><path d="M24 10v28"/></svg>
+      <b>阅读与写作</b><div class="prog"><i style="width:5%"></i></div><div class="prog-tx">读写</div>
     </button>
     <button class="panel" type="button" data-m="logic">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="16"/><path d="M24 14v10l7 5"/></svg>
@@ -117,6 +121,10 @@
       <iframe src="yuwen.html" title="语法"></iframe>
     </div>
 
+    <div id="panel-yuedu" class="panel-frame" style="display:none">
+      <iframe src="yuedu-xiezuo.html" title="阅读与写作"></iframe>
+    </div>
+
     <div id="panel-logic" class="panel-logic" style="display:none">
       <div id="logiclist"></div>
     </div>
@@ -156,12 +164,14 @@
   var modSub = document.getElementById('modSub');
   var panels = {shizi: document.getElementById('panel-shizi'),
                 yuwen: document.getElementById('panel-yuwen'),
+                yuedu: document.getElementById('panel-yuedu'),
                 logic: document.getElementById('panel-logic'),
                 lab: document.getElementById('panel-lab'),
                 bushou: document.getElementById('panel-bushou'),
                 shici: document.getElementById('panel-shici'),
                 guwen: document.getElementById('panel-guwen')};
   var titles = {shizi:['识字','3500 常用字'], yuwen:['语法','句子 / 修辞 / 病句'],
+    yuedu:['阅读与写作','阅读 / 写作'],
     logic:['逻辑','推理 / 判断'], lab:['实验','动手 / 观察'],
     bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','120 首 / 常识卡'],
     guwen:['古文','文言 / 寓言 / 名篇']};
@@ -243,7 +253,7 @@
     for(var k in panels) panels[k].style.display = (k===m?'block':'none');
     /* iframe 模块自带左上角返回按钮，父页按钮隐藏，避免出现两个 */
     var btnBack = document.getElementById('btnBack');
-    var isIframe = (m==='yuwen'||m==='lab'||m==='bushou'||m==='shici'||m==='guwen');
+    var isIframe = (m==='yuwen'||m==='yuedu'||m==='lab'||m==='bushou'||m==='shici'||m==='guwen');
     if(btnBack) btnBack.style.display = isIframe ? 'none' : '';
     if(m==='logic' && !panels.logic.dataset.done){
       var D = (window.NHZ_YUWEN||{}).logic;
@@ -254,7 +264,7 @@
           h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
             c.items.map(lessonHtml).join('');
         });
-        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 学完去闯关：逻辑大闯关 →</a>';
+        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：逻辑大闯关 →</a>';
         el.innerHTML = h;
       }
       panels.logic.dataset.done='1';
