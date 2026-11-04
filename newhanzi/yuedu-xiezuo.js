@@ -80,7 +80,7 @@
     var html = '';
     var counts = { reading: 0, writing: 0 };
     points.forEach(function (p) { if (match(p, q)) counts[p.mod.key]++; });
-    html += '<p class="src-note">阅读 ' + counts.reading + ' 点 · 写作 ' + counts.writing + ' 点 · 程序型范式：步骤卡 → 全程演示（决策树内容待增补，不编造）。</p>';
+    html += '<p class="src-note">阅读 ' + counts.reading + ' 点 · 写作 ' + counts.writing + ' 点 · 步骤卡 → 全程演示。</p>';
     MODULES.forEach(function (m) {
       var cats = {};
       var order = [];
