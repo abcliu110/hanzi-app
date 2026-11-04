@@ -176,6 +176,45 @@
       '辨析': { analogy: '💡 啊哈现象', rule: '辨析对照', ex: '分水岭例句', bad: '天坑病例' },
       '程序': { analogy: '💡 啊哈现象', rule: '一句话', ex: '全程演示', bad: '易错诊所' }
     }[tp];
+    /* 4. 规则/对照/步骤 */
+    if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
+      body += stepHead(T.rule);
+      if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
+    if (it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
+    if (it['例子'] && it['例子'].length) {
+      body += '<div class="words">' + it['例子'].map(function (w) {
+        return '<span>' + esc(w) + '</span>';
+      }).join('') + '</div>';
+    }
+    } /* 4. 规则一句话结束：此前缺了这个右括号，导致文件尾多出一个 }) */
+    /* 4a. 分类：每个子类单独一块（类名 + 代表词 + 例句），不再只藏在一段话里 */
+    if (it['分类'] && it['分类'].length) {
+      var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
+      body += stepHead('分类 · ' + it['分类'].length + '类');
+      body += it['分类'].map(function (c, ci) {
+        return '<div class="yw-fenlei" style="--fl:' + flColors[ci % flColors.length] + '">' +
+          '<div class="yw-fl-head"><span class="yw-fl-name">' + esc(c['类']) + '</span>' +
+          '<span class="yw-fl-rep">' + esc(c['代表'] || '') + '</span></div>' +
+          '<p class="yw-exp">' + esc(c['说明'] || '') + '</p>' +
+          (c['例子'] ? c['例子'].map(function (e) {
+            return '<p class="yw-exp">📝 ' + esc(e) + '</p>';
+          }).join('') : '') + '</div>';
+      }).join('');
+    }
+    /* 4c. 怎么认：程序型重排为步骤卡形态 */
+    if (it['怎么认'] && it['怎么认'].length) {
+      if (tp === '程序') {
+        body += stepHead('🃏 步骤卡') + '<div class="yw-stepcards">' +
+          it['怎么认'].map(function (s, si) {
+            return '<div class="yw-stepcard"><span class="yw-stepcard-n">' + (si + 1) + '</span><span>' + esc(s) + '</span></div>';
+          }).join('') + '</div>';
+      } else {
+        body += stepHead('怎么认') +
+          it['怎么认'].map(function (s, si) {
+            return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
+          }).join('');
+      }
+    }
     /* 1. 啊哈现象（类比） */
     if (it['类比']) body += stepHead(T.analogy,'蒙特梭利语法符号') +
       '<div class="yw-analogy">' + it['类比'] + '</div>';
@@ -204,47 +243,8 @@
         '<div class="game-area"></div>' +
         '<div class="game-fb"></div></div>';
     }
-    /* 4. 规则/对照/步骤 */
-    if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
-      body += stepHead(T.rule);
-      if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
-    if (it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
-    if (it['例子'] && it['例子'].length) {
-      body += '<div class="words">' + it['例子'].map(function (w) {
-        return '<span>' + esc(w) + '</span>';
-      }).join('') + '</div>';
-    }
-    } /* 4. 规则一句话结束：此前缺了这个右括号，导致文件尾多出一个 }) */
-    /* 4a. 分类：每个子类单独一块（类名 + 代表词 + 例句），不再只藏在一段话里 */
-    if (it['分类'] && it['分类'].length) {
-      var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
-      body += stepHead('分类 · ' + it['分类'].length + '类');
-      body += it['分类'].map(function (c, ci) {
-        return '<div class="yw-fenlei" style="--fl:' + flColors[ci % flColors.length] + '">' +
-          '<div class="yw-fl-head"><span class="yw-fl-name">' + esc(c['类']) + '</span>' +
-          '<span class="yw-fl-rep">' + esc(c['代表'] || '') + '</span></div>' +
-          '<p class="yw-exp">' + esc(c['说明'] || '') + '</p>' +
-          (c['例子'] ? c['例子'].map(function (e) {
-            return '<p class="yw-exp">📝 ' + esc(e) + '</p>';
-          }).join('') : '') + '</div>';
-      }).join('');
-    }
     /* 4b. 深讲一点（语法深讲样板：词类） */
     if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
-    /* 4c. 怎么认：程序型重排为步骤卡形态 */
-    if (it['怎么认'] && it['怎么认'].length) {
-      if (tp === '程序') {
-        body += stepHead('🃏 步骤卡') + '<div class="yw-stepcards">' +
-          it['怎么认'].map(function (s, si) {
-            return '<div class="yw-stepcard"><span class="yw-stepcard-n">' + (si + 1) + '</span><span>' + esc(s) + '</span></div>';
-          }).join('') + '</div>';
-      } else {
-        body += stepHead('怎么认') +
-          it['怎么认'].map(function (s, si) {
-            return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
-          }).join('');
-      }
-    }
     /* 4d. 辨析 */
     if (it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
     /* 4e. 例句解析：程序型标题为全程演示 */
