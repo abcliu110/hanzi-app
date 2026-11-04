@@ -12,12 +12,12 @@
 <div id="view-home" class="home-view">
   <div class="brand"><h1>识字星球</h1><p>护眼学习</p></div>
   <div class="today">
-    <div><div class="t-num" id="stTotal">0</div><div class="t-label">今日学习</div></div>
+    <div><div class="t-num" id="stTotal">0</div><div class="t-label">已学字数</div></div>
     <div class="t-mid">
       <div class="t-row"><span id="heroPct">完成度 0%</span><span id="learnedCount">已学 0 / 3500</span></div>
       <div class="t-bar"><div class="t-fill" id="pfill"></div></div>
     </div>
-    <div class="t-side"><b id="stToday">0</b> 新字 · <a href="fuxi.html" style="color:inherit;text-decoration:underline"><b id="stReview">0</b> 待复习</a></div>
+    <div class="t-side"><b id="stToday">0</b> 今日新字 · <a href="fuxi.html" style="color:inherit;text-decoration:underline"><b id="stReview">0</b> 待复习</a></div>
   </div>
   <div class="today-task" id="todayTask" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 14px 12px">
     <h2 style="margin:0 0 4px;font-size:17px">📋 今日任务</h2>
@@ -43,7 +43,7 @@
     </button>
     <button class="panel" type="button" data-m="bushou">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h6a4 4 0 014 4v4h4a4 4 0 014 4v6a4 4 0 01-4 4h-4v4a4 4 0 01-4 4h-6a4 4 0 01-4-4v-4h-4a4 4 0 01-4-4v-6a4 4 0 014-4h4v-4a4 4 0 014-4z"/></svg>
-      <b>部首</b><div class="prog"><i style="width:8%"></i></div><div class="prog-tx">214 部首</div>
+      <b>部首</b><div class="prog"><i style="width:8%"></i></div><div class="prog-tx">240 部首</div>
     </button>
     <button class="panel" type="button" data-m="shici">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 28A14 14 0 1120 8a11 11 0 0016 20z"/></svg>
@@ -51,7 +51,7 @@
     </button>
     <button class="panel" type="button" data-m="guwen">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10c6-3 12-3 16 0 4-3 10-3 16 0v28c-6-3-12-3-16 0-4-3-10-3-16 0z"/><path d="M24 10v28"/></svg>
-      <b>古文</b><div class="prog"><i style="width:10%"></i></div><div class="prog-tx">12 篇</div>
+      <b>古文</b><div class="prog"><i style="width:10%"></i></div><div class="prog-tx">50 篇</div>
     </button>
     <button class="panel" type="button" data-m="lab">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6h8M22 6v12l-10 18a4 4 0 003.5 6h17a4 4 0 003.5-6L26 18V6"/><path d="M16 30h16"/></svg>
@@ -84,20 +84,20 @@
           </div>
           <div class="tabrow">
             <span class="browse-hint">点右侧索引可快速跳转</span>
-            <select id="gradeSel" title="按年级筛选" style="padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px">
+            <select id="gradeSel" title="年级生字表尚未录入，选年级会提示待核对" style="padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px">
               <option value="">全部年级</option>
-              <option value="1上">一年级上册</option>
-              <option value="1下">一年级下册</option>
-              <option value="2上">二年级上册</option>
-              <option value="2下">二年级下册</option>
-              <option value="3上">三年级上册</option>
-              <option value="3下">三年级下册</option>
-              <option value="4上">四年级上册</option>
-              <option value="4下">四年级下册</option>
-              <option value="5上">五年级上册</option>
-              <option value="5下">五年级下册</option>
-              <option value="6上">六年级上册</option>
-              <option value="6下">六年级下册</option>
+              <option value="1上">一年级上册（待录入）</option>
+              <option value="1下">一年级下册（待录入）</option>
+              <option value="2上">二年级上册（待录入）</option>
+              <option value="2下">二年级下册（待录入）</option>
+              <option value="3上">三年级上册（待录入）</option>
+              <option value="3下">三年级下册（待录入）</option>
+              <option value="4上">四年级上册（待录入）</option>
+              <option value="4下">四年级下册（待录入）</option>
+              <option value="5上">五年级上册（待录入）</option>
+              <option value="5下">五年级下册（待录入）</option>
+              <option value="6上">六年级上册（待录入）</option>
+              <option value="6下">六年级下册（待录入）</option>
               <option value="none">未分级</option>
             </select>
             <button class="chip-toggle" type="button" id="onlyNew">只看未学</button>

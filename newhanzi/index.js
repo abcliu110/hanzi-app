@@ -40,13 +40,23 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function dueReviewCount() {
+    var now = Date.now(), n = 0;
+    try {
+      var srs = JSON.parse(localStorage.getItem('nhz_srs') || '{}') || {};
+      for (var id in srs) {
+        if (srs[id] && typeof srs[id].next === 'number' && srs[id].next <= now) n++;
+      }
+    } catch (e) {}
+    return n;
+  }
   function updateProgress() {
     var keys = Object.keys(learned);
     var n = keys.length;
     var today = todayStr();
     var nToday = 0;
     keys.forEach(function (z) { if (learned[z] === today) nToday++; });
-    var review = n - nToday;
+    var review = dueReviewCount();
     document.getElementById('learnedCount').textContent = '已学 ' + n + ' / 3500';
     document.getElementById('pfill').style.width = (n / 3500 * 100).toFixed(1) + '%';
     document.getElementById('stTotal').textContent = n;

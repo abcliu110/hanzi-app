@@ -7,7 +7,7 @@
 
   /* ---- 与各页错题钩子同款 helper（保持一致，勿单改一处） ---- */
   window.NHZReview = window.NHZReview || (function () {
-    var WK = 'nhz_wrong', SK = 'nhz_srs';
+    var WK = 'nhz_wrong', SK = 'nhz_srs', FK = 'nhz_srs_face';
     var IV = [1, 2, 4, 7, 15, 30];
     function load(k, fb) {
       try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
@@ -60,20 +60,34 @@
       save(SK, srs);
       return true;
     }
-    // 已掌握清除：错题本与复习安排一起清
+    // 已掌握清除：错题本、题面库与复习安排一起清
     function clearWrong(id) {
-      var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+      var wrong = load(WK, []), srs = load(SK, {}), faces = load(FK, {}), nw = [];
       for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
       save(WK, nw);
       if (srs[id]) { delete srs[id]; save(SK, srs); }
+      if (faces[id]) { delete faces[id]; save(FK, faces); }
     }
-    // 新学"记得"：直接安排首次复习（默认 1 天后），不进错题本
-    function schedule(id, ivIdx) {
+    // 新学"记得"：安排首次复习，并写入题面库（到期时靠题面库回放，不进错题本）
+    function schedule(id, ivIdx, it) {
       if (!id) return;
       var srs = load(SK, {}), now = Date.now();
-      var iv = Math.max(0, Math.min(ivIdx || 0, IV.length - 1));
+      var iv = Math.max(0, Math.min(ivIdx == null ? 0 : ivIdx, IV.length - 1));
       srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
       save(SK, srs);
+      if (it && it.q) {
+        var faces = load(FK, {});
+        faces[id] = {
+          id: id, q: it.q, options: it.options || [], answer: it.answer,
+          解析: it['解析'] || '', src: it.src || '', point: it.point || ''
+        };
+        save(FK, faces);
+      }
+    }
+    function faceOf(id) {
+      var wrong = load(WK, []);
+      for (var i = 0; i < wrong.length; i++) if (wrong[i].id === id) return wrong[i];
+      return load(FK, {})[id] || null;
     }
     /* ---- SRS模型§3：三态派生视图（只读，不新增存储） ----
      * 未学：id ∉ nhz_srs
@@ -108,7 +122,7 @@
       return out;
     }
     return { record: record, review: review, clearWrong: clearWrong, schedule: schedule, idOf: idOf,
-      stateOf: stateOf, dueItems: dueItems, wrongItems: wrongItems,
+      stateOf: stateOf, dueItems: dueItems, wrongItems: wrongItems, faceOf: faceOf,
       loadWrong: function () { return load(WK, []); },
       loadSrs: function () { return load(SK, {}); } };
   })();
@@ -148,11 +162,16 @@
     var d = new Date(ts);
     return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
   }
-  function optsHtml(w) {
+  function optsHtml(w, revealed) {
     if (!w.options || !w.options.length) return '';
     return '<div class="fx-opts">' + w.options.map(function (o) {
-      return '<span class="fx-opt' + (o === w.answer ? ' fx-right' : '') + '">' + esc(o) + '</span>';
+      return '<span class="fx-opt' + (revealed && o === w.answer ? ' fx-right' : '') + '">' + esc(o) + '</span>';
     }).join('') + '</div>';
+  }
+  /* 新学只抽选择题：须有 opts 数组 + 数字下标答案 */
+  function isChoiceQ(q) {
+    return !!(q && q.q && Array.isArray(q.opts) && q.opts.length &&
+      typeof q.a === 'number' && q.a >= 0 && q.a < q.opts.length && q.opts[q.a] != null);
   }
 
   /* ---------- 今日队列（阶段1效率引擎） ----------
@@ -201,13 +220,15 @@
       point: pool.title || pool.tab || ''
     };
   }
-  /* C段：从题库抽未见过的新题；当日已抽的复用，避免每次渲染重抽 */
+  /* C段：从题库抽未见过的选择题；当日已抽的复用，避免每次渲染重抽 */
   function sampleFresh(n, seen) {
     if (n <= 0 || !window.NHZ_POOLS || !window.NHZ_POOLS.length) return [];
     try {
       var saved = JSON.parse(localStorage.getItem(QFRESH_KEY) || 'null');
       if (saved && saved.date === todayStr() && saved.items && saved.items.length) {
-        var kept = saved.items.filter(function (it) { return !seen[window.NHZReview.idOf(it)]; });
+        var kept = saved.items.filter(function (it) {
+          return it && it.options && it.options.length && it.answer != null && !seen[window.NHZReview.idOf(it)];
+        });
         if (kept.length) return kept.slice(0, n);
       }
     } catch (e) {}
@@ -217,7 +238,7 @@
       var g = pool.tab || pool.title || '?';
       for (var mode in pool.modes) {
         (pool.modes[mode] || []).forEach(function (q) {
-          if (!q || !q.q) return;
+          if (!isChoiceQ(q)) return;
           var it = normalizeFresh(pool, q);
           var id = window.NHZReview.idOf(it);
           if (seen[id]) return;
@@ -243,24 +264,25 @@
     var wrong = window.NHZReview.loadWrong();
     var srs = window.NHZReview.loadSrs();
     var now = Date.now();
-    var byId = {};
-    wrong.forEach(function (w) { byId[w.id] = w; });
     var seen = {};
-    for (var id in byId) seen[id] = 1;
+    wrong.forEach(function (w) { seen[w.id] = 1; });
     for (var sid in srs) seen[sid] = 1;
-    /* A段：到期复习，将忘优先（逾期毫秒数倒序） */
+    /* A段：到期复习（错题本或题面库均可回放），将忘优先 */
     var due = [];
     for (var did in srs) {
-      if (srs[did].next <= now && byId[did]) {
-        due.push({ it: byId[did], qid: did, seg: 'due', k: now - srs[did].next });
-      }
+      if (!(srs[did] && srs[did].next <= now)) continue;
+      var face = window.NHZReview.faceOf(did);
+      if (face) due.push({ it: face, qid: did, seg: 'due', k: now - srs[did].next });
     }
     due.sort(function (a, b) { return b.k - a.k; });
-    /* B段：错题回炉（错题本中有但未到期），先错先来 */
+    var dueIds = {};
+    due.forEach(function (e) { dueIds[e.qid] = 1; });
+    /* B段：错题回炉——仅 iv=0 或尚无 srs 的未到期错题（已推进间隔的勿再塞回炉） */
     var retry = [];
     wrong.forEach(function (w) {
+      if (dueIds[w.id]) return;
       var s = srs[w.id];
-      if (!s || s.next > now) retry.push({ it: w, qid: w.id, seg: 'retry', k: w.addedAt || 0 });
+      if (!s || s.iv === 0) retry.push({ it: w, qid: w.id, seg: 'retry', k: w.addedAt || 0 });
     });
     retry.sort(function (a, b) { return a.k - b.k; });
     /* 复习预算 = 会话上限 - 新学配额；到期优先占位后交错 */
@@ -287,7 +309,7 @@
     return '<div class="fx-card" data-seg="' + seg + '" data-qid="' + esc(e.qid) + '">' +
       '<div class="fx-src"><span class="fx-seg fx-seg-' + seg + '">' + SEG_LABEL[seg] + '</span>' +
       esc(w.src || '') + (w.point ? ' · ' + esc(w.point) : '') + '</div>' +
-      '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w) +
+      '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w, false) +
       '<div class="fx-ans" hidden><p>答案：' + esc(w.answer) + '</p>' +
       (w['解析'] ? '<p>' + esc(w['解析']) + '</p>' : '') + '</div>' +
       '<button class="fx-btn" data-act="show">显示答案</button>' +
@@ -327,7 +349,7 @@
         h += '<div class="fx-card" data-wrong="' + esc(w.id) + '">' +
           '<div class="fx-src">' + esc(w.src) + ' · ' + esc(w.point) +
           (s ? ' · 下次复习：' + fmtDate(s.next) : '') + '</div>' +
-          '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w) +
+          '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w, true) +
           '<p>答案：' + esc(w.answer) + '</p>' +
           (w['解析'] ? '<p>' + esc(w['解析']) + '</p>' : '') +
           '<button class="fx-btn" data-act="clear">已掌握，清除</button></div>';
@@ -360,6 +382,14 @@
       card.querySelector('.fx-ans').hidden = false;
       btn.hidden = true;
       card.querySelector('.fx-grade').hidden = false;
+      /* 揭晓后再标正确选项，避免未回忆就看见答案 */
+      var entryShow = queueIndex[card.getAttribute('data-qid')];
+      if (entryShow && entryShow.it && entryShow.it.answer != null) {
+        var opts = card.querySelectorAll('.fx-opt');
+        for (var oi = 0; oi < opts.length; oi++) {
+          if (opts[oi].textContent === entryShow.it.answer) opts[oi].classList.add('fx-right');
+        }
+      }
     } else if (act === 'remember' || act === 'forget') {
       var seg = card.getAttribute('data-seg');
       var qid = card.getAttribute('data-qid');
@@ -368,22 +398,25 @@
       if (seg === 'due') {
         /* 到期复习：记得推进间隔，忘了回到 1 天 */
         window.NHZReview.review(qid, remembered);
+        if (!remembered && entry) window.NHZReview.record(entry.it, false);
         var s = window.NHZReview.loadSrs()[qid];
         lastNote = s ? (remembered ? '记得！下次复习：' + fmtDate(s.next) + '。'
           : '忘了也没关系，下次复习：' + fmtDate(s.next) + '。') : '已记录。';
       } else if (seg === 'retry') {
-        /* 错题回炉：记得=已掌握清除，忘了=重新安排明天 */
+        /* 错题回炉：记得=推进间隔（勿清进度），忘了=重新安排明天；清除留给「已掌握」按钮 */
         if (remembered) {
-          window.NHZReview.clearWrong(qid);
-          lastNote = '已掌握，从错题本清除。';
+          if (!window.NHZReview.loadSrs()[qid] && entry) window.NHZReview.record(entry.it, false);
+          window.NHZReview.review(qid, true);
+          var sr = window.NHZReview.loadSrs()[qid];
+          lastNote = sr ? '记得！下次复习：' + fmtDate(sr.next) + '。' : '已记录。';
         } else if (entry) {
           window.NHZReview.record(entry.it, false);
           lastNote = '明天再复习这道。';
         }
       } else if (seg === 'new') {
-        /* 新学：记得=安排首次复习，忘了=记入错题本 */
+        /* 新学：记得=安排首次复习（写题面库），忘了=记入错题本 */
         if (remembered) {
-          window.NHZReview.schedule(qid, 0);
+          window.NHZReview.schedule(qid, 0, entry && entry.it);
           lastNote = '新知识已学，明天第一次复习。';
         } else if (entry) {
           window.NHZReview.record(entry.it, false);

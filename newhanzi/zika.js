@@ -90,7 +90,7 @@
       /* 字源可信度：迁移自老 app origin.conf；空值显示“未标注”，不编造 */
       zy += kv('字源可信度', z['可信度'] ? esc(z['可信度']) + (z['可信度'] === '待查' ? '（说法尚待核对）' : '') : '未标注');
       if (z['反切']) zy += kv('反切', esc(z['反切']));
-      if (z['小篆']) zy += kv('小篆', '<span style="font-size:28px">' + esc(z['小篆']) + '</span>');
+      /* 小篆字段系统性错位（如天→七），DATA_MODEL.md 已标注不可靠，暂不展示 */
       if (z['演变阶段']) {
         zy += '<div class="kv"><div class="k">演变</div><div class="v"><div class="evo">' +
           asArray(z['演变阶段']).map(function (s, i) {
@@ -220,28 +220,28 @@
         '<div class="err">没有指定汉字，<a href="index.html">回首页选字</a></div>';
       return;
     }
-    // 记为已学（首页识字表进度用），带首次学习日期
-    try {
-      var k = 'nhz_learned';
-      var raw = localStorage.getItem(k);
-      var map = raw ? JSON.parse(raw) : {};
-      if (Array.isArray(map)) {
-        // 老格式迁移：都是今天学的
-        var m2 = {};
-        map.forEach(function (x) { m2[x] = todayStr(); });
-        map = m2;
-      }
-      if (!map[zi]) {
-        map[zi] = todayStr();
-        localStorage.setItem(k, JSON.stringify(map));
-      }
-    } catch (e) {}
     var s = document.createElement('script');
     s.src = 'data/zika/' + encodeURIComponent(zi) + '.js';
     s.onload = function () {
       var rec = window.NHZ_ZIKA;
-      if (rec && rec.zi === zi) render(rec);
-      else showErr(zi);
+      if (rec && rec.zi === zi) {
+        // 数据加载成功后再记为已学，避免 404/错字撑大进度
+        try {
+          var k = 'nhz_learned';
+          var raw = localStorage.getItem(k);
+          var map = raw ? JSON.parse(raw) : {};
+          if (Array.isArray(map)) {
+            var m2 = {};
+            map.forEach(function (x) { m2[x] = todayStr(); });
+            map = m2;
+          }
+          if (!map[zi]) {
+            map[zi] = todayStr();
+            localStorage.setItem(k, JSON.stringify(map));
+          }
+        } catch (e) {}
+        render(rec);
+      } else showErr(zi);
     };
     s.onerror = function () { showErr(zi); };
     document.head.appendChild(s);

@@ -4,8 +4,8 @@ const PORT = process.env.PORT || 4173;
 module.exports = defineConfig({
   testDir: "tests",
   timeout: 60_000,
-  fullyParallel: true,
-  workers: process.env.CI ? 4 : undefined,
+  fullyParallel: false,
+  workers: 1,
   reporter: process.env.CI ? [["list"], ["github"]] : "list",
   expect: { timeout: 10_000 },
   use: { baseURL: `http://127.0.0.1:${PORT}/`, serviceWorkers: "block" },
