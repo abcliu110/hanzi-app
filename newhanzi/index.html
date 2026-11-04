@@ -167,40 +167,73 @@
     guwen:['古文','文言 / 寓言 / 名篇']};
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  function lessonHtml(it){
+  var logicAnimData = {};
+  function lessonHtml(it, idx){
     var b='', step=0;
     function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
     function escA(s){return esc(s).replace(/"/g,'&quot;');}
+    function quizBlock(qs){
+      return '<div class="yw-quiz">'+qs.map(function(q,qi){
+        return '<div class="quiz-q"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div><div class="quiz-opts">'+
+          q.options.map(function(op,oi){return '<button data-a="'+q.answer+'" data-oi="'+oi+'" data-p="'+escA(q['解析']||'')+'">'+esc(op)+'</button>';}).join('')+
+          '</div><div class="quiz-fb"></div></div>';
+      }).join('')+'</div>';
+    }
+    /* 学前先看：仅当有真实前置时显示 */
+    if(it['前置知识']&&it['前置知识'].length){
+      b += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+it['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
+    }
+    /* 今天的目标 */
+    if(it['目标']) b += '<div class="yw-goal">🎯 今天的目标：'+esc(it['目标'])+'</div>';
+    /* 先试试：动手练第1题提到最前面 */
+    var lx = it['练习']||[];
+    if(lx.length){
+      b += '<div class="yw-try"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">先试试</span></div><p class="yw-exp">先做一道题，再往下看讲解。</p>'+quizBlock([lx[0]])+'</div>';
+    }
+    if(it['讲解']) b += sh('规则一句话')+'<p class="yw-exp">'+esc(it['讲解'])+'</p>';
+    /* 动画演示：沿用语法页播放器（步骤0的词＋每步说明） */
+    if(it['动画']&&it['动画'].steps&&it['动画'].steps.length){
+      var aid = 'lanim'+(typeof idx==='number'?idx:0)+'_'+Math.floor(Math.random()*100000);
+      b += sh('动画演示')+'<div class="yw-anim" id="'+aid+'">'+
+        '<div class="yw-anim-tokens">'+it['动画'].steps[0].tokens.map(function(t){ return '<span class="tok">'+esc(t)+'</span>'; }).join('')+'</div>'+
+        '<div class="yw-anim-note">'+esc(it['动画'].steps[0].note||'')+'</div>'+
+        '<div class="yw-anim-ctrl"><button data-aid="'+aid+'" data-act="play">▶ 播放</button>'+
+        '<button data-aid="'+aid+'" data-act="step">单步</button></div></div>';
+      logicAnimData[aid] = it['动画'].steps;
+    }
     if(it['类比']) b += sh('打个比方')+'<div class="yw-analogy">'+it['类比']+'</div>';
     if(it['图示']) b += sh('看图说话')+'<div class="yw-diagram">'+it['图示']+'</div>';
-    if(it['讲解']) b += sh('规则一句话')+'<p class="yw-exp">'+esc(it['讲解'])+'</p>';
     if(it['口诀']) b += '<div class="yw-koujue2">🗣️ 口诀：'+esc(it['口诀'])+'</div>';
-    if(it['例子']&&it['例子'].length) b += '<div class="words">'+it['例子'].map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div>';
-    if(it['深讲']) b += sh('深讲一点')+'<p class="yw-exp">'+esc(it['深讲'])+'</p>';
+    /* 例子：同时有好/坏对照时分组，否则保持原样 */
+    if(it['例子']&&it['例子'].length){
+      var good = it['例子'].filter(function(e){ return e.indexOf('好')===0; });
+      var bad = it['例子'].filter(function(e){ return e.indexOf('坏')===0; });
+      var rest = it['例子'].filter(function(e){ return e.indexOf('好')!==0 && e.indexOf('坏')!==0; });
+      b += sh('例子');
+      if(good.length && bad.length){
+        b += '<div class="yw-exgroups">'+
+          '<div class="yw-exg"><b>✅ 正例</b><div class="words">'+good.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>'+
+          '<div class="yw-exg"><b>❌ 反例</b><div class="words">'+bad.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>'+
+          (rest.length?'<div class="yw-exg"><b>⚠️ 病例</b><div class="words">'+rest.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>':'')+
+          '</div>';
+      } else {
+        b += '<div class="words">'+it['例子'].map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div>';
+      }
+    }
     if(it['怎么认']&&it['怎么认'].length) b += sh('怎么认')+'<div class="yw-exp">'+it['怎么认'].map(function(s,si){return (si+1)+'、'+esc(s);}).join('<br>')+'</div>';
+    if(it['深讲']) b += sh('深讲一点')+'<p class="yw-exp">'+esc(it['深讲'])+'</p>';
     if(it['辨析']) b += '<div class="warn">🔍 辨析：'+esc(it['辨析'])+'</div>';
     if(it['例句解析']&&it['例句解析'].length) b += sh('例句解析')+it['例句解析'].map(function(e){
       return '<p class="yw-exp">“'+esc(e.句)+'”<br>↳ '+esc(e.析)+'</p>';}).join('');
     if(it['易错']) b += sh('易错诊所')+'<div class="warn">⚠️ '+esc(it['易错'])+'</div>';
-    if(it['练习']&&it['练习'].length){
-      b += sh('动手练')+'<div class="yw-quiz">'+it['练习'].map(function(q,qi){
-        return '<div class="quiz-q"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div><div class="quiz-opts">'+
-          q.options.map(function(op,oi){return '<button data-a="'+q.answer+'" data-oi="'+oi+'" data-p="'+escA(q['解析']||'')+'">'+esc(op)+'</button>';}).join('')+
-          '</div><div class="quiz-fb"></div></div>';
-      }).join('')+'</div>';
-    }
-    if(it['小测']&&it['小测'].length){
-      b += sh('动手小测')+'<div class="yw-quiz">'+it['小测'].map(function(q,qi){
-        return '<div class="quiz-q"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div><div class="quiz-opts">'+
-          q.options.map(function(op,oi){return '<button data-a="'+q.answer+'" data-oi="'+oi+'" data-p="'+escA(q['解析']||'')+'">'+esc(op)+'</button>';}).join('')+
-          '</div><div class="quiz-fb"></div></div>';
-      }).join('')+'</div>';
-    }
+    /* 小结：口诀复述＋快速回忆 */
+    if(it['口诀']) b += '<div class="yw-summary">📌 小结：'+esc(it['口诀'])+'<br>快速回忆：合上页面，试着说出「'+esc(it.name||'')+'」的要点，再展开对照。</div>';
+    if(lx.length > 1) b += sh('动手练')+quizBlock(lx.slice(1));
+    if(it['小测']&&it['小测'].length) b += sh('动手小测')+quizBlock(it['小测']);
     return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+
       (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
   }
-
   function openModule(m){
     if(!panels[m]) return;
     viewHome.style.display='none';
@@ -216,11 +249,12 @@
       var D = (window.NHZ_YUWEN||{}).logic;
       var el = document.getElementById('logiclist');
       if(D&&el){
-        var h='<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;">🎮 互动练习：逻辑大闯关 →</a>';
+        var h='';
         D.categories.forEach(function(c){
           h += '<div class="ghead">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
             c.items.map(lessonHtml).join('');
         });
+        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;">🎮 学完去闯关：逻辑大闯关 →</a>';
         el.innerHTML = h;
       }
       panels.logic.dataset.done='1';
@@ -237,9 +271,103 @@
     window.scrollTo(0,0);
   });
 
+  window.NHZReview = window.NHZReview || (function () {
+    var WK = 'nhz_wrong', SK = 'nhz_srs';
+    var IV = [1, 2, 4, 7, 15, 30];
+    function load(k, fb) {
+      try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+      catch (e) { return fb; }
+    }
+    function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function hash(s) {
+      var h = 0;
+      for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+      return 'q' + (h < 0 ? -h : h);
+    }
+    function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+    function record(it, correct) {
+      if (!it || !it.q) return;
+      var id = idOf(it);
+      var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+      if (correct) {
+        if (srs[id]) {
+          var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+          srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+          save(SK, srs);
+        }
+      } else {
+        var found = false;
+        for (var i = 0; i < wrong.length; i++) {
+          if (wrong[i].id === id) {
+            wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+              解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+            found = true; break;
+          }
+        }
+        if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+          解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+        save(WK, wrong);
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+        save(SK, srs);
+      }
+    }
+    function review(id, remembered) {
+      var srs = load(SK, {}), now = Date.now();
+      if (!srs[id]) return false;
+      if (remembered) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+      } else {
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      }
+      save(SK, srs);
+      return true;
+    }
+    function clearWrong(id) {
+      var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+      for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+      save(WK, nw);
+      if (srs[id]) { delete srs[id]; save(SK, srs); }
+    }
+    return { record: record, review: review, clearWrong: clearWrong,
+      loadWrong: function () { return load(WK, []); },
+      loadSrs: function () { return load(SK, {}); } };
+  })();
   document.addEventListener('click', function(e){
     var h = e.target.closest('.yw-head');
     if(h){ h.parentElement.classList.toggle('open'); return; }
+    var ab = e.target.closest('[data-aid]');
+    if(ab){
+      var aid = ab.getAttribute('data-aid');
+      var act = ab.getAttribute('data-act');
+      var steps = logicAnimData[aid];
+      var box = document.getElementById(aid);
+      if(!steps || !box) return;
+      var toks = box.querySelectorAll('.tok');
+      var note = box.querySelector('.yw-anim-note');
+      var cur = parseInt(box.getAttribute('data-cur') || '0', 10);
+      e.stopPropagation();
+      if(act === 'step'){
+        cur = (cur + 1) % steps.length;
+        showStep(cur);
+      } else {
+        cur = 0;
+        var timer = setInterval(function(){
+          showStep(cur);
+          cur++;
+          if(cur >= steps.length) clearInterval(timer);
+        }, 1200);
+        return;
+      }
+      function showStep(i){
+        box.setAttribute('data-cur', i);
+        for(var k = 0; k < toks.length; k++){
+          toks[k].classList.toggle('on', k === i);
+        }
+        note.textContent = steps[i].note || '';
+      }
+      return;
+    }
     var qb = e.target.closest('.quiz-opts button');
     if(qb){
       var oi = parseInt(qb.getAttribute('data-oi')), ans = parseInt(qb.getAttribute('data-a'));
@@ -249,6 +377,16 @@
       var pj = qb.getAttribute('data-p') || '';
       if(oi===ans){ qb.classList.add('right'); fb.innerHTML='✅ 答对了！'+(pj?'<br>'+pj:''); }
       else { qb.classList.add('wrong'); box.querySelectorAll('button')[ans].classList.add('right'); fb.innerHTML='❌ 再想想'+(pj?'<br>'+pj:''); }
+      if(!box.dataset.recorded){
+        box.dataset.recorded = '1';
+        var qt = box.querySelector('.quiz-t');
+        var opts = [];
+        box.querySelectorAll('button').forEach(function(bt){ opts.push(bt.textContent); });
+        var pitem = qb.closest('.yw-item');
+        var pname = (pitem && pitem.querySelector('.yw-name')) ? pitem.querySelector('.yw-name').textContent : '';
+        if(window.NHZReview) window.NHZReview.record({ q: qt ? qt.textContent.replace(/^\d+\.\s*/, '') : '', options: opts,
+          answer: opts[ans] || '', 解析: pj, src: '逻辑', point: pname }, oi===ans);
+      }
     }
   });
 })();

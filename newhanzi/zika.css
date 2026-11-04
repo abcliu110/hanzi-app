@@ -857,3 +857,9 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .yw-vtable table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
 .yw-vtable th,.yw-vtable td{border:1px solid #d5dfd0;padding:8px 10px;text-align:left;vertical-align:top}
 .yw-vtable th{background:#f8faf5;width:60px;white-space:nowrap}
+
+/* 逻辑面板：目标/例子分组/小结（动画沿用 .yw-anim 播放器样式） */
+.yw-goal{margin:12px 16px;padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:15px;font-weight:bold;color:var(--accent-deep)}
+.yw-exg{margin:10px 0}
+.yw-exg b{display:block;margin:0 16px 4px;font-size:14px}
+.yw-summary{margin:14px 16px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.8}
