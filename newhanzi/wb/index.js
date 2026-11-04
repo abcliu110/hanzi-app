@@ -51,4 +51,5 @@ window.NHZ_WB_INDEX = {
   "排比": "xc_paibi",
   "对偶": "xc_duiou",
   "反复": "xc_fanfu",
+  "设问": "xc_shewen",
 };
