@@ -53,4 +53,5 @@ window.NHZ_WB_INDEX = {
   "反复": "xc_fanfu",
   "设问": "xc_shewen",
   "反问": "xc_fanwen",
+  "语序不当": "bj_yuxu",
 };
