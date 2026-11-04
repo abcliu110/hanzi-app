@@ -93,4 +93,5 @@ window.NHZ_WB_INDEX = {
   "才/就": "xc_caijiu",
   "都/也": "xc_douye",
   "以/已": "xc_yiyi",
+  "像/象": "xc_xiangxiang",
 };
