@@ -380,18 +380,19 @@
    * kind：并列（双向箭头）修饰（a→b 小箭头，a 灰框）陈述（a | b 竖线）支配（动作箭头 a→b）补充（b 回指 a） */
   TPL.rel = function (c, q, d) {
     if (d.h) heading(c, q, d.h, d.sub);
-    var top = d.h ? 170 : 110, gap = Math.min(170, (500 - top) / d.pairs.length + 40);
+    var top = d.h ? 170 : 110, n = d.pairs.length, wide = n >= 3;
+    var gap = n > 1 ? Math.min(170, (500 - (top + 40)) / (n - 1)) : 0;
     d.pairs.forEach(function (p, i) {
-      var y = top + 40 + i * gap, xa = W / 2 - 170, xb = W / 2 + 170;
+      var y = top + 40 + i * gap, xa = wide ? 300 : W / 2 - 170, xb = wide ? 640 : W / 2 + 170, mid = (xa + xb) / 2;
       q.beat(p.say || (p.a + (p.r || '') + p.b), function (t) {
         var A = c.card(xa, y, p.a, t, { size: 38 }), B = c.card(xb, y, p.b, t + .5, { size: 38 });
         var k = p.kind, la = xa + A.w / 2 + 10, lb = xb - B.w / 2 - 10;
         if (k === '并列') { c.arrow(la, y, lb, y, 0, t + 1.1, BLUE); c.arrow(lb, y + 8, la, y + 8, 0, t + 1.5, BLUE); }
         else if (k === '修饰' || k === '支配') c.arrow(la, y, lb, y, k === '修饰' ? 0 : 40, t + 1.1, k === '修饰' ? BLUE : '#c22f2f');
         else if (k === '补充') c.arrow(lb, y - 10, la, y - 10, 50, t + 1.1, ACC);
-        else if (k === '陈述') c.R('line', [W / 2, y - 40, W / 2, y + 40], { stroke: INK, strokeWidth: 4 }, t + 1.1, .3);
-        if (p.r) c.T(W / 2, y - 48, p.r, { size: 28, color: ACC }, t + 1.3, .4);
-        if (p.n) c.T(W / 2, y + 68, p.n, { size: 24, color: GRAY }, t + 1.7, .6);
+        else if (k === '陈述') c.R('line', [mid, y - 40, mid, y + 40], { stroke: INK, strokeWidth: 4 }, t + 1.1, .3);
+        if (p.r) c.T(mid, y - 48, p.r, { size: 28, color: ACC }, t + 1.3, .4);
+        if (p.n) { if (wide) c.T(xb + B.w / 2 + 40, y + 10, p.n, { size: 26, color: GRAY, anchor: 'start' }, t + 1.7, .6); else c.T(mid, y + 68, p.n, { size: 24, color: GRAY }, t + 1.7, .6); }
         return 2.4;
       }, { ask: p.ask });
     });
