@@ -55,4 +55,5 @@ window.NHZ_WB_INDEX = {
   "反问": "xc_fanwen",
   "语序不当": "bj_yuxu",
   "搭配不当": "bj_dapei",
+  "成分残缺或赘余": "bj_canque_zhuiyu",
 };
