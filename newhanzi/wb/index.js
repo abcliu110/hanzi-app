@@ -8,4 +8,5 @@ window.NHZ_WB_INDEX = {
   "代词": "daici",
   "副词": "fuci",
   "介词": "jieci",
+  "连词": "lianci",
 };
