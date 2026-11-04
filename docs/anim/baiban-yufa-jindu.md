@@ -124,6 +124,6 @@
 | 03j 给字被动 | 完成（含引擎：块淡出时 tag/外框同淡出） | `jiaojie/yufa-p2-03j-geizi.md` |
 | l3-huilian「高级句式」批 | 完成（从场景回填） | `jiaojie/yufa-neirong-08-l3-huilian.md` |
 | 第 3 期 nest | 完成（模板 + 短语 5 项 + 定语 + 歧义句两图） | `jiaojie/yufa-p3-01-nest.md`、`yufa-p3-02-duanyu.md` |
-| 缺 L3 回炉（R4） | 进行中：批 1 词类 13 项完成（77→64） | `jiaojie/yufa-l3-buqi.md` |
+| 缺 L3 回炉（R4） | 进行中：批 1 词类 13、批 2 复句 7 完成（77→57） | `jiaojie/yufa-l3-buqi.md` |
 
 下一步命令：见当项交接文档「怎么验证」。
