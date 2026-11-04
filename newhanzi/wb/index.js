@@ -23,4 +23,5 @@ window.NHZ_WB_INDEX = {
   "宾语": "binyu",
   "定语": "dingyu",
   "状语": "zhuangyu",
+  "补语": "buyu",
 };
