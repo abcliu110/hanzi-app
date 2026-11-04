@@ -118,11 +118,11 @@
     </div>
 
     <div id="panel-yuwen" class="panel-frame" style="display:none">
-      <iframe src="yuwen.html" title="语法"></iframe>
+      <iframe data-src="yuwen.html" title="语法"></iframe>
     </div>
 
     <div id="panel-yuedu" class="panel-frame" style="display:none">
-      <iframe src="yuedu-xiezuo.html" title="阅读与写作"></iframe>
+      <iframe data-src="yuedu-xiezuo.html" title="阅读与写作"></iframe>
     </div>
 
     <div id="panel-logic" class="panel-logic" style="display:none">
@@ -130,26 +130,25 @@
     </div>
 
     <div id="panel-lab" class="panel-frame" style="display:none">
-      <iframe src="grammar_lab.html" title="实验"></iframe>
+      <iframe data-src="grammar_lab.html" title="实验"></iframe>
     </div>
 
     <div id="panel-bushou" class="panel-frame" style="display:none">
-      <iframe src="bushou.html" title="部首"></iframe>
+      <iframe data-src="bushou.html" title="部首"></iframe>
     </div>
 
     <div id="panel-shici" class="panel-frame" style="display:none">
-      <iframe src="shici.html" title="古诗词"></iframe>
+      <iframe data-src="shici.html" title="古诗词"></iframe>
     </div>
 
     <div id="panel-guwen" class="panel-frame" style="display:none">
-      <iframe src="guwen.html" title="古文"></iframe>
+      <iframe data-src="guwen.html" title="古文"></iframe>
     </div>
   </div>
 </div>
 
 <script src="data/index.js"></script>
 <script src="data/grade_map.js"></script>
-<script src="yuwen/data.js"></script>
 <script src="index.js"></script>
 <script src="today-task.js"></script>
 <script src="checkin.js"></script>
@@ -251,10 +250,26 @@
     modTitle.textContent = titles[m][0];
     modSub.textContent = titles[m][1];
     for(var k in panels) panels[k].style.display = (k===m?'block':'none');
+    /* 子页 iframe 懒加载：首次打开面板时才把 data-src 赋给 src，首页初始只加载自身 */
+    var fr = panels[m].querySelector('iframe[data-src]');
+    if(fr && !fr.getAttribute('src')) fr.setAttribute('src', fr.getAttribute('data-src'));
     /* 模块视图的返回按钮统一由父页提供；iframe 子页被嵌入时隐藏自家顶栏，避免出现两个 */
     var btnBack = document.getElementById('btnBack');
     if(btnBack) btnBack.style.display = '';
-    if(m==='logic' && !panels.logic.dataset.done){
+    if(m==='logic' && !panels.logic.dataset.done && !window.NHZ_YUWEN){
+      /* 逻辑数据在 yuwen/data.js（~700KB），只在首次打开逻辑面板时按需加载（file:// 下 <script> 也可用） */
+      var lg = document.getElementById('logiclist');
+      if(lg && !lg.innerHTML) lg.innerHTML = '<div class="noresult">加载中…</div>';
+      if(!panels.logic.dataset.loading){
+        panels.logic.dataset.loading='1';
+        var sc = document.createElement('script');
+        sc.src = 'yuwen/data.js';
+        sc.onload = function(){ if(panels.logic.style.display!=='none') openModule('logic'); };
+        sc.onerror = function(){ delete panels.logic.dataset.loading; if(lg) lg.innerHTML = '<div class="noresult">逻辑内容加载失败，请检查网络后重试</div>'; };
+        document.head.appendChild(sc);
+      }
+    }
+    if(m==='logic' && !panels.logic.dataset.done && window.NHZ_YUWEN){
       var D = (window.NHZ_YUWEN||{}).logic;
       var el = document.getElementById('logiclist');
       if(D&&el){
