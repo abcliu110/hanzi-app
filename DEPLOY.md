@@ -17,35 +17,41 @@
 Pages 只能发布分支根或 `/docs`，不能直接发布 `newhanzi/` 子目录，
 所以要单独建一个内容在根的 `gh-pages` 分支：
 
-1. 本地建分支并铺内容（在仓库根执行）：
+1. 生成站点目录（在仓库根执行）：
    ```sh
-   git checkout --orphan gh-pages
-   git rm -rf .
-   cp -r newhanzi/. .        # 上一步先切回 master 复制，或用 git show 导出
-   cp -r icons .             # manifest 引用的图标必须同步到分支根
+   python3 tools/build_site.py          # 输出到 build/site/（已在 .gitignore）
    ```
-   注意：`manifest.webmanifest` 里的图标路径是 `../icons/...`（相对
-   `newhanzi/` 的写法）。部署到分支根后，`../` 会越出站点根而 404，
-   所以在 `gh-pages` 分支里要把 manifest 的图标路径改为 `icons/...`
-   （只改 `gh-pages` 分支，不改 `master`）。
+   该脚本会：只复制运行时文件，**排除 `newhanzi/ziku/`（26MB 字库构建源）**、
+   `*.md`、`*.py` 等；把仓库根 `icons/` 复制到站点根，并把 manifest 图标路径
+   `../icons/...` 改成 `icons/...`（`master` 里保持 `../icons/` 不变）。
+   然后把 `build/site/` 的内容提交到 `gh-pages` 分支根：
+   ```sh
+   git worktree add ../hanzi-gh-pages gh-pages   # 首次：git worktree add --orphan -b gh-pages ../hanzi-gh-pages
+   rsync -a --delete --exclude .git build/site/ ../hanzi-gh-pages/
+   cd ../hanzi-gh-pages && git add -A && git commit -m "发布" && git push origin gh-pages
+   ```
+   不要再用 `cp -r newhanzi/. .` 整目录复制——那样会把 ziku/ 构建源和文档一起发布。
 2. GitHub 网页操作（需仓库管理员）：
    仓库 Settings → Pages → Build and deployment → Source 选
    “Deploy from a branch” → Branch 选 `gh-pages`、目录选 `/ (root)` → Save。
 3. 等 1–2 分钟，访问 `https://abcliu110.github.io/hanzi-app/`。
    这是按仓库名推导的**预期地址**，部署完成前会 404；
    只有完成上面两步后它才是真实可用的公开链接。
-4. 之后每次更新：把 `newhanzi/` 的改动同步到 `gh-pages` 分支并推送
+4. 之后每次更新：重跑 `python3 tools/build_site.py`，再同步到 `gh-pages` 分支并推送
    （后续可加一个 workflow 自动同步，本次未做——需用户确认是否要自动发布）。
 
 ## 方案 B（免配置）：拖拽部署
 
-把 `newhanzi/` 文件夹拖到 Netlify Drop / Cloudflare Pages / Vercel，
-得到一个临时域名。同样注意：保持应用文件在站点根，并把 `icons/`
-同步到根、把 manifest 图标路径改为 `icons/...`，否则图标 404。
+先运行 `python3 tools/build_site.py`，把生成的 `build/site/` 文件夹拖到
+Netlify Drop / Cloudflare Pages / Vercel，得到一个临时域名
+（不要直接拖 `newhanzi/`：会带上 26MB 的 `ziku/` 构建源，图标路径也不对）。
 
 ## PWA 相关
 
 - `start_url` 是相对路径 `./index.html`，根部署下正常。
 - `sw.js` 注册仅在 `http(s)` 下进行，`file://` 打开不注册，属正常。
+- `sw.js` 预缓存清单由 `python3 tools/gen_sw_core.py` 从全部页面生成，VERSION 随清单自动变；
+  请求一律网络优先（断网/超时才用缓存），发布新版后孩子下次打开即是新版，无需手动改 VERSION。
+  新增或删除页面后重跑该脚本（smoke 测试会检查页面是否齐）。
 - 安装入口逻辑在 `newhanzi/install.js`：桌面/安卓走浏览器安装提示，
   iOS 走手动“分享 → 添加到主屏幕”说明；已安装时不显示。
