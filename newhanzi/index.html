@@ -63,7 +63,7 @@
 <!-- 模块页：返回栏 + 内容 -->
 <div id="view-module" class="module-view" style="display:none">
   <div class="topbar">
-    <button class="back" type="button" id="btnBack">← 首页</button>
+    <button class="back" type="button" id="btnBack">← 返回</button>
     <h1 id="modTitle">识字</h1><span class="sub" id="modSub"></span>
   </div>
   <div class="app-main">
@@ -208,6 +208,10 @@
     modTitle.textContent = titles[m][0];
     modSub.textContent = titles[m][1];
     for(var k in panels) panels[k].style.display = (k===m?'block':'none');
+    /* iframe 模块自带左上角返回按钮，父页按钮隐藏，避免出现两个 */
+    var btnBack = document.getElementById('btnBack');
+    var isIframe = (m==='yuwen'||m==='lab'||m==='bushou'||m==='shici'||m==='guwen');
+    if(btnBack) btnBack.style.display = isIframe ? 'none' : '';
     if(m==='logic' && !panels.logic.dataset.done){
       var D = (window.NHZ_YUWEN||{}).logic;
       var el = document.getElementById('logiclist');
