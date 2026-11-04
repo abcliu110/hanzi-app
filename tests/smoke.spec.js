@@ -171,3 +171,18 @@ test('sw.js precache list is up to date', async () => {
   const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..') }).toString();
   expect(out).toContain('最新');
 });
+
+/* 原型/游戏/练习页都要能一键回首页；原型页不得依赖外部字体等外链 */
+test.describe('home links & no external deps', () => {
+  const EXTRA = ALL_PAGES.filter((p) => /\/games\/|proto-yuwen|speedtest|quiz\/index/.test(p));
+  for (const path of EXTRA) {
+    test(`home link ${path}`, async ({ page }) => {
+      const external = [];
+      page.on('request', (r) => { if (!r.url().startsWith('http://127.0.0.1')) external.push(r.url()); });
+      await page.goto(path, { waitUntil: 'load' });
+      const hrefs = await page.locator('a[href]').evaluateAll((as) => as.map((a) => a.href));
+      expect(hrefs.some((h) => /\/newhanzi\/index\.html$/.test(h)), 'link to newhanzi/index.html').toBeTruthy();
+      expect(external, 'external requests').toEqual([]);
+    });
+  }
+});
