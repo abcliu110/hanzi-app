@@ -60,4 +60,5 @@ window.NHZ_WB_INDEX = {
   "表意不明": "bj_biaoyi",
   "不合逻辑": "bj_luoji",
   "主语残缺": "bj_zhuyu",
+  "谓语残缺": "bj_weiyu",
 };
