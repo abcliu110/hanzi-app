@@ -357,7 +357,7 @@
   TPL.link = function (c, q, d) {
     if (d.h) heading(c, q, d.h, d.sub);
     var y = d.h ? 260 : 220, xa = W * .3, xb = W * .7;
-    var bw = Math.max(textW(d.a, 38), textW(d.b, 38)) + 80; bw = Math.min(bw, 520);
+    var bw = Math.max(textW(d.a, 38), textW(d.b, 38)) + 80; bw = Math.min(bw, 440);
     q.beat(d.say || (d.a + '。' + d.b + '。'), function (t) {
       c.box(xa - bw / 2, y - 50, bw, 90, t); wrap(c, d.a, xa, y + 10, bw - 30, 38, INK, t + .4);
       c.box(xb - bw / 2, y - 50, bw, 90, t + 1.2); wrap(c, d.b, xb, y + 10, bw - 30, 38, INK, t + 1.6);
