@@ -877,7 +877,7 @@ function openKnow(idx){
   if(svg) h += '<div class="sc-svg">'+svg+'</div>';
   /* 图示字段：数据编译动画（SMIL），配重播按钮 */
   if(k['图示']){
-    h += '<div class="sc-svg"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+k['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" onclick="var s=this.parentNode.previousElementSibling.querySelector(\'svg\');if(s)s.setCurrentTime(0)">↻ 重播</button></div></div>';
+    h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+k['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
   }
   var dHtml = escD(k.d);
   var tp = knowType(k.m, k.t);
@@ -1047,7 +1047,7 @@ function openImagery(i){
   h += '<div class="sc-know"><p>'+esc(g.desc)+'</p></div>';
   /* 图示字段：意象动画 */
   if(g['图示']){
-    h += '<div class="sc-svg"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+g['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" onclick="var s=this.parentNode.previousElementSibling.querySelector(\'svg\');if(s)s.setCurrentTime(0)">↻ 重播</button></div></div>';
+    h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+g['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
   }
   var hits = [];
   D.poems.forEach(function(p){
