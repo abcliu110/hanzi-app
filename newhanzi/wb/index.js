@@ -36,4 +36,5 @@ window.NHZ_WB_INDEX = {
   "如果…就…": "gl_ruguo",
   "虽然…但是…": "gl_suiran",
   "不但…而且…": "gl_budan",
+  "只有…才…": "gl_zhiyou",
 };
