@@ -82,4 +82,5 @@ window.NHZ_WB_INDEX = {
   "歧义句": "gj_qiyi",
   "兼语句": "gj_jianyu",
   "话题句": "gj_huati",
+  "给字被动": "gj_geizi",
 };
