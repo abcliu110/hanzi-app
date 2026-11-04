@@ -44,7 +44,7 @@
 
 ## 冻结清单（阶段一至三期间）
 
-- ❌ 新动画/白板（2026-11-04 负责人对语法区白板动画解除，见 docs/anim/baiban-yufa-guifan.md）
+- ❌ 新动画/白板（2026-11-04 负责人对语法区白板动画解除，见 docs/anim/baiban-yufa-guifan.md；同日对逻辑 / 古诗词 / 古文三区改进设计中的白板项解除，见 docs/gaijin/README.md）
 - ❌ 新tab/新页面
 - ❌ 新游戏
 - ❌ 笔顺/练字（永久冻结）
