@@ -647,6 +647,140 @@
     if (d.rule) q.beat(d.rule, function (t) { c.T(W / 2, 520, d.rule, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
 
+  /* trunk 抽骨架（E15，设计 §5.1）：先生长（扩句），再修剪（缩句）。
+   * 生长：{k:'trunk', mode:'grow+prune'|'grow', core:['小猫','捉','老鼠'], role:['zhu','wei','bin'],
+   *        grow:[{q:'哪只小猫？', ins:['胖胖','的'], before:0, role:'ding', say, at:'far', keep, why, cutOk}], formula:true, ask}
+   * 修剪：{k:'trunk', mode:'prune', s:[…], role:[…], keep:[{i, why:'neg'|'num'|'key', say, label}],
+   *        tryCut:{i, q, show:'剪掉后的句子', say}, prune:{cue:['的','地','得'], strike:0}, ask, coreSay, end}
+   * 词块不写坐标：每一步的排版在构建时算好（lay），步与步之间平移（move）；括号类成分线画在词块组里随块移动。
+   * 「的 / 地 / 得」是路标（枢纽圈），不画成分线；否定、数量、关键定语用 keep 保护（--lint R8）。 */
+  TPL.trunk = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var size = d.size || 44, GX = d.gap || 34, y = d.y || (d.h ? 286 : 266), fy = y + 92, lv = c.lv, TT = window.NHZWB_TERMS || {};
+    var CUE = { '的': 1, '地': 1, '得': 1 }, B = [], pr = d.prune || {};
+    function mk(w, role, ex) { var b = { w: w, role: role || null, id: B.length }; for (var k in (ex || {})) b[k] = ex[k]; b.cue = !b.role && !!CUE[w]; b.wd = textW(w, size); B.push(b); return b; }
+    var seq, mode = d.mode || (d.grow ? 'grow+prune' : 'prune');
+    if (d.core) seq = d.core.map(function (w, i) { return mk(w, (d.role || [])[i], { core: 1, ci: i }); });
+    else seq = d.s.map(function (w, i) { var r = (d.role || [])[i]; return mk(w, CUE[w] && !r ? null : r, { core: r === 'zhu' || r === 'wei' || r === 'bin', ci: i }); });
+    /* 路标归属：的 / 地 跟前一块，得 跟后一块 */
+    function owners(L) { L.forEach(function (b, i) { if (b.cue && !b.own) b.own = b.w === '得' ? L[i + 1] : L[i - 1]; }); }
+    (d.keep || []).forEach(function (k) { var b = seq[k.i]; if (b) { b.keep = 1; b.why = k.why; b.ksay = k.say; b.klabel = k.label; } });
+    var curF = null, bar = null;
+    /* 排版：主谓分界处多留 26px 给 ‖ */
+    function xs(L) {
+      var se = lv >= 2 && d.bar !== false ? subjEnd(L) : -1, ws = L.map(function (b, i) { return b.wd + (i === se ? 26 : 0); }), X = lay(ws, GX, W / 2);
+      return X;
+    }
+    function subjEnd(L) { for (var i = 0; i < L.length; i++) if (L[i].role === 'zhu' && L[i].core) { var j = i; while (L[j + 1] && L[j + 1].cue && L[j + 1].own === L[i]) j++; return L[j + 1] ? j : -1; } return -1; }
+    function create(b, x0, t0, drop) {
+      b.g = c.G(function () { b.tx = c.T(x0 + b.wd / 2, y, b.w, { size: size }, t0, .4); if (b.role) c.role(b.role, x0, x0 + b.wd, y, t0 + .4, { size: size }); });
+      b.x0c = x0; b.x = x0;
+      if (drop) { c.key(b.g, 'transform', t0, [0, 0], { d: .6, from: [0, -70], ease: 1 }); c.key(b.g, 'opacity', t0, 1, { d: .4, from: 0 }); }
+    }
+    function formula(L, X, t0) {
+      if (d.formula === false) return;
+      var g = c.G(function () {
+        var cells = [], se = subjEnd(L);
+        L.forEach(function (b, i) {
+          if (!b.role || !TT[b.role]) return;
+          var pv = cells[cells.length - 1];
+          if (pv && pv.role === b.role && pv.last === i - 1 && b.core && L[pv.last].core) { pv.last = i; pv.cx = (X[pv.i] + X[i] + b.wd) / 2; return; }   /* 同一成分的相邻骨架词并成一格（喜欢 吃 → 谓） */
+          cells.push({ i: i, last: i, role: b.role, s: lv <= 1 ? TT[b.role].k : TT[b.role].s, cx: X[i] + b.wd / 2 });
+        });
+        cells.forEach(function (cl0, k) {
+          cl0.w = textW(cl0.s, 26); c.T(cl0.cx, fy, cl0.s, { size: 26, color: ROLE }, t0 + k * .12, .3);
+          var nx = cells[k + 1]; if (!nx) return;
+          var sep = cl0.last <= se && nx.i > se ? '‖' : '+', mx = (cl0.cx + cl0.w / 2 + nx.cx - textW(nx.s, 26) / 2) / 2;
+          c.T(mx, fy, sep, { size: 26, color: GRAY }, t0 + k * .12 + .1, .2);
+        });
+      });
+      if (curF) c.key(curF, 'display', t0, false);
+      c.key(g, 'opacity', t0, 1, { d: .3, from: 0 });
+      curF = g;
+    }
+    function barAt(L, X, t0, d0) {
+      if (lv < 2 || d.bar === false) return;
+      var se = subjEnd(L); if (se < 0) return;
+      var bx = (X[se] + L[se].wd + X[se + 1]) / 2;
+      if (!bar) { bar = c.G(function () { c.role('bar', bx, bx, y, t0, { size: size }); }); bar.x0c = bx; }
+      else c.move(bar, { t: t0, x: bx - bar.x0c, d: d0 });
+    }
+    function place(L, t0, d0, drop) {
+      owners(L); var X = xs(L);
+      L.forEach(function (b, i) { if (!b.g) create(b, X[i], drop ? t0 + .6 : t0 + i * .25, drop); else if (b.x !== X[i]) { c.move(b.g, { t: t0, x: X[i] - b.x0c, d: d0 }); b.x = X[i]; } });
+      barAt(L, X, t0, d0); formula(L, X, t0 + (drop ? 1 : .2) + (d0 || 0));
+      return X;
+    }
+    function txt(L) { return L.map(function (b) { return b.w; }).join(''); }
+    function sayOf(L) { return d.read || txt(L) + '。'; }
+    /* 1 骨架 / 原句出场 */
+    q.beat(d.say || (mode === 'prune' ? sayOf(seq) : (d.coreIntro || '骨架：' + txt(seq) + '。')), function (t) { place(seq, t, 0); return seq.length * .25 + 1.4; });
+    /* 2 生长 */
+    var att = {};
+    (d.grow || []).forEach(function (g) {
+      var ch = [], buf = [];
+      g.ins.forEach(function (w) { if (CUE[w]) { if (buf.length) { ch.push(buf.join('')); buf = []; } ch.push(w); } else buf.push(w); });
+      if (buf.length) ch.push(buf.join(''));
+      var leaf = null, blocks = ch.map(function (w) { var b = CUE[w] ? mk(w) : (leaf = mk(w, g.role, { leaf: 1, keep: g.keep ? 1 : 0, why: g.why })); return b; });
+      blocks.forEach(function (b) { if (b.cue) b.own = leaf; });
+      var ti = g.before !== undefined ? g.before : g.after, tgt = seq.filter(function (b) { return b.core && b.ci === ti; })[0], a = att[ti] = att[ti] || { b: [], a: [] };
+      if (!tgt) throw new Error('trunk：grow 找不到骨架词 ' + ti);
+      q.beat(g.q, function (t) { g._qg = c.T(W / 2, d.h ? 168 : 140, g.q, { size: 30 }, t, .6); return 1; }, { gap: .2 });
+      q.beat(g.say || ('“' + g.ins.join('') + '”。'), function (t) {
+        var at, it = seq.indexOf(tgt);
+        if (g.before !== undefined) { at = it; if (g.at === 'far') a.b.forEach(function (chk) { at = Math.min(at, seq.indexOf(chk[0])); }); a.b.push(blocks); }
+        else { at = it + 1; if (g.at === 'far') a.a.forEach(function (chk) { at = Math.max(at, seq.indexOf(chk[chk.length - 1]) + 1); }); a.a.push(blocks); }
+        seq = seq.slice(0, at).concat(blocks, seq.slice(at));
+        place(seq, t, .8, true); return 2;
+      }, { ask: true });
+      q.beat(null, function (t) { c.key(g._qg, 'display', t, false); return 0; }, { gap: 0 });
+    });
+    if (d.grow && d.grow.length) q.beat(d.fullSay || '连起来读：' + txt(seq) + '。', function () { return 1.2; });
+    if (mode === 'grow') { if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; }); return; }
+    /* 3 修剪：找路标 */
+    owners(seq);
+    var cueWant = pr.cue || ['的', '地', '得'], cues = seq.filter(function (b) { return b.cue && cueWant.indexOf(b.w) >= 0; });
+    if (cues.length) q.beat(d.cueSay || ('先找路标：' + cues.map(function (b) { return '“' + b.w + '”'; }).join('、') + '。'), function (t) {
+      cues.forEach(function (b, k) { c.into(b.g, function () { c.hub(b.x0c + b.wd / 2, y - 14, b.wd + 22, 66, t + k * .5); }); }); return cues.length * .5 + .6;
+    });
+    /* 4 试剪（演示后果） */
+    var tc = d.tryCut;
+    if (tc) {
+      var tb = seq.filter(function (b) { return b.ci === tc.i && !b.leaf; })[0] || seq[tc.i];
+      q.beat(tc.q || ('要是把“' + tb.w + '”也剪掉呢？'), function (t) {
+        var p0 = c.at(tb.g, 'transform', t); c.key(tb.g, 'transform', t, [p0[0], p0[1] + 40], { d: .6, ease: 1 }); c.key(tb.g, 'opacity', t, .3, { d: .6, from: 1 }); return 1;
+      });
+      q.beat(tc.say, function (t) {
+        var sg = c.T(W / 2, fy + 92, tc.show, { size: 34, color: INK }, t, 1); c.cross(sg.x1 + 46, fy + 80, t + 1);
+        var p0 = c.at(tb.g, 'transform', t + 1.4); c.key(tb.g, 'transform', t + 1.4, [p0[0], p0[1] - 40], { d: .5, ease: 1 }); c.key(tb.g, 'opacity', t + 1.4, 1, { d: .5 });
+        c.into(tb.g, function () { c.guard(tb.x0c, tb.x0c + tb.wd, y, t + 1.9, { size: size, label: tb.klabel }); }); tb.guarded = 1;
+        return 2.6;
+      }, { ask: true });
+    }
+    /* 5 保护标签 */
+    var WHY = { neg: '是否定，剪掉意思就反了，不能剪。', num: '是数量，剪掉范围就变了，不能剪。', key: '是关键的修饰，剪掉意思就错了，不能剪。' };
+    seq.filter(function (b) { return b.keep && !b.guarded; }).forEach(function (b) {
+      q.beat(b.ksay || ('“' + b.w + '”' + (WHY[b.why] || '不能剪。')), function (t) { c.into(b.g, function () { c.guard(b.x0c, b.x0c + b.wd, y, t, { size: size, label: b.klabel }); }); return 1; });
+    });
+    /* 6 剪：枝叶与路标下沉淡出（或删除线） */
+    function kept(b) { return b.core || b.keep || (b.cue && b.own && (b.own.keep)); }
+    var cut = seq.filter(function (b) { return !kept(b); }), rest = seq.filter(kept);
+    if (cut.length) q.beat(d.cutSay || '修饰的枝叶，剪掉。', function (t) {
+      cut.forEach(function (b, k) {
+        if (pr.strike) { c.into(b.g, function () { c.strike(b.x0c, b.x0c + b.wd, y - size * .35, t + k * .3); }); c.key(b.g, 'opacity', t + k * .3 + .4, .35, { d: .4, from: 1 }); }
+        else c.sink(b.g, t + k * .3, .8);
+      });
+      return cut.length * .3 + 1;
+    }, { ask: d.ask || '哪几个字是骨头？' });
+    /* 7 合拢，读骨架 */
+    q.beat(d.coreSay || ('骨架：' + txt(rest) + '。'), function (t) {
+      if (pr.strike) { var X = rest.map(function (b) { return b.x; }); formula(rest, X, t); }
+      else place(rest, t, .8);
+      return 2;
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
   /* E9：种子 = 20261104 + 原始序号 × 1000（原始序号 = 该幕在 scenes 数组里的位置，与档位过滤无关） */
   function buildScene(svg, sc, idx) {

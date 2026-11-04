@@ -42,7 +42,9 @@ NHZWB.add('_自测', { scenes: [
   { k: '_probe', lv: 2 },
   { k: 'review', lv: 2, task: '把“茂密的树林把太阳遮住了”改成被字句', answer: '太阳被树林遮住了', ok: false, diff: { miss: '茂密的' }, good: '太阳被茂密的树林遮住了', rule: '修饰的词要跟着名词一起搬。' },
   { k: 'review', lv: 1, task: '给“小猫捉老鼠”加一个“的”', answer: '胖胖的小猫捉老鼠', ok: true, rule: '“的”后面跟名词。' },
-  { k: 'mark', lv: 2, s: ['小猫', '捉', '老鼠'], gap: 30, m: [{ i: 0, role: 'zhu', note: '{t:zhu|term}', tag: '动手的' }, { i: 1, role: 'wei', hub: 1 }] }
+  { k: 'mark', lv: 2, s: ['小猫', '捉', '老鼠'], gap: 30, m: [{ i: 0, role: 'zhu', note: '{t:zhu|term}', tag: '动手的' }, { i: 1, role: 'wei', hub: 1 }] },
+  { k: 'trunk', lv: 2, core: ['小猫', '捉', '老鼠'], role: ['zhu', 'wei', 'bin'], grow: [{ q: '哪只？', ins: ['胖胖', '的'], before: 0, role: 'ding' }, { q: '几只？', ins: ['三只'], before: 0, role: 'ding', at: 'far', keep: 1, why: 'num' }, { q: '怎样？', ins: ['得', '很快'], after: 1, role: 'bu' }] },
+  { k: 'trunk', lv: 1, mode: 'prune', s: ['弟弟', '不', '喜欢', '吃', '香菜'], role: ['zhu', 'zhuang', 'wei', 'wei', 'bin'], keep: [{ i: 1, why: 'neg' }], tryCut: { i: 1, show: '弟弟喜欢吃香菜', say: '剪掉“不”，意思反了。' }, prune: { strike: 1 } }
 ] });
 window.P = NHZWB.mount(document.getElementById('box'), '_自测');
 </script></body></html>"""
@@ -63,7 +65,7 @@ JS = r"""() => {
   P.seek(0, 3.5); if (window._sn.style.opacity !== '0') out.push('sink 后应透明：' + window._sn.style.opacity);
   const op = t => (P.seek(0, t), window._fd.style.opacity);
   if (op(0.5) !== '0' || op(2) !== '1' || op(4) !== '0') out.push('fade 接力：' + [op(0.5), op(2), op(4)]);
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < P.durations().length; i++) {
     const d = P.durations()[i];
     P.seek(i, 0); P.seek(i, d * .6); const a = P.svg.innerHTML; P.seek(i, 0); P.seek(i, d * .6);
     if (a !== P.svg.innerHTML) out.push('第' + (i + 1) + '幕不确定');
@@ -86,6 +88,12 @@ JS = r"""() => {
   const hb = [...bx.querySelectorAll('.wb-lv button')].map(b => b.getBoundingClientRect().height);
   if (hb.some(h => h < 44)) out.push('档位按钮高度 < 44：' + hb);
   Q.destroy(); bx.remove(); try { localStorage.removeItem('nhz_wb_lv'); } catch (e) {}
+  /* trunk：「三只」排在最外（far），「得很快」在动词后；收尾只剩骨架 + 受保护的数量词 */
+  P.seek(4, P.durations()[4]);
+  const vis = [...P.svg.querySelectorAll('text')].filter(t => { let e = t; while (e && e !== P.svg) { if (e.style && (e.style.display === 'none' || e.style.opacity === '0')) return false; e = e.parentNode; } return true; });
+  const order = vis.filter(t => t.getAttribute('font-size') === '44').map(t => [t.getBoundingClientRect().left, t.textContent]).sort((a, b) => a[0] - b[0]).map(x => x[1]).join(' ');
+  if (order !== '三只 小猫 捉 老鼠') out.push('trunk 收尾骨架应为「三只 小猫 捉 老鼠」，得「' + order + '」');
+  P.seek(4, P.durations()[4] * .72);
   P.seek(0, 9); if (P.svg.innerHTML.indexOf('主语（谁 / 什么）') < 0) out.push('E14：lv2 幕 tag 应显示「主语（谁 / 什么）」');
   P.seek(3, 99); if (P.svg.innerHTML.indexOf('>主语<') < 0) out.push('E14：|term 应显示「主语」');
   return out;
