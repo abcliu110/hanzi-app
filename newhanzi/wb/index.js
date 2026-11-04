@@ -4,4 +4,5 @@ window.NHZ_WB_INDEX = {
   "形容词": "xingrongci",
   "动词": "dongci",
   "名词": "mingci",
+  "量词": "liangci",
 };
