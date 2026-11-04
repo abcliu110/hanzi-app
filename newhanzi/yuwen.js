@@ -218,7 +218,7 @@
     /* 2. 看图说话 */
     if (it['图示']) body += stepHead('看图说话','符号标注') +
       '<div class="yw-diagram">' + it['图示'] +
-      '<div style="text-align:center;margin-top:8px;"><button class="back" style="padding:8px 16px;font-size:14px;" onclick="var s=this.parentNode.previousElementSibling;if(s)s.setCurrentTime(0)">↻ 重播动画</button></div></div>';
+      '<div style="text-align:center;margin-top:8px;"><button class="back" style="padding:8px 16px;font-size:14px;" onclick="var d=this.closest(\'.yw-diagram\');var s=d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播动画</button></div></div>';
     /* 3. 动手试试（动画） */
     if (it['动画'] && it['动画'].steps && it['动画'].steps.length) {
       var aid = 'anim' + idx + '_' + Math.floor(Math.random() * 100000);
