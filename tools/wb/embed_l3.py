@@ -87,7 +87,7 @@ def main():
         it = draft[n]
         add = '  ' + js(review(it['huilian'])) + ',\n  ' + js(test(it['l3'], srcmap.get(n))) + ',\n'
         if dry: print('==', n, '\n' + add); continue
-        m = list(re.finditer(r"^\s*\{\s*k:\s*'end'", s, re.M))
+        m = list(re.finditer(r"^[ \t]*\{\s*(?:k|\"k\"):\s*['\"]end['\"]", s, re.M))
         if not m: print('✗ 找不到 end 幕', n); continue
         p = m[-1].start()
         s = s[:p] + add + s[p:]
