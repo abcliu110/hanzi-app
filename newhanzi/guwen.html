@@ -53,6 +53,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
   <div id="gwmdetail" style="display:none"></div>
   <p class="gw-src" id="gwsrc">原文为公有领域古代文献；导读、译意、重点字词为本应用原创讲解。</p>
 </main>
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
 <script src="data/guwen.js"></script>
 <script src="data/guwen_knowledge.js"></script>
 <script src="guwen/quiz_bank_guwen_xuci.js"></script>

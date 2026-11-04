@@ -251,10 +251,9 @@
     modTitle.textContent = titles[m][0];
     modSub.textContent = titles[m][1];
     for(var k in panels) panels[k].style.display = (k===m?'block':'none');
-    /* iframe 模块自带左上角返回按钮，父页按钮隐藏，避免出现两个 */
+    /* 模块视图的返回按钮统一由父页提供；iframe 子页被嵌入时隐藏自家顶栏，避免出现两个 */
     var btnBack = document.getElementById('btnBack');
-    var isIframe = (m==='yuwen'||m==='yuedu'||m==='lab'||m==='bushou'||m==='shici'||m==='guwen');
-    if(btnBack) btnBack.style.display = isIframe ? 'none' : '';
+    if(btnBack) btnBack.style.display = '';
     if(m==='logic' && !panels.logic.dataset.done){
       var D = (window.NHZ_YUWEN||{}).logic;
       var el = document.getElementById('logiclist');
