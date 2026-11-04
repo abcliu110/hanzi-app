@@ -185,19 +185,26 @@ const AnimEngine = (function() {
    */
   function sequence(data) {
     const {items, summary} = data;
-    const h = 70 + items.length * 70;
+    // 动态计算高度：有wrong的项需要更多空间
+    let y = 50;
+    const positions = [];
+    items.forEach((item, i) => {
+      positions.push(y);
+      y += item.wrong ? 95 : 75; // 有错误对比的项更高
+    });
+    const h = y + 60;
     let svg = `<svg viewBox="0 0 640 ${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
 
     // 连接线（虚线，显示逻辑流）
     if (items.length > 1) {
-      const lineTop = 55;
-      const lineBottom = 40 + (items.length - 1) * 70 + 25;
+      const lineTop = positions[0];
+      const lineBottom = positions[positions.length-1];
       svg += `<line x1="32" y1="${lineTop}" x2="32" y2="${lineBottom}" stroke="${C.muted}" stroke-width="2" stroke-dasharray="6,4" opacity="0">`;
       svg += `<animate attributeName="opacity" values="0;0.5" dur="0.5s" begin="0.4s" fill="freeze"/></line>`;
     }
 
     items.forEach((item, i) => {
-      const y = 50 + i * 70;
+      const y = positions[i];
       const t = 0.6 + i * 0.8;
       const color = item.color || [C.green, C.blue, C.yellow, C.red][i % 4];
 
@@ -205,22 +212,22 @@ const AnimEngine = (function() {
       // 序号圆点
       svg += `<circle cx="32" cy="${y}" r="12" fill="${color}"/>`;
       svg += `<text x="32" y="${y+5}" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">${i+1}</text>`;
-      // 卡片
-      const cardH = item.wrong ? 58 : 50;
+      // 卡片（有wrong时更高）
+      const cardH = item.wrong ? 68 : 52;
       svg += `<rect x="52" y="${y-28}" width="568" height="${cardH}" rx="10" fill="${color}14" stroke="${color}" stroke-width="1.5"/>`;
       // 标题（16px加粗）
-      svg += `<text x="70" y="${y-4}" text-anchor="start" font-size="16" fill="${color}" font-weight="bold">${esc(item.title)}</text>`;
+      svg += `<text x="70" y="${y-2}" text-anchor="start" font-size="16" fill="${color}" font-weight="bold">${esc(item.title)}</text>`;
       // 正文
-      svg += `<text x="70" y="${y+18}" text-anchor="start" font-size="13" fill="${C.ink}">${esc(item.text)}</text>`;
-      // 错误对比
+      svg += `<text x="70" y="${y+20}" text-anchor="start" font-size="13" fill="${C.ink}">${esc(item.text)}</text>`;
+      // 错误对比（卡片内）
       if (item.wrong) {
-        svg += `<text x="70" y="${y+36}" text-anchor="start" font-size="12" fill="${C.red}">✗ ${esc(item.wrong)}</text>`;
+        svg += `<text x="70" y="${y+38}" text-anchor="start" font-size="12" fill="${C.red}">✗ ${esc(item.wrong)}</text>`;
       }
       svg += `</g>`;
     });
 
     if (summary) {
-      const y = 50 + items.length * 70;
+      const y = positions[positions.length-1] + (items[items.length-1].wrong ? 75 : 60);
       const t = 0.6 + items.length * 0.8;
       svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.5s" begin="${t}s" fill="freeze"/>`;
       svg += `<rect x="52" y="${y-22}" width="568" height="36" rx="8" fill="${C.ink}0d" stroke="${C.ink}" stroke-width="1" stroke-dasharray="5,3"/>`;
