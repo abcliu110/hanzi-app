@@ -6,4 +6,5 @@ window.NHZ_WB_INDEX = {
   "名词": "mingci",
   "量词": "liangci",
   "代词": "daici",
+  "副词": "fuci",
 };
