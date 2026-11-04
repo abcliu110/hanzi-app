@@ -40,7 +40,7 @@ button.zibtn.hit{background:var(--accent);color:#fff;border-color:var(--accent-d
 </style></head>
 <body>
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../../shici.html" style="display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">← 返回</a><a href="../../../index.html" target="_top" class="home-link" style="display:inline-flex;align-items:center;padding:10px 14px;border-radius:12px;background:var(--accent-soft,#e8f0e4);border:2px solid var(--accent-deep,#3f6b4f);color:var(--accent-deep,#3f6b4f);font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">🏠 首页</a><h1 style="font-size:20px;margin:0;">📏 平仄判断</h1></div><div class="wrap">
-<p class="sub">一二声是平声，三四声是仄声。答对 +10 分。</p>
+<p class="sub">普通话一二声大多是平声，三四声是仄声。小心「入声字」：白、竹这些字古代读得短促，今天虽然念一声、二声，写诗时算仄声。答对 +10 分。</p>
 <div class="scorebar"><span id="qtag">第 1 题</span><span>得分 <b id="score">0</b></span></div>
 <div id="stage"></div>
 <div class="btnrow">
@@ -52,7 +52,7 @@ button.zibtn.hit{background:var(--accent);color:#fff;border-color:var(--accent-d
 <button class="btn" id="btnAgain">🔄 再来一轮</button>
 </div>
 <script>
-var CHARS = [["天", "平"], ["开", "平"], ["飞", "平"], ["高", "平"], ["明", "平"], ["红", "平"], ["白", "平"], ["青", "平"], ["黄", "平"], ["东", "平"], ["西", "平"], ["南", "平"], ["春", "平"], ["云", "平"], ["风", "平"], ["花", "平"], ["山", "平"], ["江", "平"], ["湖", "平"], ["河", "平"], ["梅", "平"], ["兰", "平"], ["竹", "平"], ["松", "平"], ["桃", "平"], ["梨", "平"], ["年", "平"], ["时", "平"], ["来", "平"], ["回", "平"], ["多", "平"], ["金", "平"], ["银", "平"], ["珠", "平"], ["琴", "平"], ["歌", "平"], ["诗", "平"], ["游", "平"], ["船", "平"], ["桥", "平"], ["楼", "平"], ["城", "平"], ["林", "平"], ["田", "平"], ["园", "平"], ["村", "平"], ["茶", "平"], ["烟", "平"], ["霞", "平"], ["虹", "平"], ["霜", "平"], ["冰", "平"], ["凉", "平"], ["寒", "平"], ["朋", "平"], ["同", "平"], ["行", "平"], ["朝", "平"], ["泊", "平"], ["曾", "平"], ["地", "仄"], ["雨", "仄"], ["雪", "仄"], ["月", "仄"], ["夜", "仄"], ["水", "仄"], ["火", "仄"], ["海", "仄"], ["柳", "仄"], ["岛", "仄"], ["岸", "仄"], ["树", "仄"], ["果", "仄"], ["杏", "仄"], ["李", "仄"], ["枣", "仄"], ["栗", "仄"], ["好", "仄"], ["美", "仄"], ["小", "仄"], ["大", "仄"], ["老", "仄"], ["上", "仄"], ["下", "仄"], ["左", "仄"], ["右", "仄"], ["后", "仄"], ["里", "仄"], ["外", "仄"], ["内", "仄"], ["北", "仄"], ["夏", "仄"], ["昼", "仄"], ["晚", "仄"], ["早", "仄"], ["午", "仄"], ["暑", "仄"], ["冷", "仄"], ["热", "仄"], ["暖", "仄"], ["酷", "仄"], ["丽", "仄"], ["艳", "仄"], ["静", "仄"], ["动", "仄"], ["笑", "仄"], ["唱", "仄"], ["诵", "仄"], ["写", "仄"], ["画", "仄"], ["剪", "仄"], ["绣", "仄"], ["染", "仄"], ["洗", "仄"], ["晒", "仄"], ["烤", "仄"], ["煮", "仄"], ["炒", "仄"], ["炖", "仄"], ["醉", "仄"], ["饱", "仄"], ["饿", "仄"], ["渴", "仄"], ["困", "仄"], ["倦", "仄"], ["懒", "仄"], ["奋", "仄"], ["勇", "仄"], ["猛", "仄"], ["烈", "仄"], ["壮", "仄"], ["伟", "仄"], ["俊", "仄"], ["俏", "仄"], ["少", "仄"], ["斗", "仄"], ["扫", "仄"], ["乐", "仄"]];
+var CHARS = [["天", "平"], ["开", "平"], ["飞", "平"], ["高", "平"], ["明", "平"], ["红", "平"], ["白", "仄", "入"], ["青", "平"], ["黄", "平"], ["东", "平"], ["西", "平"], ["南", "平"], ["春", "平"], ["云", "平"], ["风", "平"], ["花", "平"], ["山", "平"], ["江", "平"], ["湖", "平"], ["河", "平"], ["梅", "平"], ["兰", "平"], ["竹", "仄", "入"], ["松", "平"], ["桃", "平"], ["梨", "平"], ["年", "平"], ["时", "平"], ["来", "平"], ["回", "平"], ["多", "平"], ["金", "平"], ["银", "平"], ["珠", "平"], ["琴", "平"], ["歌", "平"], ["诗", "平"], ["游", "平"], ["船", "平"], ["桥", "平"], ["楼", "平"], ["城", "平"], ["林", "平"], ["田", "平"], ["园", "平"], ["村", "平"], ["茶", "平"], ["烟", "平"], ["霞", "平"], ["虹", "平"], ["霜", "平"], ["冰", "平"], ["凉", "平"], ["寒", "平"], ["朋", "平"], ["同", "平"], ["行", "平"], ["朝", "平"], ["泊", "仄", "入"], ["曾", "平"], ["地", "仄"], ["雨", "仄"], ["雪", "仄", "入"], ["月", "仄", "入"], ["夜", "仄"], ["水", "仄"], ["火", "仄"], ["海", "仄"], ["柳", "仄"], ["岛", "仄"], ["岸", "仄"], ["树", "仄"], ["果", "仄"], ["杏", "仄"], ["李", "仄"], ["枣", "仄"], ["栗", "仄", "入"], ["好", "仄"], ["美", "仄"], ["小", "仄"], ["大", "仄"], ["老", "仄"], ["上", "仄"], ["下", "仄"], ["左", "仄"], ["右", "仄"], ["后", "仄"], ["里", "仄"], ["外", "仄"], ["内", "仄"], ["北", "仄", "入"], ["夏", "仄"], ["昼", "仄"], ["晚", "仄"], ["早", "仄"], ["午", "仄"], ["暑", "仄"], ["冷", "仄"], ["热", "仄", "入"], ["暖", "仄"], ["酷", "仄"], ["丽", "仄"], ["艳", "仄"], ["静", "仄"], ["动", "仄"], ["笑", "仄"], ["唱", "仄"], ["诵", "仄"], ["写", "仄"], ["画", "仄"], ["剪", "仄"], ["绣", "仄"], ["染", "仄"], ["洗", "仄"], ["晒", "仄"], ["烤", "仄"], ["煮", "仄"], ["炒", "仄"], ["炖", "仄"], ["醉", "仄"], ["饱", "仄"], ["饿", "仄"], ["渴", "仄"], ["困", "仄"], ["倦", "仄"], ["懒", "仄"], ["奋", "仄"], ["勇", "仄"], ["猛", "仄"], ["烈", "仄", "入"], ["壮", "仄"], ["伟", "仄"], ["俊", "仄"], ["俏", "仄"], ["少", "仄"], ["斗", "仄"], ["扫", "仄"], ["乐", "仄", "入"]];
 
 var order = shuffle(CHARS.slice()), qi = 0, score = 0, lock = false;
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
@@ -67,7 +67,7 @@ function nextQ(){
     + '<button class="opt" data-a="平">平声</button>'
     + '<button class="opt" data-a="仄">仄声</button>'
     + '</div><div class="fb" id="fb"></div>'
-    + '<div class="koujue">📖 口诀：一二声是平声，三四声是仄声</div></div>';
+    + '<div class="koujue">📖 口诀：一二声平，三四声仄；入声短促也算仄</div></div>';
   $('stage').innerHTML = h;
   $('qtag').textContent = '第 ' + (qi+1) + ' / ' + order.length + ' 题';
   $('stage').querySelectorAll('.opt').forEach(function(b){
@@ -76,10 +76,10 @@ function nextQ(){
       var fb = $('fb');
       if(b.getAttribute('data-a') === c[1]){
         b.classList.add('right'); score += 10;
-        fb.className='fb ok'; fb.textContent='✓ 答对了！+10分';
+        fb.className='fb ok'; fb.textContent='✓ 答对了！+10分'+(c[2]==='入'?'　「'+c[0]+'」是入声字，算仄声':'');
       } else {
         b.classList.add('wrong'); fb.className='fb no';
-        fb.textContent='✗ 「'+c[0]+'」是'+c[1]+'声';
+        fb.textContent='✗ 「'+c[0]+'」是'+c[1]+'声'+(c[2]==='入'?'：它是入声字，古代读得短促，写诗时算仄声':'');
         $('stage').querySelectorAll('.opt').forEach(function(x){ if(x.getAttribute('data-a')===c[1]) x.classList.add('right'); });
       }
       $('score').textContent = score;
@@ -91,7 +91,7 @@ function endGame(){
   $('stage').style.display='none'; $('btnSkip').style.display='none';
   $('end').style.display='block';
   $('finalScore').textContent = score + ' 分';
-  $('finalMsg').textContent = '共 '+order.length+' 题，'+(score>=order.length*8?'平仄小达人！':score>=order.length*5?'不错，继续加油！':'记住口诀：一二声平，三四声仄。');
+  $('finalMsg').textContent = '共 '+order.length+' 题，'+(score>=order.length*8?'平仄小达人！':score>=order.length*5?'不错，继续加油！':'记住口诀：一二声平，三四声仄，入声也算仄。');
 }
 $('btnSkip').onclick = function(){ if($('stage').style.display==='none')return; qi++; nextQ(); };
 $('btnAgain').onclick = function(){ location.reload(); };
