@@ -64,4 +64,5 @@ window.NHZ_WB_INDEX = {
   "宾语残缺": "bj_binyu",
   "定语语序不当": "bj_dingyu",
   "关联词误用": "bj_glc_wuyong",
+  "关联词残缺": "bj_glc_canque",
 };
