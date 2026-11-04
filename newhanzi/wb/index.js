@@ -92,4 +92,5 @@ window.NHZ_WB_INDEX = {
   "吗/呢/吧": "xc_manieba",
   "才/就": "xc_caijiu",
   "都/也": "xc_douye",
+  "以/已": "xc_yiyi",
 };
