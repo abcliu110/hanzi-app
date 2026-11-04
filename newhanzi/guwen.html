@@ -298,6 +298,11 @@ window.NHZReview = window.NHZReview || (function () {
     var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
     var step = 0;
     var tp = itemType(modId);
+    /* 学前先看：仅当有真实前置时显示 */
+    if(it['前置知识'] && it['前置知识'].length){
+      body += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div>' +
+        '<p class="yw-exp">先复习：' + it['前置知识'].map(function(q){ return esc(q); }).join('、') + '</p></div>';
+    }
     /* 型标签 */
     body += typeTag(tp);
     function stepHead(title){
