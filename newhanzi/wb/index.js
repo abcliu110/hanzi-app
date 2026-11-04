@@ -9,4 +9,5 @@ window.NHZ_WB_INDEX = {
   "副词": "fuci",
   "介词": "jieci",
   "连词": "lianci",
+  "助词": "zhuci",
 };
