@@ -77,4 +77,5 @@ window.NHZ_WB_INDEX = {
   "被字句": "gj_beizi",
   "存现句": "gj_cunxian",
   "是…的句": "gj_shide",
+  "比较句": "gj_bijiao",
 };
