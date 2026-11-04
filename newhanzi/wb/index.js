@@ -73,4 +73,5 @@ window.NHZ_WB_INDEX = {
   "否定失当": "bj_fouding",
   "主谓搭配不当": "bj_zhuwei",
   "动宾搭配不当": "bj_dongbin",
+  "把字句": "gj_bazi",
 };
