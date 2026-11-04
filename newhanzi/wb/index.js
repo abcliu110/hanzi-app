@@ -84,4 +84,5 @@ window.NHZ_WB_INDEX = {
   "话题句": "gj_huati",
   "给字被动": "gj_geizi",
   "了/着/过": "xc_lezheguo",
+  "的/地/得": "xc_dedide",
 };
