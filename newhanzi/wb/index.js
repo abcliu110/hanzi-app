@@ -67,4 +67,5 @@ window.NHZ_WB_INDEX = {
   "关联词残缺": "bj_glc_canque",
   "指代不明": "bj_zhidai",
   "前后矛盾": "bj_qianhou",
+  "并列概念交叉": "bj_binglie",
 };
