@@ -58,4 +58,5 @@ window.NHZ_WB_INDEX = {
   "成分残缺或赘余": "bj_canque_zhuiyu",
   "结构混乱": "bj_jiegou",
   "表意不明": "bj_biaoyi",
+  "不合逻辑": "bj_luoji",
 };
