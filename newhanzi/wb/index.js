@@ -19,4 +19,5 @@ window.NHZ_WB_INDEX = {
   "动宾式": "dongbinshi",
   "补充式": "buchongshi",
   "主语": "zhuyu",
+  "谓语": "weiyu",
 };
