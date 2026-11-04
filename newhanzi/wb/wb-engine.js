@@ -844,6 +844,13 @@
         if (o.omit && o.omit.indexOf(b.w) >= 0) { c.move(b.g, { t: t0 + .2, x: b.x - b.x0c, y: 72, d: .7 }); b.dy = 72; }
         else { c.key(b.g, 'opacity', t0, 0, { d: .5 }); b.vis = 0; }
       });
+      /* 整块淡出（不在新排版里）时，挂在块上的 tag / 外框一起淡出；块回来时再显出（第 2 期 03j 补） */
+      from.concat(to).forEach(function (ch) {
+        if (!ch.deco.length) return;
+        var gone = ch.words.every(function (b) { return !b.vis; });
+        if (gone && !ch.decoOff) { ch.deco.forEach(function (g) { c.key(g, 'opacity', t0, 0, { d: .5 }); }); ch.decoOff = 1; }
+        else if (!gone && ch.decoOff) { ch.deco.forEach(function (g) { c.key(g, 'opacity', t0 + d0 - .3, 1, { d: .4 }); }); ch.decoOff = 0; }
+      });
       /* 块上挂的 tag / 外框跟着中心语走 */
       from.concat(to).forEach(function (ch) {
         if (!ch.deco.length) return; var ndx = ch.head.x - ch.head.x0c;
