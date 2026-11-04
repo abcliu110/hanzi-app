@@ -27,4 +27,5 @@ window.NHZ_WB_INDEX = {
   "趋向补语引申义": "quxiangbuyu",
   "并列复句": "binglie_fuju",
   "递进复句": "dijin_fuju",
+  "选择复句": "xuanze_fuju",
 };
