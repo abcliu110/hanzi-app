@@ -188,6 +188,8 @@
 
     h += '<div class="src-note">数据来源：通用规范汉字表 · Unihan · 《说文解字》· hanzi-writer-data · CC-CEDICT</div>';
 
+    /* 切字前销毁旧笔顺播放器，避免孤儿 rAF 在已拆节点上继续跑（当前每字整页加载、尚未触发，属防御） */
+    try { if (app._sp) { app._sp.destroy(); app._sp = null; } } catch (e) {}
     app.innerHTML = h;
 
     /* 看笔顺挂载：形块区容器已随 innerHTML 生成，有数据且组件已加载时挂载并播一次 */
@@ -199,6 +201,7 @@
           strokes: dim['笔顺'].strokes,
           medians: dim['笔顺'].medians
         });
+        app._sp = sp;
         sp.play();
       }
     } catch (e) {}
