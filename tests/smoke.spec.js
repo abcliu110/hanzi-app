@@ -95,3 +95,54 @@ test.describe('newhanzi smoke', () => {
     }
   });
 });
+
+/* 首页与语法页初始加载预算：子页 iframe、逻辑数据、语法题库都应按需加载。
+   实测（2026-11-04 懒加载后）：首页 9 请求 / 0.36MB，语法页 5 请求 / 0.75MB；
+   改前首页 140 请求 / 11.2MB。阈值留余量，超了说明有东西又被提前加载了。 */
+async function measureLoad(page, path) {
+  let n = 0, bytes = 0;
+  const pending = [];
+  page.on('requestfinished', (r) => {
+    n++;
+    pending.push(r.sizes().then((s) => { bytes += s.responseBodySize; }).catch(() => {}));
+  });
+  await page.goto(path, { waitUntil: 'load' });
+  await page.waitForTimeout(1000);
+  await Promise.all(pending);
+  return { n, mb: bytes / 1048576 };
+}
+
+test.describe('load budget', () => {
+  test('home initial load is small (lazy iframes)', async ({ page }) => {
+    const { n, mb } = await measureLoad(page, 'newhanzi/index.html');
+    console.log(`home: ${n} requests, ${mb.toFixed(2)} MB`);
+    expect(n).toBeLessThan(25);
+    expect(mb).toBeLessThan(1.0);
+    await expect(page.locator('iframe[src]')).toHaveCount(0);
+  });
+
+  test('yuwen initial load is small (lazy quiz banks)', async ({ page }) => {
+    const { n, mb } = await measureLoad(page, 'newhanzi/yuwen.html');
+    console.log(`yuwen: ${n} requests, ${mb.toFixed(2)} MB`);
+    expect(n).toBeLessThan(15);
+    expect(mb).toBeLessThan(1.5);
+  });
+
+  test('home panels load iframe / logic on open', async ({ page }) => {
+    await page.goto('newhanzi/index.html');
+    await page.click('#view-home .panel[data-m="logic"]');
+    await expect(page.locator('#logiclist .yw-item').first()).toBeVisible();
+    await page.click('#btnBack');
+    await page.click('#view-home .panel[data-m="yuwen"]');
+    await expect(page.locator('#panel-yuwen iframe')).toHaveAttribute('src', 'yuwen.html');
+  });
+
+  test('yuwen quiz bank loads on demand', async ({ page }) => {
+    await page.goto('newhanzi/yuwen.html');
+    await page.locator('.yw-head:has(.yw-name:text-is("名词"))').click();
+    await expect(page.locator('#ywdetail .bank-qs .quiz-q')).toHaveCount(10);
+    await page.click('#ywBack');
+    await page.locator('.yw-head:has(.yw-name:text-is("把字句"))').click();
+    await expect(page.locator('#ywdetail .bank-qs .quiz-q')).toHaveCount(10);
+  });
+});
