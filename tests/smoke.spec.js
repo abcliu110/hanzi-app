@@ -147,23 +147,25 @@ test.describe('load budget', () => {
   });
 });
 
-/* 手机 390x844 下所有页面不得横向溢出（2026-11-04 首页 .panels 曾 517px、阅读写作 .yw-head 487px） */
+/* 只支持平板和桌面（负责人 2026-11-04）：平板 768x1024、桌面 1280x800 下所有页面不得横向溢出 */
 const ALL_PAGES = require('fs').readdirSync(require('path').join(__dirname, '..', 'newhanzi'), { recursive: true })
   .filter((f) => f.endsWith('.html') && !f.startsWith('ziku'))
   .map((f) => 'newhanzi/' + f.split(require('path').sep).join('/'))
   .sort();
 
-test.describe('mobile 390px no horizontal overflow', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
-  for (const path of ALL_PAGES) {
-    test(`no overflow ${path}`, async ({ page }) => {
-      await page.goto(path, { waitUntil: 'load' });
-      await page.waitForTimeout(300);
-      const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
-      expect(r.sw, `scrollWidth ${r.sw} > clientWidth ${r.cw}`).toBeLessThanOrEqual(r.cw);
-    });
-  }
-});
+for (const vp of [{ name: 'tablet', width: 768, height: 1024 }, { name: 'desktop', width: 1280, height: 800 }]) {
+  test.describe(`${vp.name} ${vp.width}px no horizontal overflow`, () => {
+    test.use({ viewport: { width: vp.width, height: vp.height } });
+    for (const path of ALL_PAGES) {
+      test(`no overflow ${vp.name} ${path}`, async ({ page }) => {
+        await page.goto(path, { waitUntil: 'load' });
+        await page.waitForTimeout(300);
+        const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
+        expect(r.sw, `scrollWidth ${r.sw} > clientWidth ${r.cw}`).toBeLessThanOrEqual(r.cw);
+      });
+    }
+  });
+}
 
 /* sw.js 预缓存清单要覆盖全部页面：新增/删除页面后运行 python3 tools/gen_sw_core.py */
 test('sw.js precache list is up to date', async () => {
