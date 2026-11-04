@@ -88,9 +88,6 @@
   var listEl = document.getElementById('ywlist');
   var detailEl = document.getElementById('ywdetail');
   var tabsEl = document.getElementById('ywtabs');
-  var stdEl = document.getElementById('ywstd');
-  var qEl = document.getElementById('yq');
-  var controlsEl = document.getElementById('ywcontrols');
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -342,7 +339,6 @@
     var itemEl = headEl.closest('.yw-item');
     var bodyEl = itemEl ? itemEl.querySelector('.yw-body') : null;
     listEl.style.display = 'none';
-    controlsEl.style.display = 'none';
     detailEl.style.display = 'block';
     detailEl.innerHTML =
       '<div style="display:flex;gap:10px;margin-bottom:16px">' +
@@ -367,15 +363,13 @@
     detailEl.style.display = 'none';
     detailEl.innerHTML = '';
     listEl.style.display = '';
-    controlsEl.style.display = '';
     window.scrollTo(0, 0);
   }
 
   function render() {
     var d = DATA[active];
     if (!d) return;
-    var q = qEl.value.trim();
-    stdEl.textContent = d['标准'] || '';
+    var q = '';
 
     var html = '';
     var visCats = []; /* 顶部模块索引 chips：只收录过滤后仍可见的分类 */
@@ -401,7 +395,8 @@
     listEl.innerHTML = html ||
       '<div class="noresult">没找到相关知识点，换个词试试</div>';
 
-    var top = controlsEl.offsetHeight;
+    var tb = document.querySelector('.topbar');
+    var top = tb ? tb.offsetHeight : 0;
     Array.prototype.forEach.call(listEl.querySelectorAll('.ghead'), function (h) {
       h.style.top = top + 'px';
     });
@@ -420,7 +415,6 @@
     var t = e.target.closest('.tab');
     if (!t) return;
     active = t.getAttribute('data-m');
-    qEl.value = '';
     syncTabs(); render();
     window.scrollTo(0, 0);
   });
@@ -579,14 +573,10 @@
     }
   });
 
-  var deb = null;
-  qEl.addEventListener('input', function () {
-    clearTimeout(deb);
-    deb = setTimeout(render, 150);
-  });
 
   window.addEventListener('resize', function () {
-    var top = controlsEl.offsetHeight;
+    var tb = document.querySelector('.topbar');
+    var top = tb ? tb.offsetHeight : 0;
     Array.prototype.forEach.call(listEl.querySelectorAll('.ghead'), function (h) {
       h.style.top = top + 'px';
     });
