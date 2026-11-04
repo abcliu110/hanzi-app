@@ -63,6 +63,12 @@
 .sc-chips{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
 .sc-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
 .sc-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.sc-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 20px}
+.sc-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 12px;cursor:pointer;text-align:center;color:var(--ink)}
+.sc-panel:active{background:var(--accent-soft)}
+.sc-panel-ic{font-size:32px;margin-bottom:8px}
+.sc-panel-t{font-size:16px;font-weight:700;margin-bottom:4px}
+.sc-panel-n{font-size:12px;color:var(--muted)}
 .sc-zrow{display:flex;gap:8px;padding:14px 16px}
 .sc-zrow input{flex:1;font-size:18px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;max-width:120px}
 .sc-zrow button{font-size:15px;padding:10px 18px;border-radius:10px;border:1px solid var(--accent-deep);background:var(--accent-deep);color:#fff;cursor:pointer}
@@ -825,24 +831,35 @@ function vKnow(){
     D.knowledge.forEach(function(k, i){ if(k.m===mm[0]) idxs.push(i); });
     if(idxs.length) mods.push({mm: mm, idxs: idxs});
   });
-  h += '<div class="sc-chips">' + mods.map(function(m){
-    return '<button class="sc-chip" data-midx="'+m.mm[0]+'">'+m.mm[1]+' '+m.mm[2]+'（'+m.idxs.length+'）</button>';
+  /* 面板网格：19个模块各一张面板，点进单独明细页 */
+  h += '<div class="sc-panels">' + mods.map(function(m){
+    return '<div class="sc-panel" data-midx="'+m.mm[0]+'">'+
+      '<div class="sc-panel-ic">'+m.mm[1]+'</div>'+
+      '<div class="sc-panel-t">'+m.mm[2]+'</div>'+
+      '<div class="sc-panel-n">'+m.idxs.length+'卡</div>'+
+      '</div>';
   }).join('') + '</div>';
-  mods.forEach(function(m){
-    h += '<div class="sc-kmod" id="knowmod-'+m.mm[0]+'">'+m.mm[1]+' '+m.mm[2]+'（'+m.idxs.length+'）</div>';
-    m.idxs.forEach(function(i){
-      h += '<div class="sc-knowtitle" data-idx="'+i+'">'+esc(D.knowledge[i].t)+'</div>';
-    });
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('.sc-panel').forEach(function(el){
+    el.addEventListener('click', function(){ vKnowList(el.getAttribute('data-midx')); });
+  });
+}
+/* 模块明细列表页：单独一页，只显示该模块的条目 */
+function vKnowList(midx){
+  var mm = null, idxs = [];
+  KNOW_MODS.forEach(function(x){ if(x[0]===midx) mm = x; });
+  if(!mm) return;
+  D.knowledge.forEach(function(k, i){ if(k.m===midx) idxs.push(i); });
+  setTitle(mm[2]);
+  var h = '<button class="sc-backbtn" id="knowlBack">← 返回诗词常识</button>';
+  h += '<div class="sc-kmod">'+mm[1]+' '+mm[2]+'（'+idxs.length+'）</div>';
+  idxs.forEach(function(i){
+    h += '<div class="sc-knowtitle" data-idx="'+i+'">'+esc(D.knowledge[i].t)+'</div>';
   });
   listEl.innerHTML = h; showList(); wireBack();
+  document.getElementById('knowlBack').addEventListener('click', vKnow);
   listEl.querySelectorAll('[data-idx]').forEach(function(el){
     el.addEventListener('click', function(){ openKnow(parseInt(el.getAttribute('data-idx'),10)); });
-  });
-  listEl.querySelectorAll('[data-midx]').forEach(function(el){
-    el.addEventListener('click', function(){
-      var tg = document.getElementById('knowmod-'+el.getAttribute('data-midx'));
-      if(tg) tg.scrollIntoView();
-    });
   });
 }
 
