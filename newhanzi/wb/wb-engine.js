@@ -372,7 +372,7 @@
     return lines.length;
   }
 
-  /* test：{h:'第一招：前面能加数量词吗？', rows:[{p:'三个', w:'书包', ok:true, r:'三个书包，能说，书包是名词。'}]}
+  /* test：{h:'第一招：前面能加数量词吗？', rows:[{p:'三个', w:'书包', ok:true, r:'三个书包，能说，书包是名词。'}], size:词卡字号(默认38), expl:['只念不画的讲解']}
    * 每行：词卡 → 试探词滑到前面 → 想一想 → ✓/✗ + 结论 */
   TPL.test = function (c, q, d) {
     if (d.h) heading(c, q, d.h, d.sub);
@@ -380,7 +380,7 @@
     rows.forEach(function (r, i) {
       var y = y0 + i * gapY, wx = 560, pw = 0;
       q.beat(r.say || ('试试“' + r.w + '”。'), function (t) {
-        var wc = c.card(wx, y, r.w, t, { size: 38 });
+        var wc = c.card(wx, y, r.w, t, { size: d.size || 38 });
         if (r.p) {
           var pc = c.G(function () { var g = c.card(0, 0, r.p, t + .8, { size: 38, color: ACC }); pw = g.w; });
           var after = r.after;
@@ -395,6 +395,8 @@
         return 1;
       }, { ask: i === 0 || r.ask ? (r.q || true) : false });
     });
+    /* expl：只念不画的讲解拍（缺 L3 回炉时由内容稿 say 嵌入；字幕显示） */
+    (d.expl || []).forEach(function (s) { q.beat(s, null); });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 525, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
 
