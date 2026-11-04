@@ -18,6 +18,14 @@
 .sc-pmeta{font-size:13px;color:var(--muted);margin-top:4px}
 .sc-badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:10px;background:var(--accent-soft);border:1px solid var(--line);margin-right:6px;color:var(--accent-deep)}
 .sc-lines{font-size:20px;line-height:2;text-align:center;padding:18px 8px}
+/* 阅读条（改进设计 P0-2）：朗读高亮 / 节奏 / 渐隐背诵 */
+.sc-readbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}
+.sc-readbar button{min-height:44px;padding:8px 16px;border-radius:12px;border:2px solid var(--accent-deep,#3f6b4f);background:var(--accent-soft,#e8f0e4);color:var(--accent-deep,#3f6b4f);font-size:16px;font-weight:700;cursor:pointer}
+.sc-readbar button.on{background:var(--accent-deep,#3f6b4f);color:#fff}
+.sc-line.reading{background:#fff3c4;border-radius:10px}
+.sc-line .rb{color:#b08d57;margin:0 .15em;font-weight:400}
+.sc-line .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
+.sc-memo-tip{text-align:center;color:#6b7c6b;font-size:14px;margin-top:4px}
 .sc-lines p{margin:0}
 .sc-poet{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
 .sc-poet .sc-pname{font-size:17px;font-weight:700}
@@ -1145,7 +1153,8 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+esc(l)+'</p>';}).join('')+'</div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button></div>';
+  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
     var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
@@ -1175,7 +1184,67 @@ function openPoem(order){
       })(lineEls[li], li);
     }
   }catch(e){}
+  try{ scReadBar(p); }catch(e){}
   try{ history.replaceState(null,'','#poem-'+order); }catch(e){}
+}
+
+/* ===== 阅读条（docs/gaijin/shici-gaijin-sheji.md P0-2）=====
+   节奏：只给纯五言（2/3）、纯七言（2/2/3）的句子加停顿线，其余句子不硬加；
+   背一背：四档渐隐——全显 → 隔字隐 → 只留句首字 → 全隐，点一句可看一眼；
+   朗读：浏览器自带中文语音逐句读，读到哪句高亮哪句。 */
+function scHanzi(c){ return /[\u3400-\u9fff]/.test(c); }
+function scLineHTML(l, beat, memo, li){
+  var chars = Array.from(l), hz = chars.filter(scHanzi).length, cut = {};
+  if(beat && (hz===5 || hz===7)){ if(hz===5) cut[2]=1; else { cut[2]=1; cut[4]=1; } }
+  var out = '', k = 0;
+  chars.forEach(function(c){
+    if(!scHanzi(c)){ out += esc(c); return; }
+    if(cut[k]) out += '<span class="rb">/</span>';
+    var hide = memo===3 || (memo===2 && k>0) || (memo===1 && k%2===1);
+    out += '<span class="hz'+(hide?' hid':'')+'">'+esc(c)+'</span>';
+    k++;
+  });
+  return out;
+}
+function scReadBar(p){
+  var bar = detEl.querySelector('.sc-readbar'); if(!bar) return;
+  var st = {beat:false, memo:0};
+  var tips = ['', '隔一个字藏一个，试着读出来', '只留每句第一个字', '全藏起来了，点一句可以偷看一眼'];
+  function redraw(){
+    detEl.querySelectorAll('.sc-line').forEach(function(el){ var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); });
+    bar.querySelector('[data-rb=beat]').classList.toggle('on', st.beat);
+    var mb = bar.querySelector('[data-rb=memo]'); mb.classList.toggle('on', st.memo>0); mb.textContent = st.memo ? '🙈 背一背 '+st.memo+'/3' : '🙈 背一背';
+    var t = document.getElementById('scmemotip'); if(t) t.textContent = tips[st.memo];
+  }
+  function stopRead(){ try{ speechSynthesis.cancel(); }catch(e){} detEl.querySelectorAll('.sc-line.reading').forEach(function(x){ x.classList.remove('reading'); }); bar.querySelector('[data-rb=read]').classList.remove('on'); }
+  function readFrom(i){
+    var els = detEl.querySelectorAll('.sc-line');
+    if(i >= els.length || !document.body.contains(bar)){ stopRead(); return; }
+    els.forEach(function(x){ x.classList.remove('reading'); }); els[i].classList.add('reading');
+    var u = new SpeechSynthesisUtterance(p.lines[i].replace(/[，。！？、；：]/g,' '));
+    u.lang = 'zh-CN'; u.rate = 0.8;
+    u.onend = function(){ if(bar.querySelector('[data-rb=read]').classList.contains('on')) readFrom(i+1); };
+    speechSynthesis.speak(u);
+  }
+  bar.addEventListener('click', function(e){
+    var b = e.target.closest('[data-rb]'); if(!b) return;
+    var a = b.getAttribute('data-rb');
+    if(a==='read'){
+      if(b.classList.contains('on')){ stopRead(); return; }
+      if(!('speechSynthesis' in window)){ b.textContent = '🔇 这台设备不能朗读'; return; }
+      stopRead(); b.classList.add('on'); readFrom(0);
+    } else if(a==='beat'){ st.beat = !st.beat; redraw(); }
+    else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
+  });
+  /* 背诵模式下点一句：偷看 2 秒 */
+  detEl.querySelectorAll('.sc-line').forEach(function(el){
+    el.addEventListener('click', function(){
+      if(!st.memo) return;
+      var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, 0, i);
+      setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); }, 2000);
+    });
+  });
+  var back = document.getElementById('scback'); if(back) back.addEventListener('click', stopRead);
 }
 
 function go(v){
