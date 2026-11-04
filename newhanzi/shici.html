@@ -24,6 +24,7 @@
 .sc-poet .sc-pbio{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.7}
 .sc-know{margin:12px 16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .sc-kmod{font-size:17px;font-weight:700;color:var(--accent-deep);margin:20px 16px 6px}
+.sc-knowtitle{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:8px 16px;font-size:16px;cursor:pointer}
 .sc-svg{margin:8px 0}
 .sc-svg svg{width:100%;height:auto;display:block;background:var(--accent-deep);border-radius:10px}
 .sc-svg .svg-muted{fill:#c8d8cc} .sc-svg .svg-muted-s{stroke:#c8d8cc}
@@ -818,36 +819,61 @@ function vKnow(){
   setTitle('诗词常识');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
   h += '<div class="sc-know"><p>诗词常识，配着例子看。🎬 是延伸视频，📊 是图解资料。</p></div>';
+  var mods = [];
   KNOW_MODS.forEach(function(mm){
-    var cards = D.knowledge.filter(function(k){ return k.m===mm[0]; });
-    if(!cards.length) return;
-    h += '<div class="sc-kmod">'+mm[1]+' '+mm[2]+'（'+cards.length+'）</div>';
-    cards.forEach(function(k){
-      var tp = knowType(k.m, k.t);
-      h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
-      /* 学前先看：仅当有真实前置时显示 */
-      if(k['前置知识'] && k['前置知识'].length){
-        h += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+k['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
-      }
-      var svg = knowSVG(k.g);
-      if(svg) h += '<div class="sc-svg">'+svg+'</div>';
-      var dHtml = escD(k.d);
-      /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
-      var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
-      if (parts.length > 1) {
-        var exTitle = SC_EX_TITLE[tp] || '📜 例句';
-        h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+exTitle+'</b>'+parts[1]+'</div>';
-      } else {
-        h += '<p>'+dHtml+'</p>';
-      }
-      var links = '';
-      (k.v||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
-      (k.l||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
-      if(links) h += '<div style="margin-top:6px">'+links+'</div>';
-      h += '</div>';
+    var idxs = [];
+    D.knowledge.forEach(function(k, i){ if(k.m===mm[0]) idxs.push(i); });
+    if(idxs.length) mods.push({mm: mm, idxs: idxs});
+  });
+  h += '<div class="sc-chips">' + mods.map(function(m){
+    return '<button class="sc-chip" data-midx="'+m.mm[0]+'">'+m.mm[1]+' '+m.mm[2]+'（'+m.idxs.length+'）</button>';
+  }).join('') + '</div>';
+  mods.forEach(function(m){
+    h += '<div class="sc-kmod" id="knowmod-'+m.mm[0]+'">'+m.mm[1]+' '+m.mm[2]+'（'+m.idxs.length+'）</div>';
+    m.idxs.forEach(function(i){
+      h += '<div class="sc-knowtitle" data-idx="'+i+'">'+esc(D.knowledge[i].t)+'</div>';
     });
   });
   listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('[data-idx]').forEach(function(el){
+    el.addEventListener('click', function(){ openKnow(parseInt(el.getAttribute('data-idx'),10)); });
+  });
+  listEl.querySelectorAll('[data-midx]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var tg = document.getElementById('knowmod-'+el.getAttribute('data-midx'));
+      if(tg) tg.scrollIntoView();
+    });
+  });
+}
+
+function openKnow(idx){
+  var k = D.knowledge[idx]; if(!k) return;
+  setTitle(k.t);
+  var h = '<button class="sc-backbtn" id="scback">← 返回诗词常识</button>';
+  h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
+  /* 学前先看：仅当有真实前置时显示 */
+  if(k['前置知识'] && k['前置知识'].length){
+    h += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+k['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
+  }
+  var svg = knowSVG(k.g);
+  if(svg) h += '<div class="sc-svg">'+svg+'</div>';
+  var dHtml = escD(k.d);
+  var tp = knowType(k.m, k.t);
+  /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
+  var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
+  if (parts.length > 1) {
+    var exTitle = SC_EX_TITLE[tp] || '📜 例句';
+    h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+exTitle+'</b>'+parts[1]+'</div>';
+  } else {
+    h += '<p>'+dHtml+'</p>';
+  }
+  var links = '';
+  (k.v||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
+  (k.l||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
+  if(links) h += '<div style="margin-top:6px">'+links+'</div>';
+  h += '</div>';
+  detEl.innerHTML = h; showDetail();
+  document.getElementById('scback').addEventListener('click', function(){ vKnow(); });
 }
 
 function vDyn(){
@@ -900,12 +926,24 @@ function openPoet(name){
 function vFamous(){
   setTitle('名句典故');
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += D.famous.map(function(f){
-    var link = f.order ? '<div class="sc-flink">📜 出自<span class="sc-worklink" data-o="'+f.order+'">《'+esc(f.title)+'》</span>（'+esc(f.author)+'）</div>' : '<div class="sc-flink">📜 '+esc(f.author)+'《'+esc(f.title)+'》</div>';
-    return '<div class="sc-famous"><div class="sc-fline">'+esc(f.line)+'</div><div class="sc-fbai">白话：'+esc(f.baihua)+'</div><div class="sc-fstory">典故：'+esc(f.story)+'</div>'+link+'</div>';
+  h += D.famous.map(function(f, i){
+    return '<div class="sc-knowtitle" data-fidx="'+i+'">'+esc(f.line)+'</div>';
   }).join('');
   listEl.innerHTML = h; showList(); wireBack();
-  listEl.querySelectorAll('.sc-worklink').forEach(function(a){
+  listEl.querySelectorAll('[data-fidx]').forEach(function(el){
+    el.addEventListener('click', function(){ openFamous(parseInt(el.getAttribute('data-fidx'),10)); });
+  });
+}
+
+function openFamous(i){
+  var f = D.famous[i]; if(!f) return;
+  setTitle('名句典故');
+  var link = f.order ? '<div class="sc-flink">📜 出自<span class="sc-worklink" data-o="'+f.order+'">《'+esc(f.title)+'》</span>（'+esc(f.author)+'）</div>' : '<div class="sc-flink">📜 '+esc(f.author)+'《'+esc(f.title)+'》</div>';
+  var h = '<button class="sc-backbtn" id="scback">← 返回名句典故</button>';
+  h += '<div class="sc-famous"><div class="sc-fline">'+esc(f.line)+'</div><div class="sc-fbai">白话：'+esc(f.baihua)+'</div><div class="sc-fstory">典故：'+esc(f.story)+'</div>'+link+'</div>';
+  detEl.innerHTML = h; showDetail();
+  document.getElementById('scback').addEventListener('click', function(){ vFamous(); });
+  detEl.querySelectorAll('.sc-worklink').forEach(function(a){
     a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
   });
 }
