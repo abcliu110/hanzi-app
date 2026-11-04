@@ -54,4 +54,5 @@ window.NHZ_WB_INDEX = {
   "设问": "xc_shewen",
   "反问": "xc_fanwen",
   "语序不当": "bj_yuxu",
+  "搭配不当": "bj_dapei",
 };
