@@ -16,7 +16,7 @@
 | A3 | P2 | docs/anim/jiaojie/yufa-l3-buqi.md 断点 | 语法白板缺 L3 回炉 批 4：修辞格 8 项（草稿齐；嵌入脚本 embed.py 未入库，需重写） | 待做 |
 | A4 | P2 | 同上 | 批 5：常见病句 20 项（草稿齐） | 待做 |
 | A5 | P2 | yufa-neirong-08-l3-huilian.md / yufa-l3-buqi.md | 批次 9：虚词精讲 16 项先写 L3+回练草稿进 l3-huilian.json（src 必须可核），再嵌入场景（批 6） | 待做 |
-| A6 | P2 | yufa-l3-buqi.md「已知」 | 「介词」场景旧幕第 4 幕标签为空 | 待做 |
+| A6 | P2 | yufa-l3-buqi.md「已知」 | 「介词」场景旧幕第 4 幕标签为空 | ✅ 见执行日志 |
 | A7 | P2 | gaijin/README.md 进度 | 逻辑区：按 `point` 过滤直达（quiz engine.js） | 待做 |
 | A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | ✅ 见执行日志 |
 | A9 | P2 | xiufu/content.md | share.js 注释/逻辑写 seed%120，诗库现 192 首，改用 POEMS.length | ✅ 代码早已用 POEMS.length，只改注释 |
@@ -73,4 +73,5 @@
 - A1+A2 · 453af4f1 · 8e1383d5 的 112 字讲解按汉典/《说文》重写，六书修正 4 字（元 兑 斑 显）；交接 docs/xiufu/zika-jiangjie.md
 - A2b · d050e0b4 · 三线 158 字讲解按汉典重写，六书修正 7 字；check_content.js 加字卡讲解检查；smoke 加用例
 - A8 · c53e4c92 · index.html 年级下拉：有字表的 8 册去掉「（待录入）」，6上标「课本无识字表」，4下/5下/6下 保留待录入
-- A9+A10 · 本提交 · shici.html 朝代 chips 改为按诗库实有朝代、按时间排序生成（先秦…清 10 个）；share.js 注释改为 POEMS.length
+- A9+A10 · 9552822d · shici.html 朝代 chips 改为按诗库实有朝代、按时间排序生成（先秦…清 10 个）；share.js 注释改为 POEMS.length
+- A6 · 本提交 · 介词第 4 幕补 tab「引出对象」；lint 0、check_wb 700/1100 过、baseline 9 幕一致
