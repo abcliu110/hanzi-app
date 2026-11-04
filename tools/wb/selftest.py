@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""语法白板引擎自测（第 1 期新原语 E1–E14 + review / trunk；第 2 期 morph）。
+"""语法白板引擎自测（第 1 期新原语 E1–E14 + review / trunk；第 2 期 morph；第 3 期 nest）。
 
 用法：python3 tools/wb/selftest.py [--shot /tmp/selftest.png]
 检查：
@@ -46,7 +46,10 @@ NHZWB.add('_自测', { scenes: [
   { k: 'trunk', lv: 2, core: ['小猫', '捉', '老鼠'], role: ['zhu', 'wei', 'bin'], grow: [{ q: '哪只？', ins: ['胖胖', '的'], before: 0, role: 'ding' }, { q: '几只？', ins: ['三只'], before: 0, role: 'ding', at: 'far', keep: 1, why: 'num' }, { q: '怎样？', ins: ['得', '很快'], after: 1, role: 'bu' }] },
   { k: 'trunk', lv: 1, mode: 'prune', s: ['弟弟', '不', '喜欢', '吃', '香菜'], role: ['zhu', 'zhuang', 'wei', 'wei', 'bin'], keep: [{ i: 1, why: 'neg' }], tryCut: { i: 1, show: '弟弟喜欢吃香菜', say: '剪掉“不”，意思反了。' }, prune: { strike: 1 } },
   { k: 'morph', lv: 2, from: [{ id: 'A', w: ['茂密的', '树林'], tag: '动手的' }, { id: 'h1', w: ['把'], hub: 1 }, { id: 'B', w: ['太阳'], tag: '被动手的' }, { id: 'V', w: ['遮住了'] }], to: ['B', { id: 'h2', w: ['被'], hub: 1 }, 'A', 'V'], ask: '谁搬到前面？', wrongTry: { drop: ['茂密的'], say: '“茂密的”丢了。' }, roleTo: { B: 'zhu' }, state: { a: '太阳亮亮的', b: '太阳被挡住了', ok: true } },
-  { k: 'morph', lv: 3, src: '自测', from: [{ id: 'P', w: ['在', '操场', '上'] }, { id: 'V', w: ['跑'] }, { id: 'O', w: ['步'] }], to: [{ w: ['把'], hub: 1 }, 'O', 'V', 'P'], ok: false, say: '不能说。' }
+  { k: 'morph', lv: 3, src: '自测', from: [{ id: 'P', w: ['在', '操场', '上'] }, { id: 'V', w: ['跑'] }, { id: 'O', w: ['步'] }], to: [{ w: ['把'], hub: 1 }, 'O', 'V', 'P'], ok: false, say: '不能说。' },
+  { k: 'nest', lv: 2, style: 'box', s: ['妈妈', '买', '的', '新', '书包'], tree: ['pz', ['de', ['zw', 0, 1], 2], ['pz', 3, 4]], ask: '先装哪两个？' },
+  { k: 'nest', lv: 3, style: 'stair', src: '自测', s: ['妈妈', '买', '的', '新', '书包'], tree: ['pz', ['de', ['zw', 0, 1], 2], ['pz', 3, 4]] },
+  { k: 'nest', lv: 3, style: 'stair', src: '自测', s: ['表扬', '班长', '的', '老师'], reads: [{ tree: ['pz', ['de', ['db', 0, 1], 2], 3], pic: { t: '说的是一位老师' } }, { tree: ['db', 0, ['pz', ['de', 1, 2], 3]], pic: { t: '说的是表扬谁' } }] }
 ] });
 window.P = NHZWB.mount(document.getElementById('box'), '_自测');
 </script></body></html>"""
@@ -102,6 +105,18 @@ JS = r"""() => {
   if (order44(7) !== '在 操场 上 跑 步') out.push('morph 失败后应退回原句，得「' + order44(7) + '」');
   P.seek(0, 9); if (P.svg.innerHTML.indexOf('主语（谁 / 什么）') < 0) out.push('E14：lv2 幕 tag 应显示「主语（谁 / 什么）」');
   P.seek(3, 99); if (P.svg.innerHTML.indexOf('>主语<') < 0) out.push('E14：|term 应显示「主语」');
+  /* nest（第 3 期）：box 由内向外——结构名越外层越靠下；stair 一层一行往下；一句两图点亮当前卡 */
+  const labY = (i, lab, fs) => { P.seek(i, P.durations()[i]); return [...P.svg.querySelectorAll('text')].filter(t => t.textContent === lab && t.getAttribute('font-size') === fs).map(t => +t.getAttribute('y')).sort((a, b) => a - b); };
+  const zw = labY(8, '主谓', '20'), de = labY(8, '的字', '20'), pz = labY(8, '偏正', '20');
+  if (zw.length !== 1 || de.length !== 1 || pz.length !== 2) out.push('nest box 结构名个数不对：' + [zw, de, pz]);
+  else if (!(zw[0] < de[0] && de[0] < pz[1] && pz[0] < de[0])) out.push('nest box 结构名应由内向外下移：' + [zw, de, pz]);
+  const szw = labY(9, '主谓', '26'), sde = labY(9, '的字', '26'), spz = labY(9, '偏正', '26');
+  if (!(szw.length === 1 && sde.length === 1 && spz.length === 2 && spz[0] < sde[0] && sde[0] < szw[0] && spz[1] === sde[0])) out.push('nest stair 应一层一行往下：' + [spz, sde, szw]);
+  const pics = () => [...P.svg.querySelectorAll('[data-pic]')];
+  P.seek(10, P.durations()[10]); const pe = pics().map(g => g.style.opacity || '1');
+  if (pe.length !== 2 || pe.some(o => o !== '1')) out.push('一句两图收尾两卡应全亮：' + pe);
+  const mid = P.durations()[10] * .75; P.seek(10, 0); P.seek(10, mid); const pm = pics().map(g => g.style.opacity || '1');
+  if (!(pm[0] === '0.35' && pm[1] === '1')) out.push('一句两图第二种装法时应点亮第二张、第一张变灰：' + pm);
   return out;
 }"""
 

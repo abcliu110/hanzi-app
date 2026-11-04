@@ -934,6 +934,104 @@
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
 
+  /* ---------- nest 套盒子（E15，设计 §5.3；第 3 期） ----------
+   * 树：[结构键, 子, 子, …]，子为子树或词下标（从 0 起，从左到右连续）；结构键查 terms.js（pz/db/zw/bl/bc/de/jb…）。
+   * {k:'nest', lv:1, style:'box', s:['妈妈','买','的','新','书包'], tree:['pz',['de',['zw',0,1],2],['pz',3,4]], ask, say:[每个盒子的旁白，可省]}
+   *   box：自底向上画圆角框（矮的先装），框下写结构名（L1 儿童简称、L2/L3 术语）。
+   * {k:'nest', lv:3, style:'stair', s, tree, ask}
+   *   stair：句子在上，句下一层一行台阶线：横线覆盖片段、切分处竖短线、结构名写在切分处下方；从上往下逐层切。
+   * {k:'nest', lv:3, style:'stair'|'box', s, reads:[{tree, pic:{t:'情境卡文字'}, say}, {…}], ask}
+   *   一句两图：左右两栏各一份句子，栏上方情境卡；画到哪种装法就点亮哪张卡，另一张变灰。
+   * 排版在构建时算好（textW 估宽，不调用 getBBox）；树深 ≤ 4（--lint R14）。 */
+  function nestLabel(key, lv) {
+    var e = (window.NHZWB_TERMS || {})[key]; if (!e) return key;
+    return lv >= 2 ? (e.s || e.t) : (e.k || e.kid);
+  }
+  function nestPrep(tree) {
+    /* 返回节点表：{key, kids:[node|leaf], lo, hi, h(高度，叶=0), dep(深度，根=0)} */
+    var nodes = [];
+    function walk(t, dep) {
+      if (typeof t === 'number') return { leaf: 1, lo: t, hi: t, h: 0, dep: dep };
+      var n = { key: t[0], kids: [], dep: dep };
+      for (var i = 1; i < t.length; i++) n.kids.push(walk(t[i], dep + 1));
+      n.lo = n.kids[0].lo; n.hi = n.kids[n.kids.length - 1].hi;
+      n.h = 1 + Math.max.apply(null, n.kids.map(function (k) { return k.h; }));
+      nodes.push(n); return n;
+    }
+    var root = walk(tree, 0);
+    return { root: root, nodes: nodes };
+  }
+  /* 词间距：相邻两词之间，按两侧最高的盒子留出内边距 */
+  function nestLayout(s, P, size, cx, style) {
+    var ws = s.map(function (w) { return textW(w, size); }), gaps = [];
+    for (var i = 0; i < s.length - 1; i++) {
+      var hl = 0, hr = 0;
+      P.nodes.forEach(function (n) { if (n.hi === i) hl = Math.max(hl, n.h); if (n.lo === i + 1) hr = Math.max(hr, n.h); });
+      gaps.push(style === 'box' ? (hl ? 8 + 12 * hl : 0) + (hr ? 8 + 12 * hr : 0) + 16 : size * .5);
+    }
+    return { ws: ws, xs: layG(ws, gaps, cx), gaps: gaps };
+  }
+  TPL.nest = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var lv = c.lv, style = d.style || (lv >= 3 ? 'stair' : 'box');
+    var reads = d.reads || [{ tree: d.tree, say: d.say }];
+    var two = reads.length > 1, size = d.size || (two ? 36 : 44);
+    var y = d.y || (two ? (style === 'box' ? 300 : 250) : (style === 'box' ? 290 : 200));
+    function txt(n) { return d.s.slice(n.lo, n.hi + 1).join(''); }
+    var cols = reads.map(function (r, k) {
+      var P = nestPrep(r.tree), cx = two ? (k ? W * .75 : W * .25) : W / 2, L = nestLayout(d.s, P, size, cx, style);
+      return { r: r, P: P, cx: cx, L: L };
+    });
+    var pics = [];
+    /* 1 读句子（两栏：先出两张情境卡） */
+    q.beat(d.read || d.s.join('') + '。', function (t) {
+      cols.forEach(function (col, k) {
+        if (two && col.r.pic) { pics[k] = c.pic(col.cx, 150, 500, 76, col.r.pic.t, t + k * .3, { size: 24 }); pics[k].setAttribute('data-pic', k); }
+        d.s.forEach(function (w, i) { c.T(col.L.xs[i] + col.L.ws[i] / 2, y, w, { size: size }, t + .4 + i * .2, .3); });
+      });
+      return .8 + d.s.length * .2;
+    });
+    /* 2 逐栏装 / 切 */
+    cols.forEach(function (col, k) {
+      var X0 = function (i) { return col.L.xs[i]; }, X1 = function (i) { return col.L.xs[i] + col.L.ws[i]; };
+      if (two) q.beat(col.r.say || ('第' + (k ? '二' : '一') + '种装法。'), function (t) {
+        if (pics[k]) c.key(pics[k], 'opacity', t, 1, { d: .3 });
+        pics.forEach(function (g, j) { if (j !== k && g) c.key(g, 'opacity', t, .35, { d: .4 }); });
+        return .6;
+      }, { ask: k === 0 ? (d.ask || true) : false });
+      if (style === 'box') {
+        var ord = col.P.nodes.slice().sort(function (a, b) { return a.h - b.h || a.lo - b.lo; });
+        ord.forEach(function (n, j) {
+          var lab = nestLabel(n.key, lv), say = (!two && d.say && d.say[j]) || ('“' + n.kids.map(function (kk) { return txt(kk); }).join('”和“') + '”装进一个盒子：' + lab + '。');
+          q.beat(say, function (t) {
+            var ph = 8 + 12 * n.h, pv = 6 + 26 * n.h, x0 = X0(n.lo) - ph, x1 = X1(n.hi) + ph, top = y - size * .95 - pv, bot = y + size * .28 + pv;
+            c.R('rectangle', [x0, top, x1 - x0, bot - top], { stroke: ROLE, strokeWidth: 2.4, roughness: .7 }, t, .6);
+            c.T((x0 + x1) / 2, bot - 5, lab, { size: 20, color: ROLE }, t + .5, .4);
+            return 1.1;
+          }, { ask: !two && j === 0 ? (d.ask || true) : false });
+        });
+      } else {
+        var deps = col.P.nodes.map(function (n) { return n.dep; }), maxd = Math.max.apply(null, deps);
+        for (var r = 0; r <= maxd; r++) (function (r) {
+          var row = col.P.nodes.filter(function (n) { return n.dep === r; }).sort(function (a, b) { return a.lo - b.lo; });
+          var sayR = (!two && d.say && d.say[r]) || (r === 0 ? '先一刀切成两块：' : '再往下切：') + row.map(function (n) { return n.kids.map(function (kk) { return txt(kk); }).join('｜') + '，' + nestLabel(n.key, lv); }).join('；') + '。';
+          q.beat(sayR, function (t) {
+            var yy = y + 50 + 46 * r;
+            row.forEach(function (n, j) {
+              var x0 = X0(n.lo) + 3, x1 = X1(n.hi) - 3, cuts = [];
+              for (var m = 0; m < n.kids.length - 1; m++) { var a = n.kids[m].hi; cuts.push((X1(a) + X0(a + 1)) / 2); }
+              c.stair(x0, x1, yy, cuts, null, t + j * .3);
+              c.T(cuts[0] + (cuts.length > 1 ? (cuts[cuts.length - 1] - cuts[0]) / 2 : 0), yy + 32, nestLabel(n.key, lv), { size: size > 40 ? 26 : 24, color: ROLE }, t + j * .3 + .5, .4);
+            });
+            return .9 + row.length * .3;
+          }, { ask: !two && r === 0 ? (d.ask || true) : false });
+        })(r);
+      }
+    });
+    if (two) q.beat(d.both || '一句话，两种装法，两种意思。', function (t) { pics.forEach(function (g) { if (g) c.key(g, 'opacity', t, 1, { d: .4 }); }); return .8; });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
   /* E9：种子 = 20261104 + 原始序号 × 1000（原始序号 = 该幕在 scenes 数组里的位置，与档位过滤无关） */
   function buildScene(svg, sc, idx) {
