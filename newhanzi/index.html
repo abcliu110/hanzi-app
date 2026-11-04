@@ -103,7 +103,7 @@
             <button class="chip-toggle" type="button" id="onlyNew">只看未学</button>
           </div>
         </div>
-        <a href="quiz/index.html?tab=zika" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;">🎮 互动练习：识字大闯关 →</a>
+        <a href="quiz/index.html?tab=zika" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：识字大闯关 →</a>
         <div class="list-area">
           <main class="listwrap">
             <div id="list"></div>
@@ -258,7 +258,7 @@
           h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
             c.items.map(lessonHtml).join('');
         });
-        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;">🎮 学完去闯关：逻辑大闯关 →</a>';
+        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 学完去闯关：逻辑大闯关 →</a>';
         el.innerHTML = h;
       }
       panels.logic.dataset.done='1';
