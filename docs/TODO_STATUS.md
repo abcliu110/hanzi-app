@@ -76,4 +76,5 @@
 - A9+A10 · 9552822d · shici.html 朝代 chips 改为按诗库实有朝代、按时间排序生成（先秦…清 10 个）；share.js 注释改为 POEMS.length
 - A6 · 227315c1 · 介词第 4 幕补 tab「引出对象」；lint 0、check_wb 700/1100 过、baseline 9 幕一致
 - A3 · 5545da64 · 修辞格 8 项补 L3+回练（R4 44→36）；新增 tools/wb/embed_l3.py；lint 0、check_wb 全过、基线其余 635 幕一致
-- A4 · 本提交 · 病句 20 项补 L3+回练（R4 36→16）；lint 0、check_wb 全过、基线其余 590 幕一致
+- A4 · cf8873cc · 病句 20 项补 L3+回练（R4 36→16）；lint 0、check_wb 全过、基线其余 590 幕一致
+- A5（草稿）· 本提交 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
