@@ -1,7 +1,7 @@
 /* 每日一字 / 一诗分享卡：本地按日期确定内容，无后端。
  * 取数规则（每天固定，换天即换）：seed = 年 × 366 + 年内第几天；
  *   字序号 = seed % 3500（data/index.js 的 NHZ_INDEX 顺序），
- *   诗序号 = seed % 120（data/shici.js 的 NHZ_SHICI.poems 顺序）；
+ *   诗序号 = seed % 诗库首数（POEMS.length，data/shici.js 的 NHZ_SHICI.poems 顺序）；
  *   seed 为偶数默认显示字，奇数默认显示诗；“换一个看看”只切当天另一型。
  * 字释义取该字单字文件（data/zika/<字>.js，与 zika.html 同款 <script> 加载，
  *   file:// 可用）；加载失败则只显示字音形信息并链到字卡，不编造释义。

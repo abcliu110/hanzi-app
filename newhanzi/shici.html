@@ -1119,7 +1119,10 @@ function vZilian(preZi){
 var poemQ = '', poemDyn = 'all';
 function vPoems(){
   setTitle('诗库');
-  var dyns = ['all','唐','宋','五代','晋'];
+  /* 朝代按时间排，只列诗库里实有的（含拓展诗） */
+  var DYN_ORDER = ['先秦','汉','魏','晋','南北朝','隋','唐','五代','宋','金','元','明','清','近代','现代'];
+  var have = {}; D.poems.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
+  var dyns = ['all'].concat(DYN_ORDER.filter(function(d){ return have[d]; }), Object.keys(have).filter(function(d){ return DYN_ORDER.indexOf(d) < 0; }));
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
   h += '<div class="searchbox" style="padding:10px 16px 0"><input id="pq" type="text" placeholder="搜诗名 / 诗人 / 诗句" value="'+esc(poemQ)+'" autocomplete="off"></div>';
   h += '<div class="sc-chips">' + dyns.map(function(d){
