@@ -87,4 +87,5 @@ window.NHZ_WB_INDEX = {
   "的/地/得": "xc_dedide",
   "在/再": "xc_zaizai",
   "做/作": "xc_zuozuo",
+  "和/与": "xc_heyu",
 };
