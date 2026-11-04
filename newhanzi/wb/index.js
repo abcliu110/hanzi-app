@@ -47,4 +47,5 @@ window.NHZ_WB_INDEX = {
   "除非…才…": "gl_chufei",
   "比喻": "xc_biyu",
   "拟人": "xc_niren",
+  "夸张": "xc_kuazhang",
 };
