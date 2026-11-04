@@ -280,7 +280,7 @@ function svgAnimSisheng(){
   rows.forEach(function(r,i){
     var y = i*38;
     var kp = ['0'];
-    for(var j=1;j<=4;j++) kp.push(j<=i ? '1' : '0');
+    for(var j=1;j<=4;j++) kp.push(j>i ? '1' : '0');
     var kA = i*0.25, kB = (i+1)*0.25;
     var kt = '0;'+Math.max(0.001,kA-0.03).toFixed(3)+';'+(kA+0.03).toFixed(3)+';'+(kB-0.03).toFixed(3)+';'+Math.min(0.999,kB+0.03).toFixed(3)+';1';
     s += '<g transform="translate(0,'+y+')">';
