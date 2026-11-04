@@ -48,4 +48,5 @@ window.NHZ_WB_INDEX = {
   "比喻": "xc_biyu",
   "拟人": "xc_niren",
   "夸张": "xc_kuazhang",
+  "排比": "xc_paibi",
 };
