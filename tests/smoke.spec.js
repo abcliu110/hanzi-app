@@ -146,3 +146,21 @@ test.describe('load budget', () => {
     await expect(page.locator('#ywdetail .bank-qs .quiz-q')).toHaveCount(10);
   });
 });
+
+/* 手机 390x844 下所有页面不得横向溢出（2026-11-04 首页 .panels 曾 517px、阅读写作 .yw-head 487px） */
+const ALL_PAGES = require('fs').readdirSync(require('path').join(__dirname, '..', 'newhanzi'), { recursive: true })
+  .filter((f) => f.endsWith('.html') && !f.startsWith('ziku'))
+  .map((f) => 'newhanzi/' + f.split(require('path').sep).join('/'))
+  .sort();
+
+test.describe('mobile 390px no horizontal overflow', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  for (const path of ALL_PAGES) {
+    test(`no overflow ${path}`, async ({ page }) => {
+      await page.goto(path, { waitUntil: 'load' });
+      await page.waitForTimeout(300);
+      const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
+      expect(r.sw, `scrollWidth ${r.sw} > clientWidth ${r.cw}`).toBeLessThanOrEqual(r.cw);
+    });
+  }
+});
