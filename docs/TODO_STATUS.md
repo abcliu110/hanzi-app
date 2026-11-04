@@ -18,7 +18,7 @@
 | A5 | P2 | yufa-neirong-08-l3-huilian.md / yufa-l3-buqi.md | 批次 9：虚词精讲 16 项先写 L3+回练草稿进 l3-huilian.json（src 必须可核），再嵌入场景（批 6） | 待做 |
 | A6 | P2 | yufa-l3-buqi.md「已知」 | 「介词」场景旧幕第 4 幕标签为空 | 待做 |
 | A7 | P2 | gaijin/README.md 进度 | 逻辑区：按 `point` 过滤直达（quiz engine.js） | 待做 |
-| A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | 待做 |
+| A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | ✅ 见执行日志 |
 | A9 | P2 | xiufu/content.md | share.js 注释/逻辑写 seed%120，诗库现 192 首，改用 POEMS.length | 待做 |
 | A10 | P2 | xiufu/content.md | shici.html 朝代筛选 chips 只有 唐/宋/五代/晋，补齐库里已有朝代（汉/南北朝/元/明/清/先秦） | 待做 |
 | A11 | P3 | xiufu/anim.md「遗留」 | 部首区 120 个图示中 90 个内容空位（「口（）」空括号、「含口的字多与相关」缺关键词、31 处「部首含义」占位文字）——只删空位/占位，不编造含义 | 待做 |
@@ -71,4 +71,5 @@
 
 （按完成顺序追加：ID · 提交号 · 说明）
 - A1+A2 · 453af4f1 · 8e1383d5 的 112 字讲解按汉典/《说文》重写，六书修正 4 字（元 兑 斑 显）；交接 docs/xiufu/zika-jiangjie.md
-- A2b · 本提交 · 三线 158 字讲解按汉典重写，六书修正 7 字；check_content.js 加字卡讲解检查；smoke 加用例
+- A2b · d050e0b4 · 三线 158 字讲解按汉典重写，六书修正 7 字；check_content.js 加字卡讲解检查；smoke 加用例
+- A8 · 本提交 · index.html 年级下拉：有字表的 8 册去掉「（待录入）」，6上标「课本无识字表」，4下/5下/6下 保留待录入
