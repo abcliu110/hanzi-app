@@ -6,7 +6,8 @@
 生成：
   newhanzi/data/index.js            <- data/index.json      (window.NHZ_INDEX)
   newhanzi/data/zika/<字>.js        <- data/zika/<字>.json  (window.NHZ_ZIKA)
-  newhanzi/yuwen/data.js            <- yuwen/*.json         (window.NHZ_YUWEN)
+  newhanzi/yuwen/data.js            <- yuwen/*.json         (window.NHZ_YUWEN，仅 --rebuild-yuwen 时)
+  newhanzi/yuwen/quiz_bank_index.js <- yuwen/quiz_bank_*.js (tools/gen_quiz_bank_index.py)
 """
 import json, os, sys
 
@@ -76,6 +77,18 @@ def main():
     print('zika: %d files converted/normalized' % n)
 
     # 3. 语文知识库
+    #    注意（2026-11-04 核查）：yuwen/data.js 已被直接编辑、内容远多于 yuwen/*.json（json 是旧版），
+    #    默认不再从 json 重建，避免回退内容；确认 json 已同步后才用 --rebuild-yuwen。
+    if '--rebuild-yuwen' not in sys.argv:
+        print('yuwen/data.js: 保持不动（如需从 json 重建加 --rebuild-yuwen）')
+    else:
+        build_yuwen()
+
+    # 4. 语法题库清单（yuwen.html 按需加载题库用）
+    import subprocess
+    subprocess.run([sys.executable, os.path.join(ROOT, '..', 'tools', 'gen_quiz_bank_index.py')], check=True)
+
+def build_yuwen():
     yuwen = {}
     for key, fn in [('grammar', 'grammar.json'), ('logic', 'logic.json'), ('reading', 'reading.json'), ('writing', 'writing.json')]:
         yuwen[key] = json.load(open(os.path.join(ROOT, 'yuwen', fn), encoding='utf-8'))

@@ -17,6 +17,42 @@
   var gameData = {};
   /* 按点分文件的语法题库（如名词 200 道），yuwen.html 以 <script> 引入，file:// 下也能用 */
   var bankData = window.NHZ_GRAMMAR_BANK || {};
+  window.NHZ_GRAMMAR_BANK = bankData;
+  /* 题库按需加载：yuwen.html 只引入 yuwen/quiz_bank_index.js（点名 -> 文件、题数，
+     由 tools/gen_quiz_bank_index.py 生成），进入某点详情时才 <script> 加载对应 quiz_bank_*.js。
+     <script> 注入在 file:// 下同样可用。 */
+  var bankIndex = window.NHZ_GRAMMAR_BANK_INDEX || {};
+  var bankLoading = {};
+  function hasBank(name) {
+    return !!((bankData[name] && bankData[name].questions && bankData[name].questions.length) || bankIndex[name]);
+  }
+  function bankTotal(name) {
+    return bankData[name] ? bankData[name].total : (bankIndex[name] ? bankIndex[name].total : 0);
+  }
+  function loadBank(name, cb) {
+    if (bankData[name]) { cb(true); return; }
+    var meta = bankIndex[name];
+    if (!meta) { cb(false); return; }
+    if (bankLoading[name]) { bankLoading[name].push(cb); return; }
+    bankLoading[name] = [cb];
+    var sc = document.createElement('script');
+    function done(ok) {
+      /* 个别旧题库文件整对象赋值 window.NHZ_GRAMMAR_BANK = {...}，这里合并回来 */
+      var cur = window.NHZ_GRAMMAR_BANK;
+      if (cur && cur !== bankData) {
+        Object.keys(cur).forEach(function (k) { bankData[k] = cur[k]; });
+        window.NHZ_GRAMMAR_BANK = bankData;
+      }
+      var cbs = bankLoading[name] || [];
+      delete bankLoading[name];
+      ok = ok && !!(bankData[name] && bankData[name].questions);
+      cbs.forEach(function (f) { f(ok); });
+    }
+    sc.onload = function () { done(true); };
+    sc.onerror = function () { done(false); };
+    sc.src = meta.file;
+    document.head.appendChild(sc);
+  }
   var bankState = {};
   var bankQuizData = {};
   /* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
@@ -124,6 +160,43 @@
           return '<button data-bqid="' + qid + '" data-boi="' + oi + '">' + esc(op) + '</button>';
         }).join('') + '</div><div class="quiz-fb"></div></div>';
     }).join('');
+  }
+
+  function bankStepHead() {
+    return '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>';
+  }
+
+  function bankInnerHtml(bid) {
+    var name = bankState[bid].name;
+    var bclasses = ['全部'];
+    bankData[name].questions.forEach(function (q) {
+      if (q['类'] && bclasses.indexOf(q['类']) < 0) bclasses.push(q['类']);
+    });
+    return bankStepHead() +
+      '<div class="bank-filters">' + bclasses.map(function (c) {
+        return '<button class="' + (c === '全部' ? 'on' : '') + '" data-bank-filter="' + bid + '|' + esc(c) + '">按类练：' + esc(c) + '</button>';
+      }).join('') + '</div>' +
+      '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
+      '<div class="bank-qs">' + bankBatchHtml(bid, name) + '</div>' +
+      '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button>';
+  }
+
+  /* 详情区里尚未加载的题库：按需加载后填充 */
+  function fillLazyBanks(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('[data-bank-lazy]'), function (box) {
+      var bid = box.id, st = bankState[bid];
+      if (!st) return;
+      loadBank(st.name, function (ok) {
+        if (!document.getElementById(bid)) return;
+        if (ok) {
+          box.removeAttribute('data-bank-lazy');
+          box.innerHTML = bankInnerHtml(bid);
+        } else {
+          box.querySelector('.bank-head').textContent = '题库加载失败，请检查网络后重新打开本知识点';
+        }
+      });
+    });
   }
 
   function renderBank(bid) {
@@ -268,24 +341,16 @@
     /* 5. 易错诊所 */
     if (it['易错']) body += '<div class="warn">⚠️ ' + esc(it['易错']) + '</div>';
     /* 5b1. 题库动手练：有 200 道题库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
-    if (bankData[it.name] && bankData[it.name].questions && bankData[it.name].questions.length) {
+    if (hasBank(it.name)) {
       var bid = 'bank' + idx + '_' + Math.floor(Math.random() * 100000);
       bankState[bid] = { name: it.name, offset: 0, score: 0, answered: 0, filter: '全部' };
-      var bclasses = ['全部'];
-      bankData[it.name].questions.forEach(function (q) {
-        if (q['类'] && bclasses.indexOf(q['类']) < 0) bclasses.push(q['类']);
-      });
-      body += '<div class="yw-quiz yw-bank" id="' + bid + '">' +
-        '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>' +
-        '<div class="bank-filters">' + bclasses.map(function (c) {
-          return '<button class="' + (c === '全部' ? 'on' : '') + '" data-bank-filter="' + bid + '|' + c + '">按类练：' + esc(c) + '</button>';
-        }).join('') + '</div>' +
-        '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
-        '<div class="bank-qs">' + bankBatchHtml(bid, it.name) + '</div>' +
-        '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button></div>';
+      body += '<div class="yw-quiz yw-bank" id="' + bid + '"' +
+        (bankData[it.name] ? '>' + bankInnerHtml(bid) :
+          ' data-bank-lazy="1">' + bankStepHead() + '<p class="yw-exp bank-head">题库加载中…</p>') +
+        '</div>';
     }
     /* 5b. 动手练（每点 3 道带解析的选择题，复用小测的答题逻辑） */
-    if (it['练习'] && it['练习'].length && !bankData[it.name]) {
+    if (it['练习'] && it['练习'].length && !hasBank(it.name)) {
       /* 练习按类分组：同类题放一块，组头就是类名 */
       var groups = [];
       it['练习'].forEach(function (q) {
@@ -327,7 +392,7 @@
       (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
       '<span class="yw-badges">' +
       (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
-      (bankData[it.name] ? '<span class="yw-badge">📝' + bankData[it.name].total + '道</span>' :
+      (hasBank(it.name) ? '<span class="yw-badge">📝' + bankTotal(it.name) + '道</span>' :
         (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
       '</span>' +
       '<span class="yw-arrow">▾</span></button>' +
@@ -349,6 +414,7 @@
       (it['口诀'] ? '<p class="yw-kj-lg">' + esc(it['口诀']) + '</p>' : '') + '</div></div>' +
       '<div class="yw-detail-body" id="ywDetailBody"></div>';
     if (bodyEl) document.getElementById('ywDetailBody').appendChild(bodyEl);
+    fillLazyBanks(bodyEl);
     document.getElementById('ywBack').addEventListener('click', hideDetail);
     window.scrollTo(0, 0);
   }
