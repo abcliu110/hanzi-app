@@ -29,4 +29,5 @@ window.NHZ_WB_INDEX = {
   "递进复句": "dijin_fuju",
   "选择复句": "xuanze_fuju",
   "转折复句": "zhuanzhe_fuju",
+  "因果复句": "yinguo_fuju",
 };
