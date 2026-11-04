@@ -66,4 +66,5 @@ window.NHZ_WB_INDEX = {
   "关联词误用": "bj_glc_wuyong",
   "关联词残缺": "bj_glc_canque",
   "指代不明": "bj_zhidai",
+  "前后矛盾": "bj_qianhou",
 };
