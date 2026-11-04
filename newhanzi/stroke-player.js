@@ -169,7 +169,14 @@
     btnReplay.addEventListener('click', replay);
     sel.addEventListener('change', function () {
       speed = parseFloat(sel.value) || 1;
-      if (state === 'playing') strokeDur = strokeDuration(idx);
+      /* 播放中改速度：按已走比例折算剩余时长，否则进度会跳变 */
+      if (state === 'playing' && strokeStart > 0 && strokeDur > 0) {
+        var frac = Math.min(1, (performance.now() - strokeStart) / strokeDur);
+        strokeDur = strokeDuration(idx);
+        strokeStart = performance.now() - frac * strokeDur;
+      } else if (state === 'playing') {
+        strokeDur = strokeDuration(idx);
+      }
     });
 
     return {
