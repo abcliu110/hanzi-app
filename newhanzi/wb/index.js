@@ -5,4 +5,5 @@ window.NHZ_WB_INDEX = {
   "动词": "dongci",
   "名词": "mingci",
   "量词": "liangci",
+  "代词": "daici",
 };
