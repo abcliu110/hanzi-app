@@ -13,7 +13,7 @@ ROOT = os.path.normpath(os.path.join(HERE, '..', '..', 'newhanzi'))
 WB = os.path.join(ROOT, 'wb')
 
 # 已回炉、R1 / R7 按错误级检查的语法点（第 1 期：单句成分 7 项）
-STRICT = {'主语'}
+STRICT = {'主语', '谓语', '宾语'}
 
 CLS_KEYS = {'noun', 'adj', 'pron', 'verb', 'adv', 'prep', 'conj', 'interj', 'tagc'}
 JUDGE_KEYS = {'ok', 'bad'}
