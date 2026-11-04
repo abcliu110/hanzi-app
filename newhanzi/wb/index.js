@@ -16,4 +16,5 @@ window.NHZ_WB_INDEX = {
   "并列式": "binglieshi",
   "偏正式": "pianzhengshi",
   "主谓式": "zhuweishi",
+  "动宾式": "dongbinshi",
 };
