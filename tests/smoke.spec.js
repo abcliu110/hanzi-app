@@ -164,3 +164,10 @@ test.describe('mobile 390px no horizontal overflow', () => {
     });
   }
 });
+
+/* sw.js 预缓存清单要覆盖全部页面：新增/删除页面后运行 python3 tools/gen_sw_core.py */
+test('sw.js precache list is up to date', async () => {
+  const { execFileSync } = require('child_process');
+  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check'], { cwd: require('path').join(__dirname, '..') }).toString();
+  expect(out).toContain('最新');
+});

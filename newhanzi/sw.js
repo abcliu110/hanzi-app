@@ -1,19 +1,100 @@
 /* newhanzi service worker：离线使用
    只在 http(s) 下由各页面注册；file:// 打开时不会注册。
-   - 安装时只预缓存主页面、样式、脚本和索引，不预缓存 3500 个单字数据文件
-   - 页面：先走网络，失败时用缓存
-   - 其他同源静态文件（含单字数据脚本）：先用缓存，同时在后台更新
-   改了预缓存清单或想强制更新时，把 VERSION 加 1。 */
-const VERSION = "nhz-v2";
+   - 安装时预缓存全部页面及其引用的样式/脚本（清单由 tools/gen_sw_core.py 从页面生成，勿手改）
+     不预缓存 3500 个单字数据文件与语法题库，用到时再缓存
+   - 所有同源请求：网络优先（拿到就更新缓存），断网或超时才用缓存
+     → 改了代码/数据孩子下次打开就是新版，不必手动改 VERSION
+   - VERSION 随清单自动变化；新增/删除页面后运行 python3 tools/gen_sw_core.py（测试会检查）。 */
+/* @generated-core-start */
+const VERSION = "nhz-35269134e1";
 const CORE = [
-  "./", "index.html", "zika.html", "yuwen.html", "bushou.html", "shici.html", "grammar_lab.html", "proto-yuwen.html",
-  "zika.css", "index.js", "zika.js", "yuwen.js", "bushou.js",
-  "data/index.js", "data/shici.js", "data/shiju.js", "yuwen/data.js", "bushou/data.js", "bushou/zi_map.js",
-  "manifest.webmanifest"
+  "./",
+  "bushou.html",
+  "bushou.js",
+  "bushou/anim.js",
+  "bushou/data.js",
+  "bushou/pianpang.js",
+  "bushou/zi_map.js",
+  "checkin.js",
+  "data/grade_map.js",
+  "data/guwen.js",
+  "data/guwen_knowledge.js",
+  "data/index.js",
+  "data/pinyin_lookup.js",
+  "data/shangxi.js",
+  "data/shici.js",
+  "data/shiju.js",
+  "eye-care.js",
+  "fuxi.html",
+  "fuxi.js",
+  "games/shici/data_feihua.js",
+  "games/shici/feihua.html",
+  "games/shici/jichu/beisong.html",
+  "games/shici/jichu/duiou.html",
+  "games/shici/jichu/guti.html",
+  "games/shici/jichu/jiezou.html",
+  "games/shici/jichu/langdu.html",
+  "games/shici/jichu/lianju.html",
+  "games/shici/jichu/pingze.html",
+  "games/shici/jichu/qicheng.html",
+  "games/shici/jichu/shiti.html",
+  "games/shici/jichu/shiyan.html",
+  "games/shici/jichu/silian.html",
+  "games/shici/jichu/ticaid.html",
+  "games/shici/jichu/wuyan.html",
+  "games/shici/jichu/yayun.html",
+  "games/shici/jichu/yixiang.html",
+  "games/shici/jichu/yuefu.html",
+  "games/yufa/bazi-beizi.html",
+  "games/yufa/data_bazi.js",
+  "games/yufa/data_dede.js",
+  "games/yufa/data_guanlianci.js",
+  "games/yufa/data_juzi.js",
+  "games/yufa/dedide-dashu.html",
+  "games/yufa/guanlianci.html",
+  "games/yufa/juzi-chengfen.html",
+  "grammar_lab.html",
+  "guwen.html",
+  "index.html",
+  "index.js",
+  "install.js",
+  "manifest.webmanifest",
+  "proto-yuwen.html",
+  "quiz/data_bushou.js",
+  "quiz/data_lab.js",
+  "quiz/data_logic.js",
+  "quiz/data_shici.js",
+  "quiz/data_yuwen.js",
+  "quiz/data_zika.js",
+  "quiz/engine.js",
+  "quiz/index.html",
+  "quiz/quiz.css",
+  "share.html",
+  "share.js",
+  "shici.html",
+  "speedtest.html",
+  "stroke-player.css",
+  "stroke-player.js",
+  "today-task.js",
+  "weekly.html",
+  "weekly.js",
+  "yuedu-xiezuo.html",
+  "yuedu-xiezuo.js",
+  "yuwen.html",
+  "yuwen.js",
+  "yuwen/data.js",
+  "yuwen/quiz_bank_index.js",
+  "zika.css",
+  "zika.html",
+  "zika.js"
 ];
+/* @generated-core-end */
+const NET_TIMEOUT_MS = 5000; /* 有缓存时网络超过这么久就先用缓存 */
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION)
+    .then(c => Promise.all(CORE.map(u => c.add(new Request(u, { cache: "reload" })).catch(() => {}))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -22,10 +103,10 @@ self.addEventListener("activate", e => {
     .then(() => self.clients.claim()));
 });
 
-function put(req, res) {
+function put(key, res) {
   if (res && res.status === 200 && res.type === "basic") {
     const copy = res.clone();
-    caches.open(VERSION).then(c => c.put(req, copy)).catch(() => {});
+    caches.open(VERSION).then(c => c.put(key, copy)).catch(() => {});
   }
   return res;
 }
@@ -36,14 +117,15 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   const isPage = req.mode === "navigate" || req.destination === "document";
-  if (isPage) {
-    e.respondWith(fetch(req).then(res => put(new Request(url.pathname), res))
-      .catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("index.html"))));
-    return;
-  }
+  const key = isPage ? new Request(url.pathname) : req;
+  const fallback = () => caches.match(req, { ignoreSearch: true })
+    .then(r => r || (isPage ? caches.match("index.html") : undefined))
+    .then(r => r || Response.error());
   e.respondWith(caches.match(req, { ignoreSearch: true }).then(cached => {
-    const net = fetch(req).then(res => put(req, res)).catch(() => cached);
-    if (cached) { e.waitUntil(net.catch(() => {})); return cached; }
-    return net;
+    const net = fetch(req).then(res => put(key, res));
+    if (!cached) return net.catch(fallback);
+    /* 有缓存：网络优先，但网络太慢时先给缓存（网络结果仍会写入缓存，下次即新版） */
+    const timer = new Promise(resolve => setTimeout(() => resolve(cached), NET_TIMEOUT_MS));
+    return Promise.race([net, timer]).catch(() => cached);
   }));
 });
