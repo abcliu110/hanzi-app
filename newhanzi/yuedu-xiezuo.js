@@ -40,7 +40,6 @@
       step++;
       return '<div class="yw-step"><span class="yw-stepnum">' + step + '</span><span class="yw-steptitle">' + title + '</span></div>';
     }
-    body += '<div class="yw-typetag" style="--tc:#7a5a3a">程序型</div>';
     if (it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)) {
       body += stepHead('一句话');
       if (it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';

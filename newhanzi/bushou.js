@@ -38,7 +38,7 @@
       '<span class="bs-sub">' + (r.benzi ? '本字「' + esc(r.benzi) + '」 · ' : '') + r.count + '字</span></span>' +
       '<span class="bs-count">' + r.count + '字</span>' +
       '<span class="bs-arrow">▾</span></div>' +
-      '<div class="bs-body"><div class="yw-typetag" style="--tc:#3d5a40">词条型</div>';
+      '<div class="bs-body">';
 
     if (r.bianti) {
       html += '<div class="bs-sec"><h4>变体</h4><div class="bs-sem">' + esc(r.bianti) + '</div>';

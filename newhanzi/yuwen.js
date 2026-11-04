@@ -165,7 +165,6 @@
         '<p class="yw-exp">先复习：' + it['前置知识'].map(function (q) { return esc(q); }).join('、') + '</p></div>';
     }
     /* 型标签 */
-    body += '<div class="yw-typetag" style="--tc:' + TYPE_COLOR[tp] + '">' + TYPE_LABEL[tp] + '</div>';
     function stepHead(title, right){
       step++;
       return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span>'+
@@ -265,9 +264,6 @@
       }
       if (vt['边界']) vth += '<tr><th>边界</th><td>' + esc(vt['边界']) + '</td></tr>';
       vth += '</table>';
-      if (vt['覆盖缺失'] && vt['覆盖缺失'].length) {
-        vth += '<p class="yw-exp" style="color:#b85a52">⚠️ 待补维度：' + esc(vt['覆盖缺失'].join('、')) + '</p>';
-      }
       vth += '</div>';
       body += stepHead('📐 变式表') + vth;
     }

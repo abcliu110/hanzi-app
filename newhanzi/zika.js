@@ -41,7 +41,7 @@
     document.getElementById('navtitle').textContent = r.zi + ' · 字卡';
     document.title = r.zi + ' · 字卡';
 
-    var h = '<div class="yw-typetag" style="--tc:#3d5a40">词条型</div>';
+    var h = '';
 
     /* 1. 字头区 */
     var chips = '';

@@ -227,7 +227,6 @@ window.NHZReview = window.NHZReview || (function () {
     var t = D.texts[idx]; if(!t) return;
     hideAll(); detEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__back">← 回篇目</button>';
-    h += typeTag('材料');
     h += '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
     h += '<div class="gw-sec">📖 原文</div><div class="gw-yuanwen">'+esc(t.原文)+'</div>';
     h += '<div class="gw-sec">💡 导读</div><p class="gw-p">'+esc(t.导读)+'</p>';
@@ -304,7 +303,6 @@ window.NHZReview = window.NHZReview || (function () {
         '<p class="yw-exp">先复习：' + it['前置知识'].map(function(q){ return esc(q); }).join('、') + '</p></div>';
     }
     /* 型标签 */
-    body += typeTag(tp);
     function stepHead(title){
       step++;
       return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span></div>';
@@ -483,7 +481,7 @@ window.NHZReview = window.NHZReview || (function () {
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
-    if(!cat){ h += '<p class="gw-p">本子模块内容正在补充。</p>'; mlistEl.innerHTML = h; return; }
+    if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
     h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点</span></div>';
     if(cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
