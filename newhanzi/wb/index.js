@@ -70,4 +70,5 @@ window.NHZ_WB_INDEX = {
   "并列概念交叉": "bj_binglie",
   "重复啰嗦": "bj_chongfu",
   "约数矛盾": "bj_yueshu",
+  "否定失当": "bj_fouding",
 };
