@@ -66,7 +66,7 @@ function checkScene(sc, tag) {
 }
 
 const ids = new Map(), titles = new Map();
-let nItems = 0, nScenes = 0;
+let nItems = 0, nScenes = 0, nL3 = 0;
 const files = fs.existsSync(DIR) ? fs.readdirSync(DIR).filter((f) => f.endsWith(".json")).sort() : [];
 if (!files.length) warn("docs/yufa-neirong/ 下没有 JSON 内容稿");
 
@@ -109,7 +109,6 @@ for (const f of files) {
   }
 }
 
-let nL3 = 0;
 function checkL3(J, f) {
   if (!J || typeof J.items !== "object") return err(`${f}：顶层要有 items（名称 -> {l3, huilian}）`);
   for (const [name, v] of Object.entries(J.items)) {
