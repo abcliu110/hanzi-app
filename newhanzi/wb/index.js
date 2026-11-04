@@ -80,4 +80,5 @@ window.NHZ_WB_INDEX = {
   "比较句": "gj_bijiao",
   "双重否定": "gj_shuangfou",
   "歧义句": "gj_qiyi",
+  "兼语句": "gj_jianyu",
 };
