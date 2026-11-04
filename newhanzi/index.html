@@ -346,25 +346,35 @@
       var toks = box.querySelectorAll('.tok');
       var note = box.querySelector('.yw-anim-note');
       var cur = parseInt(box.getAttribute('data-cur') || '0', 10);
+      var playBtn = box.querySelector('[data-act="play"]');
       e.stopPropagation();
+      if(box._animTimer){ clearInterval(box._animTimer); box._animTimer = null; }
+      if(playBtn) playBtn.disabled = false;
+      function showStep(i){
+        box.setAttribute('data-cur', i);
+        var hi = toks.length ? Math.min(i, toks.length - 1) : 0;
+        for(var k = 0; k < toks.length; k++){
+          toks[k].classList.toggle('on', k === hi);
+        }
+        note.textContent = steps[i].note || '';
+      }
       if(act === 'step'){
         cur = (cur + 1) % steps.length;
         showStep(cur);
       } else {
         cur = 0;
-        var timer = setInterval(function(){
-          showStep(cur);
+        showStep(0);
+        if(playBtn) playBtn.disabled = true;
+        box._animTimer = setInterval(function(){
+          if(!document.body.contains(box)){ clearInterval(box._animTimer); box._animTimer = null; return; }
           cur++;
-          if(cur >= steps.length) clearInterval(timer);
+          if(cur >= steps.length){
+            clearInterval(box._animTimer); box._animTimer = null;
+            if(playBtn) playBtn.disabled = false;
+            return;
+          }
+          showStep(cur);
         }, 1200);
-        return;
-      }
-      function showStep(i){
-        box.setAttribute('data-cur', i);
-        for(var k = 0; k < toks.length; k++){
-          toks[k].classList.toggle('on', k === i);
-        }
-        note.textContent = steps[i].note || '';
       }
       return;
     }

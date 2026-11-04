@@ -445,25 +445,39 @@
       var toks = box.querySelectorAll('.tok');
       var note = box.querySelector('.yw-anim-note');
       var cur = parseInt(box.getAttribute('data-cur') || '0', 10);
+      var playBtn = box.querySelector('[data-act="play"]');
       e.stopPropagation();
-      if (act === 'step') {
-        cur = (cur + 1) % steps.length;
-      } else { /* play: 从头播 */
-        cur = 0;
-        var timer = setInterval(function () {
-          showStep(cur);
-          cur++;
-          if (cur >= steps.length) clearInterval(timer);
-        }, 1200);
-        return;
-      }
-      showStep(cur);
+      /* 停掉本盒子正在跑的播放定时器：重复点播放、播放中点单步都不再打架；
+         单步同时解禁播放钮 */
+      if (box._animTimer) { clearInterval(box._animTimer); box._animTimer = null; }
+      if (playBtn) playBtn.disabled = false;
       function showStep(i) {
         box.setAttribute('data-cur', i);
+        /* 步数多于词数时（如多米诺 3 步 2 词），末词保持高亮 */
+        var hi = toks.length ? Math.min(i, toks.length - 1) : 0;
         for (var k = 0; k < toks.length; k++) {
-          toks[k].classList.toggle('on', k === i);
+          toks[k].classList.toggle('on', k === hi);
         }
         note.textContent = steps[i].note || '';
+      }
+      if (act === 'step') {
+        cur = (cur + 1) % steps.length;
+        showStep(cur);
+      } else { /* play: 从头播 */
+        cur = 0;
+        showStep(0);
+        if (playBtn) playBtn.disabled = true;
+        box._animTimer = setInterval(function () {
+          /* 盒子已被移出文档（如列表重渲染）时停掉，避免在 detached 节点上空跑 */
+          if (!document.body.contains(box)) { clearInterval(box._animTimer); box._animTimer = null; return; }
+          cur++;
+          if (cur >= steps.length) {
+            clearInterval(box._animTimer); box._animTimer = null;
+            if (playBtn) playBtn.disabled = false;
+            return;
+          }
+          showStep(cur);
+        }, 1200);
       }
       return;
     }

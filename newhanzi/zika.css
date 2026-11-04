@@ -868,3 +868,6 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .sc-chips{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
 .sc-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink);font-family:inherit}
 .sc-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+
+/* 动画播放器：播放中禁用播放钮，置灰可见 */
+.yw-anim-ctrl button:disabled{opacity:.55}
