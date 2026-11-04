@@ -93,10 +93,28 @@ if (GK && GK.categories) {
   }
 }
 
+/* 字卡讲解（dim.字源.讲解）：不许占位套话、抓取截断、混入英文义项（见 docs/xiufu/zika-jiangjie.md） */
+let zjN = 0;
+const ZD = path.join(D, "zika");
+if (fs.existsSync(ZD)) for (const f of fs.readdirSync(ZD)) {
+  if (!f.endsWith(".js")) continue;
+  const s = fs.readFileSync(path.join(ZD, f), "utf8");
+  const k = JSON.parse(s.slice(s.indexOf("{")).trim().replace(/;$/, ""));
+  const t = ((k.dim || {})["字源"] || {})["讲解"];
+  if (!t) continue;
+  zjN++;
+  const tag = `字卡讲解「${k.zi}」：`;
+  if (/是一个常用汉字|很快就记牢了|多组词、多造句/.test(t)) err(tag + "占位/模板套话");
+  if (/由'[^']*\(/.test(t) || /\(\s*[a-zāáǎàēéěèīíǐìōóǒòūúǔù]+$/.test(t.replace(/（来源[^）]*）$/, ""))) err(tag + "疑似抓取截断");
+  for (const [a, b] of [["“", "”"], ["（", "）"], ["(", ")"]]) if (t.split(a).length !== t.split(b).length) err(tag + `${a}${b} 不配对`);
+  const en = (t.match(/[a-z]{4,}/g) || []).filter((w) => !["beer"].includes(w));
+  if (en.length) err(tag + "混入英文：" + en.join(","));
+}
+
 if (errs.length) {
   console.error(errs.slice(0, 80).join("\n"));
   if (errs.length > 80) console.error(`……共 ${errs.length} 处`);
   console.error(`内容校验：${errs.length} 处问题`);
   process.exit(1);
 }
-console.log(`内容校验通过：古诗 ${S.poems.length} 首（课内 ${S.poems.filter((p) => p.ke === "课内").length}）、赏析 ${(window.NHZ_SHANGXI || []).length} 条、年级表 ${Object.keys(GM || {}).length} 字`);
+console.log(`内容校验通过：古诗 ${S.poems.length} 首（课内 ${S.poems.filter((p) => p.ke === "课内").length}）、赏析 ${(window.NHZ_SHANGXI || []).length} 条、年级表 ${Object.keys(GM || {}).length} 字、字卡讲解 ${zjN} 条`);

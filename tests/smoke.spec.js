@@ -65,6 +65,14 @@ test.describe('newhanzi smoke', () => {
     expect(learned['天']).toBeTruthy();
   });
 
+  test('zika shows 字源讲解 without template text', async ({ page }) => {
+    await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('肠'));
+    await expect(page.locator('.bigzi')).toHaveText('肠', { timeout: 20000 });
+    const body = await page.locator('body').innerText();
+    expect(body).toContain('本义是人和动物的消化器官之一');
+    expect(body).not.toMatch(/intestine|是一个常用汉字|很快就记牢了/);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });
