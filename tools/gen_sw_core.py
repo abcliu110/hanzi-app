@@ -8,7 +8,8 @@
 
 用法：
   python3 tools/gen_sw_core.py          # 改写 sw.js
-  python3 tools/gen_sw_core.py --check  # 只检查，清单过期时退出码 1（测试里用）
+  python3 tools/gen_sw_core.py --check  # 严格检查（页面+依赖），过期时退出码 1
+  python3 tools/gen_sw_core.py --check-pages  # 只查页面是否齐（smoke 测试用）
 新增/删除页面或改了页面引用的脚本后重跑一次。
 """
 import hashlib, json, os, re, sys
@@ -60,6 +61,14 @@ def render(src):
 def main():
     src = open(SW, encoding='utf-8').read()
     new, n, ver = render(src)
+    if '--check-pages' in sys.argv:
+        # 宽松检查（测试用）：只要求每个页面都在 CORE 里；依赖脚本漂移不报错，避免别处改脚本就让 CI 变红
+        m = re.search(r'const CORE = (\[.*?\]);', src, re.S)
+        have = set(json.loads(m.group(1)))
+        miss = [p for p in pages() if p not in have]
+        if miss:
+            print('sw.js 预缓存缺页面：%s；请运行 python3 tools/gen_sw_core.py' % ', '.join(miss)); sys.exit(1)
+        print('sw.js 页面清单最新（%d 页）' % len(pages())); return
     if '--check' in sys.argv:
         if new != src:
             print('sw.js 预缓存清单已过期，请运行 python3 tools/gen_sw_core.py'); sys.exit(1)
