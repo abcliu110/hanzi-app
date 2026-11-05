@@ -24,16 +24,22 @@ function loadWindow(file, key) {
 }
 const WB = loadWindow("wb/index.js", "NHZ_WB_INDEX") || {};
 const YW = loadWindow("yuwen/data.js", "NHZ_YUWEN") || {};
+/* OLD_NAMES 在 NEW_NAMES 收集后填充（见下） */
 const OLD_NAMES = new Set();
-for (const c of (YW.grammar && YW.grammar.categories) || []) for (const it of c.items) OLD_NAMES.add(it.name);
-/* 本次新增 50 项的 id：场景已上线进 index.js，校验“现有”时先排除，只防与其它场景 id 撞车 */
-const NEW_IDS = new Set();
+/* 本次新增 50 项的 id 与标题：场景/条目已上线进 index.js 与 data.js，校验“现有 99 项”
+   基准时先排除，只防新增项与其它场景 id / 旧标题撞车（2026-11-05 Q13 50 项上线后，
+   data.js 已是 149 项，直接拿它当基准会让新增项标题与自身相撞自报错） */
+const NEW_IDS = new Set(), NEW_NAMES = new Set();
 for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith(".json") && !x.startsWith("l3-huilian")).sort()) {
   try {
     const J = JSON.parse(fs.readFileSync(path.join(DIR, f), "utf8"));
-    if (Array.isArray(J.items)) for (const it of J.items) if (it && it.id) NEW_IDS.add(it.id);
+    if (Array.isArray(J.items)) for (const it of J.items) {
+      if (it && it.id) NEW_IDS.add(it.id);
+      if (it && it.title && it.title.term) NEW_NAMES.add(it.title.term);
+    }
   } catch (e) { /* 解析失败由主循环报错，这里跳过 */ }
 }
+for (const c of (YW.grammar && YW.grammar.categories) || []) for (const it of c.items) if (!NEW_NAMES.has(it.name)) OLD_NAMES.add(it.name);
 const OLD_IDS = new Set(Object.values(WB).filter((id) => !NEW_IDS.has(id)));
 if (OLD_NAMES.size !== 99) warn(`现有语法项不是 99 个，而是 ${OLD_NAMES.size} 个（data.js）`);
 
