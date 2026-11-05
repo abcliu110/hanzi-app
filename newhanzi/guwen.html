@@ -75,6 +75,7 @@ if (window.self !== window.top) {
 <script src="data/guwen_knowledge.js"></script>
 <script src="data/guwen_links.js"></script>
 <script src="wb/index.js"></script>
+<script src="guwen/songdu.js"></script>
 <script>
 (function(){
   'use strict';
@@ -214,6 +215,7 @@ window.NHZReview = window.NHZReview || (function () {
     return {id:id, icon:'📖', t:id, d:''};
   }
   function hideAll(){
+    if(window.NHZGwSd) NHZGwSd.stop();
     navEl.style.display='none'; listEl.style.display='none'; detEl.style.display='none';
     mlistEl.style.display='none'; mdetEl.style.display='none';
   }
@@ -250,6 +252,7 @@ window.NHZReview = window.NHZReview || (function () {
     listEl.innerHTML = h;
   }
   var curText = -1;
+  if(window.NHZGwSd) NHZGwSd.cur = function(){ return detEl.style.display !== 'none' ? D.texts[curText] : null; };
   function showDetail(idx){
     var t = D.texts[idx]; if(!t) return;
     curText = idx; try{ speechSynthesis.cancel(); }catch(e){}
@@ -257,6 +260,7 @@ window.NHZReview = window.NHZReview || (function () {
     var h = '<button class="gw-backbtn" data-go="__back">← 回篇目</button>';
     h += '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
     h += '<div class="gw-sec">📖 原文 <span class="gw-tag">点读</span></div><div class="gw-yuanwen gw-yw">'+yuanwenHtml(t)+'</div>';
+    if(window.NHZGwSd) h += NHZGwSd.barHtml(t); /* P1-D 诵读跟读（guwen/songdu.js） */
     h += '<div class="gw-gloss" id="gwGloss">点带橙线的字看意思；点句末标点听这一句。</div>';
     h += '<div class="gw-sec">💡 导读</div><p class="gw-p">'+esc(t.导读)+'</p>';
     h += '<div class="gw-sec">🔍 译意</div><p class="gw-p">'+esc(t.译意)+'</p>';

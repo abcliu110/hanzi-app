@@ -260,6 +260,49 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen songdu follow-along reading', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.addInitScript(() => {
+      // 无头浏览器不一定出声：替换朗读，每段 30ms 后回调 onend，记下读了什么
+      window.__said = [];
+      const ss = { speaking: false, cancel() { window.__cancel = (window.__cancel || 0) + 1; }, getVoices() { return []; },
+        speak(u) { window.__said.push(u.text); setTimeout(() => u.onend && u.onend(), 30); } };
+      Object.defineProperty(window, 'speechSynthesis', { value: ss, configurable: true });
+    });
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="pianmu"]').first().click();
+    await page.locator('[data-go="全部"]').click();
+    await page.locator('.gw-item', { hasText: '司马光' }).first().click();
+    await expect(page.locator('#gwSdTip')).toContainText('停顿');
+    await page.locator('[data-gwsd="read"]').click();
+    await expect(page.locator('.gw-yw .sdj')).toHaveCount(7);
+    await expect(page.locator('.gw-yw .sdt').first()).toHaveText('/');
+    await expect(page.locator('#gwSdTip')).toHaveText('读完了', { timeout: 15000 });
+    await expect(page.locator('.gw-yw .zd').first()).toBeVisible();
+    const said = await page.evaluate(() => window.__said);
+    expect(said[0].trim()).toBe('群儿');
+    expect(said[1].trim()).toBe('戏于庭');
+    // 跟我读：读完一节停下等孩子（约 3 秒），离开篇目即停
+    await page.locator('[data-gwsd="follow"]').click();
+    await expect(page.locator('.gw-yw .sdj.you')).toHaveCount(1);
+    await expect(page.locator('#gwSdTip')).toContainText('该你读了');
+    const n1 = await page.evaluate(() => window.__said.length);
+    await page.waitForTimeout(1200);
+    expect(await page.evaluate(() => window.__said.length)).toBe(n1);
+    await page.locator('[data-go="__back"]').click();
+    expect(await page.evaluate(() => window.NHZGwSd.playing())).toBe(false);
+    // 没有 停 的篇目：按标点分节（过渡版）
+    await page.locator('.gw-item', { hasText: '学而时习之' }).first().click();
+    await expect(page.locator('#gwSdTip')).toContainText('过渡版');
+    await page.locator('[data-gwsd="read"]').click();
+    await expect(page.locator('.gw-yw .sdj')).toHaveCount(7);
+    await expect(page.locator('.gw-yw .sdt')).toHaveCount(0);
+    await page.locator('[data-gwsd="read"]').click();
+    expect(await page.evaluate(() => window.NHZGwSd.playing())).toBe(false);
+    expect(errors).toEqual([]);
+  });
+
   test('guwen daozhuang morph whiteboard', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
