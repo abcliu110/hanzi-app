@@ -20,6 +20,31 @@ function shuffle(arr) {
   }
   return a;
 }
+/* 选项洗牌（2026-11-05 内容审查 F6）：choice/blank/spot/rewrite 每次出题打乱选项，
+   重映射答案下标 a 与「误解标注.选项」字母；选项里有「都对 / B和C」这类指位置的就不打乱。
+   返回新对象，原题对象不变（错题本、统一错题本仍按原题存，id 不受洗牌影响）。 */
+var SHUF_MODES = { choice: 1, blank: 1, spot: 1, rewrite: 1 };
+function shuffleOpts(m, q) {
+  if (!SHUF_MODES[m] || !q || !Array.isArray(q.opts) || q.opts.length < 2 || typeof q.a !== 'number') return q;
+  for (var t = 0; t < q.opts.length; t++) {
+    if (/都对|都不对|以上|[A-D]和[A-D]|[A-D]、[A-D]|[A-D]项/.test(String(q.opts[t]))) return q;
+  }
+  var idx = shuffle(q.opts.map(function (o, i) { return i; }));
+  var v = {}, k;
+  for (k in q) if (Object.prototype.hasOwnProperty.call(q, k)) v[k] = q[k];
+  v.opts = idx.map(function (i) { return q.opts[i]; });
+  v.a = idx.indexOf(q.a);
+  if (Array.isArray(q['误解标注'])) {
+    v['误解标注'] = q['误解标注'].map(function (mz) {
+      var o = {}, kk;
+      for (kk in mz) if (Object.prototype.hasOwnProperty.call(mz, kk)) o[kk] = mz[kk];
+      var oi = typeof mz['选项'] === 'string' ? mz['选项'].charCodeAt(0) - 65 : -1;
+      if (oi >= 0 && oi < q.opts.length) o['选项'] = String.fromCharCode(65 + idx.indexOf(oi));
+      return o;
+    });
+  }
+  return v;
+}
 function getParam(name) {
   var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search || '');
   return m ? decodeURIComponent(m[1]) : '';
@@ -218,11 +243,11 @@ function startMode(mode) {
   if (mode === 'wrong') {
     list = [];
     availModes().forEach(function (m) {
-      wbList(S.tab, m).forEach(function (q) { list.push({ _m: m, _q: q }); });
+      wbList(S.tab, m).forEach(function (q) { list.push({ _m: m, _q: q, _v: shuffleOpts(m, q) }); });
     });
     list = shuffle(list);
   } else {
-    list = shuffle(S.modes[mode]).map(function (q) { return { _m: mode, _q: q }; });
+    list = shuffle(S.modes[mode]).map(function (q) { return { _m: mode, _q: q, _v: shuffleOpts(mode, q) }; });
   }
   if (!list.length) return;
   S.mode = mode; S.list = list; S.idx = 0;
@@ -244,7 +269,7 @@ function renderQ() {
   $('qzModeTag').textContent = S.mode === 'wrong'
     ? '📓 错题'
     : MODES[item._m].icon + ' ' + MODES[item._m].name;
-  $('qbox').innerHTML = Render[item._m](item._q);
+  $('qbox').innerHTML = Render[item._m](item._v || item._q);
   $('qfb').innerHTML = '';
   $('qfb').hidden = true;
   $('btnNext').hidden = true;
@@ -426,7 +451,7 @@ function onTap(el) {
   var act = el.getAttribute('data-act');
   var item = S.list[S.idx];
   if (!item) return;
-  var m = item._m, q = item._q, i, k;
+  var m = item._m, q = item._v || item._q, i, k;
 
   /* 单选类：choice / blank / spot / rewrite 用 pick；judge 用 judge */
   if ((act === 'pick' || act === 'judge') && !S.locked) {
@@ -608,7 +633,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     Render: Render, MODES: MODES, MODE_ORDER: MODE_ORDER, TAB_NAMES: TAB_NAMES,
-    shuffle: shuffle, esc: esc, buildExp: buildExp,
+    shuffle: shuffle, shuffleOpts: shuffleOpts, esc: esc, buildExp: buildExp,
     wbLoad: wbLoad, wbSave: wbSave, wbAdd: wbAdd, wbList: wbList,
     wbRemove: wbRemove, wbCount: wbCount, WB_KEY: WB_KEY
   };
