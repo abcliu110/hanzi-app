@@ -774,18 +774,12 @@ window.NHZReview = window.NHZReview || (function () {
     var cat = catById('yufa'); if(!cat) return [];
     return cat.items.filter(function(it){ return yufaGroupOf(it) === g; });
   }
-  function topChips(activeId){
-    return '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu' && !m.parent;}).map(function(m){
-      return '<button class="gw-chip'+(m.id===activeId?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
-    }).join('') + '</div>';
-  }
   function showYufaHub(){
     curMod = 'yufa'; curGroup = null;
     var cat = catById('yufa'), meta = modMeta('yufa');
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
-    h += topChips('yufa');
     if(cat && cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     var panels = YUFA_GROUPS.slice(0, 3).map(function(x){ return {key:'g:'+x.g, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d}; })
       .concat(MODS.filter(function(m){ return m.parent==='yufa'; }).map(function(m){
@@ -796,12 +790,6 @@ window.NHZReview = window.NHZReview || (function () {
       return '<button class="yw-head" data-ysub="'+esc(p.key)+'"><span class="yw-ico">'+p.icon+'</span><span class="yw-name">'+esc(p.t)+'</span><span class="yw-sub">'+p.n+'点 · '+esc(p.d)+'</span><span class="yw-arrow">▾</span></button>';
     }).join('') + '</div>';
     mlistEl.innerHTML = h;
-    mlistEl.querySelectorAll('.gw-chip').forEach(function(el){
-      el.addEventListener('click', function(){
-        var mid = el.getAttribute('data-mid');
-        if(mid && mid!=='yufa') showMList(mid);
-      });
-    });
   }
   function showMList(id, keepFilter, group){
     if(id==='yufa' && !group){ showYufaHub(); return; }
@@ -818,7 +806,6 @@ window.NHZReview = window.NHZReview || (function () {
     var h = meta.parent ? '<button class="gw-backbtn" data-mid="yufa">← 回语法</button>' : '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
     if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
-    h += topChips(meta.parent || id);
     h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
     h += levelFilterHtml(levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
     if(cat.intro && !curGroup) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
@@ -832,7 +819,7 @@ window.NHZReview = window.NHZReview || (function () {
     if(inp) inp.addEventListener('input', function(){ curFilter = inp.value; renderMItems(); });
     var jb = document.getElementById('gwJrBtn');
     if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
-    mlistEl.querySelectorAll('.gw-chip, .gw-backbtn[data-mid]').forEach(function(el){
+    mlistEl.querySelectorAll('.gw-backbtn[data-mid]').forEach(function(el){
       el.addEventListener('click', function(){
         var mid = el.getAttribute('data-mid');
         if(mid && (mid!==id || curGroup)) showMList(mid);
