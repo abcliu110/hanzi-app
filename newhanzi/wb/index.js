@@ -110,4 +110,5 @@ window.NHZ_WB_INDEX = {
   "古文:被动句": "gw_beidong",
   "古文:省略句": "gw_shenglue",
   "古文:是以": "gw_shiyi",
+  "古文:然则": "gw_ranze",
 };
