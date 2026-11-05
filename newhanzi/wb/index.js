@@ -110,6 +110,8 @@ window.NHZ_WB_INDEX = {
   "对比论证": "lj_map_duibi",
   /* 逻辑区 P1-4 四大规律法庭（A22-4，vs + 法槌） */
   "四大逻辑规律": "lj_fating",
+  /* 逻辑区 P2-3 言外之意情景对话（A22-16，mark 话里话外三层展开） */
+  "言外之意": "lj_yanwai",
   /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
   /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */
