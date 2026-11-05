@@ -1247,7 +1247,7 @@ function openPoem(order){
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
   h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+(scWbName(p)?'<a href="games/shici/huazhong.html?tab=shici">🎨 画中有诗</a>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
-  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
+  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div>'+(p.pron?'<div class="sc-memo-tip">📌 读音：'+Object.keys(p.pron).map(function(ch){return ch+'读 '+p.pron[ch];}).join('；')+'</div>':'')+'<div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
     var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
