@@ -168,6 +168,7 @@ if (window.self !== window.top) {
 </script>
 <script src="data/shici.js"></script>
 <script src="data/pinyin_lookup.js"></script>
+<script src="data/pz_derive.js"></script>
 <script src="data/shangxi.js"></script>
 <script src="data/shiju.js"></script>
 <script src="wb/index.js"></script>
@@ -1404,13 +1405,20 @@ function scReadBar(p){
 
 /* ===== 打拍器 + 平仄格（docs/gaijin/shici-gaijin-sheji.md P0-3）=====
    节拍分组：有逐首校过的 beats 用它；否则纯五言 2/3、纯七言 2/2/3（与「节奏」按钮同规则），别的句式不出打拍器。
-   平仄格只给逐首校过 pz / ru 的诗（SC_PZ，下标按去标点后的字序）；其余诗只做节奏，不自动标平仄。
+   平仄格：pz 取自 poems[].pz（91 首近体诗，平水韵逐字核对），ru / rhyme 由 data/pz_derive.js 推导
+   （入声字 = 粤语 -p/-t/-k 收尾，Unihan kCantonese；韵脚 = 偶句句末 + 首句平收入韵），下标按去标点后的字序；
+   无 pz 的诗只做节奏，不自动标平仄。SC_PZ 只留登鹳雀楼的 beats（逐首校过）与兜底。
    木鱼声用 WebAudio 合成，每组敲一下，句间空一拍；孩子点「拍」，离最近的一拍不超过 1/4 拍算准，那组亮金。 */
 var SC_PZ = {
   /* 王之涣《登鹳雀楼》：节奏、平仄、入声、韵脚取自设计 (e) 之二，按平水韵逐字核过（白日入欲目一 为入声，流、楼 押尤韵） */
   '登鹳雀楼|王之涣': { beats:['白日/依山/尽','黄河/入海/流','欲穷/千里/目','更上/一层/楼'],
     pz:'仄仄平平仄|平平仄仄平|仄平平仄仄|仄仄仄平平', ru:[0,1,7,10,14,17], rhyme:[9,19] }
 };
+/* 平仄数据：优先用 poems[].pz 推导（data/pz_derive.js，91 首）；无 pz 时回落到 SC_PZ 手工条目 */
+function scPZData(p){
+  if(window.NHZ_PZ && p && p.pz){ var r = window.NHZ_PZ.derive(p); if(r) return r; }
+  return SC_PZ[p.title+'|'+p.author] || null;
+}
 function scBeatGroups(p){
   var d = SC_PZ[p.title+'|'+p.author];
   if(d && d.beats) return d.beats.map(function(b){ return b.split('/'); });
@@ -1462,7 +1470,7 @@ function scBeatBox(p, on){
   if(!on){ box.innerHTML = ''; return; }
   var G = scBeatGroups(p);
   if(!G){ box.innerHTML = '<div class="sc-beat"><div class="bk-msg">这首诗句式长短不一，暂不出打拍器（节拍只给纯五言、纯七言）。</div></div>'; return; }
-  var d = SC_PZ[p.title+'|'+p.author], pz = d ? d.pz.replace(/\|/g,'') : '', st = { bpm:80, pz:false, timer:null, sched:[], hit:0, total:0 };
+  var d = scPZData(p), pz = d ? d.pz.replace(/\|/g,'') : '', st = { bpm:80, pz:false, timer:null, sched:[], hit:0, total:0 };
   function grid(){
     var k = 0, gi = 0;
     return G.map(function(row){

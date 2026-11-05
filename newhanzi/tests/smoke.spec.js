@@ -266,7 +266,12 @@ test.describe('newhanzi smoke', () => {
     await page.locator('[data-rb="wb"]').click();
     await expect(page.locator('#scwb svg').first()).toBeVisible({ timeout: 10000 });
     await page.goto('about:blank');
-    // 咏鹅（order 42）未登记白板；登鹳雀楼（38）已登记，不能用来断言“无按钮”
+    // 《登鹳雀楼》已在 3384bb59 登记为 scroll 白板（sc_deng_guanque_wang），不再是无白板反例
+    await page.goto('newhanzi/shici.html#poem-38');
+    await page.locator('[data-rb="wb"]').click();
+    await expect(page.locator('#scwb svg').first()).toBeVisible({ timeout: 10000 });
+    await page.goto('about:blank');
+    // 未登记白板的诗（《咏鹅》）仍不出白板按钮
     await page.goto('newhanzi/shici.html#poem-42');
     await expect(page.locator('[data-rb="wb"]')).toHaveCount(0);
     expect(errors).toEqual([]);
@@ -691,8 +696,7 @@ for (const vp of [{ name: 'tablet', width: 768, height: 1024 }, { name: 'desktop
 /* sw.js 预缓存清单要覆盖全部页面：新增/删除页面后运行 python3 tools/gen_sw_core.py */
 test('sw.js precache list is up to date', async () => {
   const { execFileSync } = require('child_process');
-  // PYTHONUTF8：Windows 控制台默认 GBK，不设则中文输出被错解码，断言“最新”会误判
-  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true, env: { ...process.env, PYTHONUTF8: '1' } }).toString();
+  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true }).toString();
   expect(out).toContain('最新');
 });
 
