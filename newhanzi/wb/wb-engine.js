@@ -1697,7 +1697,44 @@
       [[790, 430, 778, 418], [820, 420, 812, 404], [850, 417, 850, 400], [880, 420, 888, 404], [910, 430, 922, 418], [908, 480, 922, 492], [792, 480, 778, 492], [850, 513, 850, 528]].forEach(function (p, k) { c.R('line', p, { stroke: INK, strokeWidth: 1.8 }, t + .5 + k * .08, .15); });
       c.R('linearPath', [[[918, 465], [942, 450], [942, 480]]], { stroke: INK, strokeWidth: 2 }, t + 1.1, .2);
       c.R('circle', [872, 452, 5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + 1.2, .15);
-      c.R('path', ['M830 505 q20 12 40 0'], { stroke: INK, strokeWidth: 1.8 }, t + 1.3, .2); return 1.5; } }
+      c.R('path', ['M830 505 q20 12 40 0'], { stroke: INK, strokeWidth: 1.8 }, t + 1.3, .2); return 1.5; } },
+    /* Q16：人物线稿（火柴人式单线条；老师持教鞭 + 书本，班长戴臂章 + 点名册；供歧义句 pic 情境卡 Q22 配图共用） */
+    teacher: { at: [430, 280], f: function (c, t) {
+      c.R('circle', [430, 205, 27], { stroke: INK, strokeWidth: 2.6 }, t, .4);
+      c.R('circle', [422, 202, 2.5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + .4, .15);
+      c.R('circle', [438, 202, 2.5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + .5, .15);
+      c.R('path', ['M420 215 q10 8 20 0'], { stroke: INK, strokeWidth: 1.8 }, t + .6, .2);
+      c.R('line', [430, 232, 430, 330], { stroke: INK, strokeWidth: 3 }, t + .8, .4);
+      c.R('linearPath', [[[420, 240], [430, 252], [440, 240]]], { stroke: INK, strokeWidth: 2 }, t + 1.1, .2);
+      c.R('line', [430, 250, 400, 300], { stroke: INK, strokeWidth: 2.4 }, t + 1.3, .3);
+      c.R('rectangle', [366, 292, 36, 46], { stroke: INK, strokeWidth: 2.2 }, t + 1.6, .3);
+      c.R('line', [384, 292, 384, 338], { stroke: INK, strokeWidth: 1.6 }, t + 1.9, .2);
+      c.R('line', [430, 250, 470, 215], { stroke: INK, strokeWidth: 2.4 }, t + 2.1, .3);
+      c.R('line', [470, 215, 540, 170], { stroke: INK, strokeWidth: 2.4 }, t + 2.4, .3);
+      c.R('line', [430, 330, 408, 430], { stroke: INK, strokeWidth: 2.6 }, t + 2.7, .3);
+      c.R('line', [430, 330, 452, 430], { stroke: INK, strokeWidth: 2.6 }, t + 3, .3);
+      c.R('line', [398, 430, 414, 430], { stroke: INK, strokeWidth: 2.2 }, t + 3.3, .15);
+      c.R('line', [446, 430, 462, 430], { stroke: INK, strokeWidth: 2.2 }, t + 3.4, .15);
+      c.R('line', [380, 442, 480, 442], { stroke: GRAY, strokeWidth: 1.8 }, t + 3.5, .2); return 3.7; } },
+    monitor: { at: [770, 290], f: function (c, t) {
+      c.R('circle', [770, 220, 25], { stroke: INK, strokeWidth: 2.6 }, t, .4);
+      c.R('path', ['M758 202 q12 -12 24 0'], { stroke: INK, strokeWidth: 2 }, t + .4, .2);
+      c.R('circle', [762, 217, 2.5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + .6, .15);
+      c.R('circle', [778, 217, 2.5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + .7, .15);
+      c.R('path', ['M760 227 q10 8 20 0'], { stroke: INK, strokeWidth: 1.8 }, t + .8, .2);
+      c.R('line', [770, 245, 770, 325], { stroke: INK, strokeWidth: 3 }, t + 1, .4);
+      c.R('line', [770, 262, 738, 308], { stroke: INK, strokeWidth: 2.4 }, t + 1.4, .3);
+      c.R('line', [746, 279, 762, 291], { stroke: ACC, strokeWidth: 6 }, t + 1.7, .2);
+      c.R('line', [770, 262, 800, 305], { stroke: INK, strokeWidth: 2.4 }, t + 1.9, .3);
+      c.R('rectangle', [796, 300, 34, 46], { stroke: INK, strokeWidth: 2.2 }, t + 2.2, .3);
+      c.R('line', [802, 312, 824, 312], { stroke: INK, strokeWidth: 1.6 }, t + 2.5, .15);
+      c.R('line', [802, 324, 824, 324], { stroke: INK, strokeWidth: 1.6 }, t + 2.6, .15);
+      c.R('line', [802, 336, 824, 336], { stroke: INK, strokeWidth: 1.6 }, t + 2.7, .15);
+      c.R('line', [770, 325, 750, 420], { stroke: INK, strokeWidth: 2.6 }, t + 2.9, .3);
+      c.R('line', [770, 325, 790, 420], { stroke: INK, strokeWidth: 2.6 }, t + 3.2, .3);
+      c.R('line', [740, 420, 756, 420], { stroke: INK, strokeWidth: 2.2 }, t + 3.5, .15);
+      c.R('line', [784, 420, 800, 420], { stroke: INK, strokeWidth: 2.2 }, t + 3.6, .15);
+      c.R('line', [720, 432, 820, 432], { stroke: GRAY, strokeWidth: 1.8 }, t + 3.7, .2); return 3.9; } }
   };
   TPL.scroll = function (c, q, d) {
     var fills = {};
