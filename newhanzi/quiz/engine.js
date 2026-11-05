@@ -23,7 +23,7 @@ function shuffle(arr) {
 /* 选项洗牌（2026-11-05 内容审查 F6）：choice/blank/spot/rewrite 每次出题打乱选项，
    重映射答案下标 a 与「误解标注.选项」字母；选项里有「都对 / B和C」这类指位置的就不打乱。
    返回新对象，原题对象不变（错题本、统一错题本仍按原题存，id 不受洗牌影响）。 */
-var SHUF_MODES = { choice: 1, blank: 1, spot: 1, rewrite: 1 };
+var SHUF_MODES = { choice: 1, blank: 1, spot: 1, rewrite: 1, fill: 1 };
 function shuffleOpts(m, q) {
   if (!SHUF_MODES[m] || !q || !Array.isArray(q.opts) || q.opts.length < 2 || typeof q.a !== 'number') return q;
   for (var t = 0; t < q.opts.length; t++) {
@@ -62,7 +62,11 @@ var MODES = {
   rewrite: { name: '句式改写', icon: '🔄', desc: '换个说法来表达' },
   /* A22-7 论证地图（设计 docs/gaijin/luoji-gaijin-sheji.md P1-1）：tag 题里标签恰为「论点 / 论据 / 论证」的，
      按树形挂卡渲染（论点在顶、论证是连接、论据在下）。数据仍是 tag 题、错题本仍记在 tag 下，只换显示与交互外观。 */
-  map:     { name: '论证地图', icon: '🌳', desc: '把卡片挂到论证树上' }
+  map:     { name: '论证地图', icon: '🌳', desc: '把卡片挂到论证树上' },
+  /* A22-9 古文产出题型（docs/gaijin/guwen-gaijin-sheji.md P1-C）：题目由 data/guwen.js 句.停/今/对 经 gw_chan.js 自动生成 */
+  cut:     { name: '断句',     icon: '✂️', desc: '在字缝里点出朗读停顿' },
+  fill:    { name: '填今译',   icon: '🈳', desc: '选出画线字词的今译' },
+  gworder: { name: '排今译',   icon: '🧩', desc: '把今译词块排回通顺的话' }
 };
 var MAP_TAGS = ['论点', '论证', '论据'];   /* 树上自上而下的顺序 */
 function isMap(q) {
@@ -72,12 +76,13 @@ function isMap(q) {
 }
 /* 模式卡/顶栏显示用：整组 tag 题都是论证题时显示为「论证地图」 */
 function modeMeta(m, q) {
+  if (m === 'order' && (q ? q.gw : (S.modes.order && S.modes.order.length && S.modes.order.every(function (x) { return x && x.gw; })))) return MODES.gworder;
   if (m === 'tag') {
     if (q ? isMap(q) : (S.modes.tag && S.modes.tag.length && S.modes.tag.every(isMap))) return MODES.map;
   }
   return MODES[m];
 }
-var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite'];
+var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite', 'cut', 'fill'];
 var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验', guwen: '古文' };
 
 /* ---------- 会话状态 ---------- */
@@ -295,7 +300,9 @@ function buildExp(m, q, pickedIdx) {
   if (m === 'spot') {
     x = '<div class="qz-fix">✅ 改正：' + esc(q.fix) + '</div>';
   } else if (m === 'order') {
-    x = '正确答案：' + esc(q.answer);
+    x = '正确答案：' + esc(q.gw ? q.full : q.answer);
+  } else if (m === 'cut') {
+    x = '停顿：' + esc(q.ting) + (q.jin ? '<br>今译：' + esc(q.jin) : '') + (q.src ? '<div class="qz-sub">停顿出处：' + esc(q.src) + '</div>' : '');
   } else if (m === 'tag') {
     x = q.tokens.map(function (t) { return esc(t.t) + ' → ' + esc(t.tag); }).join('<br>');
   } else if (m === 'match') {
@@ -341,9 +348,12 @@ function finishQuestion(ok, expHtml) {
     else if (m === 'blank') rec = { q: q.s, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
     else if (m === 'spot') rec = { q: q.s + ' ' + q.prompt, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
     else if (m === 'rewrite') rec = { q: q.from + ' → ' + q.target, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'fill') rec = { q: '《' + q.t + '》' + q.yuan + ' 中「' + q.w + '」的今译', options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'cut') rec = { q: '断句：' + q.ting.replace(/\//g, '') + '（《' + q.t + '》）', options: [], answer: q.ting, 解析: q.src ? '停顿出处：' + q.src : '' };
+    else if (m === 'order' && q.gw) rec = { q: q.prompt, options: [], answer: q.full, 解析: '' };
     if (rec && rec.q && rec.answer != null) NHZReview.record({
       q: rec.q, options: rec.options, answer: rec.answer, 解析: rec.解析, src: '练习',
-      point: (S.title || TAB_NAMES[S.tab] || '') + ' · ' + (MODES[m] ? MODES[m].name : m) }, ok);
+      point: (S.title || TAB_NAMES[S.tab] || '') + ' · ' + (modeMeta(m, q) ? modeMeta(m, q).name : m) }, ok);
   })();
   var fb = $('qfb');
   fb.innerHTML = '<div class="qz-fb ' + (ok ? 'ok' : 'no') + '">' +
@@ -469,6 +479,34 @@ var Render = {
         return '<button class="qz-btn" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
       }).join('') + '</div>';
   },
+  /* cut（A22-9 断句）: {gw, t, ting:带 / 的原文, jin, src}；字缝按钮 data-act="gap"，提交 csubmit */
+  cut: function (q) {
+    var p = window.NHZGwChan.parseTing(q.ting), h = '', hi = 0, k;
+    for (k = 0; k < p.text.length; k++) {
+      var c = p.text.charAt(k);
+      h += '<span class="qz-cch' + (k === p.han[hi] ? '' : ' pu') + '">' + esc(c) + '</span>';
+      if (k === p.han[hi]) {
+        if (p.gaps.indexOf(hi) >= 0) h += '<button class="qz-gap" data-act="gap" data-i="' + hi + '" aria-label="在这里停顿"></button>';
+        hi++;
+      }
+    }
+    return '<div class="qz-q">《' + esc(q.t) + '》这句朗读时在哪里停顿？</div>' +
+      '<div class="qz-sub">点两个字之间的缝插入 /，再点一次取消；标点处本来就停，不用点</div>' +
+      '<div class="qz-sent qz-cut">' + h + '</div>' +
+      (q.jin ? '<div class="qz-sub">今译：' + esc(q.jin) + '</div>' : '') +
+      '<div class="qz-rowbtns"><button class="qz-btn primary" data-act="csubmit">✓ 提交</button>' +
+      '<button class="qz-btn ghost" data-act="cclear">清空</button></div>';
+  },
+  /* fill（A22-9 填今译）: {gw, t, yuan, i, w, jin:今译挖空（可空）, opts, a, exp} */
+  fill: function (q) {
+    var y = esc(q.yuan.slice(0, q.i)) + '<b class="qz-hl">' + esc(q.w) + '</b>' + esc(q.yuan.slice(q.i + q.w.length));
+    return '<div class="qz-q">《' + esc(q.t) + '》句中画线的「' + esc(q.w) + '」，今译是什么？</div>' +
+      '<div class="qz-sent">' + y + (q.jin ? '<div class="qz-sub">今译：' +
+        esc(q.jin).replace(/___/g, '<span class="qz-blank">____</span>') + '</div>' : '') + '</div>' +
+      '<div class="qz-opts">' + q.opts.map(function (o, i) {
+        return '<button class="qz-btn" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
+      }).join('') + '</div>';
+  },
   /* rewrite: {from, target, opts:[3], a, exp} */
   rewrite: function (q) {
     return '<div class="qz-sent">' + esc(q.from) + '</div>' +
@@ -534,6 +572,30 @@ function onTap(el) {
       cur.sel = -1;
       var ndone = $('qbox').querySelectorAll('.qz-tok.right, .qz-tok.wrong').length;
       if (ndone === q.tokens.length) finishQuestion(!cur.wrong, buildExp(m, q));
+      return;
+    }
+  }
+
+  /* 断句（A22-9） */
+  if (m === 'cut') {
+    if (act === 'gap') { el.classList.toggle('on'); return; }
+    if (act === 'cclear') {
+      var gs = $('qbox').querySelectorAll('.qz-gap.on');
+      for (k = 0; k < gs.length; k++) gs[k].classList.remove('on');
+      return;
+    }
+    if (act === 'csubmit') {
+      var ansC = window.NHZGwChan.parseTing(q.ting).ans, okC = true;
+      var gEls = $('qbox').querySelectorAll('.qz-gap');
+      for (k = 0; k < gEls.length; k++) {
+        var gi = parseInt(gEls[k].getAttribute('data-i'), 10), want = ansC.indexOf(gi) >= 0, on = gEls[k].classList.contains('on');
+        if (want && on) gEls[k].classList.add('right');
+        else if (want) { gEls[k].classList.add('miss'); okC = false; }
+        else if (on) { gEls[k].classList.add('wrong'); okC = false; }
+      }
+      var allC = $('qbox').querySelectorAll('[data-act]');
+      for (k = 0; k < allC.length; k++) allC[k].style.pointerEvents = 'none';
+      finishQuestion(okC, buildExp(m, q));
       return;
     }
   }
@@ -614,6 +676,20 @@ function loadData(tab) {
     if (D && D.modes) {
       S.title = D.title || '';
       S.modes = D.modes;
+      if (tab === 'guwen' && extra) {
+        /* A22-9：古文产出题型由篇目逐句标注生成；?text=篇名 只出这一篇的产出题 */
+        var gm = {}, txt = getParam('text');
+        Object.keys(D.modes).forEach(function (m) { gm[m] = D.modes[m]; });
+        ['cut', 'order', 'fill'].forEach(function (m) {
+          gm[m] = (extra[m] || []).filter(function (q) { return !txt || q.t === txt; });
+        });
+        if (txt && (gm.cut.length + gm.order.length + gm.fill.length)) {
+          gm = { cut: gm.cut, order: gm.order, fill: gm.fill };
+          S.title = (D.title || '') + ' · ' + txt;
+          S.point = txt;
+        }
+        S.modes = gm;
+      }
       /* ?point=专题名：只出该专题的题（逻辑题每题带 point）；没有匹配的题时退回全部 */
       var pt = getParam('point');
       if (pt) {
@@ -627,11 +703,24 @@ function loadData(tab) {
     }
     renderHome();
   }
-  var sc = document.createElement('script');
-  sc.src = 'data_' + tab + '.js';
-  sc.onload = ready;
-  sc.onerror = ready;
-  document.head.appendChild(sc);
+  var extra = null;
+  function addScript(src, cb) {
+    var el = document.createElement('script');
+    el.src = src; el.onload = cb; el.onerror = cb;
+    document.head.appendChild(el);
+  }
+  addScript('data_' + tab + '.js', function () {
+    if (tab !== 'guwen') { ready(); return; }
+    /* 古文：再加载篇目数据与产出题生成器（A22-9） */
+    addScript('../data/guwen.js', function () {
+      addScript('gw_chan.js', function () {
+        try {
+          if (window.NHZGwChan && window.NHZ_GUWEN) extra = window.NHZGwChan.build(window.NHZ_GUWEN.texts);
+        } catch (e) { extra = null; }
+        ready();
+      });
+    });
+  });
   setTimeout(ready, 4000); /* 兜底：file:// 某些环境不上报 onerror */
 }
 

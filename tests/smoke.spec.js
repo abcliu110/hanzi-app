@@ -560,6 +560,31 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen production modes: cut / order / fill from 句 annotations (A22-9)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/quiz/index.html?tab=guwen&text=' + encodeURIComponent('守株待兔'));
+    await expect(page.locator('[data-mode="cut"]')).toContainText('断句', { timeout: 15000 });
+    await expect(page.locator('[data-mode="fill"]')).toContainText('填今译');
+    await expect(page.locator('[data-mode="order"]')).toContainText('排今译');
+    await expect(page.locator('[data-mode="choice"]')).toHaveCount(0);
+    await page.locator('[data-mode="cut"]').click();
+    await expect(page.locator('#qbox .qz-gap').first()).toBeVisible();
+    await page.evaluate(() => {
+      const s = [...document.querySelectorAll('.qz-cut .qz-cch')].map((e) => e.textContent).join('');
+      const q = window.NHZGwChan.build(window.NHZ_GUWEN.texts).cut.find((x) => x.ting.replace(/\//g, '') === s);
+      window.NHZGwChan.parseTing(q.ting).ans.forEach((i) => document.querySelector('.qz-gap[data-i="' + i + '"]').click());
+    });
+    await page.locator('[data-act="csubmit"]').click();
+    await expect(page.locator('#qfb .qz-fb.ok')).toBeVisible();
+    await page.locator('#btnNext').click();
+    await page.locator('[data-act="csubmit"]').click();   /* 不插 / 直接交：错，进统一错题本 */
+    await expect(page.locator('#qfb .qz-fb.no')).toBeVisible();
+    const wrong = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_wrong') || '[]'));
+    expect(wrong.some((w) => /^断句：/.test(w.q) && w.answer.indexOf('/') > 0)).toBeTruthy();
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

@@ -135,3 +135,19 @@ body{background:var(--qz-bg);color:var(--qz-text);
 .qz-miscon{background:#fff8e1;border-left:4px solid #f5c518;padding:10px 12px;border-radius:0 8px 8px 0;margin:10px 0;font-size:14px}
 .qz-pair{margin:8px 0;padding:8px 12px;background:#f8faf5;border-radius:8px;font-size:14px}
 .qz-pair p{margin:4px 0;font-family:Georgia,"Songti SC",serif}
+
+/* A22-9 古文产出题型：断句（字缝按钮）、填今译（加点字） */
+.qz-cut{font-size:26px;line-height:2.2;letter-spacing:0;font-family:"Kaiti SC","STKaiti","KaiTi",serif;}
+.qz-cch{display:inline-block;}
+.qz-cch.pu{color:var(--qz-muted);}
+.qz-gap{display:inline-block;vertical-align:middle;width:22px;height:40px;margin:0 1px;padding:0;
+  border:none;border-radius:6px;background:rgba(255,255,255,.05);cursor:pointer;position:relative;}
+.qz-gap:hover{background:rgba(245,197,24,.18);}
+.qz-gap.on::after,.qz-gap.miss::after{content:'/';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:bold;color:var(--qz-gold);}
+.qz-gap.right{background:rgba(76,175,80,.22);}
+.qz-gap.right::after{color:var(--qz-green);}
+.qz-gap.wrong{background:rgba(244,67,54,.22);}
+.qz-gap.wrong::after{color:var(--qz-red);}
+.qz-gap.miss{background:rgba(245,197,24,.12);outline:2px dashed var(--qz-gold);}
+.qz-hl{color:var(--qz-gold);text-decoration:underline;text-underline-offset:5px;}
