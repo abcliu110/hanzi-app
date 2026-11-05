@@ -452,6 +452,35 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic concept relations whiteboard + fenchouti drawers (A22-3)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/index.html');
+    await page.locator('#view-home .panel[data-m="logic"]').click();
+    const name = '概念：定义与划分';
+    await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+    const wb = page.locator('#logiclist .yw-wb[data-lwb="' + name + '"]');
+    await wb.locator('[data-lwb-start]').click();
+    await expect(wb.locator('svg').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#logiclist a[href="games/luoji/fenchouti.html"]')).toHaveCount(1);
+    await page.goto('newhanzi/games/luoji/fenchouti.html');
+    await page.evaluate(() => localStorage.removeItem('nhz_wrong'));
+    await page.locator('[data-l="男生"]').click();
+    await page.locator('[data-l="戴眼镜的"]').click();
+    await page.locator('#go').click();
+    await expect(page.locator('.drw.smoke')).toHaveCount(2);
+    await expect(page.locator('#fb')).toContainText('冒烟');
+    const wrong = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_wrong') || '[]').filter((w) => w.point === '概念：定义与划分').length);
+    expect(wrong).toBe(1);
+    await page.locator('#retry').click();
+    await page.locator('[data-l="戴眼镜的"]').click();
+    await page.locator('[data-l="不戴眼镜的"]').click();
+    await page.locator('#go').click();
+    await expect(page.locator('#fb')).toContainText('✓');
+    await expect(page.locator('.drw.smoke')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('logic argument map whiteboard (A22-7 tree)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));

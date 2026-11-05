@@ -102,6 +102,8 @@ window.NHZ_WB_INDEX = {
   /* 逻辑区（docs/gaijin/luoji-gaijin-sheji.md） */
   "三段论": "lj_sanduanlun",
   "推理三兄弟：演绎/归纳/类比": "lj_shiwuguan",
+  /* 逻辑 P1-3 概念四关系（A22-3，euler pair 两圈模式） */
+  "概念：定义与划分": "lj_gainian",
   /* 逻辑区 P1-1 论证地图 + 虚拟论敌（A22-7，模板 tree）：键为知识点名 */
   "举例论证": "lj_map_juli",
   "道理论证": "lj_map_daoli",

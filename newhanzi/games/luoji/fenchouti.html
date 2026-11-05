@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分抽屉 · 概念的划分</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top .home{background:var(--accent-soft);border:2px solid var(--accent-deep);color:var(--accent-deep)}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.prem{font-size:19px;margin:4px 0}
+.prem b{color:var(--accent-deep)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"Kaiti SC","STKaiti","KaiTi",serif;pointer-events:none}
+#sdot{pointer-events:none}
+.hot{cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+
+.cab{display:flex;gap:14px;margin:12px 0}
+.drw{position:relative;flex:1 1 0;min-height:190px;background:var(--surface);border:2px solid var(--accent-deep);border-radius:12px;padding:8px 10px 12px;transition:border-color .3s}
+.drw .lab{display:flex;align-items:center;justify-content:center;min-height:46px;border:2px dashed var(--line);border-radius:10px;font-size:18px;font-weight:700;color:var(--muted);cursor:pointer;margin-bottom:8px}
+.drw .lab.set{border-style:solid;border-color:var(--orange);color:var(--orange);background:var(--card)}
+.drw .knob{position:absolute;left:50%;bottom:-9px;width:44px;height:10px;margin-left:-22px;border-radius:6px;background:var(--accent-deep)}
+.drw.smoke{border-color:var(--red);animation:shake .5s 2}
+.drw.ok{border-color:var(--green)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.puff{position:absolute;top:-8px;width:34px;height:34px;border-radius:50%;background:#9aa39566;pointer-events:none;animation:puff 1.6s ease-out infinite}
+.puff:nth-child(2){left:30%;animation-delay:.3s}.puff:nth-child(3){left:55%;animation-delay:.6s}.puff:nth-child(4){left:75%;animation-delay:.9s}
+@keyframes puff{0%{transform:translateY(0) scale(.5);opacity:.9}100%{transform:translateY(-60px) scale(1.6);opacity:0}}
+.pile{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;background:var(--surface);border:1px dashed var(--line);border-radius:12px}
+.chip{display:inline-block;padding:6px 10px;border-radius:10px;border:2px solid var(--blue);background:var(--card);font-size:16px;font-weight:700;margin:3px}
+.chip.dup{border-color:var(--red);color:var(--red)}
+.chip.miss{border-color:var(--red);border-style:dashed;color:var(--red)}
+.tray{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.tag{min-height:48px;padding:8px 16px;font-size:17px;font-weight:700;border-radius:10px;border:2px solid var(--orange);background:var(--surface);color:var(--orange);cursor:pointer}
+.tag:disabled{opacity:.35;cursor:default}
+.lbl{font-size:14px;color:var(--muted);margin-top:8px}
+.kj{font-size:18px;font-weight:700;color:var(--accent-deep);margin:6px 0}
+.why{font-size:15px;color:var(--muted)}
+h2{font-size:18px;margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🗄️ 分抽屉：一个标准，一次分完</h1></div>
+  <div class="card" id="box"></div>
+  <div class="rule">划分回答“有哪些”：要按一个标准一次分完，分出来的小类不能重叠、不能漏掉。<br>易错：划分标准要统一，不能一会儿按颜色一会儿按大小。口诀：定义讲内涵，划分列外延。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 内容只取 newhanzi/yuwen/data.js 逻辑区「概念：定义与划分」：
+     坏划分「把同学分成男生和戴眼镜的（标准交叉：戴眼镜的男生两边都算，子项不互斥）」、
+     坏划分「水果按颜色分红的、按大小分大的（标准不一）」及练习解析「两个标准混在一起，小类会重叠」、
+     深讲「按一个标准一次分完，分出来的小类不能重叠、不能漏掉」、易错、口诀。
+     每轮的物品是两个标准两两组合出来的（如“戴眼镜的男生”），每个标准的另一半（女生 / 不戴眼镜的、不是红的 / 小的）为补全标准而加。
+     玩法按 docs/gaijin/luoji-gaijin-sheji.md P1-3：选标签贴抽屉 → 一次分完；混用两个标准时同一样东西被塞进两个抽屉，抽屉冒烟。 */
+  var P = '概念：定义与划分';
+  var RS = [
+    { name: '同学', labels: [['男生', '女生'], ['戴眼镜的', '不戴眼镜的']], stds: ['是男生还是女生', '戴不戴眼镜'],
+      items: [{ t: '戴眼镜的男生', in: ['男生', '戴眼镜的'] }, { t: '不戴眼镜的男生', in: ['男生', '不戴眼镜的'] },
+              { t: '戴眼镜的女生', in: ['女生', '戴眼镜的'] }, { t: '不戴眼镜的女生', in: ['女生', '不戴眼镜的'] }],
+      bad: '标准交叉：戴眼镜的男生两边都算，子项不互斥。' },
+    { name: '水果', labels: [['红的', '不是红的'], ['大的', '小的']], stds: ['颜色', '大小'],
+      items: [{ t: '又红又大的', in: ['红的', '大的'] }, { t: '红的、小的', in: ['红的', '小的'] },
+              { t: '不红、大的', in: ['不是红的', '大的'] }, { t: '不红、小的', in: ['不是红的', '小的'] }],
+      bad: '一会儿按颜色一会儿按大小，两个标准混在一起，小类会重叠。' }
+  ];
+  var OPTS = ['只用一个标准，一次分完', '两个标准混着用'];
+  var box = document.getElementById('box'), ri = 0, pick = [], tried = false, done = false, score = 0;
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function allLabels(r){ return r.labels[0].concat(r.labels[1]); }
+  function stdOf(r, l){ return r.labels[0].indexOf(l) >= 0 ? 0 : 1; }
+  function render(msg, cls){
+    var r = RS[ri], i;
+    var h = '<div class="prog">分抽屉 · 第 ' + (ri + 1) + ' / ' + RS.length + ' 轮</div>';
+    h += '<div class="ask">把「' + esc(r.name) + '」分进两个抽屉：先给抽屉贴标签，再一次分完。</div>';
+    h += '<div class="lbl">要分的' + esc(r.name) + '：</div><div class="pile" id="pile">' + r.items.map(function(it){ return '<span class="chip">' + esc(it.t) + '</span>'; }).join('') + '</div>';
+    h += '<div class="lbl">标签（点一张贴到空抽屉上，点抽屉上的标签可撕下）：</div><div class="tray">' + allLabels(r).map(function(l){
+      return '<button class="tag" data-l="' + esc(l) + '"' + (pick.indexOf(l) >= 0 || done ? ' disabled' : '') + '>' + esc(l) + '</button>'; }).join('') + '</div>';
+    h += '<div class="cab">';
+    for (i = 0; i < 2; i++) h += '<div class="drw" data-d="' + i + '"><div class="lab' + (pick[i] ? ' set' : '') + '" data-un="' + i + '">' + (pick[i] ? esc(pick[i]) : '贴标签') + '</div><div class="in"></div><div class="knob"></div></div>';
+    h += '</div><div class="btns" id="btns">' + (done ? '<button class="btn main" id="next">' + (ri + 1 < RS.length ? '下一轮 →' : '看结果') + '</button>' :
+      '<button class="btn main" id="go"' + (pick[0] && pick[1] ? '' : ' disabled') + '>一次分完 ▶</button>') + '</div>';
+    h += '<div class="fb' + (cls ? ' ' + cls : '') + '" id="fb">' + (msg || '') + '</div>';
+    box.innerHTML = h;
+  }
+  function sortNow(){
+    var r = RS[ri], drws = box.querySelectorAll('.drw'), pile = document.getElementById('pile');
+    var mixed = stdOf(r, pick[0]) !== stdOf(r, pick[1]), dups = [], miss = [];
+    pile.innerHTML = '';
+    r.items.forEach(function(it){
+      var hit = [];
+      pick.forEach(function(l, k){ if (it.in.indexOf(l) >= 0) hit.push(k); });
+      hit.forEach(function(k){ drws[k].querySelector('.in').insertAdjacentHTML('beforeend', '<span class="chip' + (hit.length > 1 ? ' dup' : '') + '">' + esc(it.t) + '</span>'); });
+      if (hit.length > 1) { dups.push(it.t); hit.forEach(function(k){ drws[k].classList.add('smoke'); }); }
+      if (!hit.length) { miss.push(it.t); pile.insertAdjacentHTML('beforeend', '<span class="chip miss">' + esc(it.t) + '（没地方放）</span>'); }
+    });
+    for (var k = 0; k < drws.length; k++) {
+      if (drws[k].classList.contains('smoke')) drws[k].insertAdjacentHTML('beforeend', '<span class="puff" style="left:8%"></span><span class="puff"></span><span class="puff"></span><span class="puff"></span>');
+      else drws[k].classList.add('ok');
+    }
+    var right = !mixed;
+    if (!tried) {
+      tried = true; if (right) score++;
+      NHZReview.record({ q: '分抽屉：把「' + r.name + '」分进两个抽屉，标签该怎么贴？', options: OPTS.slice(), answer: OPTS[0],
+        解析: r.bad + '划分要按一个标准一次分完，分出来的小类不能重叠、不能漏掉。', src: '逻辑', point: P }, right);
+    }
+    var fb = document.getElementById('fb'), btns = document.getElementById('btns');
+    if (right) {
+      done = true;
+      fb.className = 'fb ok';
+      fb.innerHTML = '✓ 一个标准（' + esc(r.stds[stdOf(r, pick[0])]) + '）一次分完：每样只进一个抽屉，不重叠、不遗漏。<div class="kj">定义讲内涵，划分列外延</div>';
+      btns.innerHTML = '<button class="btn main" id="next">' + (ri + 1 < RS.length ? '下一轮 →' : '看结果') + '</button>';
+      var tags = box.querySelectorAll('.tag'); for (var j = 0; j < tags.length; j++) tags[j].disabled = true;
+    } else {
+      fb.className = 'fb bad';
+      fb.innerHTML = '✗ 抽屉冒烟了！「' + esc(pick[0]) + '」和「' + esc(pick[1]) + '」用的是两个标准（' + esc(r.stds[0]) + '、' + esc(r.stds[1]) + '）。' +
+        (dups.length ? '「' + esc(dups.join('」「')) + '」两边都算，被塞进了两个抽屉；' : '') +
+        (miss.length ? '「' + esc(miss.join('」「')) + '」哪个抽屉都放不进，漏掉了。' : '') +
+        '<div class="why">' + esc(r.bad) + '</div>';
+      btns.innerHTML = '<button class="btn" id="retry">撕下标签，重新贴</button>';
+    }
+  }
+  function finish(){
+    box.innerHTML = '<div class="ask">分完了：' + RS.length + ' 轮里第一次就贴对 ' + score + ' 轮。</div>' +
+      '<div class="why">划分回答“有哪些”：要按一个标准一次分完，分出来的小类不能重叠、不能漏掉。</div>' +
+      '<div class="kj">定义讲内涵，划分列外延</div><div class="btns"><button class="btn main" id="again">再来一轮</button></div>';
+  }
+  box.addEventListener('click', function(e){
+    var el = e.target;
+    if (el.id === 'again') { ri = 0; score = 0; pick = []; tried = false; done = false; render(); return; }
+    if (el.id === 'next') { ri++; pick = []; tried = false; done = false; if (ri >= RS.length) finish(); else render(); return; }
+    if (el.id === 'retry') { pick = []; render(); return; }
+    if (el.id === 'go') { el.disabled = true; sortNow(); return; }
+    if (done || box.querySelector('.drw.smoke')) return;
+    var tg = el.closest('.tag');
+    if (tg && !tg.disabled) {
+      var l = tg.getAttribute('data-l');
+      if (!pick[0]) pick[0] = l; else if (!pick[1]) pick[1] = l; else return;
+      render(); return;
+    }
+    var un = el.closest('[data-un]');
+    if (un) { var i = +un.getAttribute('data-un'); if (pick[i]) { pick[i] = undefined; render(); } }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

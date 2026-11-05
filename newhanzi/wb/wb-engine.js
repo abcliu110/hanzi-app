@@ -15,7 +15,7 @@
  *   line   时间轴                       end    口诀收尾
  *   scroll 古诗诗画同生（一句一拍、只画本句物件、颜色字上色、收卷）
  *   chain  逻辑条件箭头链（顺推 / 倒推打叉 / 否定后件回灭）
- *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）
+ *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）；pair 两圈四关系 全同 / 包含 / 交叉 / 全异（A22-3）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
  *   tree   逻辑论证地图（论点 / 论据 / 补强卡挂树 + 虚拟论敌气泡，A22-7）
@@ -1119,7 +1119,63 @@
    *         {line:'所以…？', counter:['S','out','M'], ok:0},             // 反例：小圈挪到 M 外，红叉 + 红字
    *         {line:'所有鸟都会飞…', aside:'形式对，前提错，结论照样错'}]}   // 旁注：红字 + 波浪线，不动圈
    * 左栏逐行写前提 / 结论，右边画圈；只比拓扑关系（in / out），不做任意坐标。 */
+  /* euler 两圈关系（A22-3 概念四关系 全同 / 包含 / 交叉 / 全异，设计 docs/gaijin/luoji-gaijin-sheji.md P1-3）：
+   * {pair:{rel:'eq'|'in'|'cross'|'out', a:'白马', b:'马', c:'三年级'（只 out 可选，第三个并排圈）, mid:'戴眼镜的男生'（只 cross）},
+   *  beats:[{draw:'b'|'c', line, say},            // 画出 B（或 C）圈
+   *         {draw:'a', line, ask, say},           // ask 时 A 的名字先悬在上方打「？」，揭晓时 A 圈画在关系位置
+   *         {mid:1, line, ok, say},               // 交叉：重叠区闪橙并写 mid
+   *         {line, ok:1|0, say},                  // 写一行，ok=1 打 ✓、ok=0 打 ✗（不写 ok 不打）
+   *         {line, aside, say}]}                  // 旁注：红字 + 波浪线，不动圈（同三圈模式）
+   * 左栏逐行写，右边画圈；只按 rel 排四种拓扑，不做任意坐标。 */
+  function eulerPair(c, q, d) {
+    var pr = d.pair, rel = pr.rel, CX = 850, CY = 300, row = 0, POS;
+    if (rel === 'eq') POS = { b: { x: CX, y: CY, w: 470, h: 330, ly: CY - 110 }, a: { x: CX, y: CY, w: 440, h: 300, ly: CY + 40 } };
+    else if (rel === 'in') POS = { b: { x: CX, y: CY, w: 580, h: 430, ly: CY - 160 }, a: { x: CX, y: CY + 40, w: 260, h: 170, ly: CY + 50 } };
+    else if (rel === 'cross') POS = { a: { x: 735, y: CY, w: 400, h: 310, ly: CY + 10, lx: 640 }, b: { x: 965, y: CY, w: 400, h: 310, ly: CY + 10, lx: 1060 } };
+    else if (pr.c) POS = { a: { x: 660, y: CY, w: 175, h: 150, ly: CY + 10 }, b: { x: 850, y: CY, w: 175, h: 150, ly: CY + 10 }, c: { x: 1040, y: CY, w: 175, h: 150, ly: CY + 10 } };
+    else POS = { a: { x: 710, y: CY, w: 250, h: 200, ly: CY + 10 }, b: { x: 1000, y: CY, w: 250, h: 200, ly: CY + 10 } };
+    var COL = { a: ACC, b: INK, c: BLUE };
+    function circle(k, t) {
+      var p = POS[k], s = pr[k] || '', col = COL[k];
+      return c.G(function () {
+        c.R('ellipse', [p.x, p.y, p.w, p.h], { stroke: col, strokeWidth: 3, strokeLineDash: rel === 'eq' && k === 'a' ? [12, 8] : undefined }, t, .7);
+        c.T(p.lx || p.x, p.ly, s, { size: textW(s, 30) > p.w - 30 ? 24 : 30, color: col }, t + .4, .5);
+      });
+    }
+    function line(s, t, col) { var y = 150 + row * 72; row++; return c.T(60, y, s, { size: textW(s, 30) > 460 ? 24 : 30, anchor: 'start', color: col || INK }, t, Math.min(1.4, Math.max(.5, len(s) * .1))); }
+    (d.beats || []).forEach(function (b) {
+      q.beat(b.say || b.line, function (t) {
+        var g = b.line ? line(b.line, t, b.aside ? BAD : INK) : null, tt = t + (b.line ? .9 : 0), dd = 1.2;
+        if (b.aside) {
+          if (g) c.R('linearPath', [[[g.x0, g.y + 12], [g.x0 + (g.x1 - g.x0) / 3, g.y + 20], [g.x0 + 2 * (g.x1 - g.x0) / 3, g.y + 12], [g.x1, g.y + 20]]], { stroke: BAD, strokeWidth: 3 }, tt, .5);
+          if (b.aside !== true) line(b.aside, tt + .4, BAD);
+          dd += 1.2;
+        }
+        if (b.draw && POS[b.draw]) {
+          if (b.ask) {   /* 想一想：名字先悬在上方打问号，揭晓时淡出、圈画到位 */
+            var hv = c.G(function () { c.T(CX, 56, (pr[b.draw] || '') + '　放哪儿？', { size: 30, color: COL[b.draw] }, t - THINK, .6); });
+            c.key(hv, 'opacity', tt, 0, { d: .4, from: 1 });
+          }
+          circle(b.draw, tt); dd += 1.2;
+        }
+        if (b.mid && rel === 'cross') {
+          var mx = (POS.a.x + POS.b.x) / 2;
+          c.ring(mx, CY, 150, 220, tt);
+          if (pr.mid) {
+            c.T(mx, CY + 160 + 30, pr.mid, { size: 26, color: ACC }, tt + .5, .6);
+            c.R('line', [mx, CY + 160, mx, CY + 112], { stroke: ACC, strokeWidth: 2.4 }, tt + .4, .3);
+          }
+          dd += 1.2;
+        }
+        if (g && b.ok === 1) c.check(g.x1 + 40, g.y - 12, tt + .3);
+        else if (g && b.ok === 0) c.cross(g.x1 + 40, g.y - 12, tt + .3);
+        return dd;
+      }, { ask: b.ask || false });
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 545, d.end, { size: 26, color: ACC }, t, 1.2); return 1.2; });
+  }
   TPL.euler = function (c, q, d) {
+    if (d.pair) return eulerPair(c, q, d);
     var S = d.sets || [], ids = {}, CX = 850, CY = 300;
     S.forEach(function (o, i) { ids[o.id] = i; });
     var POS = [{ x: CX, y: CY, w: 580, h: 420 }, { x: 790, y: 330, w: 300, h: 220 }, { x: 785, y: 360, w: 120, h: 80 }];
