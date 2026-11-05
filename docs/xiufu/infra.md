@@ -24,7 +24,7 @@
 ## 问题 / 待拍板
 
 1. **yuwen/grammar|logic|reading|writing.json 是旧版**，内容远少于 yuwen/data.js（data.js 被直接编辑过）。原 build_filemode.py 会用它们覆盖 data.js 导致内容回退——已改为默认跳过（`--rebuild-yuwen` 才重建）。需负责人决定：删这 4 个 json（以 data.js 为源），还是把 data.js 反写回 json。
-2. **sync-to-source.yml**：在 abcliu110-jpg/hanzi-app 上任何推送都会 `git push --force` 覆盖 abcliu110/hanzi-app 同名分支。现在大家直接推 abcliu110，若有人再往 -jpg 推，会抹掉这边的提交。建议负责人确认 -jpg 是否已弃用，弃用就删该 workflow 或去掉 --force。本次未改。
+2. **sync-to-source.yml**：在 abcliu110-jpg/hanzi-app 上任何推送都会 `git push --force` 覆盖 abcliu110/hanzi-app 同名分支。现在大家直接推 abcliu110，若有人再往 -jpg 推，会抹掉这边的提交。建议负责人确认 -jpg 是否已弃用，弃用就删该 workflow 或去掉 --force。本次未改。**（2026-11-05 更新：已随 d35afd64 删除，-jpg 镜像已弃用，不恢复。）**
 3. 发布方式：是否要加自动发布 gh-pages 的 workflow（DEPLOY.md 原就待确认）。
 4. docs/wenxue 文学常识功能落点（建议字卡文学区块）待确认。
 5. ~~guwen.html 仍一次加载 15 个古文题库~~ 2026-11-05 改为进入子模块时按需加载（`loadBank(mid)`，见 docs/TODO_STATUS.md A12）。

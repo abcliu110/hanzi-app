@@ -3,6 +3,7 @@
 ## 现状核查（2026-11-04，实测）
 
 - **目前没有已上线的公开链接**，切勿把下文推导地址当作已发布链接对外张贴。
+- 更新（2026-11-05）：`sync-to-source.yml` 已在 d35afd64 删除（-jpg 镜像已弃用，不恢复）；新增 `.github/workflows/gh-pages.yml`，master 推送后自动发布到 `gh-pages` 分支（见方案 A 步骤 4）。
 - 无 `gh-pages` 分支（远端仅 `master`）；仓库根与 `newhanzi/` 下均无 `CNAME`；
   无 Pages 部署 workflow：`.github/workflows/ci.yml` 仅做数据校验与 npm，
   `sync-to-source.yml` 仅把推送镜像到 `abcliu110/hanzi-app`，都不是部署。
