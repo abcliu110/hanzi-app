@@ -106,4 +106,5 @@ window.NHZ_WB_INDEX = {
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
   /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */
   "古文:倒装句": "gw_daozhuang",
+  "古文:判断句": "gw_panduan",
 };
