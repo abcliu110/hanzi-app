@@ -51,7 +51,7 @@
 | A22-8 | 逻辑 P1-5 | 每日一句：首页「逻辑一分钟」三选一 → 解析 → 进错题本 | 复用 today-task.js/checkin.js；句子须有出处，内容持续供给需负责人定来源 | 待做（机制可先做） |
 | A22-9 | 古文 P1-C | 产出题型 断句 cut / 排序 order / 填今译 fill | 依赖 guwen.js 逐句 `停`/`对` 标注（F2）+ engine.js（F6）；原因被另一代理领取卡住 → **用户 2026-11-05 授权直接做**（可改对方文件，先 pull --rebase、改动小而集中、不覆盖对方内容） | 待做（用户 2026-11-05 授权直接做） **下一项**；数据前提 `停`/`对` ✅ 8971c8f0（GW 线，小学课内 13 篇，字段格式见 tools/content/fix_gw_ju_tingdui.py 头注；引擎归 MAIN） |
 | A22-10 | 古文 P1-D | 诵读跟读（按 `停` 分节朗读、跟我读留 3 秒，不打分） | 依赖 `停` 标注；可先按标点分节做过渡版 | ✅ c92d48ae（篇目页「🔊 诵读」「🗣️ 跟我读」；13 篇按 `停`，其余按标点过渡版） |
-| A22-11 | 古诗 P1-2 | 意象卡牌：19 意象可翻卡，读过含该字的诗点亮；意象地图三层展开 | imagery 现有 SVG + shiju 倒排；shiju.js 属 F3（只读） | 待做 |
+| A22-11 | 古诗 P1-2 | 意象卡牌：19 意象可翻卡，读过含该字的诗点亮；意象地图三层展开 | imagery 现有 SVG + shiju 倒排；shiju.js 属 F3（只读） | ✅ bb1de579 |
 | A22-12 | 古诗 P1-3 | 画中有诗：scroll 终帧四选一诗句 | 依赖 scroll 首批多于 1 首 + engine.js 新模式（F6）；原因被另一代理领取卡住 → **用户 2026-11-05 授权直接做**（可改对方文件，先 pull --rebase、改动小而集中、不覆盖对方内容） | 待做（用户 2026-11-05 授权直接做） |
 | A22-13 | 古诗 P1-1 | 诗人足迹地图：wb `route` 模板 + 简化中国 SVG，10 位诗人 trail | trail 数据须按年谱核对，放独立文件；L 级 | 待做 |
 | A22-14 | 古诗 P1-5 / P1-6 | 小游戏回流深链 + 飞花令双字令/指定位置令 | games/shici/**、飞花令数据属古诗线（F3）；原因被另一代理领取卡住 → **用户 2026-11-05 授权直接做**（可改对方文件，先 pull --rebase、改动小而集中、不覆盖对方内容） | 待做（用户 2026-11-05 授权直接做） |
@@ -218,3 +218,4 @@
 | F5 字卡下半 | data/zika/ 按 NHZ_INDEX 第 1751–3500 字 | fix-zika-b.md |
 | F6 部首+界面+识字题 | newhanzi/bushou/**、bushou.js、quiz/data_bushou.js、quiz/data_zika.js、quiz/engine.js（仅选项洗牌）、index/share/shici 页的数字文案 | fix-bushou-ui.md |
 - 测试修复 · pinyin.spec 厂 hǎn · newhanzi/tools/pinyin_fix.json rare 厂 由 [ān] 改为 [hǎn, ān]（与 5aa86d4d 同步，汉典确认），pinyin.spec 2 passed
+- A22-11 · bb1de579 · shici.html 意象地图圆环改为 19 张可翻卡（平板 4 列/桌面 5 列）：正面意象字（月柳雁取「图示」左半线稿、去文字），翻面看 mean+desc，「看诗句」展开 3 句原句（作者《题》可点开那首诗），「完整讲解」进原详情；例句只取 imagery.line（核到原文才用）→ imagery.poems → shiju 倒排含该字的句，排除燕山/燕然/雪白/四海这类非意象用法；openPoem 记 localStorage nhz_shici_read，读过含该字或该意象自带的诗即点亮；smoke 加用例、anim3 改入口，shici/意象相关 58 例过，1280/820 截图 0 报错。内容疑点：imagery「柳」挂《咏柳》、「竹」挂《竹里馆》，两诗原文不含该字（意象成立，倒排点亮按该意象自带诗也算）；「柳」图示 SVG 文字引「碧玉妆成一树高」但 line 字段是「客舍青青柳色新」，未改（shici.js 属 F3）
