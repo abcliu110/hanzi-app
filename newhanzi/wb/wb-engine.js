@@ -19,6 +19,7 @@
  *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）；pair 两圈四关系 全同 / 包含 / 交叉 / 全异（A22-3）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
+ *   huo    古文词类活用「换帽子」：词性帽 → 岗位（成分线）→ 新帽 + 释义 → 展开 → 今译
  *   tree   逻辑论证地图（论点 / 论据 / 补强卡挂树 + 虚拟论敌气泡，A22-7）
  *   （vs 的一栏加 gavel:1 时在栏右上角敲一下法槌，用于逻辑「四大规律法庭」判决，A22-4）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
@@ -952,6 +953,58 @@
       return 2.4;
     });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
+  /* huo 词类活用「换帽子」（古文 词类活用原型，docs/anim/jiaojie/guwen-donghua.md §原型）：
+   * 词性帽（蒙氏符号）说「它本来是什么词」，成分线说「它在句中站什么岗」。活用 = 帽子没变的词站到了别的岗上，
+   * 于是帽子换成新岗位要的词性，意思跟着变；最后展开成今天的说法再读今译。
+   * {k:'huo', lv, h, sub, s:['必先','苦','其心志'], w:1, obj:2,            // w 活用词下标；obj 宾语（或状语所修饰的动词）下标，可为数组
+   *  from:'adj', to:'verb', fromTag:'形容词', read, fromSay,                  // fromSay：说本来的词性（与读句同拍之后）
+   *  ask1, objSay, objRole:'bin', objNote:'他的内心',                         // 第一问：看位置 / 看宾语
+   *  ask2, swapSay, role:'wei', toTag:'谓语 · 使动', gloss:'使……痛苦',         // 第二问：换岗位 → 换帽子
+   *  re:['使','其心志','苦'], hubAt:0, reSay, jin:'使他的内心痛苦', jinSay, end}
+   * 版面：句子 y=250（字号 50，词间距 84），帽子与岗位标签在句上方，释义在句下方；展开行 y=436，今译 y=518。 */
+  TPL.huo = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var size = d.size || 50, y = d.y || 250, y2 = y + 186, toks, hat, lab, obj = [].concat(d.obj === undefined ? [] : d.obj);
+    function span(ix) { var a = toks[ix[0]], b = toks[ix[ix.length - 1]]; return [a.x0, b.x1]; }
+    q.beat(d.read || d.s.join(''), function (t) { toks = c.sentence(y, d.s, t, { size: size, gap: d.gap || 84 }); return d.s.length * .3 + .4; });
+    q.beat(d.fromSay || null, function (t) {
+      var b = toks[d.w];
+      hat = c.sym(d.from, b.cx, y - 64, 14, t);
+      if (d.fromTag) lab = c.T(b.cx, y - 104, d.fromTag, { size: 24, color: C(d.from, INK) }, t + .3, .5);
+      return .9;
+    });
+    if (obj.length) q.beat(d.objSay, function (t) {
+      var sp = span(obj), cx = (sp[0] + sp[1]) / 2;
+      c.role(d.objRole || 'bin', sp[0], sp[1], y, t, { size: size });
+      if (d.objTag !== false) c.tag(cx, y - 80, d.objTag || '{t:bin|term}', t + .3);
+      if (d.objNote) c.T(cx, y + 70, d.objNote, { size: 26, color: GRAY }, t + .6, .5);
+      return 1.2;
+    }, { ask: d.ask1 || false });
+    q.beat(d.swapSay, function (t) {
+      var b = toks[d.w];
+      if (hat) { c.move(hat, { t: t, x: -84, y: 0, d: .6 }); c.key(hat, 'opacity', t, .3, { d: .6 }); }   /* 旧帽挪到左边变淡，箭头指向新帽 */
+      if (lab) c.key(lab, 'opacity', t, 0, { d: .5 });
+      c.arrow(b.cx - 64, y - 76, b.cx - 24, y - 76, 0, t + .4, GRAY);
+      c.sym(d.to, b.cx, y - 64, 14, t + .6);
+      c.recolor(b.g, t + .6, C(d.to, INK));
+      if (d.role) c.role(d.role, b.x0, b.x1, y, t + 1, { size: size });
+      if (d.toTag) c.T(b.cx, y - 104, d.toTag, { size: 24, color: C(d.to, INK) }, t + 1.2, .5);
+      if (d.gloss) c.T(b.cx, y + 70, d.gloss, { size: 28, color: ACC, bold: 1 }, t + 1.6, .6);
+      return 2.3;
+    }, { ask: d.ask2 || false });
+    if (d.re) q.beat(d.reSay || null, function (t) {
+      c.arrow(W / 2, y + 92, W / 2, y2 - 58, 0, t, GRAY);
+      var r = c.sentence(y2, d.re, t + .6, { size: 42, gap: 26 });
+      if (d.hubAt !== undefined && r[d.hubAt]) c.hub(r[d.hubAt].cx, y2 - 14, r[d.hubAt].w + 34, 66, t + .6 + d.re.length * .3 + .2);
+      return .6 + d.re.length * .3 + 1;
+    });
+    if (d.jin) q.beat(d.jinSay || d.jin, function (t) {
+      var g = c.T(W / 2, y2 + 82, d.jin, { size: 34 }, t, 1.2);
+      c.check(g.x1 + 46, y2 + 70, t + 1.3); return 1.9;
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 540, d.end, { size: 28, color: ACC }, t, 1.4); return 1.4; });
   };
 
   /* ---------- valence 动词伸手（设计 §5.4；Q13 新模板） ----------

@@ -455,6 +455,20 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen huoyong prototype whiteboard + diagram (形容词使动用法)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="yufa"]').first().click();
+    await page.locator('[data-ysub="m:huoyong"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '形容词使动用法' }).first().click();
+    await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:词类活用:形容词使动用法');
+    await expect(page.locator('#gwmdetail .yw-diagram svg[aria-label*="苦其心志"]')).toHaveCount(1);
+    await page.locator('#gwmdetail [data-gwwb-start]').click();
+    await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
+    expect(errors).toEqual([]);
+  });
+
   test('logic domino page (A22-2)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));

@@ -253,4 +253,5 @@ window.NHZ_WB_INDEX = {
   "顿号与分号": "bd_dunfen",
   "破折号": "bd_pozhe",
   "省略号": "bd_shenglue",
+  "古文:词类活用:形容词使动用法": "gw_hy_xing_shidong",
 };
