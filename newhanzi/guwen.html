@@ -85,6 +85,8 @@ if (window.self !== window.top) {
 <script src="data/guwen_links.js"></script>
 <script src="wb/index.js"></script>
 <script src="guwen/songdu.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
 <script>
 (function(){
   'use strict';
@@ -215,6 +217,31 @@ window.NHZReview = window.NHZReview || (function () {
   var routeEl = document.getElementById('gwroute'); /* P2-B 进阶路线容器 */
   var routeBack = false; /* P2-B：从路线图进详情时，详情的“回篇目”只回上一层（回路线图） */
   var curMod = null, curFilter = '', curJr = false;
+  /* 学段筛选（Q10-guwen）：数据实测 level 只有两种——"小学"19卡、"初高中拓展"287卡，
+     没有单独的初中/高中拆分，故筛选项为 全部/小学/初高中（初中+高中合一档，不虚构拆分）。
+     知识点按 it.level 判；篇目无 level 字段，按有无 ce（小学课内册次）判：有 ce=小学14篇，无 ce=初高中45篇。
+     默认"全部"，不默认隐藏任何内容；筛选状态全局保持，切换子模块/篇目分类不重置。 */
+  var curLevel = '全部';
+  var curListCat = null; /* listEl 当前显示：null=篇目分类页，否则为篇目分类名/全部 */
+  function levelOf(it){ return (it && it.level) ? it.level : '初高中拓展'; }
+  function levelMatch(it){
+    if(curLevel === '全部') return true;
+    if(curLevel === '小学') return levelOf(it) === '小学';
+    return levelOf(it) === '初高中拓展'; /* 初高中档 */
+  }
+  function textLevel(t){ return t.ce ? '小学' : '初高中'; }
+  function textMatch(t){ return curLevel === '全部' || textLevel(t) === curLevel; }
+  function levelCounts(items, fn){
+    var c = {'全部': 0, '小学': 0, '初高中': 0};
+    (items || []).forEach(function(x){ c['全部']++; c[fn(x)]++; });
+    return c;
+  }
+  function levelFilterHtml(counts){
+    return '<div style="margin:8px 0"><span style="font-size:15px;font-weight:bold;margin-right:6px">学段：</span>' +
+      ['全部', '小学', '初高中'].map(function(lv){
+        return '<button class="gw-filterbtn' + (curLevel === lv ? ' on' : '') + '" data-level="' + lv + '">' + lv + '（' + counts[lv] + '）</button>';
+      }).join('') + '</div>';
+  }
   var lastTextList = '全部'; /* 篇目详情返回用：记住从哪个篇目列表进来（全部或分类） */
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function catById(id){
@@ -243,21 +270,29 @@ window.NHZReview = window.NHZReview || (function () {
   }
   /* ---------- 篇目流（原有分类→列表→明细，原样不动） ---------- */
   function showSections(){
+    curListCat = null;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→分类排）</button>'; /* P2-B */
+    h += levelFilterHtml(levelCounts(D.texts, textLevel));
     h += '<div class="gw-grid">' + SECTIONS.map(function(s){
-      var n = D.texts.filter(function(t){ return t.cat === s.id; }).length;
+      var n = D.texts.filter(function(t){ return t.cat === s.id && textMatch(t); }).length;
       return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+n+' 篇 · '+esc(s.d)+'</p></div>';
     }).join('') + '</div>';
-    h += '<button class="gw-backbtn" data-go="全部">📜 全部篇目（共'+D.texts.length+'篇）</button>';
+    h += '<button class="gw-backbtn" data-go="全部">📜 全部篇目（共'+D.texts.filter(textMatch).length+'篇）</button>';
     listEl.innerHTML = h;
   }
   function showList(cat){
     lastTextList = cat;
+    curListCat = cat;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
-    var items = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
+    var base = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
+    var items = base.filter(textMatch);
     var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
+    h += levelFilterHtml(levelCounts(base, textLevel));
+    if(!items.length){
+      h += '<p class="gw-p">本分类下没有「'+esc(curLevel)+'」篇目，切换学段或回分类看看。</p>';
+    }
     h += items.map(function(t){
       var idx = D.texts.indexOf(t);
       return '<div class="gw-item" data-idx="'+idx+'"><div class="gw-ititle">'+esc(t.title)+'</div><div class="gw-imeta">'+esc(t.author)+' · '+esc(t.source)+' · '+esc(t.cat)+'</div></div>';
@@ -561,6 +596,12 @@ window.NHZReview = window.NHZReview || (function () {
         }).join('') + '</div>';
       }
     }
+    /* Q15 四型模板：对照表（结构化字段）+ 图式（分类 → 中心 + 成员阵列） */
+    var PT = window.NHZPatterns || null;
+    if (PT) {
+      if (it['对照表']) body += PT.renderCompare(it['对照表']);
+      if (PT.schemaFromItem(it)) body += PT.renderSchema(PT.schemaFromItem(it));
+    }
     /* 分类：每类独立块 */
     if(it['分类'] && it['分类'].length){
       var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
@@ -588,6 +629,14 @@ window.NHZReview = window.NHZReview || (function () {
             return '<p class="yw-exp">' + (si+1) + '. ' + esc(s) + '</p>';
           }).join('');
       }
+    }
+    /* Q15 四型模板：决策树（字段优先；程序型无字段时用「怎么认」排成判断流程）+ 时间轴（故事型：讲解里的 → 链） */
+    if (PT) {
+      if (it['决策树']) body += PT.renderDecision(it['决策树']);
+      else if (tp === '程序' && it['怎么认'] && it['怎么认'].length) {
+        body += PT.renderDecisionNodes(PT.decisionFromSteps(it['怎么认']), '判断流程（按「怎么认」）');
+      }
+      if (tp === '故事' && PT.timelineFromItem(it)) body += PT.renderTimeline(PT.timelineFromItem(it));
     }
     if(it['类比']) body += stepHead(T.analogy) + '<div class="yw-analogy">' + it['类比'] + '</div>';
     if(it['图示']) body += stepHead('看图说话') + '<div class="yw-diagram">' + it['图示'] + '</div>';
@@ -680,6 +729,7 @@ window.NHZReview = window.NHZReview || (function () {
       (it['口诀'] ? '<span class="yw-kj">'+esc(it['口诀'])+'</span>' : '') +
       (it['subtitle'] ? '<span class="yw-sub">'+esc(it['subtitle'])+'</span>' : '') +
       '<span class="yw-badges">' +
+      (levelOf(it) === '小学' ? '<span class="yw-badge">🎒小学</span>' : '') +
       (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
       (bank ? '<span class="yw-badge">📝'+bank.total+'道</span>' :
         (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
@@ -694,6 +744,7 @@ window.NHZReview = window.NHZReview || (function () {
     var meta = modMeta(curMod);
     var q = curFilter.trim();
     var list = (cat.items || []).filter(function(it){
+      if(!levelMatch(it)) return false;
       if(curMod==='shici' && curJr && !it.jr) return false;
       if(!q) return true;
       return (it.name || '').indexOf(q) >= 0 ||
@@ -702,7 +753,7 @@ window.NHZReview = window.NHZReview || (function () {
         (it['辨析'] || '').indexOf(q) >= 0 ||
         (it['口诀'] || '').indexOf(q) >= 0;
     });
-    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的知识点，换个词试试。</p>'; return; }
+    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的知识点' + (curLevel !== '全部' ? '（学段：' + esc(curLevel) + '）' : '') + '，换个词或学段试试。</p>'; return; }
     box.innerHTML = '<div class="yw-grid">' + list.map(function(it){
       var idx = (cat.items || []).indexOf(it);
       return itemHtml(it, curMod+'_'+idx, meta.icon, curMod);
@@ -720,7 +771,8 @@ window.NHZReview = window.NHZReview || (function () {
     h += '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu';}).map(function(m){
       return '<button class="gw-chip'+(m.id===id?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
     }).join('') + '</div>';
-    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点</span></div>';
+    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
+    h += levelFilterHtml(levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
     if(cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
     if(id==='shici'){
@@ -779,6 +831,16 @@ window.NHZReview = window.NHZReview || (function () {
       if(mid==='pianmu') showSections(); else showMList(mid);
       return;
     }
+    /* 学段筛选：切换后按当前所在视图重渲染（知识点列表 keepFilter 保留搜索/初中优先；篇目列表按分类重渲染） */
+    var lvb = e.target.closest('[data-level]');
+    if(lvb){
+      curLevel = lvb.getAttribute('data-level');
+      if(mlistEl.style.display !== 'none' && curMod) showMList(curMod, true);
+      else if(listEl.style.display !== 'none'){
+        if(curListCat) showList(curListCat); else showSections();
+      }
+      return;
+    }
     var wbs = e.target.closest('[data-gwwb-start]');
     if(wbs){
       e.stopPropagation();
@@ -827,6 +889,10 @@ window.NHZReview = window.NHZReview || (function () {
     }
     var mi = e.target.closest('.gw-item');
     if(mi && mi.hasAttribute('data-idx')){ showDetail(parseInt(mi.getAttribute('data-idx'), 10)); return; }
+    /* 附带修（Q10 验证发现，P2-B 预留逻辑本就要求但缺处理）：路线图篇目用 data-route-idx，
+       原先点之无响应，routeBack 死代码；补上后进详情，详情"回篇目"按 routeBack 只回路线图 */
+    var ri = e.target.closest('[data-route-idx]');
+    if(ri){ routeBack = true; showDetail(parseInt(ri.getAttribute('data-route-idx'), 10)); return; }
     /* 题库按类过滤 */
     var fb = e.target.closest('[data-bank-filter]');
     if(fb){
