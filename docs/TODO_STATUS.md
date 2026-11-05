@@ -25,7 +25,7 @@
 | A12 | P3 | xiufu/infra.md 第 5 条 | guwen.html 一次加载 15 个古文题库（~1.5MB），改按需加载（同语法页做法） | 待做 |
 | A13 | P3 | xiufu/content.md | 拓展 84 首与通行本逐字核对（如蜀道难「噫吁戏/噫吁嚱」、离思「𥮾」） | 待做（量大，排后） |
 | A14 | P3 | xiufu/content.md | guwen.js 缺 9 篇小学课内文言（原文已在 tools/content/xiaoxue_wenyan.json，需写导读/译意，逐句有出处） | 待做（量大，排后） |
-| A15 | P2 | MASTER_PLAN 阶段一 | 渲染验证：yuwen.html 各节显示正常（Playwright 逐节打开无报错） | 待做 |
+| A15 | P2 | MASTER_PLAN 阶段一 | 渲染验证：yuwen.html 各节显示正常（Playwright 逐节打开无报错） | ✅ 见执行日志 |
 | A16 | P4 | gaijin/luoji P0-1 | 逻辑「套圈判官」euler 模板 + 三段论场景 | 待做（L） |
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | 待做（L） |
 | A18 | P4 | gaijin/luoji P0-3 | 谬误卡牌册（重组现有「常见谬误」内容） | 待做（M） |
@@ -79,7 +79,8 @@
 - A4 · cf8873cc · 病句 20 项补 L3+回练（R4 36→16）；lint 0、check_wb 全过、基线其余 590 幕一致
 - A5（草稿）· 1e37d706 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
 - A5（嵌入）· 15aaf326 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
-- A7 · 本提交 · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
+- A7 · dd228f2e · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
+- A15 · 本提交 · smoke 新增 yuwen.html 99 条逐条打开用例（正文非空、无报错），通过；MASTER_PLAN 渲染验证标完成
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 

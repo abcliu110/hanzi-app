@@ -205,3 +205,31 @@ test.describe('home links & no external deps', () => {
     });
   }
 });
+
+/* MASTER_PLAN 阶段一「渲染验证」：yuwen.html（语法）每一条都能打开详情、正文非空、无页面报错 */
+test.describe('yuwen every item renders', () => {
+  for (const m of ['grammar']) {
+    test(`yuwen ${m} items open`, async ({ page }) => {
+      test.setTimeout(120_000);
+      const errs = [];
+      page.on('pageerror', (e) => errs.push(String(e)));
+      await page.setViewportSize({ width: 1024, height: 768 });
+      await page.goto('newhanzi/yuwen.html');
+      await expect(page.locator('.yw-head').first()).toBeVisible({ timeout: 20000 });
+      const ids = await page.locator('.yw-head').evaluateAll((els) => els.map((e) => e.getAttribute('data-idx')));
+      expect(ids.length).toBeGreaterThan(90);
+      const empty = [];
+      for (const id of ids) {
+        const head = page.locator(`.yw-head[data-idx="${id}"]`).first();
+        const name = (await head.locator('.yw-name').innerText()).trim();
+        await head.click();
+        await expect(page.locator('#ywDetailBody')).toBeVisible();
+        const txt = (await page.locator('#ywDetailBody').innerText()).trim();
+        if (txt.length < 20) empty.push(name);
+        await page.locator('#ywBack').click();
+      }
+      expect(empty, '正文为空的条目').toEqual([]);
+      expect(errs, '页面报错').toEqual([]);
+    });
+  }
+});
