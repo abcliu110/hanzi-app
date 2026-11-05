@@ -432,6 +432,22 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen duoyi star whiteboard keyed by category (A22-5)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="duoyi"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '去' }).first().click();
+    await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:一词多义:去');
+    await page.locator('#gwmdetail [data-gwwb-start]').click();
+    await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="guyin"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '去' }).first().click();
+    await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:去');
+    expect(errors).toEqual([]);
+  });
+
   test('logic domino page (A22-2)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));

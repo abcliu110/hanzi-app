@@ -442,8 +442,10 @@ window.NHZReview = window.NHZReview || (function () {
       '清单': { analogy:'💡 啊哈现象', rule:'一览', ex:'例组', bad:'易错诊所' }
     }[tp] || { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' };
     /* 白板（gaijin/guwen P0-B 句式拆装，键「古文:知识点名」）：点了才加载引擎和场景 */
-    if((window.NHZ_WB_INDEX || {})['古文:' + it.name]){
-      body += '<div class="yw-step"><span class="yw-stepnum">🎬</span><span class="yw-steptitle">白板动画</span></div><div class="gw-wb" data-gwwb="'+esc('古文:' + it.name)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放白板动画</button></div>';
+    /* 先查「古文:分类名:名」（一词多义「去」与古今异义「去」同名，A22-5），再查「古文:名」 */
+    var wbI = window.NHZ_WB_INDEX || {}, wbCat = catById(modId), wbK = wbCat && wbI['古文:' + wbCat.name + ':' + it.name] ? '古文:' + wbCat.name + ':' + it.name : '古文:' + it.name;
+    if(wbI[wbK]){
+      body += '<div class="yw-step"><span class="yw-stepnum">🎬</span><span class="yw-steptitle">白板动画</span></div><div class="gw-wb" data-gwwb="'+esc(wbK)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放白板动画</button></div>';
     }
     /* 规则一句话 */
     if(it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)){
