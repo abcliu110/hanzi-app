@@ -6,6 +6,10 @@
   { bushou, benzi, bianti, shuowen, shuowen_url, meaning, semantic,
     examples: [{z, w}], chars: [...], count, has_meaning }
 按 count 降序；有含义的 106 条在前，其余纯字表附后。
+
+注意（2026-11-05 审查 F6）：ziku/pinyin.csv 的 radical 列用「X、Y」表示一字两部，另有「?」「一字头」和空值；
+index.js 的 bu 必须先清理成单个主部首（tools/content/fix_bushou_ui_radicals.py，同时写 bu2「也可查」），
+本脚本遇到组合/异常 label 只取第一段，绝不再生成「X、Y」「?」条目。重跑本脚本后要再跑一次该修复脚本。
 """
 import json, os, re
 
@@ -63,7 +67,11 @@ def main():
     char_info = {}  # z -> (tl, st) for sorting
     char_set = set()
     for e in idx:
-        our.setdefault(e['bu'], []).append(e['z'])
+        lab = (e['bu'] or '').split('、')[0]
+        if not lab or lab in ('?', '一字头') or len(lab) != 1:
+            print('跳过异常部首 label：', e['z'], e['bu'])
+            continue
+        our.setdefault(lab, []).append(e['z'])
         char_info[e['z']] = (e['tl'], e['st'])
         char_set.add(e['z'])
 
