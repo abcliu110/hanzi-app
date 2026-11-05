@@ -178,6 +178,10 @@
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   var logicAnimData = {};
+  /* 逻辑 P2-5 难度分层：lv 1=小学（直观例子/圈套圈），2=初中（大前提/小前提/中项），
+     3=高中（周延/肯定后件/形式化规则）；缺省 1。定级只看专题已有文本是否出现这些术语。 */
+  var LOGIC_LV_LABEL = {1:'L1 · 小学', 2:'L2 · 初中', 3:'L3 · 高中'};
+  function logicLv(it){ var v = parseInt(it.lv, 10); return (v===2||v===3) ? v : 1; }
   /* 逻辑 P2-4 讨论卡：完成状态只记 localStorage，不判分 */
   function logicTalkDone(){
     try { return JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}'); } catch(e){ return {}; }
@@ -193,14 +197,22 @@
       '<button type="button" class="back" data-talk-done="1"'+(done?' disabled':'')+'>'+
       (done?'✓ 已完成，和家人聊过了':'✓ 聊完了，记完成')+'</button></div>';
   }
+  /* 逻辑 P2-5 列表 lv 筛选：全部 / L1小学 / L2初中 / L3高中（L2 目前暂无专题，点后显示空提示） */
+  var logicLvFilter = '全部';
   function renderLogicList(){
     var D = (window.NHZ_YUWEN||{}).logic;
     var el = document.getElementById('logiclist');
     if(!D || !el) return;
-    var h = '';
+    var counts = {'全部':0, '1':0, '2':0, '3':0};
+    D.categories.forEach(function(c){ c.items.forEach(function(it){ counts['全部']++; counts[String(logicLv(it))]++; }); });
+    var chips = ['全部','1','2','3'].map(function(k){
+      var label = k==='全部' ? '全部' : LOGIC_LV_LABEL[k];
+      return '<button type="button" class="back" data-logic-lv="'+k+'" style="'+(logicLvFilter===k?'':'opacity:.6')+'">'+esc(label)+'（'+counts[k]+'）</button>';
+    }).join(' ');
+    var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">'+chips+'</div>';
     var shown = 0;
     D.categories.forEach(function(c,ci){
-      var items = c.items;
+      var items = c.items.filter(function(it){ return logicLvFilter==='全部' || String(logicLv(it))===logicLvFilter; });
       if(!items.length) return;
       shown += items.length;
       h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+items.length+'条</span></div>'+
@@ -285,6 +297,7 @@
     /* 逻辑 P2-4 讨论卡：专题末尾，不判分 */
     if(it['讨论卡']) b += logicTalkHtml(it);
     return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+
+      '<span class="yw-lv" style="margin-left:8px;font-size:13px;color:#3d5a40;border:1px solid #3d5a40;border-radius:8px;padding:1px 7px;">'+esc(LOGIC_LV_LABEL[logicLv(it)])+'</span>'+
       (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
   }
@@ -420,6 +433,14 @@
         localStorage.setItem('nhz_logic_talk_done', JSON.stringify(done));
       } catch(err){}
       tk.disabled = true; tk.textContent = '✓ 已完成，和家人聊过了';
+      return;
+    }
+    /* 逻辑 P2-5 lv 筛选 chip：点后只显示该档专题 */
+    var lvb = e.target.closest('[data-logic-lv]');
+    if(lvb){
+      e.stopPropagation();
+      logicLvFilter = lvb.getAttribute('data-logic-lv');
+      renderLogicList();
       return;
     }
     var h = e.target.closest('.yw-head');

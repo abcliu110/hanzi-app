@@ -146,6 +146,10 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  /* 逻辑 P2-5 难度分层（仅逻辑区）：lv 1=小学，2=初中，3=高中；缺省 1 */
+  var LOGIC_LV_LABEL = { 1: 'L1 · 小学', 2: 'L2 · 初中', 3: 'L3 · 高中' };
+  var logicLvFilter = '全部';
+  function logicLv(it) { var v = parseInt(it.lv, 10); return (v === 2 || v === 3) ? v : 1; }
   /* 逻辑 P2-4 讨论卡（仅逻辑区）：完成只记 localStorage，不判分 */
   function logicTalkDone() {
     try { return JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}'); } catch (e) { return {}; }
@@ -427,6 +431,7 @@
     currentItems[idx] = {it: it, body: body, icon: icon};
     return '<div class="yw-item">' +
       '<button class="yw-head" data-idx="' + idx + '"><span class="yw-ico">' + icon + '</span><span class="yw-name">' + esc(it.name || '') + '</span>' +
+      (active === 'logic' ? '<span class="yw-lv" style="margin-left:8px;font-size:13px;color:#3d5a40;border:1px solid #3d5a40;border-radius:8px;padding:1px 7px;">' + esc(LOGIC_LV_LABEL[logicLv(it)]) + '</span>' : '') +
       (it['口诀'] ? '<span class="yw-kj">' + esc(it['口诀']) + '</span>' : '') +
       (it['subtitle'] ? '<span class="yw-sub">' + esc(it['subtitle']) + '</span>' : '') +
       '<span class="yw-badges">' +
@@ -478,9 +483,27 @@
     var q = '';
 
     var html = '';
+    /* 逻辑 P2-5 列表 lv 筛选（仅逻辑区）：顶部三个 lv chip，点后只显示该档专题 */
+    if (active === 'logic') {
+      var lvCounts = { '全部': 0, '1': 0, '2': 0, '3': 0 };
+      d.categories.forEach(function (c) {
+        c.items.forEach(function (it) { lvCounts['全部']++; lvCounts[String(logicLv(it))]++; });
+      });
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">' +
+        ['全部', '1', '2', '3'].map(function (k) {
+          var label = k === '全部' ? '全部' : LOGIC_LV_LABEL[k];
+          return '<button type="button" class="back" data-yw-lv="' + k + '"' +
+            (logicLvFilter === k ? '' : ' style="opacity:.6"') + '>' +
+            esc(label) + '（' + lvCounts[k] + '）</button>';
+        }).join('') + '</div>';
+    }
     var visCats = []; /* 顶部模块索引 chips：只收录过滤后仍可见的分类 */
     d.categories.forEach(function (c, ci) {
       var items = c.items;
+      if (active === 'logic' && logicLvFilter !== '全部') {
+        items = items.filter(function (it) { return String(logicLv(it)) === logicLvFilter; });
+        if (!items.length) return;
+      }
       if (q) {
         items = items.filter(function (it) {
           return (it.name || '').indexOf(q) >= 0 ||
@@ -498,6 +521,7 @@
         items.map(function (it, ii) { return itemHtml(it, ci + '_' + ii, c.name); }).join('') +
         '</div>';
     });
+    if (active === 'logic' && !visCats.length) html += '<div class="noresult">该档暂无专题，换个档位试试</div>';
     listEl.innerHTML = html ||
       '<div class="noresult">没找到相关知识点，换个词试试</div>';
 
@@ -538,6 +562,15 @@
         localStorage.setItem('nhz_logic_talk_done', JSON.stringify(done));
       } catch (err) {}
       tk.disabled = true; tk.textContent = '✓ 已完成，和家人聊过了';
+      return;
+    }
+    /* 逻辑 P2-5 lv 筛选 chip（仅逻辑列表）：点后只显示该档专题 */
+    var lvb = e.target.closest('[data-yw-lv]');
+    if (lvb && active === 'logic') {
+      e.stopPropagation();
+      logicLvFilter = lvb.getAttribute('data-yw-lv');
+      render();
+      window.scrollTo(0, 0);
       return;
     }
     var h = e.target.closest('.yw-head');
