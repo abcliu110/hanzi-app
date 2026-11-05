@@ -158,6 +158,93 @@ def xingrongci():
     return n
 
 
+# ---------------- 谓语：「是学生」不是名词谓语 ----------------
+WY = {
+    '动词谓语': [('小明', '读书'), ('弟弟', '踢球'), ('妈妈', '做饭'), ('姐姐', '唱歌'), ('爸爸', '游泳'), ('哥哥', '跑步'), ('妹妹', '画画'), ('爷爷', '写字')],
+    '形容词谓语': [('花园', '很美'), ('今天', '很热'), ('西瓜', '很甜'), ('河水', '很清'), ('教室', '很安静'), ('天气', '很冷'), ('他', '很高'), ('房间', '很干净')],
+    '名词谓语': [('今天', '星期一'), ('明天', '国庆节'), ('鲁迅', '浙江人'), ('这本书', '十块钱'), ('小明', '八岁'), ('现在', '九点'), ('今天', '晴天'), ('爷爷', '北京人')],
+}
+WY_WHAT = {'动词谓语': '做什么', '形容词谓语': '怎么样', '名词谓语': '是什么（日期、年龄、籍贯、价钱等）'}
+WY_ST = {
+    '名词谓语': (['名词谓语句由名词或数量词直接作谓语，中间不用「是」，如「今天星期一」「小明八岁」。',
+                '「他是学生」的谓语「是学生」不是名词谓语，「是」是判断动词，属于动词谓语。',
+                '名词谓语句多用来说日期、年龄、籍贯、价钱，如「这本书十块钱」。'],
+               ['「是学生」是名词谓语。', '名词谓语表示主语的动作。', '名词谓语前面一定要加「是」。', '「很高」是名词谓语。', '「踢球」是名词谓语。']),
+    '动词谓语': (['动词谓语说明主语做什么，如「弟弟踢球」。',
+                '「他是学生」的谓语「是学生」也是动词谓语，「是」是判断动词。',
+                '「妈妈做饭」的谓语是「做饭」，属于动词谓语。'],
+               ['动词谓语说明主语怎么样，如「花园很美」。', '「很美」是动词谓语。', '「今天星期一」的谓语是动词谓语。', '动词谓语前面一定要加「很」。']),
+    '形容词谓语': (['形容词谓语说明主语怎么样，如「花园很美」。',
+                 '形容词作谓语时前面常加「很」，不用「是」：说「花很红」，不说「花是红」。',
+                 '「西瓜很甜」的谓语「很甜」是形容词谓语。'],
+                ['形容词谓语说明主语做什么。', '「踢球」是形容词谓语。', '形容词作谓语要加「是」，如「花是红」。', '「今天星期一」的谓语是形容词谓语。']),
+}
+
+
+def weiyu():
+    """谓语库：原「名词谓语」全用「是学生/是老师」，而「是」是判断动词（黄廖：名词谓语句如「今天星期一」「鲁迅浙江人」）。
+    整库重写：三类都用整句，名词谓语换成日期/年龄/籍贯/价钱句；动词/形容词题不再拿「是X」当干扰项（它本身是动词谓语，会多解）；解析按选项顺序。"""
+    name, d, fn = load_bank('weiyu')
+    C = list(WY)
+    cnt = {}; out = []
+    for i, q in enumerate(d['questions']):
+        cls = q['类']; t = q['q']
+        typ = 'A' if t.startswith('下面哪个') else 'B' if ('句子中' in t or '这句话的谓语是' in t) else 'C' if t.startswith('选') else 'D'
+        k = cnt.get((cls, typ), 0); cnt[(cls, typ)] = k + 1
+        rng = random.Random('wy|%d' % i)
+        oth = [c for c in C if c != cls]
+        sj, pr = WY[cls][k % 8]
+        if typ == 'A':
+            pick = [(cls, sj + pr + '。')]
+            for j, c in enumerate(oth + [oth[k % 2]]):
+                a, b = WY[c][(k + 2 + 3 * j) % 8]
+                pick.append((c, a + b + '。'))
+            rng.shuffle(pick)
+            ans = sj + pr + '。'
+            exp = '「%s」的谓语「%s」说明%s，是%s。其他三句：' % (ans.rstrip('。'), pr, WY_WHAT[cls], cls)
+            exp += '；'.join('「%s」是%s' % (s_.rstrip('。'), c) for c, s_ in pick if s_ != ans) + '。'
+            if cls == '名词谓语': exp += '注意：名词谓语中间不用「是」，「他是学生」是动词谓语。'
+            nq = {'q': '下面哪个句子的谓语是%s？' % cls, 'options': [x[1] for x in pick], 'answer': [x[1] for x in pick].index(ans), '解析': exp}
+        elif typ == 'B':
+            d1 = WY[oth[0]][(k + 1) % 8][1]; d2 = WY[oth[1]][(k + 5) % 8][1]
+            opts = [sj, pr, d1, d2]; rng.shuffle(opts)
+            exp = '「%s」是主语，「%s」说明%s%s，是谓语，属于%s。「%s」「%s」不在这句话里。' % (sj, pr, sj, WY_WHAT[cls].split('（')[0], cls, d1, d2)
+            nq = {'q': '%s%s。 这句话的谓语是？' % (sj, pr), 'options': opts, 'answer': opts.index(pr), '解析': exp}
+        elif typ == 'C':
+            d1 = WY[oth[0]][(k + 3) % 8][1]; d2 = WY[oth[1]][(k + 6) % 8][1]; d3 = WY[oth[k % 2]][(k + 4) % 8][1]
+            if d3 in (d1, d2): d3 = WY[oth[k % 2]][(k + 7) % 8][1]
+            opts = [pr, d1, d2, d3]; rng.shuffle(opts)
+            lab = {pr: cls}; lab.update({x: oth[0] for x in [WY[oth[0]][j][1] for j in range(8)]}); lab.update({x: oth[1] for x in [WY[oth[1]][j][1] for j in range(8)]})
+            exp = '题目要%s，「%s」是%s：%s%s。' % (cls, pr, cls, sj, pr)
+            exp += '其他三个：' + '，'.join('「%s」是%s' % (o, lab[o]) for o in opts if o != pr) + '。'
+            nq = {'q': '选%s填入___处：%s___。' % (cls, sj), 'options': opts, 'answer': opts.index(pr), '解析': exp}
+        else:
+            tr, fl = WY_ST[cls]
+            true = tr[k % 3]; f = fl[:]; random.Random('wyD|%s|%d' % (cls, k)).shuffle(f)
+            opts = [true] + f[:3]; rng.shuffle(opts)
+            nq = {'q': '下面说法正确的是？', 'options': opts, 'answer': opts.index(true),
+                  '解析': true + ' 其他三项都不对：' + '；'.join(x.rstrip('。') for x in f[:3]) + '。'}
+        nq['类'] = cls; out.append(nq)
+    n = sum(1 for a, b in zip(d['questions'], out) if a != b)
+    d['questions'] = out; save_bank(fn, name, d)
+    dd, tail = load_data()
+    it = item(dd, '谓语', 'grammar')
+    it['例子'] = ['他〔来了〕' if x == '他〔来了〕' else '今天〔星期一〕' if x == '祖国〔是花园〕' else x for x in it['例子']]
+    for c in it['分类']:
+        if c['类'] == '名词谓语':
+            c.update({'说明': '名词或数量词直接作谓语，中间不用「是」，多说日期、年龄、籍贯、价钱。', '代表': '星期一、八岁、浙江人',
+                      '例子': ['今天星期一。', '鲁迅浙江人。']})
+    for e in it['例句解析']:
+        if e['句'] == '祖国是花园。':
+            e['析'] = '“是花园”是谓语，说明祖国是什么；谓语里的“是”是判断动词，所以这是动词谓语，不是名词谓语（名词谓语像“今天星期一”，不用“是”）。'
+    for p in it['练习']:
+        if p['q'] == '“祖国是花园”中，谓语是？':
+            p['解析'] = '“是花园”说明祖国是什么，是谓语；“是”是判断动词，这是动词谓语。'
+            p['类'] = '动词谓语'
+    save_data(dd, tail)
+    return n
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         print(a, globals()[a]())
