@@ -134,3 +134,14 @@ def find_point(B, key):
     for mid, pts in B.items():
         for k, o in pts:
             if k == key: return o
+
+def map_strings(o, fn):
+    """递归替换 o 里所有字符串（原地），返回新对象"""
+    if isinstance(o, str): return fn(o)
+    if isinstance(o, list):
+        for i, v in enumerate(o): o[i] = map_strings(v, fn)
+        return o
+    if isinstance(o, dict):
+        for k in list(o): o[k] = map_strings(o[k], fn)
+        return o
+    return o
