@@ -40,7 +40,6 @@
 .gw-filterbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .gw-chips{padding:10px 0;display:flex;flex-wrap:wrap;gap:8px}
 .gw-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
-.gw-subchips{padding-top:0;align-items:center}.gw-subtag{font-size:14px;color:var(--muted,#6b7566)}
 .gw-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
 .gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
 .gw-kc-sum{font-size:15px;color:var(--muted);padding:0 4px;margin:4px 0 8px}
@@ -185,12 +184,12 @@ window.NHZReview = window.NHZReview || (function () {
   var MODS = [
     {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
     {id:'xuci', icon:'🔤', t:'虚词', d:'21个点 · 用法、例句、辨析、题库', parent:'yufa'},
-    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先', parent:'yufa'},
-    {id:'yufa', icon:'🧩', t:'语法', d:'虚词、实词、句子成分、特殊句式、固定句式'},
+    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式、虚词、词类活用'},
     {id:'tongjia', icon:'🔁', t:'通假', d:'16个点 · 通假字读本字'},
     {id:'guyin', icon:'⚖️', t:'古今异义', d:'16个点 · 古今意思大不同'},
     {id:'duoyi', icon:'🌿', t:'一词多义', d:'12个点 · 一字多义看语境'},
-    {id:'huoyong', icon:'🔄', t:'词类活用', d:'按类型 · 换词性换意思'},
+    {id:'huoyong', icon:'🔄', t:'词类活用', d:'按类型 · 换词性换意思', parent:'yufa'},
     {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
     {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
     {id:'wenhua', icon:'🏺', t:'文化常识', d:'器物、度量衡、历法、节日、地理'},
@@ -217,7 +216,7 @@ window.NHZReview = window.NHZReview || (function () {
   var mdetEl = document.getElementById('gwmdetail');
   var routeEl = document.getElementById('gwroute'); /* P2-B 进阶路线容器 */
   var routeBack = false; /* P2-B：从路线图进详情时，详情的“回篇目”只回上一层（回路线图） */
-  var curMod = null, curFilter = '', curJr = false;
+  var curMod = null, curFilter = '', curJr = false, curGroup = null;
   /* 学段筛选（Q10-guwen）：数据实测 level 只有两种——"小学"19卡、"初高中拓展"287卡，
      没有单独的初中/高中拆分，故筛选项为 全部/小学/初高中（初中+高中合一档，不虚构拆分）。
      知识点按 it.level 判；篇目无 level 字段，按有无 ce（小学课内册次）判：有 ce=小学14篇，无 ce=初高中45篇。
@@ -262,7 +261,7 @@ window.NHZReview = window.NHZReview || (function () {
   /* ---------- 子模块列表（语法模块式 panel 网格） ---------- */
   function showNav(){
     hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
-    /* 虚词、实词属于语法（parent:'yufa'），首页不与语法并列，从语法页进入 */
+    /* 虚词、词类活用属于语法（parent:'yufa'），首页不与语法并列，从语法页的子面板进入 */
     var h = '<div class="yw-grid">' + MODS.filter(function(m){ return !m.parent; }).map(function(m){
       var n = m.id==='pianmu' ? D.texts.length : (catById(m.id) ? catById(m.id).items.length : 0);
       var unit = m.id==='pianmu' ? '篇' : '点';
@@ -494,7 +493,8 @@ window.NHZReview = window.NHZReview || (function () {
     return -1;
   }
   function openPoint(mid, i){
-    showMList(mid);
+    var yc = mid==='yufa' ? catById('yufa') : null;
+    showMList(mid, false, yc && yc.items[i] ? yufaGroupOf(yc.items[i]) : undefined);
     loadBank(mid, function(){
       if(curMod !== mid) return;
       var key = mid + '_' + i;
@@ -746,6 +746,7 @@ window.NHZReview = window.NHZReview || (function () {
     var meta = modMeta(curMod);
     var q = curFilter.trim();
     var list = (cat.items || []).filter(function(it){
+      if(curMod==='yufa' && curGroup && yufaGroupOf(it) !== curGroup) return false;
       if(!levelMatch(it)) return false;
       if(curMod==='shici' && curJr && !it.jr) return false;
       if(!q) return true;
@@ -761,28 +762,66 @@ window.NHZReview = window.NHZReview || (function () {
       return itemHtml(it, curMod+'_'+idx, meta.icon, curMod);
     }).join('') + '</div>';
   }
-  function showMList(id, keepFilter){
-    curMod = id;
-    if(!keepFilter){ curFilter = ''; curJr = false; }
-    var cat = catById(id);
-    var meta = modMeta(id);
+  /* 语法页 = 子面板：句子成分、特殊句式、固定句式（yufa 条目按 subtitle 分组）+ 虚词、词类活用（parent:'yufa' 的子模块）+ 总说 */
+  var YUFA_GROUPS = [
+    {g:'句子成分', icon:'🧱', d:'主谓宾定状补，古今不同处'},
+    {g:'特殊句式', icon:'🔀', d:'判断、被动、倒装、省略'},
+    {g:'固定句式', icon:'🧷', d:'者…也、为…所…、何…之等'},
+    {g:'总说', icon:'🧭', d:'读句三步：主干、虚词、活用'}
+  ];
+  function yufaGroupOf(it){ return String(it.subtitle || '').split(' · ')[0]; }
+  function yufaGroupItems(g){
+    var cat = catById('yufa'); if(!cat) return [];
+    return cat.items.filter(function(it){ return yufaGroupOf(it) === g; });
+  }
+  function topChips(activeId){
+    return '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu' && !m.parent;}).map(function(m){
+      return '<button class="gw-chip'+(m.id===activeId?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
+    }).join('') + '</div>';
+  }
+  function showYufaHub(){
+    curMod = 'yufa'; curGroup = null;
+    var cat = catById('yufa'), meta = modMeta('yufa');
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
-    if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
-    var topId = meta.parent || id;
-    h += '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu' && !m.parent;}).map(function(m){
-      return '<button class="gw-chip'+(m.id===topId?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
+    h += topChips('yufa');
+    if(cat && cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
+    var panels = YUFA_GROUPS.slice(0, 3).map(function(x){ return {key:'g:'+x.g, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d}; })
+      .concat(MODS.filter(function(m){ return m.parent==='yufa'; }).map(function(m){
+        var c = catById(m.id); return {key:'m:'+m.id, icon:m.icon, t:m.t, n:c ? c.items.length : 0, d:m.d.replace(/^\d+个点 · /, '')};
+      }))
+      .concat([YUFA_GROUPS[3]].map(function(x){ return {key:'g:'+x.g, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d}; }));
+    h += '<div class="yw-grid">' + panels.filter(function(p){ return p.n > 0; }).map(function(p){
+      return '<button class="yw-head" data-ysub="'+esc(p.key)+'"><span class="yw-ico">'+p.icon+'</span><span class="yw-name">'+esc(p.t)+'</span><span class="yw-sub">'+p.n+'点 · '+esc(p.d)+'</span><span class="yw-arrow">▾</span></button>';
     }).join('') + '</div>';
-    /* 语法下的分项：句子与句式（yufa 本身）、虚词、实词 */
-    if(topId==='yufa'){
-      h += '<div class="gw-chips gw-subchips"><span class="gw-subtag">语法分项：</span>' + [{id:'yufa', icon:'🧩', t:'句子与句式'}].concat(MODS.filter(function(m){return m.parent==='yufa';})).map(function(m){
-        return '<button class="gw-chip'+(m.id===id?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
-      }).join('') + '</div>';
+    mlistEl.innerHTML = h;
+    mlistEl.querySelectorAll('.gw-chip').forEach(function(el){
+      el.addEventListener('click', function(){
+        var mid = el.getAttribute('data-mid');
+        if(mid && mid!=='yufa') showMList(mid);
+      });
+    });
+  }
+  function showMList(id, keepFilter, group){
+    if(id==='yufa' && !group){ showYufaHub(); return; }
+    curMod = id; curGroup = id==='yufa' ? group : null;
+    if(!keepFilter){ curFilter = ''; curJr = false; }
+    var cat = catById(id);
+    var meta = modMeta(id);
+    if(curGroup){
+      var gm = YUFA_GROUPS.filter(function(x){ return x.g===curGroup; })[0] || {icon:'🧩', d:''};
+      meta = {id:'yufa', icon:gm.icon, t:curGroup, d:gm.d, parent:'yufa'};
     }
-    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
-    h += levelFilterHtml(levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
-    if(cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
+    var items = cat ? (curGroup ? yufaGroupItems(curGroup) : cat.items) : [];
+    hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
+    var h = meta.parent ? '<button class="gw-backbtn" data-mid="yufa">← 回语法</button>' : '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
+    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
+    h += topChips(meta.parent || id);
+    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
+    h += levelFilterHtml(levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
+    if(cat.intro && !curGroup) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
     if(id==='shici'){
       h += '<button class="gw-filterbtn'+(curJr ? ' on' : '')+'" id="gwJrBtn">只看初中优先</button>';
@@ -793,10 +832,10 @@ window.NHZReview = window.NHZReview || (function () {
     if(inp) inp.addEventListener('input', function(){ curFilter = inp.value; renderMItems(); });
     var jb = document.getElementById('gwJrBtn');
     if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
-    mlistEl.querySelectorAll('.gw-chip').forEach(function(el){
+    mlistEl.querySelectorAll('.gw-chip, .gw-backbtn[data-mid]').forEach(function(el){
       el.addEventListener('click', function(){
         var mid = el.getAttribute('data-mid');
-        if(mid && mid!==id) showMList(mid);
+        if(mid && (mid!==id || curGroup)) showMList(mid);
       });
     });
     if(bankLoaded[id] === true) renderMItems();
@@ -834,6 +873,12 @@ window.NHZReview = window.NHZReview || (function () {
     mlistEl.style.display='block'; window.scrollTo(0,0);
   }
   document.addEventListener('click', function(e){
+    var ys = e.target.closest('[data-ysub]');
+    if(ys){
+      var yk = ys.getAttribute('data-ysub');
+      if(yk.indexOf('g:')===0) showMList('yufa', false, yk.slice(2)); else showMList(yk.slice(2));
+      return;
+    }
     var card = e.target.closest('[data-mod]');
     if(card){
       var mid = card.getAttribute('data-mod');
@@ -844,7 +889,7 @@ window.NHZReview = window.NHZReview || (function () {
     var lvb = e.target.closest('[data-level]');
     if(lvb){
       curLevel = lvb.getAttribute('data-level');
-      if(mlistEl.style.display !== 'none' && curMod) showMList(curMod, true);
+      if(mlistEl.style.display !== 'none' && curMod && !(curMod==='yufa' && !curGroup)) showMList(curMod, true, curGroup || undefined);
       else if(listEl.style.display !== 'none'){
         if(curListCat) showList(curListCat); else showSections();
       }
