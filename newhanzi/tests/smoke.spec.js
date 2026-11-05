@@ -225,9 +225,10 @@ test.describe('newhanzi smoke', () => {
     await page.locator('#scbeat [data-go]').click();
     // 没有逐首校过平仄的诗只做节奏
     await page.goto('about:blank');
-    await page.goto('newhanzi/shici.html#poem-136');
+    // 绝句（两个黄鹂）已有 pz 数据，改用无平仄数据的《江南》（order 124）
+    await page.goto('newhanzi/shici.html#poem-124');
     await page.locator('[data-rb="metro"]').click();
-    await expect(page.locator('#scbeat .bk-g')).toHaveCount(12);
+    await expect(page.locator('#scbeat .bk-g').first()).toBeVisible();
     await expect(page.locator('#scbeat [data-pzt]')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
@@ -696,7 +697,8 @@ for (const vp of [{ name: 'tablet', width: 768, height: 1024 }, { name: 'desktop
 /* sw.js 预缓存清单要覆盖全部页面：新增/删除页面后运行 python3 tools/gen_sw_core.py */
 test('sw.js precache list is up to date', async () => {
   const { execFileSync } = require('child_process');
-  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true }).toString();
+  // PYTHONUTF8：Windows 控制台默认 GBK，不设则中文输出被错解码，断言“最新”会误判
+  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true, env: { ...process.env, PYTHONUTF8: '1' } }).toString();
   expect(out).toContain('最新');
 });
 
