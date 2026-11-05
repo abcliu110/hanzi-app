@@ -23,7 +23,7 @@ function shuffle(arr) {
 /* 选项洗牌（2026-11-05 内容审查 F6）：choice/blank/spot/rewrite 每次出题打乱选项，
    重映射答案下标 a 与「误解标注.选项」字母；选项里有「都对 / B和C」这类指位置的就不打乱。
    返回新对象，原题对象不变（错题本、统一错题本仍按原题存，id 不受洗牌影响）。 */
-var SHUF_MODES = { choice: 1, blank: 1, spot: 1, rewrite: 1, fill: 1 };
+var SHUF_MODES = { choice: 1, blank: 1, spot: 1, rewrite: 1, fill: 1, hua: 1 };
 function shuffleOpts(m, q) {
   if (!SHUF_MODES[m] || !q || !Array.isArray(q.opts) || q.opts.length < 2 || typeof q.a !== 'number') return q;
   for (var t = 0; t < q.opts.length; t++) {
@@ -49,6 +49,16 @@ function getParam(name) {
   var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search || '');
   return m ? decodeURIComponent(m[1]) : '';
 }
+/* A22-12：从 engine.js 自身的 script 路径推导 wb 目录（quiz/index.html 下为 ../wb/，
+   games/shici/huazhong.html 下为 ../../quiz/../wb/，浏览器按相对路径归一化） */
+function engineWbDir() {
+  var ss = document.querySelectorAll('script[src]'), i, s;
+  for (i = ss.length - 1; i >= 0; i--) {
+    s = ss[i].getAttribute('src') || '';
+    if (/(^|\/)engine\.js$/.test(s)) return s.replace(/engine\.js$/, '') + '../wb/';
+  }
+  return '../wb/';
+}
 
 /* ---------- 模式元数据 ---------- */
 var MODES = {
@@ -66,7 +76,10 @@ var MODES = {
   /* A22-9 古文产出题型（docs/gaijin/guwen-gaijin-sheji.md P1-C）：题目由 data/guwen.js 句.停/今/对 经 gw_chan.js 自动生成 */
   cut:     { name: '断句',     icon: '✂️', desc: '在字缝里点出朗读停顿' },
   fill:    { name: '填今译',   icon: '🈳', desc: '选出画线字词的今译' },
-  gworder: { name: '排今译',   icon: '🧩', desc: '把今译词块排回通顺的话' }
+  gworder: { name: '排今译',   icon: '🧩', desc: '把今译词块排回通顺的话' },
+  /* A22-12 画中有诗（设计 docs/gaijin/shici-gaijin-sheji.md P1-3）：题面为 scroll 白板终帧，
+     四选一诗句；题目由 quiz/hua_gen.js 从 wb 登记 + data/shici.js 自动生成，数据仍是 choice 形 */
+  hua:     { name: '画中有诗', icon: '🎨', desc: '看白板定格画，猜是哪句诗' }
 };
 var MAP_TAGS = ['论点', '论证', '论据'];   /* 树上自上而下的顺序 */
 function isMap(q) {
@@ -82,7 +95,7 @@ function modeMeta(m, q) {
   }
   return MODES[m];
 }
-var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite', 'cut', 'fill'];
+var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite', 'cut', 'fill', 'hua'];
 var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验', guwen: '古文' };
 
 /* ---------- 会话状态 ---------- */
@@ -291,6 +304,10 @@ function renderQ() {
     ? '📓 错题'
     : modeMeta(item._m, item._q).icon + ' ' + modeMeta(item._m, item._q).name;
   $('qbox').innerHTML = Render[item._m](item._v || item._q);
+  /* A22-12：画中有诗题渲染后，把 wb 终帧挂进画框（hua_gen.js 未加载时只出选项，不阻塞答题） */
+  if (item._m === 'hua' && window.NHZQuizHua && window.NHZQuizHua.mountFrame) {
+    window.NHZQuizHua.mountFrame($('qbox').querySelector('.qz-wb'), item._v || item._q, engineWbDir());
+  }
   $('qfb').innerHTML = '';
   $('qfb').hidden = true;
   $('btnNext').hidden = true;
@@ -339,8 +356,10 @@ function finishQuestion(ok, expHtml) {
     S.streak = 0;
     if (S.mode !== 'wrong') wbAdd(S.tab, item._m, item._q);
   }
-  /* 错题打通：单题可表述的模式（choice/judge/blank/spot/rewrite）答错进统一错题本，
-     答对复习项推进间隔；不改反馈与计分，不碰 quiz 自有错题本。tag/order/match 无单题答案文本，暂不接入。 */
+  /* 错题打通：单题可表述的模式答错进统一错题本，答对复习项推进间隔；
+     不改反馈与计分，不碰 quiz 自有错题本。tag/match/order 以往因“无单题答案文本”
+     暂不接入，现合成整题答案文本接入：tag=每词→正确分类，match=整组左→右配对，
+     order=正确顺序（与已接入的 gw order 同形，答案取 full 或 answer）。 */
   (function () {
     var q = item._q, m = item._m, rec = null;
     if (m === 'choice') rec = { q: q.q, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
@@ -349,8 +368,13 @@ function finishQuestion(ok, expHtml) {
     else if (m === 'spot') rec = { q: q.s + ' ' + q.prompt, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
     else if (m === 'rewrite') rec = { q: q.from + ' → ' + q.target, options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
     else if (m === 'fill') rec = { q: '《' + q.t + '》' + q.yuan + ' 中「' + q.w + '」的今译', options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
+    else if (m === 'hua') rec = { q: '画中有诗' + (q.title ? '《' + q.title + '》' : ''), options: q.opts, answer: q.opts[q.a], 解析: q.exp || '' };
     else if (m === 'cut') rec = { q: '断句：' + q.ting.replace(/\//g, '') + '（《' + q.t + '》）', options: [], answer: q.ting, 解析: q.src ? '停顿出处：' + q.src : '' };
-    else if (m === 'order' && q.gw) rec = { q: q.prompt, options: [], answer: q.full, 解析: '' };
+    else if (m === 'order') rec = { q: q.prompt, options: [], answer: q.gw ? q.full : q.answer, 解析: q.exp || '' };
+    else if (m === 'tag' && Array.isArray(q.tokens)) rec = { q: q.prompt, options: [],
+      answer: q.tokens.map(function (t) { return t.t + '→' + t.tag; }).join('；'), 解析: q.exp || '' };
+    else if (m === 'match' && Array.isArray(q.pairs)) rec = { q: q.title, options: [],
+      answer: q.pairs.map(function (p) { return p[0] + '→' + p[1]; }).join('；'), 解析: '' };
     if (rec && rec.q && rec.answer != null) NHZReview.record({
       q: rec.q, options: rec.options, answer: rec.answer, 解析: rec.解析, src: '练习',
       point: (S.title || TAB_NAMES[S.tab] || '') + ' · ' + (modeMeta(m, q) ? modeMeta(m, q).name : m) }, ok);
@@ -504,6 +528,16 @@ var Render = {
       '<div class="qz-sent">' + y + (q.jin ? '<div class="qz-sub">今译：' +
         esc(q.jin).replace(/___/g, '<span class="qz-blank">____</span>') + '</div>' : '') + '</div>' +
       '<div class="qz-opts">' + q.opts.map(function (o, i) {
+        return '<button class="qz-btn" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
+      }).join('') + '</div>';
+  },
+  /* hua（A22-12 画中有诗）: {q, opts:[4], a, exp, wbName, wbFile, scene, title, author}；
+     选项走通用 pick 判分，画框由 renderQ 后的 mountFrame 挂终帧 */
+  hua: function (q) {
+    return '<div class="qz-q">' + esc(q.q) + '</div>' +
+      '<div class="qz-wb" data-wb="' + esc(q.wbName || '') + '"><div class="qz-wb-load">🎨 正在加载白板画…</div></div>' +
+      '<div class="qz-opts">' +
+      q.opts.map(function (o, i) {
         return '<button class="qz-btn" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
       }).join('') + '</div>';
   },

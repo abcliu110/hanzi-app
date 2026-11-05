@@ -285,16 +285,20 @@
       if (!s || s.iv === 0) retry.push({ it: w, qid: w.id, seg: 'retry', k: w.addedAt || 0 });
     });
     retry.sort(function (a, b) { return a.k - b.k; });
-    /* 复习预算 = 会话上限 - 新学配额；到期优先占位后交错 */
+    /* 复习预算 = 会话上限 - 新学配额；到期优先占位后交错。
+       计数以实际排入本节的为准（旧代码用排队前总数，超上限时标题数与实际卡数对不上）。 */
     var reviewBudget = Math.max(0, cfg.maxPerSession - cfg.newPerDay);
     var review = interleave(due.concat(retry).slice(0, reviewBudget));
     /* C段：新学配额 */
     var fresh = sampleFresh(Math.min(cfg.newPerDay, cfg.maxPerSession - review.length), seen)
       .map(function (it) { return { it: it, qid: window.NHZReview.idOf(it), seg: 'new' }; });
+    var nDue = 0, nRetry = 0;
+    review.forEach(function (e) { if (e.seg === 'due') nDue++; else if (e.seg === 'retry') nRetry++; });
     return {
       list: review.concat(fresh),
       cfg: cfg,
-      counts: { due: due.length, retry: retry.length, fresh: fresh.length }
+      counts: { due: nDue, retry: nRetry, fresh: fresh.length,
+        more: (due.length + retry.length) - review.length }
     };
   }
 
@@ -328,7 +332,8 @@
 
     var h = '';
     h += '<section class="fx-section"><h2>今日队列' +
-      (queue.length ? '（共' + queue.length + '道：到期' + counts.due + ' · 回炉' + counts.retry + ' · 新学' + counts.fresh + '）' : '') + '</h2>';
+      (queue.length ? '（共' + queue.length + '道：到期' + counts.due + ' · 回炉' + counts.retry + ' · 新学' + counts.fresh +
+        (counts.more > 0 ? ' · 另有' + counts.more + '道超出本节上限' : '') + '）' : '') + '</h2>';
     h += '<div class="fx-cfg">每日新学 <input id="fxNew" type="number" min="0" max="20" value="' + cfg.newPerDay + '" style="width:52px"> 题' +
       '　单节上限 <select id="fxMax">' +
       [20, 25, 30].map(function (m) {
