@@ -1367,7 +1367,7 @@ function scWb(p, btn){
   var box = document.getElementById('scwb'), name = scWbName(p); if(!box || !name) return;
   if(btn.classList.contains('on')){ btn.classList.remove('on'); box.innerHTML = ''; return; }
   btn.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
-  scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[name] + '.js'], function(ok){
+  scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'data/poet_trails.js', 'wb/s/' + window.NHZ_WB_INDEX[name] + '.js'], function(ok){
     if(!ok || !window.NHZWB || !window.NHZWB.has(name)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; btn.classList.remove('on'); return; }
     box.innerHTML = ''; var pl = window.NHZWB.mount(box, name); if(pl) pl.play();
   });

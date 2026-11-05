@@ -51,6 +51,10 @@ function buildQuestions(poems, entries, specs) {
     if (!poem || !poem.lines || !poem.lines.length) return;
     var spec = specs[e.key];
     if (!spec || !spec.scenes || !spec.scenes.length) return;
+    /* 只取 scroll 长卷场景：写诗现场（title/mark 幕）本身就写着诗句，进题库等于泄题 */
+    var hasScroll = false, si;
+    for (si = 0; si < spec.scenes.length; si++) { if (spec.scenes[si].k === 'scroll') { hasScroll = true; break; } }
+    if (!hasScroll) return;
     var scene = picSceneIdx(spec.scenes);
     /* 画面幕的诗句在幕顶层 line，或在 beats[] 某 beat 的 line 里（scroll 模板后者常见） */
     var scLine = stripLine((spec.scenes[scene] || {}).line || '');
