@@ -198,4 +198,6 @@ window.NHZ_WB_INDEX = {
   "古文:时间轴:苏轼": "gw_timeline_sushi",
   "古文:时间轴:王安石": "gw_timeline_wanganshi",
   "古文:时间轴:欧阳修": "gw_timeline_ouyangxiu",
+  /* Q13 新增 50 项（docs/yufa-neirong/05）：修辞补齐 */
+  "借代": "rh_jiedai",
 };

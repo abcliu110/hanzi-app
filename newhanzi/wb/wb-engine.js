@@ -954,6 +954,125 @@
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
   };
 
+  /* ---------- valence 动词伸手（设计 §5.4；Q13 新模板） ----------
+   * 动词有几只手、要抓几个名词。幕结构：读句子 + 动词红圆 → 想一想「它要几只手？」→
+   * 逐只伸出手（从红圆画到名词块的带钩弧线）→ 标几只手；下一行出场时上一行淡出。
+   * 空手（empty / empties）：手空着画虚线框并摇晃 → 补上名词，虚线变实线。
+   * {k:'valence', lv, tab, h, ask,
+   *  rows:[{s:['奶奶','给','我','一个','苹果'], v:1,
+   *         args:[0, {i:2, tag:'给谁'}, {i:4, tag:'给什么'}],
+   *         say:'奶奶给我一个苹果。“给”伸出三只手。', hands:['抓住“奶奶”。', …]}],
+   *  empties:[{s:['奶奶','给','我'], v:1, args:[0,2], missWord:'一个苹果', missAt:3,
+   *            say:'奶奶给我——给什么？一只手空着。', fixSay:'补上“一个苹果”。'}],
+   *  end:'一句话收尾'}
+   * args 一项可以是词下标（单个词）、[a, b]（一串词）或 {i, tag} / {i:[a,b], tag}；
+   * missAt 是缺的词要插进的位置（词下标，插在该下标之前；等于词数时插在句末）。 */
+  TPL.valence = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var y = d.h ? 296 : 270, size = d.size || 44, GX = 36, prev = null, asked = false;
+    function spanOf(a) {
+      if (typeof a === 'number') return { i0: a, i1: a, tag: null };
+      if (Array.isArray(a)) return { i0: a[0], i1: a[1], tag: null };
+      var ij = a.i, tag = a.tag || null;
+      if (Array.isArray(ij)) return { i0: ij[0], i1: ij[1], tag: tag };
+      return { i0: ij, i1: (a.j === undefined ? ij : a.j), tag: tag };
+    }
+    function argText(r, sp) { return r.s.slice(sp.i0, sp.i1 + 1).join(''); }
+    /* 排词：words 按 GX 间距居中；hole 在 missAt 处留出 holeW 宽的空位 */
+    function lay(words, t0, hole) {
+      var ws = words.map(function (w) { return textW(w, size); }), all = [], gp = [], holePos = -1;
+      if (hole && hole.at === 0) { all.push(hole.w); gp.push(GX); holePos = 0; }
+      words.forEach(function (w, i) {
+        all.push(ws[i]); gp.push(GX);
+        if (hole && hole.at === i + 1) { all.push(hole.w); gp.push(GX); holePos = all.length - 1; }
+      });
+      gp.pop();
+      var xs = layG(all, gp, W / 2), toks = [], j = 0;
+      var holeX = holePos >= 0 ? xs[holePos] + hole.w / 2 : null;
+      words.forEach(function (w, i) {
+        if (j === holePos) j++;
+        var x0 = xs[j]; j++;
+        var g = c.T(x0 + ws[i] / 2, y, w, { size: size }, t0 + i * .25, .35);
+        toks.push({ g: g, cx: x0 + ws[i] / 2, x0: x0, x1: x0 + ws[i], w: ws[i] });
+      });
+      return { toks: toks, holeX: holeX };
+    }
+    function hand(vt, acx, t0) { c.arrow(vt.cx, y - 70, acx, y - 70, 45, t0, ACC); }
+    function startRow(t0) {
+      if (prev) c.fade(prev, t0, .4, true);
+      var g = c.G(function () {});
+      prev = g;
+      return g;
+    }
+    /* 一行：读句子 + 动词红圆 + 几只手 → 逐只伸手 */
+    function rowSeq(r) {
+      var args = (r.args || []).map(spanOf);
+      q.beat(r.say || (r.s.join('') + '。'), function (t) {
+        var g = startRow(t), L;
+        c.into(g, function () {
+          L = lay(r.s, t);
+          var vt = L.toks[r.v];
+          c.sym('verb', vt.cx, y - 58, 13, t + .5);
+          c.T(W - 48, y - 62, args.length + '只手', { size: 30, color: ACC, anchor: 'end' }, t + .8, .5);
+        });
+        r._L = L; r._g = g;
+        return r.s.length * .25 + 1.2;
+      }, { ask: !asked && !args.length && d.ask ? d.ask : false });
+      if (!args.length) asked = true;
+      args.forEach(function (sp, k) {
+        q.beat((r.hands && r.hands[k]) || ('第' + (k + 1) + '只手，抓住“' + argText(r, sp) + '”。'), function (t) {
+          var L = r._L, vt = L.toks[r.v], a = L.toks[sp.i0], b = L.toks[sp.i1];
+          var acx = (a.cx + b.cx) / 2;
+          c.into(r._g, function () {
+            hand(vt, acx, t);
+            if (sp.tag) c.tag(acx, y - 150, sp.tag, t + .5);
+          });
+          return 1;
+        }, { ask: !asked && d.ask ? d.ask : false });
+        asked = true;
+      });
+    }
+    /* 空手：一行没说完 → 虚线框摇晃 → 补上名词 */
+    function emptySeq(e) {
+      var args = (e.args || []).map(spanOf), holeW = textW(e.missWord, size) + 24, gapG = null;
+      q.beat(e.say, function (t) {
+        var g = startRow(t), L;
+        c.into(g, function () {
+          L = lay(e.s, t, { at: e.missAt, w: holeW });
+          var vt = L.toks[e.v];
+          c.sym('verb', vt.cx, y - 58, 13, t + .5);
+          args.forEach(function (sp) {
+            var a = L.toks[sp.i0], b = L.toks[sp.i1];
+            hand(vt, (a.cx + b.cx) / 2, t + .8);
+          });
+        });
+        e._L = L; e._g = g;
+        return e.s.length * .25 + 1.2;
+      });
+      q.beat(e.gapSay || '有一只手空着，话没说完。', function (t) {
+        c.into(e._g, function () {
+          gapG = c.gap(e._L.holeX, y, holeW, t, { sub: '？' });
+          c.shake(gapG, t + .4, .9, 8, 4);
+        });
+        return 1.4;
+      });
+      q.beat(e.fixSay || ('补上“' + e.missWord + '”，话就说完了。'), function (t) {
+        c.into(e._g, function () {
+          if (gapG) c.fade(gapG, t, .4, true);
+          var g = c.T(e._L.holeX, y, e.missWord, { size: size }, t, .5);
+          c.key(g, 'transform', t, [0, 0], { d: .6, from: [0, -70], ease: 1 });
+          c.key(g, 'opacity', t, 1, { d: .4, from: 0 });
+          hand(e._L.toks[e.v], e._L.holeX, t + .6);
+        });
+        return 1.6;
+      });
+    }
+    (d.rows || []).forEach(rowSeq);
+    var empties = d.empties || (d.empty ? [d.empty] : []);
+    empties.forEach(emptySeq);
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
   /* ---------- nest 套盒子（E15，设计 §5.3；第 3 期） ----------
    * 树：[结构键, 子, 子, …]，子为子树或词下标（从 0 起，从左到右连续）；结构键查 terms.js（pz/db/zw/bl/bc/de/jb…）。
    * {k:'nest', lv:1, style:'box', s:['妈妈','买','的','新','书包'], tree:['pz',['de',['zw',0,1],2],['pz',3,4]], ask, say:[每个盒子的旁白，可省]}
