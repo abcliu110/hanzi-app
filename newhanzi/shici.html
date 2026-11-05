@@ -1205,26 +1205,43 @@ function vZilian(preZi){
   if(preZi){ document.getElementById('ziinput').value = preZi; run(preZi); }
 }
 
-var poemQ = '', poemDyn = 'all';
+var poemQ = '', poemDyn = 'all', poemKe = '课内', poemGrade = 'all';
 function vPoems(){
   setTitle('诗库');
-  /* 朝代按时间排，只列诗库里实有的（含拓展诗） */
+  /* 朝代按时间排，只列当前课内/拓展+年级筛选后实有的诗 */
   var DYN_ORDER = ['先秦','汉','魏','晋','南北朝','隋','唐','五代','宋','金','元','明','清','近代','现代'];
-  var have = {}; D.poems.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
+  var base = D.poems.filter(function(p){
+    if(poemKe!=='all' && p.ke!==poemKe) return false;
+    if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
+    return true;
+  });
+  var have = {}; base.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
   var dyns = ['all'].concat(DYN_ORDER.filter(function(d){ return have[d]; }), Object.keys(have).filter(function(d){ return DYN_ORDER.indexOf(d) < 0; }));
+  if(poemDyn!=='all' && dyns.indexOf(poemDyn)<0) poemDyn = 'all';
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
   h += '<div class="searchbox" style="padding:10px 16px 0"><input id="pq" type="text" placeholder="搜诗名 / 诗人 / 诗句" value="'+esc(poemQ)+'" autocomplete="off"></div>';
+  h += '<div class="sc-chips">' + ['课内','拓展','all'].map(function(k){
+    return '<span class="sc-chip'+(poemKe===k?' active':'')+'" data-ke="'+k+'">'+(k==='all'?'全部':k)+'</span>';
+  }).join('') + '</div>';
+  if(poemKe==='课内'){
+    h += '<div class="sc-chips">' + ['all','1-2','3-4','5-6'].map(function(g){
+      return '<span class="sc-chip'+(poemGrade===g?' active':'')+'" data-grade="'+g+'">'+(g==='all'?'全部年级':g+'年级')+'</span>';
+    }).join('') + '</div>';
+  }
   h += '<div class="sc-chips">' + dyns.map(function(d){
     return '<span class="sc-chip'+(poemDyn===d?' active':'')+'" data-dyn="'+d+'">'+(d==='all'?'全部':d)+'</span>';
-  }).join('') + '</div><div id="poemlist"></div>';
+  }).join('') + '</div><div id="poemcount" style="padding:6px 16px;color:#888;font-size:13px"></div><div id="poemlist"></div>';
   listEl.innerHTML = h; showList(); wireBack();
   function render(){
     var q = poemQ.trim();
     var arr = D.poems.filter(function(p){
+      if(poemKe!=='all' && p.ke!==poemKe) return false;
+      if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
       if(poemDyn!=='all' && p.dynasty!==poemDyn) return false;
       if(!q) return true;
       return p.title.indexOf(q)>=0 || p.author.indexOf(q)>=0 || p.lines.join('').indexOf(q)>=0;
     });
+    document.getElementById('poemcount').textContent = '共 ' + arr.length + ' 首';
     document.getElementById('poemlist').innerHTML = arr.map(function(p){
       return '<div class="sc-poem" data-o="'+p.order+'"><div class="sc-ptitle">'+esc(p.title)+'</div><div class="sc-pmeta"><span class="sc-badge">'+esc(p.dynasty||'')+'</span><span class="sc-badge">'+esc(p.ticai||'')+'</span>'+esc(p.author)+'</div></div>';
     }).join('');
@@ -1235,6 +1252,12 @@ function vPoems(){
   document.getElementById('pq').addEventListener('input', function(e){ poemQ = e.target.value; render(); });
   listEl.querySelectorAll('[data-dyn]').forEach(function(el){
     el.addEventListener('click', function(){ poemDyn = el.getAttribute('data-dyn'); vPoems(); });
+  });
+  listEl.querySelectorAll('[data-ke]').forEach(function(el){
+    el.addEventListener('click', function(){ poemKe = el.getAttribute('data-ke'); if(poemKe!=='课内') poemGrade = 'all'; vPoems(); });
+  });
+  listEl.querySelectorAll('[data-grade]').forEach(function(el){
+    el.addEventListener('click', function(){ poemGrade = el.getAttribute('data-grade'); vPoems(); });
   });
   render();
 }
