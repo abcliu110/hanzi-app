@@ -734,16 +734,16 @@ function renderBa(it){
     + '<span class="blk" id="ba-s">我</span><span class="blk obj" id="ba-o">书</span><span class="blk" id="ba-v">放在</span><span class="blk" id="ba-c">桌子上</span>'
     + '</div><div class="role"><span>主语 S</span><span style="color:var(--red);font-weight:700">宾语 O</span><span>动词 V</span><span>结果 C</span></div></div>'
     + '<div class="btnrow"><button class="btn" id="ba-play">▶ 播放：把「书」抓过去</button><button class="btn ghost" id="ba-reset">还原</button><span class="feedback" id="ba-fb"></span></div></div></section>';
-  h += '<section class="step">'+stepHead(3,'两条铁律','Fluentide · 提交前自检')+trapsHTML([
-      ['铁律一','宾语必须「特指」','✗ 我把一本书看了（哪本书？没说清）→ ✓ 我把那本书看完了。听话人要知道说的是哪个。','bad'],
-      ['铁律二','动词不能「光杆」','✗ 我把书看 → ✓ 我把书看完了。动词后面必须带结果：补语、了、趋向，至少一样。','good']])+'</section>';
+  h += '<section class="step">'+stepHead(3,'两个要点','Fluentide · 提交前自检')+trapsHTML([
+      ['要点一','宾语通常是「知道的那一个」','我把这本书看完了（自然）／我把一本书看完了（单说不太自然，放进语境能说，如“这个寒假我总算把一本书看完了”）。无定把字句是受限格式、不是病句。','good'],
+      ['要点二','动词不能「光杆」','✗ 我把书看 → ✓ 我把书看完了。动词后面必须带结果：补语、了、趋向，至少一样。','good']])+'</section>';
   h += '<section class="step">'+stepHead(4,'把 ↔ 被 互换四步','韩群锋博客 · 句子技巧')+'<div class="panel"><div class="steps-flow" id="ba-flow">'
     + ['① 找出主动者（猫）和被动者（鱼）','② 把 / 被 对调：猫把鱼吃掉了 → 鱼被猫吃掉了','③ 主、被换位：主动者去「被」后面，被动者站句首','④ 动作不变：动词和补语（吃掉了）原样保留']
     .map(function(s,i){ return '<div class="flow-step" data-fs="'+i+'"><span class="n">'+(i+1)+'</span><span>'+s+'</span></div>'; }).join('')
     + '</div><div class="btnrow"><button class="btn" id="ba-step">下一步</button><span class="feedback" id="ba-step-fb"></span></div></div></section>';
-  QUIZREG[it.id] = {q:'哪句把字句是对的？',opts:['我把作业写。','我把那本作业写完了。','我把一本新书写了。','把书我看完了。'],a:1,why:'宾语「那本作业」特指（铁律一），动词带了结果「完」（铁律二），两条都过关。'};
+  QUIZREG[it.id] = {q:'哪句把字句是对的？',opts:['我把作业写。','我把那本作业写完了。','我把一本新书写。','把书我看完了。'],a:1,why:'宾语「那本作业」是双方都知道的那本，动词带了结果「完」，两条都过关；「我把一本新书写」错在动词光杆。'};
   h += '<section class="step">'+stepHead(5,'小测一下')+quizHTML(QUIZREG[it.id], it.id)+'</section>';
-  h += '<div class="srcbox">出处：「把 is a flag, not a verb」与两条铁律——Fluentide《Chinese Grammar: 把字句》<a href="https://fluentide.com/chinese/grammar/ba" target="_blank" rel="noopener">fluentide.com/chinese/grammar/ba</a>；口诀 S把OVC 与「把」本义导入——卡尔加里大学《初级"把"字句的"教"与"学"》；把/被互换四步——韩群锋博客《小学语文常考句子技巧与练习》<a href="https://blog.hanqunfeng.com/2026/09/03/chinese-sentence-skills/" target="_blank" rel="noopener">blog.hanqunfeng.com</a>；三步变形引入法（书放在桌子上→加上「我」→用「把」连接）——豆瓣《"把字句"怎么教？》<a href="https://www.douban.com/note/663090305/" target="_blank" rel="noopener">douban.com/note/663090305</a>。</div>';
+  h += '<div class="srcbox">出处：「把 is a flag, not a verb」与两个要点——Fluentide《Chinese Grammar: 把字句》<a href="https://fluentide.com/chinese/grammar/ba" target="_blank" rel="noopener">fluentide.com/chinese/grammar/ba</a>；口诀 S把OVC 与「把」本义导入——卡尔加里大学《初级"把"字句的"教"与"学"》；把/被互换四步——韩群锋博客《小学语文常考句子技巧与练习》<a href="https://blog.hanqunfeng.com/2026/09/03/chinese-sentence-skills/" target="_blank" rel="noopener">blog.hanqunfeng.com</a>；三步变形引入法（书放在桌子上→加上「我」→用「把」连接）——豆瓣《"把字句"怎么教？》<a href="https://www.douban.com/note/663090305/" target="_blank" rel="noopener">douban.com/note/663090305</a>。</div>';
   setTimeout(initBa, 0);
   return h;
 }
