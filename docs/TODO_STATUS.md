@@ -194,6 +194,7 @@
 - Z 字卡 · — · 本义格空补写收尾：3上–5上及未入年级表 250 格，义项无词无句 251→0（fix_zika_z_benyi.py），日志 fix-zika-b.md
 - Z 字卡 · — · 本义格空补写 1上–2下 376 格（今义补常用词+例句，古本义写一句《说文》/引文出处的古义说明；也 删「女阴」），义项无词无句 626→251。工具 fix_zika_z_benyi.py，日志 fix-zika-b.md
 - A22-1（古文 P1-B 古今异义天平·剩余 12 词，MAIN 线）· 9299a386 · 新增 tools/content/fix_main_guyin.py（幂等，二次 0 改动；--check 校验）从 guwen_knowledge.js「古今异义」本条目生成 wb/s/gw_gy_{xisheng,wulun,difang,keyi,tang,zou,qu,jiang,he,ti,xiu,yanse}.js（牺牲 无论 地方 可以 汤 走 去 江 河 涕 臭 颜色，各 4 幕 title→fix→vs→end，结构同首批），登记 wb/index.js；素材只取本条目（例子/古义今义说明/例句解析/深讲/辨析/口诀），不补整句今译、不编情景；天平框句子 >12 字（江、河）只放含该词的分句“而绝江河”，整句仍在标题；例子有两句的（可以 汤 去）第二句只在天平收尾「另见」列原句。注意：guwen.html 按「古文:+名称」查白板，实词「去 汤 涕 走」、一词多义「去」同名条目也会出古今异义白板（内容相关，不算错；要区分需 guwen.html 改按 key 查，属 GW 线文件）。lint 0 错（R4 警告 29，均为既有同类）、check_wb 12 项 700/1100 过（总览截图已看）、基线新增 48 幕、全量 874 幕一致；smoke 新增「guwen guyin balance whiteboard all 16 words (A22-1)」过；npm run check 过
+- Y · — · 语法（接手线 Y）：说法题 5725 道逐个错项写错因（理由取自讲解库说明/代表与本库正确说法），选项拼接句加引号补「是」，不通例句 9 处换掉，日志 fix-yuwen.md 批 9
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
