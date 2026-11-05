@@ -73,8 +73,11 @@
         r.examples.map(function (e) {
           var inner = esc(e.z) + '<small>' + esc(e.w) + '</small>';
           return e.in3500 ? '<a href="' + zikaLink(e.z) + '">' + inner + '</a>'
-                          : '<span class="bs-explain">' + inner + '</span>';
-        }).join('') + '</div></div>';
+                          : '<span class="bs-explain" title="3500 常用字以外，暂无字卡">' + inner + '</span>';
+        }).join('') + '</div>' +
+        (r.examples.some(function (e) { return !e.in3500; })
+          ? '<div class="bs-exnote" style="font-size:13px;color:var(--muted);margin-top:6px">虚线框里的字不在 3500 常用字内，暂时没有字卡，只看字形和词语。</div>' : '') +
+        '</div>';
     }
     if (r.chars && r.chars.length) {
       var fmCount = r.fm ? Object.keys(r.fm).length : 0;
