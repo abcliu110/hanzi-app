@@ -1337,7 +1337,247 @@
       c.R('line', [1040, 462, 1040, 380], { stroke: INK, strokeWidth: 2.4 }, t + .7, .3);
       c.R('linearPath', [[[1044, 386], [1090, 450], [1044, 450]]], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
       return 1.3; } },
-    far: { at: [1150, 430], f: function (c, t) { c.R('path', ['M1120 470 L1188 470'], { stroke: ACC, strokeWidth: 2.4, strokeLineDash: [8, 6] }, t, .4); c.R('linearPath', [[[1176, 462], [1190, 470], [1176, 478]]], { stroke: ACC, strokeWidth: 2.4 }, t + .4, .2); c.T(1150, 440, '万里', { size: 24, color: ACC }, t + .5, .4); return 1; } }
+    far: { at: [1150, 430], f: function (c, t) { c.R('path', ['M1120 470 L1188 470'], { stroke: ACC, strokeWidth: 2.4, strokeLineDash: [8, 6] }, t, .4); c.R('linearPath', [[[1176, 462], [1190, 470], [1176, 478]]], { stroke: ACC, strokeWidth: 2.4 }, t + .4, .2); c.T(1150, 440, '万里', { size: 24, color: ACC }, t + .5, .4); return 1; } },
+    /* A19 scroll：11 首诗新增物件（只追加，现有物件不动；几何线稿，不画人） */
+    sun: { at: [900, 170], f: function (c, t, fill) {
+      c.R('ellipse', [900, 170, 46, 46], { stroke: INK, strokeWidth: 2, fill: fill || '#f6d87a', fillStyle: 'solid' }, t, .5);
+      for (var i = 0; i < 8; i++) { var a = i * Math.PI / 4; c.R('line', [900 + 58 * Math.cos(a), 170 + 58 * Math.sin(a), 900 + 74 * Math.cos(a), 170 + 74 * Math.sin(a)], { stroke: INK, strokeWidth: 2 }, t + .5 + i * .06, .15); }
+      return 1.2; } },
+    moon: { at: [300, 200], f: function (c, t, fill) {
+      c.R('ellipse', [300, 200, 48, 48], { stroke: INK, strokeWidth: 2, fill: fill || '#f3e9c8', fillStyle: 'solid' }, t, .5);
+      c.R('circle', [285, 190, 8], { stroke: INK, strokeWidth: 1.4 }, t + .5, .2); c.R('circle', [315, 212, 6], { stroke: INK, strokeWidth: 1.4 }, t + .6, .2); c.R('circle', [295, 222, 5], { stroke: INK, strokeWidth: 1.4 }, t + .7, .2);
+      return 1; } },
+    cloud: { at: [620, 170], f: function (c, t, fill) {
+      c.R('ellipse', [540, 175, 62, 28], { stroke: INK, strokeWidth: 2, fill: fill || '#ffffff', fillStyle: 'solid' }, t, .4);
+      c.R('ellipse', [620, 158, 72, 34], { stroke: INK, strokeWidth: 2, fill: fill || '#ffffff', fillStyle: 'solid' }, t + .3, .4);
+      c.R('ellipse', [700, 175, 58, 26], { stroke: INK, strokeWidth: 2, fill: fill || '#ffffff', fillStyle: 'solid' }, t + .6, .4);
+      c.R('line', [500, 196, 740, 196], { stroke: INK, strokeWidth: 2 }, t + .9, .3); return 1.2; } },
+    smoke: { at: [300, 160], f: function (c, t) {
+      c.R('path', ['M250 215 q12 -30 0 -60 q-10 -28 8 -50'], { stroke: GRAY, strokeWidth: 2 }, t, .4);
+      c.R('path', ['M300 220 q-12 -32 2 -62 q10 -26 -4 -48'], { stroke: GRAY, strokeWidth: 2 }, t + .3, .4);
+      c.R('path', ['M350 212 q10 -28 -2 -58 q-8 -24 6 -44'], { stroke: GRAY, strokeWidth: 2 }, t + .6, .4); return 1; } },
+    peak: { at: [300, 320], f: function (c, t) {
+      c.R('linearPath', [[[140, 480], [300, 190], [460, 480]]], { stroke: INK, strokeWidth: 2.6 }, t, .7);
+      c.R('path', ['M240 360 q60 -30 120 0'], { stroke: GRAY, strokeWidth: 1.6 }, t + .7, .3);
+      c.R('path', ['M260 300 q40 -20 80 0'], { stroke: GRAY, strokeWidth: 1.6 }, t + .9, .3); return 1.1; } },
+    falls: { at: [650, 320], f: function (c, t) {
+      c.R('path', ['M610 160 q14 60 0 130 q-14 70 4 150'], { stroke: INK, strokeWidth: 2.4 }, t, .5);
+      c.R('path', ['M685 160 q-14 60 0 130 q14 70 -4 150'], { stroke: INK, strokeWidth: 2.4 }, t + .4, .5);
+      c.R('ellipse', [648, 478, 88, 16], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
+      c.R('path', ['M580 470 q20 -22 40 0'], { stroke: INK, strokeWidth: 1.8 }, t + 1.1, .2);
+      c.R('path', ['M680 470 q20 -22 40 0'], { stroke: INK, strokeWidth: 1.8 }, t + 1.2, .2); return 1.4; } },
+    plunge: { at: [745, 310], f: function (c, t) {
+      c.R('line', [745, 170, 745, 450], { stroke: ACC, strokeWidth: 2.4, strokeLineDash: [8, 6] }, t, .5);
+      c.R('linearPath', [[[733, 438], [745, 452], [757, 438]]], { stroke: ACC, strokeWidth: 2.4 }, t + .5, .2);
+      c.R('line', [730, 170, 760, 170], { stroke: GRAY, strokeWidth: 2 }, t + .6, .2); return .8; } },
+    river: { at: [600, 500], f: function (c, t, fill) {
+      c.R('ellipse', [600, 500, 500, 24], { stroke: 'none', fill: fill || '#dfeef2', fillStyle: 'solid' }, t, .5);
+      c.R('path', ['M120 492 Q300 472 480 494 T840 492 T1140 494'], { stroke: INK, strokeWidth: 2 }, t + .4, .5);
+      c.R('path', ['M200 512 Q400 498 600 512 T1060 510'], { stroke: INK, strokeWidth: 1.8 }, t + .8, .4); return 1.2; } },
+    galaxy: { at: [920, 260], f: function (c, t) {
+      c.R('path', ['M700 310 Q900 290 1150 210'], { stroke: GRAY, strokeWidth: 2, strokeLineDash: [10, 8] }, t, .6);
+      [[760, 305], [830, 297], [900, 285], [970, 265], [1040, 240], [1100, 220]].forEach(function (p, k) { c.R('circle', [p[0], p[1], 5], { stroke: INK, strokeWidth: 1.4, fill: '#ffffff', fillStyle: 'solid' }, t + .5 + k * .12, .15); });
+      c.R('line', [852, 282, 868, 298], { stroke: INK, strokeWidth: 1.6 }, t + 1.1, .2); c.R('line', [852, 298, 868, 282], { stroke: INK, strokeWidth: 1.6 }, t + 1.2, .2);
+      c.R('line', [1002, 242, 1018, 258], { stroke: INK, strokeWidth: 1.6 }, t + 1.3, .2); c.R('line', [1002, 258, 1018, 242], { stroke: INK, strokeWidth: 1.6 }, t + 1.4, .2); return 1.6; } },
+    mtn: { at: [500, 330], f: function (c, t, fill) {
+      c.R('polygon', [[[220, 480], [360, 260], [470, 380], [430, 480]]], { stroke: INK, strokeWidth: 2.2, fill: fill || '#e8efe4', fillStyle: 'solid' }, t, .6);
+      c.R('polygon', [[[470, 380], [580, 220], [760, 480], [520, 480]]], { stroke: INK, strokeWidth: 2.2, fill: fill || '#e8efe4', fillStyle: 'solid' }, t + .5, .6); return 1.2; } },
+    stonepath: { at: [500, 400], f: function (c, t) {
+      c.R('path', ['M430 500 L500 460 L460 420 L540 380 L500 340 L570 300'], { stroke: GRAY, strokeWidth: 1.6, strokeLineDash: [6, 6] }, t, .5);
+      [[430, 500], [500, 460], [460, 420], [540, 380], [500, 340], [570, 300]].forEach(function (p, k) { c.R('ellipse', [p[0], p[1], 16, 8], { stroke: INK, strokeWidth: 1.6, fill: '#e8efe4', fillStyle: 'solid' }, t + .4 + k * .12, .15); }); return 1.1; } },
+    house: { at: [900, 320], f: function (c, t) {
+      c.R('line', [928, 232, 928, 266], { stroke: INK, strokeWidth: 2 }, t, .3);
+      c.R('rectangle', [850, 290, 100, 80], { stroke: INK, strokeWidth: 3 }, t + .2, .5);
+      c.R('linearPath', [[[838, 290], [900, 238], [962, 290]]], { stroke: INK, strokeWidth: 2.6 }, t + .6, .4);
+      c.R('rectangle', [890, 330, 20, 40], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
+      c.R('rectangle', [862, 305, 22, 22], { stroke: INK, strokeWidth: 1.8 }, t + 1.1, .2); return 1.3; } },
+    maple: { at: [250, 430], f: function (c, t) {
+      c.R('line', [150, 500, 150, 410], { stroke: INK, strokeWidth: 4 }, t, .3); c.R('line', [250, 500, 250, 395], { stroke: INK, strokeWidth: 4 }, t + .2, .3); c.R('line', [350, 500, 350, 415], { stroke: INK, strokeWidth: 4 }, t + .4, .3);
+      c.R('polygon', [[[110, 410], [150, 350], [190, 410], [170, 430], [130, 430]]], { stroke: INK, strokeWidth: 1.6, fill: '#cf6a4e', fillStyle: 'solid' }, t + .6, .3);
+      c.R('polygon', [[[210, 395], [250, 330], [290, 395], [270, 415], [230, 415]]], { stroke: INK, strokeWidth: 1.6, fill: '#cf6a4e', fillStyle: 'solid' }, t + .8, .3);
+      c.R('polygon', [[[310, 415], [350, 355], [390, 415], [370, 432], [330, 432]]], { stroke: INK, strokeWidth: 1.6, fill: '#cf6a4e', fillStyle: 'solid' }, t + 1, .3); return 1.4; } },
+    mapleleaf: { at: [600, 400], f: function (c, t) {
+      c.R('polygon', [[[600, 330], [624, 362], [664, 356], [640, 392], [672, 424], [618, 414], [600, 458], [582, 414], [528, 424], [560, 392], [536, 356], [576, 362]]], { stroke: INK, strokeWidth: 2, fill: '#c94f38', fillStyle: 'solid' }, t, .6);
+      c.R('line', [600, 458, 600, 492], { stroke: INK, strokeWidth: 2.4 }, t + .6, .3); return 1; } },
+    blossom: { at: [1050, 380], f: function (c, t) {
+      c.R('path', ['M950 300 Q1040 350 1130 420'], { stroke: INK, strokeWidth: 3 }, t, .5);
+      [[980, 320], [1060, 365], [1110, 410]].forEach(function (p, k) {
+        [[0, -14], [13, -4], [8, 12], [-8, 12], [-13, -4]].forEach(function (d, j) { c.R('circle', [p[0] + d[0], p[1] + d[1], 9], { stroke: INK, strokeWidth: 1.4, fill: '#e8a0b4', fillStyle: 'solid' }, t + .5 + k * .3 + j * .05, .15); });
+        c.R('circle', [p[0], p[1], 5], { stroke: INK, strokeWidth: 1.4, fill: '#f6d87a', fillStyle: 'solid' }, t + .8 + k * .3, .15); });
+      return 1.6; } },
+    petals: { at: [1050, 460], f: function (c, t) {
+      [[980, 400], [1030, 440], [1080, 480], [1010, 500], [1120, 440]].forEach(function (p, k) { c.R('ellipse', [p[0], p[1], 16, 9], { stroke: INK, strokeWidth: 1.4, fill: '#e8a0b4', fillStyle: 'solid' }, t + k * .2, .25); });
+      c.R('path', ['M970 390 q14 -12 26 0'], { stroke: GRAY, strokeWidth: 1.6 }, t + .9, .2); c.R('path', ['M1020 430 q14 -12 26 0'], { stroke: GRAY, strokeWidth: 1.6 }, t + 1.1, .2); return 1.3; } },
+    ribbon: { at: [560, 360], f: function (c, t, fill) {
+      var col = fill || '#5da87e';
+      ['M440 235 Q452 300 438 360 Q428 420 444 475', 'M500 235 Q512 300 498 360 Q488 420 504 475', 'M560 235 Q572 300 558 360 Q548 420 564 475', 'M620 235 Q632 300 618 360 Q608 420 624 475', 'M680 235 Q692 300 678 360 Q668 420 684 475'].forEach(function (d, k) { c.R('path', [d], { stroke: col, strokeWidth: 3 }, t + k * .2, .5); });
+      return 1.5; } },
+    leaflet: { at: [600, 300], f: function (c, t) {
+      c.R('path', ['M480 420 Q600 320 760 240'], { stroke: INK, strokeWidth: 2.6 }, t, .5);
+      [[540, 370], [620, 315], [700, 270]].forEach(function (p, k) { c.R('polygon', [[[p[0], p[1] - 16], [p[0] + 14, p[1]], [p[0], p[1] + 16], [p[0] - 14, p[1]]]], { stroke: INK, strokeWidth: 1.6, fill: '#8cc09a', fillStyle: 'solid' }, t + .5 + k * .2, .25); }); return 1.1; } },
+    wind: { at: [520, 250], f: function (c, t) {
+      c.R('path', ['M270 190 Q310 150 350 185 Q325 212 300 192'], { stroke: GRAY, strokeWidth: 2.2 }, t, .4);
+      c.R('path', ['M490 250 Q530 210 570 245 Q545 272 520 252'], { stroke: GRAY, strokeWidth: 2.2 }, t + .3, .4);
+      c.R('path', ['M670 330 Q710 290 750 325 Q725 352 700 332'], { stroke: GRAY, strokeWidth: 2.2 }, t + .6, .4);
+      c.R('line', [380, 200, 420, 200], { stroke: GRAY, strokeWidth: 1.8 }, t + .9, .2); c.R('line', [600, 260, 640, 260], { stroke: GRAY, strokeWidth: 1.8 }, t + 1, .2); c.R('line', [780, 340, 820, 340], { stroke: GRAY, strokeWidth: 1.8 }, t + 1.1, .2); return 1.3; } },
+    scissors: { at: [880, 400], f: function (c, t) {
+      c.R('line', [830, 320, 930, 470], { stroke: INK, strokeWidth: 2.6 }, t, .4); c.R('line', [930, 320, 830, 470], { stroke: INK, strokeWidth: 2.6 }, t + .3, .4);
+      c.R('circle', [830, 482, 16], { stroke: INK, strokeWidth: 2 }, t + .7, .2); c.R('circle', [930, 482, 16], { stroke: INK, strokeWidth: 2 }, t + .8, .2);
+      c.R('circle', [880, 395, 6], { stroke: INK, strokeWidth: 1.6, fill: INK, fillStyle: 'solid' }, t + .9, .15); return 1.1; } },
+    caiyun: { at: [850, 180], f: function (c, t) {
+      c.R('ellipse', [780, 180, 55, 26], { stroke: INK, strokeWidth: 2, fill: '#ffffff', fillStyle: 'solid' }, t, .4);
+      c.R('ellipse', [850, 165, 65, 30], { stroke: INK, strokeWidth: 2, fill: '#ffffff', fillStyle: 'solid' }, t + .3, .4);
+      c.R('ellipse', [920, 180, 50, 24], { stroke: INK, strokeWidth: 2, fill: '#ffffff', fillStyle: 'solid' }, t + .6, .4);
+      c.R('path', ['M770 150 Q850 110 930 150'], { stroke: ACC, strokeWidth: 2 }, t + .9, .3);
+      c.R('path', ['M800 138 Q850 112 900 138'], { stroke: GRAY, strokeWidth: 1.8 }, t + 1.1, .3); return 1.4; } },
+    city: { at: [300, 300], f: function (c, t) {
+      c.R('rectangle', [180, 300, 240, 110], { stroke: INK, strokeWidth: 3 }, t, .5);
+      [190, 236, 282, 328, 374].forEach(function (x, k) { c.R('rectangle', [x, 282, 26, 18], { stroke: INK, strokeWidth: 2 }, t + .4 + k * .1, .15); });
+      c.R('rectangle', [280, 350, 40, 60], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
+      c.R('path', ['M280 350 Q300 330 320 350'], { stroke: INK, strokeWidth: 2 }, t + 1.1, .2); return 1.3; } },
+    bank: { at: [600, 420], f: function (c, t) {
+      c.R('polygon', [[[120, 480], [260, 360], [340, 480]]], { stroke: INK, strokeWidth: 2.2, fill: '#e8efe4', fillStyle: 'solid' }, t, .5);
+      c.R('polygon', [[[860, 480], [940, 360], [1080, 480]]], { stroke: INK, strokeWidth: 2.2, fill: '#e8efe4', fillStyle: 'solid' }, t + .4, .5); return 1; } },
+    apesound: { at: [600, 300], f: function (c, t) {
+      c.R('path', ['M320 270 q-20 30 0 60'], { stroke: ACC, strokeWidth: 2.2 }, t, .3); c.R('path', ['M300 255 q-30 45 0 90'], { stroke: ACC, strokeWidth: 2.2 }, t + .2, .3); c.R('path', ['M280 240 q-40 60 0 120'], { stroke: ACC, strokeWidth: 2.2 }, t + .4, .3);
+      c.R('path', ['M880 270 q20 30 0 60'], { stroke: ACC, strokeWidth: 2.2 }, t, .3); c.R('path', ['M900 255 q30 45 0 90'], { stroke: ACC, strokeWidth: 2.2 }, t + .2, .3); c.R('path', ['M920 240 q40 60 0 120'], { stroke: ACC, strokeWidth: 2.2 }, t + .4, .3); return 1; } },
+    peaks: { at: [600, 330], f: function (c, t) {
+      c.R('path', ['M150 300 L300 220 L420 300 L560 210 L700 300 L850 230 L1050 300'], { stroke: GRAY, strokeWidth: 2 }, t, .5);
+      c.R('path', ['M150 380 L280 290 L430 380 L580 300 L730 380 L900 310 L1050 380'], { stroke: INK, strokeWidth: 2.2 }, t + .4, .5);
+      c.R('path', ['M150 470 L300 380 L470 470 L650 390 L850 470 L1050 400'], { stroke: INK, strokeWidth: 2.6 }, t + .8, .5); return 1.4; } },
+    sea: { at: [1000, 470], f: function (c, t) {
+      c.R('path', ['M850 460 Q920 440 990 460 T1130 460'], { stroke: INK, strokeWidth: 2.2 }, t, .4);
+      c.R('path', ['M850 490 Q920 470 990 490 T1130 490'], { stroke: INK, strokeWidth: 2.2 }, t + .3, .4);
+      c.R('path', ['M850 520 Q920 500 990 520 T1130 520'], { stroke: INK, strokeWidth: 2.2 }, t + .6, .4); return 1; } },
+    tower: { at: [600, 330], f: function (c, t) {
+      c.R('rectangle', [480, 400, 240, 100], { stroke: INK, strokeWidth: 3 }, t, .5);
+      c.R('rectangle', [510, 310, 180, 90], { stroke: INK, strokeWidth: 2.6 }, t + .4, .4);
+      c.R('rectangle', [540, 220, 120, 90], { stroke: INK, strokeWidth: 2.6 }, t + .8, .4);
+      c.R('linearPath', [[[460, 400], [600, 370], [740, 400]]], { stroke: INK, strokeWidth: 2.4 }, t + 1.1, .3);
+      c.R('linearPath', [[[492, 310], [600, 282], [708, 310]]], { stroke: INK, strokeWidth: 2.4 }, t + 1.3, .3);
+      c.R('linearPath', [[[524, 220], [600, 194], [676, 220]]], { stroke: INK, strokeWidth: 2.4 }, t + 1.5, .3);
+      c.R('rectangle', [585, 450, 30, 50], { stroke: INK, strokeWidth: 2 }, t + 1.7, .2);
+      c.R('rectangle', [560, 335, 24, 24], { stroke: INK, strokeWidth: 1.8 }, t + 1.8, .15); c.R('rectangle', [616, 335, 24, 24], { stroke: INK, strokeWidth: 1.8 }, t + 1.9, .15); return 2.1; } },
+    gaze: { at: [950, 250], f: function (c, t) {
+      c.R('path', ['M720 260 Q850 230 1080 210'], { stroke: ACC, strokeWidth: 2.4, strokeLineDash: [8, 6] }, t, .5);
+      c.R('linearPath', [[[1064, 202], [1082, 210], [1066, 220]]], { stroke: ACC, strokeWidth: 2.4 }, t + .5, .2); return .8; } },
+    upstep: { at: [820, 440], f: function (c, t) {
+      c.R('rectangle', [730, 470, 60, 18], { stroke: INK, strokeWidth: 2.4 }, t, .3);
+      c.R('rectangle', [790, 440, 60, 18], { stroke: INK, strokeWidth: 2.4 }, t + .2, .3);
+      c.R('rectangle', [850, 410, 60, 18], { stroke: INK, strokeWidth: 2.4 }, t + .4, .3);
+      c.R('line', [920, 430, 920, 370], { stroke: ACC, strokeWidth: 2.4 }, t + .6, .3);
+      c.R('linearPath', [[[908, 382], [920, 368], [932, 382]]], { stroke: ACC, strokeWidth: 2.4 }, t + .8, .2); return 1; } },
+    bed: { at: [300, 400], f: function (c, t) {
+      c.R('rectangle', [180, 380, 240, 50], { stroke: INK, strokeWidth: 3 }, t, .5);
+      c.R('line', [190, 430, 190, 460], { stroke: INK, strokeWidth: 2.6 }, t + .4, .2); c.R('line', [410, 430, 410, 460], { stroke: INK, strokeWidth: 2.6 }, t + .5, .2);
+      c.R('rectangle', [190, 350, 70, 30], { stroke: INK, strokeWidth: 2 }, t + .6, .3);
+      c.R('path', ['M260 380 Q330 360 420 380'], { stroke: INK, strokeWidth: 2 }, t + .8, .3); return 1.1; } },
+    frost: { at: [600, 330], f: function (c, t) {
+      c.R('line', [150, 510, 1050, 510], { stroke: GRAY, strokeWidth: 2 }, t, .4);
+      [[180, 190], [450, 220], [850, 190], [1080, 240], [220, 420], [350, 460], [500, 400], [650, 470], [800, 420], [950, 460], [1080, 400], [300, 490], [720, 500], [1020, 490]].forEach(function (p, k) {
+        c.R('line', [p[0] - 8, p[1], p[0] + 8, p[1]], { stroke: GRAY, strokeWidth: 1.8 }, t + .3 + k * .06, .12);
+        c.R('line', [p[0], p[1] - 8, p[0], p[1] + 8], { stroke: GRAY, strokeWidth: 1.8 }, t + .3 + k * .06, .12); });
+      return 1.2; } },
+    lookup: { at: [430, 350], f: function (c, t) {
+      c.R('path', ['M520 440 Q450 350 350 260'], { stroke: ACC, strokeWidth: 3 }, t, .5);
+      c.R('linearPath', [[[338, 276], [350, 258], [368, 272]]], { stroke: ACC, strokeWidth: 3 }, t + .5, .2); return .8; } },
+    bowdown: { at: [790, 285], f: function (c, t) {
+      c.R('path', ['M700 240 Q790 270 880 330'], { stroke: ACC, strokeWidth: 3 }, t, .5);
+      c.R('linearPath', [[[862, 320], [882, 332], [866, 346]]], { stroke: ACC, strokeWidth: 3 }, t + .5, .2); return .8; } },
+    moondown: { at: [300, 345], f: function (c, t) {
+      c.R('line', [300, 265, 300, 430], { stroke: ACC, strokeWidth: 3 }, t, .5);
+      c.R('linearPath', [[[288, 416], [300, 432], [312, 416]]], { stroke: ACC, strokeWidth: 3 }, t + .5, .2); return .8; } },
+    rain: { at: [920, 350], f: function (c, t) {
+      [[780, 270, 752, 340], [840, 270, 812, 340], [900, 270, 872, 340], [960, 270, 932, 340], [1020, 270, 992, 340], [1080, 270, 1052, 340], [810, 380, 782, 450], [990, 380, 962, 450]].forEach(function (p, k) { c.R('line', p, { stroke: GRAY, strokeWidth: 2 }, t + k * .12, .2); });
+      return 1.2; } },
+    crow: { at: [700, 200], f: function (c, t) {
+      c.R('ellipse', [700, 200, 34, 20], { stroke: INK, strokeWidth: 2, fill: INK, fillStyle: 'solid' }, t, .4);
+      c.R('circle', [732, 186, 14], { stroke: INK, strokeWidth: 2, fill: INK, fillStyle: 'solid' }, t + .3, .3);
+      c.R('linearPath', [[[744, 184], [758, 190], [744, 194]]], { stroke: INK, strokeWidth: 2 }, t + .6, .2);
+      c.R('line', [666, 196, 646, 186], { stroke: INK, strokeWidth: 2 }, t + .7, .2); c.R('line', [666, 204, 646, 210], { stroke: INK, strokeWidth: 2 }, t + .8, .2);
+      c.R('path', ['M680 196 Q700 182 720 196'], { stroke: GRAY, strokeWidth: 1.8 }, t + .9, .2); return 1.1; } },
+    lamp: { at: [930, 435], f: function (c, t) {
+      c.R('line', [930, 380, 930, 410], { stroke: INK, strokeWidth: 2 }, t, .3);
+      c.R('rectangle', [900, 410, 60, 50], { stroke: INK, strokeWidth: 2.4 }, t + .2, .4);
+      c.R('ellipse', [930, 435, 12, 16], { stroke: 'none', fill: '#e8c13a', fillStyle: 'solid' }, t + .5, .3);
+      c.R('circle', [930, 435, 44], { stroke: ACC, strokeWidth: 1.8 }, t + .7, .3); return 1; } },
+    temple: { at: [600, 320], f: function (c, t) {
+      c.R('rectangle', [480, 360, 240, 120], { stroke: INK, strokeWidth: 3 }, t, .5);
+      c.R('path', ['M460 360 Q600 300 740 360'], { stroke: INK, strokeWidth: 2.6 }, t + .4, .4);
+      c.R('line', [460, 360, 446, 344], { stroke: INK, strokeWidth: 2.4 }, t + .7, .2); c.R('line', [740, 360, 754, 344], { stroke: INK, strokeWidth: 2.4 }, t + .8, .2);
+      c.R('rectangle', [585, 410, 30, 70], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
+      c.R('rectangle', [770, 300, 50, 60], { stroke: INK, strokeWidth: 2.2 }, t + 1.1, .3);
+      c.R('path', ['M762 300 Q795 282 828 300'], { stroke: INK, strokeWidth: 2.2 }, t + 1.3, .2); return 1.5; } },
+    bell: { at: [950, 300], f: function (c, t) {
+      c.R('path', ['M900 360 Q950 260 1000 360'], { stroke: INK, strokeWidth: 2.6 }, t, .5);
+      c.R('line', [900, 360, 1000, 360], { stroke: INK, strokeWidth: 2.4 }, t + .4, .3);
+      c.R('circle', [950, 372, 7], { stroke: INK, strokeWidth: 1.6, fill: INK, fillStyle: 'solid' }, t + .6, .2);
+      c.R('path', ['M1020 290 q16 20 0 40'], { stroke: ACC, strokeWidth: 2.2 }, t + .8, .2);
+      c.R('path', ['M1038 278 q24 32 0 64'], { stroke: ACC, strokeWidth: 2.2 }, t + 1, .2); return 1.2; } },
+    lake: { at: [600, 470], f: function (c, t, fill) {
+      c.R('ellipse', [600, 470, 470, 42], { stroke: INK, strokeWidth: 2.4, fill: fill || '#dfeef2', fillStyle: 'solid' }, t, .5);
+      c.R('path', ['M300 470 q60 -14 120 0'], { stroke: INK, strokeWidth: 1.8 }, t + .5, .3);
+      c.R('path', ['M700 480 q60 -14 120 0'], { stroke: INK, strokeWidth: 1.8 }, t + .7, .3); return 1; } },
+    mirror: { at: [600, 430], f: function (c, t) {
+      c.R('ellipse', [600, 430, 430, 58], { stroke: INK, strokeWidth: 3 }, t, .5);
+      c.R('ellipse', [600, 430, 400, 48], { stroke: GRAY, strokeWidth: 1.6 }, t + .4, .4);
+      c.R('path', ['M350 415 Q600 380 850 415'], { stroke: GRAY, strokeWidth: 1.8 }, t + .8, .3); return 1.1; } },
+    silverplate: { at: [600, 430], f: function (c, t, fill) {
+      c.R('ellipse', [600, 430, 260, 42], { stroke: INK, strokeWidth: 2.4, fill: fill || '#ffffff', fillStyle: 'solid' }, t, .5);
+      c.R('ellipse', [600, 430, 220, 32], { stroke: INK, strokeWidth: 1.6 }, t + .5, .3); return .9; } },
+    conch: { at: [600, 415], f: function (c, t, fill) {
+      c.R('ellipse', [600, 415, 38, 26], { stroke: INK, strokeWidth: 1.8, fill: fill || '#7fb893', fillStyle: 'solid' }, t, .4);
+      c.R('path', ['M575 425 q-8 -30 25 -32 q28 0 26 24 q-2 20 -22 20 q-16 0 -14 -14'], { stroke: INK, strokeWidth: 1.8 }, t + .4, .4); return .9; } },
+    lotusleaf: { at: [600, 450], f: function (c, t, fill) {
+      var col = fill || '#5da87e';
+      c.R('ellipse', [350, 450, 130, 34], { stroke: INK, strokeWidth: 2, fill: col, fillStyle: 'solid' }, t, .4);
+      c.R('ellipse', [600, 470, 160, 38], { stroke: INK, strokeWidth: 2, fill: col, fillStyle: 'solid' }, t + .3, .4);
+      c.R('ellipse', [850, 450, 130, 34], { stroke: INK, strokeWidth: 2, fill: col, fillStyle: 'solid' }, t + .6, .4);
+      c.R('line', [350, 450, 350, 420], { stroke: INK, strokeWidth: 1.6 }, t + .9, .2); c.R('line', [600, 470, 600, 438], { stroke: INK, strokeWidth: 1.6 }, t + 1, .2); c.R('line', [850, 450, 850, 420], { stroke: INK, strokeWidth: 1.6 }, t + 1.1, .2);
+      c.R('line', [180, 505, 1020, 505], { stroke: GRAY, strokeWidth: 1.8 }, t + 1.2, .3); return 1.5; } },
+    lotus: { at: [900, 380], f: function (c, t) {
+      c.R('line', [900, 430, 900, 500], { stroke: INK, strokeWidth: 2.6 }, t, .3);
+      c.R('polygon', [[[850, 430], [875, 365], [900, 430]]], { stroke: INK, strokeWidth: 1.8, fill: '#f0b8c6', fillStyle: 'solid' }, t + .3, .3);
+      c.R('polygon', [[[900, 430], [925, 365], [950, 430]]], { stroke: INK, strokeWidth: 1.8, fill: '#f0b8c6', fillStyle: 'solid' }, t + .5, .3);
+      c.R('polygon', [[[885, 430], [900, 340], [915, 430]]], { stroke: INK, strokeWidth: 1.8, fill: '#e8a0b4', fillStyle: 'solid' }, t + .7, .3);
+      c.R('path', ['M850 430 Q900 455 950 430'], { stroke: INK, strokeWidth: 2 }, t + 1, .3); return 1.3; } },
+    bamboo: { at: [250, 320], f: function (c, t) {
+      [180, 240, 300].forEach(function (x, k) {
+        c.R('line', [x, 160, x, 500], { stroke: INK, strokeWidth: 3.4 }, t + k * .2, .5);
+        [245, 330, 415].forEach(function (y, j) { c.R('line', [x - 8, y, x + 8, y], { stroke: INK, strokeWidth: 2 }, t + .5 + k * .2 + j * .1, .15); }); });
+      c.R('path', ['M180 245 q-28 -18 -44 -8'], { stroke: '#5da87e', strokeWidth: 2.2 }, t + 1.2, .3);
+      c.R('path', ['M240 330 q30 -20 46 -8'], { stroke: '#5da87e', strokeWidth: 2.2 }, t + 1.4, .3);
+      c.R('path', ['M300 245 q-28 -18 -44 -8'], { stroke: '#5da87e', strokeWidth: 2.2 }, t + 1.6, .3);
+      c.R('path', ['M240 415 q-30 -16 -46 -6'], { stroke: '#5da87e', strokeWidth: 2.2 }, t + 1.8, .3); return 2.1; } },
+    peach: { at: [800, 320], f: function (c, t) {
+      c.R('path', ['M650 420 Q800 300 1010 240'], { stroke: INK, strokeWidth: 3 }, t, .5);
+      [[720, 360], [850, 300], [970, 255]].forEach(function (p, k) {
+        [[0, -14], [13, -4], [8, 12], [-8, 12], [-13, -4]].forEach(function (d, j) { c.R('circle', [p[0] + d[0], p[1] + d[1], 9], { stroke: INK, strokeWidth: 1.4, fill: '#e8a0b4', fillStyle: 'solid' }, t + .5 + k * .3 + j * .05, .15); });
+        c.R('circle', [p[0], p[1], 5], { stroke: INK, strokeWidth: 1.4, fill: '#f6d87a', fillStyle: 'solid' }, t + .8 + k * .3, .15); });
+      return 1.6; } },
+    duck: { at: [380, 475], f: function (c, t) {
+      c.R('ellipse', [380, 475, 52, 30], { stroke: INK, strokeWidth: 2, fill: '#f6d87a', fillStyle: 'solid' }, t, .4);
+      c.R('circle', [428, 448, 20], { stroke: INK, strokeWidth: 2, fill: '#f6d87a', fillStyle: 'solid' }, t + .3, .3);
+      c.R('linearPath', [[[446, 446], [462, 452], [446, 458]]], { stroke: INK, strokeWidth: 2 }, t + .6, .2);
+      c.R('circle', [432, 444, 3], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + .7, .15);
+      c.R('line', [330, 468, 312, 456], { stroke: INK, strokeWidth: 2 }, t + .8, .2); c.R('line', [330, 482, 312, 492], { stroke: INK, strokeWidth: 2 }, t + .9, .2);
+      c.R('path', ['M320 505 q30 -10 60 0'], { stroke: GRAY, strokeWidth: 1.8 }, t + 1, .2); c.R('path', ['M400 505 q30 -10 60 0'], { stroke: GRAY, strokeWidth: 1.8 }, t + 1.1, .2); return 1.3; } },
+    hao: { at: [400, 450], f: function (c, t) {
+      [[340, 330, 400], [380, 380, 390], [420, 430, 400], [460, 470, 410]].forEach(function (p, k) { c.R('line', [p[0], 500, p[1], p[2]], { stroke: INK, strokeWidth: 2.4 }, t + k * .15, .3); });
+      [[330, 400], [380, 390], [430, 400], [470, 410]].forEach(function (p, k) { c.R('polygon', [[[p[0], p[1] - 14], [p[0] + 12, p[1]], [p[0], p[1] + 14], [p[0] - 12, p[1]]]], { stroke: INK, strokeWidth: 1.6, fill: '#5da87e', fillStyle: 'solid' }, t + .6 + k * .15, .2); });
+      c.R('line', [300, 500, 500, 500], { stroke: GRAY, strokeWidth: 1.8 }, t + 1.2, .3); return 1.5; } },
+    reedshoot: { at: [800, 450], f: function (c, t) {
+      [740, 770, 800, 830, 860].forEach(function (x, k) {
+        var y = [440, 430, 435, 440, 450][k];
+        c.R('line', [x, 500, x, y], { stroke: INK, strokeWidth: 2.6 }, t + k * .15, .3);
+        c.R('path', ['M' + x + ' ' + y + ' q10 -8 18 0'], { stroke: '#8cc09a', strokeWidth: 2 }, t + .7 + k * .15, .2); });
+      return 1.2; } },
+    puffer: { at: [850, 465], f: function (c, t) {
+      c.R('ellipse', [850, 465, 70, 48], { stroke: INK, strokeWidth: 2.2, fill: '#f2e6c8', fillStyle: 'solid' }, t, .5);
+      [[790, 430, 778, 418], [820, 420, 812, 404], [850, 417, 850, 400], [880, 420, 888, 404], [910, 430, 922, 418], [908, 480, 922, 492], [792, 480, 778, 492], [850, 513, 850, 528]].forEach(function (p, k) { c.R('line', p, { stroke: INK, strokeWidth: 1.8 }, t + .5 + k * .08, .15); });
+      c.R('linearPath', [[[918, 465], [942, 450], [942, 480]]], { stroke: INK, strokeWidth: 2 }, t + 1.1, .2);
+      c.R('circle', [872, 452, 5], { stroke: INK, strokeWidth: 1.4, fill: INK, fillStyle: 'solid' }, t + 1.2, .15);
+      c.R('path', ['M830 505 q20 12 40 0'], { stroke: INK, strokeWidth: 1.8 }, t + 1.3, .2); return 1.5; } }
   };
   TPL.scroll = function (c, q, d) {
     var fills = {};
