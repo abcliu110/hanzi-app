@@ -26,4 +26,12 @@ for(const f of ['data_zika.js','data_bushou.js']){
    if(v.a!==q.a)moved++;
    (v['误解标注']||[]).forEach(mz=>{if(v.opts[mz['选项'].charCodeAt(0)-65]!==mz['选项文本']){bad++;console.log('洗牌后误解标注错位',f,m,i);}});}});}
  console.log('洗牌校验：',n,'次洗牌，答案下标变化',moved,'次；不洗的题（非单选或含指位置选项）',kept);}
+// 界面写死的数量要和数据一致（首页面板、部首页/古诗页「N种玩法」）
+{const L=f=>{const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync('newhanzi/'+f,'utf8'),c);return c.window;};
+ const html=fs.readFileSync('newhanzi/index.html','utf8');
+ const real={'首':L('data/shici.js').NHZ_SHICI.poems.length,'部首':L('bushou/data.js').NHZ_BUSHOU.length,'篇':L('data/guwen.js').NHZ_GUWEN.texts.length};
+ for(const [u,n] of Object.entries(real)){const re=new RegExp('(\\d+) '+u+'(?=<| /)','g');let m;while((m=re.exec(html))){if(+m[1]!==n){bad++;console.log('index.html 写死数量不符',m[0],'实际',n);}}}
+ for(const [f,t] of [['bushou.html','bushou'],['shici.html','shici']]){const M=L('quiz/data_'+t+'.js').NHZ_QUIZ.modes;const n=Object.keys(M).filter(k=>M[k].length).length;
+  const m=fs.readFileSync('newhanzi/'+f,'utf8').match(/(\d+)种玩法/);if(m&&+m[1]!==n){bad++;console.log(f,'玩法数不符',m[0],'实际',n);}}
+ console.log('界面数量：',JSON.stringify(real));}
 console.log(bad?('FAIL '+bad):'OK');process.exit(bad?1:0);
