@@ -182,21 +182,22 @@ window.NHZReview = window.NHZReview || (function () {
   var quizRecorded = {}; /* 动手练/小测只记首次作答（反馈仍可重答，不改反馈） */
   var currentItems = {};
   var MODS = [
+    /* 首页顺序按学习路径：读篇目 → 诵读 → 字词与语法 → 高频字 → 翻译 → 背景知识（文学、文化、历史）→ 总表 */
     {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
-    {id:'yufa', icon:'🧩', t:'语法', d:'句式、实词、虚词、词类活用、通假、古今异义、一词多义'},
-    /* 以下属于语法（parent:'yufa'），首页不出现，从语法页的子面板进入；顺序即语法页面板顺序 */
+    {id:'songdu', icon:'🔊', t:'诵读', d:'篇目积累、断句、语感'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'实词、一词多义、古今异义、通假、词类活用、虚词、句式'},
+    /* 以下属于语法（parent:'yufa'），首页不出现，从语法页的子面板进入；顺序见 YUFA_ORDER */
     {id:'shici', icon:'📝', t:'实词', d:'含55个初中优先', parent:'yufa'},
-    {id:'xuci', icon:'🔤', t:'虚词', d:'用法、例句、辨析、题库', parent:'yufa'},
-    {id:'huoyong', icon:'🔄', t:'词类活用', d:'换词性换意思', parent:'yufa'},
-    {id:'tongjia', icon:'🔁', t:'通假', d:'通假字读本字', parent:'yufa'},
-    {id:'guyin', icon:'⚖️', t:'古今异义', d:'古今意思大不同', parent:'yufa'},
     {id:'duoyi', icon:'🌿', t:'一词多义', d:'一字多义看语境', parent:'yufa'},
-    {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
+    {id:'guyin', icon:'⚖️', t:'古今异义', d:'古今意思大不同', parent:'yufa'},
+    {id:'tongjia', icon:'🔁', t:'通假', d:'通假字读本字', parent:'yufa'},
+    {id:'huoyong', icon:'🔄', t:'词类活用', d:'换词性换意思', parent:'yufa'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'用法、例句、辨析、题库', parent:'yufa'},
+    {id:'gaopinci', icon:'⭐', t:'篇目高频字', d:'小学14篇与初中篇目重点字'},
+    {id:'fanyi', icon:'🔍', t:'翻译方法', d:'直译为主、留换删补调'},
     {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
     {id:'wenhua', icon:'🏺', t:'文化常识', d:'器物、度量衡、历法、节日、地理'},
-    {id:'songdu', icon:'🔊', t:'诵读', d:'篇目积累、断句、语感'},
-    {id:'fanyi', icon:'🔍', t:'翻译方法', d:'直译为主、留换删补调'},
-    {id:'gaopinci', icon:'⭐', t:'篇目高频字', d:'小学14篇与初中篇目重点字'},
+    {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
     {id:'zongbiao', icon:'📊', t:'汇总总表', d:'按分类的字表总汇'}
   ];
   var SECTIONS = [
@@ -784,11 +785,16 @@ window.NHZReview = window.NHZReview || (function () {
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
     if(cat && cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
-    var panels = YUFA_GROUPS.slice(0, 3).map(function(x){ return {key:'g:'+x.g, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d}; })
-      .concat(MODS.filter(function(m){ return m.parent==='yufa'; }).map(function(m){
-        var c = catById(m.id); return {key:'m:'+m.id, icon:m.icon, t:m.t, n:c ? c.items.length : 0, d:m.d.replace(/^\d+个点 · /, '')};
-      }))
-      .concat([YUFA_GROUPS[3]].map(function(x){ return {key:'g:'+x.g, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d}; }));
+    /* 语法子面板顺序：总说（入门）→ 字词（实词、一词多义、古今异义、通假、词类活用、虚词）→ 句子（句子成分、特殊句式、固定句式） */
+    var YUFA_ORDER = ['g:总说','m:shici','m:duoyi','m:guyin','m:tongjia','m:huoyong','m:xuci','g:句子成分','g:特殊句式','g:固定句式'];
+    var panels = YUFA_ORDER.map(function(k){
+      if(k.indexOf('g:')===0){
+        var x = YUFA_GROUPS.filter(function(y){ return 'g:'+y.g===k; })[0];
+        return {key:k, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d};
+      }
+      var m = modMeta(k.slice(2)), c = catById(m.id);
+      return {key:k, icon:m.icon, t:m.t, n:c ? c.items.length : 0, d:m.d};
+    });
     h += '<div class="yw-grid">' + panels.filter(function(p){ return p.n > 0; }).map(function(p){
       return '<button class="yw-head" data-ysub="'+esc(p.key)+'"><span class="yw-ico">'+p.icon+'</span><span class="yw-name">'+esc(p.t)+'</span><span class="yw-sub">'+p.n+'点 · '+esc(p.d)+'</span><span class="yw-arrow">▾</span></button>';
     }).join('') + '</div>';
