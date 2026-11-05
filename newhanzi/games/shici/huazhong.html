@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>画中有诗 · 互动练习</title>
+<link rel="stylesheet" href="../../quiz/quiz.css">
+<style>
+/* 定格画框：只留画板，页签/播放条由挂载时去掉 */
+.qz-wb{border:1px solid var(--qz-line,#d5dfd0);border-radius:14px;overflow:hidden;margin:0 0 12px;background:#f8faf5}
+.qz-wb svg{display:block;width:100%;height:auto}
+.qz-wb-load{padding:28px 12px;text-align:center;color:var(--qz-muted,#6b7566)}
+</style>
+</head>
+<body>
+<header class="qz-top">
+  <button class="qz-back" id="btnBack">← 返回</button>
+  <a class="qz-back back" href="../../index.html" target="_top" style="text-decoration:none">🏠 首页</a>
+  <h1 id="qzTitle">画中有诗 · 互动练习</h1>
+</header>
+<main class="qz-main">
+  <p id="hzEmpty" class="qz-wb-load" hidden>正在加载白板与诗库…</p>
+  <section id="view-home"></section>
+  <section id="view-quiz" hidden>
+    <div class="qz-hud">
+      <div class="qz-prow">
+        <span id="qzProg">1/20</span>
+        <span id="qzModeTag"></span>
+        <span class="qz-hudscore"><span id="qzScore">0 分</span><span id="qzStreak"></span></span>
+      </div>
+      <div class="qz-track"><div id="qzBar"></div></div>
+    </div>
+    <div id="qbox"></div>
+    <div id="qfb" hidden></div>
+    <button class="qz-btn primary qz-next" id="btnNext" hidden>下一题 →</button>
+  </section>
+  <section id="view-done" hidden></section>
+</main>
+<script src="../../quiz/hua_gen.js"></script>
+<script>
+/* A22-12 画中有诗：题目运行时自动生成——
+   1) 读 wb/index.js，动态发现全部「诗:题目|作者」登记（不写死首数，A19 再登记即自动扩题）；
+   2) 逐个加载场景文件，拦截 NHZWB.add 拿到场景数据（只读，不改引擎与场景文件）；
+   3) 用 hua_gen.buildQuestions 从 data/shici.js 诗句生成四选一题；
+   4) 把题库交给 quiz/engine.js（复用其答题、计分、错题本 NHZReview），再动态加载引擎。
+   引擎按 ?tab=shici 取错题本分区；缺省时补上参数重进。 */
+(function () {
+'use strict';
+if (!/[?&]tab=/.test(location.search)) {
+  location.replace(location.pathname + '?tab=shici');
+  return;
+}
+var $ = function (id) { return document.getElementById(id); };
+function showEmpty(msg) {
+  var m = $('hzEmpty');
+  if (m) { m.textContent = msg; m.hidden = false; }
+}
+var loaded = {};
+function load(src, cb) {
+  if (loaded[src]) return cb(true);
+  var s = document.createElement('script');
+  s.src = src;
+  s.onload = function () { loaded[src] = 1; cb(true); };
+  s.onerror = function () { cb(false); };
+  document.head.appendChild(s);
+}
+function seq(list, cb) {
+  var i = 0;
+  (function next(ok) {
+    if (!ok) return cb(false);
+    if (i >= list.length) return cb(true);
+    load(list[i++], next);
+  })(true);
+}
+showEmpty('正在加载白板与诗库…');
+seq(['../../wb/index.js', '../../data/shici.js', '../../wb/rough.js', '../../wb/wb-engine.js', '../../wb/terms.js'], function (ok) {
+  if (!ok || !window.NHZ_WB_INDEX || !window.NHZ_SHICI || !window.NHZWB) {
+    showEmpty('白板或诗库加载失败，刷新再试。');
+    return;
+  }
+  var entries = Object.keys(window.NHZ_WB_INDEX).filter(function (k) {
+    return k.indexOf('诗:') === 0;
+  }).map(function (k) {
+    return { key: k, file: window.NHZ_WB_INDEX[k] };
+  });
+  if (!entries.length) {
+    showEmpty('还没有登记的诗画白板，先去看看诗吧～');
+    return;
+  }
+  var specs = {}, origAdd = window.NHZWB.add;
+  window.NHZWB.add = function (name, spec) {
+    specs[name] = spec;
+    return origAdd(name, spec);
+  };
+  /* 场景文件逐个加载、单个失败只跳过该首，不拖垮整局 */
+  var pending = entries.length;
+  entries.forEach(function (e) {
+    load('../../wb/s/' + e.file + '.js', function () {
+      if (--pending === 0) {
+        window.NHZWB.add = origAdd;
+        var qs = window.NHZQuizHua.buildQuestions(window.NHZ_SHICI.poems || [], entries, specs);
+        if (!qs.length) {
+          showEmpty('已登记的白板还没有配好诗句，稍后再来。');
+          return;
+        }
+        window.NHZ_QUIZ = { tab: 'shici', title: '画中有诗', modes: { hua: qs } };
+        var eng = document.createElement('script');
+        eng.src = '../../quiz/engine.js';
+        document.body.appendChild(eng);
+      }
+    });
+  });
+});
+})();
+</script>
+</body>
+</html>

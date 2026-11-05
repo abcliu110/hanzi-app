@@ -20,7 +20,7 @@
 .sc-lines{font-size:20px;line-height:2;text-align:center;padding:18px 8px}
 /* 阅读条（改进设计 P0-2）：朗读高亮 / 节奏 / 渐隐背诵 */
 .sc-readbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}
-.sc-readbar button{min-height:44px;padding:8px 16px;border-radius:12px;border:2px solid var(--accent-deep,#3f6b4f);background:var(--accent-soft,#e8f0e4);color:var(--accent-deep,#3f6b4f);font-size:16px;font-weight:700;cursor:pointer}
+.sc-readbar button,.sc-readbar a{min-height:44px;padding:8px 16px;border-radius:12px;border:2px solid var(--accent-deep,#3f6b4f);background:var(--accent-soft,#e8f0e4);color:var(--accent-deep,#3f6b4f);font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
 .sc-readbar button.on{background:var(--accent-deep,#3f6b4f);color:#fff}
 .sc-line.reading{background:#fff3c4;border-radius:10px}
 .sc-line .rb{color:#b08d57;margin:0 .15em;font-weight:400}
@@ -1229,7 +1229,7 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+(scWbName(p)?'<a href="games/shici/huazhong.html?tab=shici">🎨 画中有诗</a>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
