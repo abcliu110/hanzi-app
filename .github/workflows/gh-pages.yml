@@ -1,0 +1,54 @@
+# 自动发布：master 有改动时，把应用发布到 gh-pages 分支（GitHub Pages 静态托管）。
+# 只做静态文件同步，不改任何 app 代码逻辑；app 本身仍是 file:// 单机应用。
+# 发布内容用仓库自带的 newhanzi/tools/build_site.py 生成（见 newhanzi/DEPLOY.md 方案 A）：
+# 只含运行时文件，排除 ziku/（26MB 字库构建源）、docs/、tools/、tests/、*.md、*.py、package*.json 等开发文件。
+# 图标在 newhanzi/icons/，随站点一起复制。不要直接整目录复制 newhanzi/。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'newhanzi/**'
+      - '.github/workflows/gh-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build publishable site from newhanzi/
+        run: python3 newhanzi/tools/build_site.py build/site
+
+      - name: Publish to gh-pages branch
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          cp -r build/site/. "$tmp"/
+          rm -rf build
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git branch -D gh-pages 2>/dev/null || true
+          git checkout --orphan gh-pages
+          git rm -rf . --quiet
+          cp -r "$tmp"/. .
+          touch .nojekyll
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No changes to deploy.'
+          else
+            git commit -m "Deploy newhanzi/ from master ${GITHUB_SHA}"
+            git push origin gh-pages --force
+          fi

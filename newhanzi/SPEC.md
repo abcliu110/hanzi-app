@@ -77,9 +77,7 @@ newhanzi/
     - 字卡：12维度→5分区呈现，笔顺SVG动画+朗读，打开即记为已学（canvas描红+练字打分：**已冻结**，以 MASTER_PLAN 为准）
   yuwen.html / yuwen.js   语文知识库前端（语法44/阅读14/写作16条，三模块Tab+分类+手风琴条目，首页banner入口）
   yuwen/             语文知识库（运行时 data.js；语法题库 quiz_bank_*.js 按需加载，清单 quiz_bank_index.js 由 tools/gen_quiz_bank_index.py 生成）
-    grammar.json     （旧版源，内容已落后于 data.js，勿用来重建；运行时只用 yuwen/data.js）语法：词类12 / 短语5 / 句子成分6 / 复句7 / 修辞8 / 病句6
-    reading.json     阅读理解：通用方法4 / 题型公式6 / 文体策略4
-    writing.json     写作：审题3 / 立意3 / 选材3 / 结构4 / 语言3
+    grammar.json / logic.json / reading.json / writing.json   旧版源已于 2026-11-05 删除（内容落后于 data.js，logic.json 早已缺失）；运行时与构建均只用 yuwen/data.js，勿重建
   bushou.html / bushou.js   偏旁部首知识库前端（手风琴条目：变体/说文/语义场/例字/含此部首的字，例字与字表均链字卡；搜索+有释义过滤，首页🧩banner入口）
   bushou/            偏旁部首知识库
     data.js          window.NHZ_BUSHOU（241条：106全资料[含义+说文+语义场+例字] + 97说解[本地说文540部提取] + 38纯字表；有释义覆盖3420/3500字）

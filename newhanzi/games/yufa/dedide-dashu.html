@@ -107,6 +107,7 @@ function start(){
   $("holes").style.display = "flex";
   updateHud();
   nextQ();
+  clearInterval(timer); /* 再次开局前先停掉上一局的计时器，否则两个 interval 同时减秒 */
   timer = setInterval(function(){
     timeLeft--;
     $("time").textContent = timeLeft;

@@ -25,6 +25,11 @@
 .sc-line.reading{background:#fff3c4;border-radius:10px}
 .sc-line .rb{color:#b08d57;margin:0 .15em;font-weight:400}
 .sc-line .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
+/* 拼音注音（Q17）：拼音在字上方，11px 次要色；竖排与注音互斥，万一同开注音优先横排 */
+.sc-lines.py{line-height:2.9}
+.sc-line .hzpy{display:inline-flex;flex-direction:column;align-items:center;line-height:1.2;vertical-align:top}
+.sc-line .hzpy i{font-style:normal;font-size:11px;color:var(--muted);line-height:1.4}
+.sc-vertical .sc-lines.py{writing-mode:horizontal-tb;height:auto}
 .sc-memo-tip{text-align:center;color:#6b7c6b;font-size:14px;margin-top:4px}
 .sc-lines p{margin:0}
 /* 古籍竖排（改进设计 P2-5）：只改诗详情原文区；竖排时轻微飘动，减动效偏好下关闭 */
@@ -162,9 +167,12 @@ if (window.self !== window.top) {
 }
 </script>
 <script src="data/shici.js"></script>
+<script src="data/pinyin_lookup.js"></script>
 <script src="data/shangxi.js"></script>
 <script src="data/shiju.js"></script>
 <script src="wb/index.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
 <script>
 (function(){
 var D = window.NHZ_SHICI || {poems:[]};
@@ -201,6 +209,9 @@ function vHome(){
   h += '<div class="sc-card" style="margin-top:12px"><h3>📚 诗歌基础互动（17 款）</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
     '<a href="games/shici/feihua.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌸 飞花令人机对战</a>' +
     '<a href="games/shici/jichu/duiou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">⚖️ 对偶对仗</a><a href="games/shici/jichu/yayun.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎵 押韵点韵脚</a><a href="games/shici/jichu/pingze.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📏 平仄判断</a><a href="games/shici/jichu/ticaid.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📜 绝句律诗</a><a href="games/shici/jichu/wuyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔢 五言七言</a><a href="games/shici/jichu/guti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📖 古体近体</a><a href="games/shici/jichu/yuefu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎶 乐府知识</a><a href="games/shici/jichu/qicheng.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔄 起承转合</a><a href="games/shici/jichu/jiezou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✂️ 节奏断句</a><a href="games/shici/jichu/silian.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🧩 四联归位</a><a href="games/shici/jichu/lianju.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔗 联句配对</a><a href="games/shici/jichu/shiyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">👁️ 找诗眼</a><a href="games/shici/jichu/yixiang.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌙 意象配对</a><a href="games/shici/jichu/shiti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🏷️ 诗题猜主题</a><a href="games/shici/jichu/langdu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🗣️ 朗读断句</a><a href="games/shici/jichu/beisong.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✍️ 背诵填空</a>' +
+    '</div></div>';
+  h += '<div class="sc-card" style="margin-top:12px"><h3>🎮 诗词新玩法</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
+    '<a href="games/shici/pengyouquan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">💬 唐朝朋友圈</a><a href="games/shici/gelu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔧 格律小作坊</a><a href="games/shici/chaodai.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🏛️ 朝代长河</a><a href="games/shici/beisong.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎙️ 背诵评测</a>' +
     '</div></div>';
   h += '<button class="sc-backbtn" data-go="poems">📜 诗库（全部'+D.poems.length+'首）</button>';
   listEl.innerHTML = h; showList();
@@ -939,6 +950,18 @@ function openKnow(idx){
     h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+k['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
   }
   var dHtml = escD(k.d);
+  /* Q15 四型模板：图式/对照表/决策树/时间轴，均取自本卡 d 文本里的对应块；已转成模板的块从正文里去掉，避免同一内容贴两遍 */
+  var PT = window.NHZPatterns;
+  if (PT) {
+    var scRows = PT.schemaFromShiciText(k.d);
+    if (scRows) { h += PT.renderSchema(scRows); dHtml = dHtml.replace(/<b>\[图式\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var cmpRows = PT.compareFromShiciText(k.d);
+    if (cmpRows) { h += PT.renderGrid(cmpRows); dHtml = dHtml.replace(/<b>\[对照表\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var decT = PT.decisionFromShiciText(k.d);
+    if (decT) { h += PT.renderDecision(decT); dHtml = dHtml.replace(/<b>\[决策树\]<\/b>[\s\S]*?(?=<br><br>|<b>📜|$)/, ''); }
+    var tlEv = PT.timelineFromShici(k);
+    if (tlEv) h += PT.renderTimeline(tlEv);
+  }
   var tp = knowType(k.m, k.t);
   /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
   var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
@@ -1188,26 +1211,43 @@ function vZilian(preZi){
   if(preZi){ document.getElementById('ziinput').value = preZi; run(preZi); }
 }
 
-var poemQ = '', poemDyn = 'all';
+var poemQ = '', poemDyn = 'all', poemKe = '课内', poemGrade = 'all';
 function vPoems(){
   setTitle('诗库');
-  /* 朝代按时间排，只列诗库里实有的（含拓展诗） */
+  /* 朝代按时间排，只列当前课内/拓展+年级筛选后实有的诗 */
   var DYN_ORDER = ['先秦','汉','魏','晋','南北朝','隋','唐','五代','宋','金','元','明','清','近代','现代'];
-  var have = {}; D.poems.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
+  var base = D.poems.filter(function(p){
+    if(poemKe!=='all' && p.ke!==poemKe) return false;
+    if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
+    return true;
+  });
+  var have = {}; base.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
   var dyns = ['all'].concat(DYN_ORDER.filter(function(d){ return have[d]; }), Object.keys(have).filter(function(d){ return DYN_ORDER.indexOf(d) < 0; }));
+  if(poemDyn!=='all' && dyns.indexOf(poemDyn)<0) poemDyn = 'all';
   var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
   h += '<div class="searchbox" style="padding:10px 16px 0"><input id="pq" type="text" placeholder="搜诗名 / 诗人 / 诗句" value="'+esc(poemQ)+'" autocomplete="off"></div>';
+  h += '<div class="sc-chips">' + ['课内','拓展','all'].map(function(k){
+    return '<span class="sc-chip'+(poemKe===k?' active':'')+'" data-ke="'+k+'">'+(k==='all'?'全部':k)+'</span>';
+  }).join('') + '</div>';
+  if(poemKe==='课内'){
+    h += '<div class="sc-chips">' + ['all','1-2','3-4','5-6'].map(function(g){
+      return '<span class="sc-chip'+(poemGrade===g?' active':'')+'" data-grade="'+g+'">'+(g==='all'?'全部年级':g+'年级')+'</span>';
+    }).join('') + '</div>';
+  }
   h += '<div class="sc-chips">' + dyns.map(function(d){
     return '<span class="sc-chip'+(poemDyn===d?' active':'')+'" data-dyn="'+d+'">'+(d==='all'?'全部':d)+'</span>';
-  }).join('') + '</div><div id="poemlist"></div>';
+  }).join('') + '</div><div id="poemcount" style="padding:6px 16px;color:#888;font-size:13px"></div><div id="poemlist"></div>';
   listEl.innerHTML = h; showList(); wireBack();
   function render(){
     var q = poemQ.trim();
     var arr = D.poems.filter(function(p){
+      if(poemKe!=='all' && p.ke!==poemKe) return false;
+      if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
       if(poemDyn!=='all' && p.dynasty!==poemDyn) return false;
       if(!q) return true;
       return p.title.indexOf(q)>=0 || p.author.indexOf(q)>=0 || p.lines.join('').indexOf(q)>=0;
     });
+    document.getElementById('poemcount').textContent = '共 ' + arr.length + ' 首';
     document.getElementById('poemlist').innerHTML = arr.map(function(p){
       return '<div class="sc-poem" data-o="'+p.order+'"><div class="sc-ptitle">'+esc(p.title)+'</div><div class="sc-pmeta"><span class="sc-badge">'+esc(p.dynasty||'')+'</span><span class="sc-badge">'+esc(p.ticai||'')+'</span>'+esc(p.author)+'</div></div>';
     }).join('');
@@ -1219,6 +1259,12 @@ function vPoems(){
   listEl.querySelectorAll('[data-dyn]').forEach(function(el){
     el.addEventListener('click', function(){ poemDyn = el.getAttribute('data-dyn'); vPoems(); });
   });
+  listEl.querySelectorAll('[data-ke]').forEach(function(el){
+    el.addEventListener('click', function(){ poemKe = el.getAttribute('data-ke'); if(poemKe!=='课内') poemGrade = 'all'; vPoems(); });
+  });
+  listEl.querySelectorAll('[data-grade]').forEach(function(el){
+    el.addEventListener('click', function(){ poemGrade = el.getAttribute('data-grade'); vPoems(); });
+  });
   render();
 }
 
@@ -1229,8 +1275,8 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+(scWbName(p)?'<a href="games/shici/huazhong.html?tab=shici">🎨 画中有诗</a>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
-  h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="py"'+(scPyOn?' class="on"':'')+'>🔤 拼音</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+(scWbName(p)?'<a href="games/shici/huazhong.html?tab=shici">🎨 画中有诗</a>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
+  h += '<div class="sc-lines'+(scPyOn?' py':'')+'">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i,p,scPyOn)+'</p>';}).join('')+'</div>'+scPronNote(p)+'<div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
     var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
@@ -1269,7 +1315,30 @@ function openPoem(order){
    背一背：四档渐隐——全显 → 隔字隐 → 只留句首字 → 全隐，点一句可看一眼；
    朗读：浏览器自带中文语音逐句读，读到哪句高亮哪句。 */
 function scHanzi(c){ return /[\u3400-\u9fff]/.test(c); }
-function scLineHTML(l, beat, memo, li){
+/* ===== 拼音注音（Q17）=====
+   读音来源：逐首校过的 pron 覆盖（@行号 键只对该行生效）> 查表主音（pinyin_lookup.js 首音）。
+   pron 只记「语境读音 ≠ 查表主音」的字（少数注释性 pron 如山行斜 xié 除外）；其余字开关显示主音。
+   开关跨诗保持（scPyOn），与竖排互斥。 */
+var scPyOn = false;
+function scPyFor(p, li, ch){
+  if(p && p.pron){
+    var k = ch+'@'+li; if(p.pron[k]) return p.pron[k];
+    if(p.pron[ch]) return p.pron[ch];
+  }
+  try{ var v = (window.NHZ_PINYIN||{})[ch]; if(v) return v.split(',')[0]; }catch(e){}
+  return '';
+}
+function scPronNote(p){
+  if(!p.pron) return '';
+  var seen = {}, items = [];
+  Object.keys(p.pron).forEach(function(k){
+    var m = k.match(/^(.*)@(\d+)$/), ch = m?m[1]:k, li = m?+m[2]:null, r = p.pron[k];
+    var s = ch+'|'+r+'|'+(li===null?'':li); if(seen[s]) return; seen[s] = 1;
+    items.push(ch+'读 '+r+(li!=null?'（第'+(li+1)+'句）':''));
+  });
+  return '<div class="sc-memo-tip">📌 读音：'+items.join('；')+'</div>';
+}
+function scLineHTML(l, beat, memo, li, p, pyOn){
   var chars = Array.from(l), hz = chars.filter(scHanzi).length, cut = {};
   if(beat && (hz===5 || hz===7)){ if(hz===5) cut[2]=1; else { cut[2]=1; cut[4]=1; } }
   var out = '', k = 0;
@@ -1277,19 +1346,23 @@ function scLineHTML(l, beat, memo, li){
     if(!scHanzi(c)){ out += esc(c); return; }
     if(cut[k]) out += '<span class="rb">/</span>';
     var hide = memo===3 || (memo===2 && k>0) || (memo===1 && k%2===1);
-    out += '<span class="hz'+(hide?' hid':'')+'">'+esc(c)+'</span>';
+    var py = (pyOn && !hide && p) ? scPyFor(p, li, c) : '';
+    var hzHtml = '<span class="hz'+(hide?' hid':'')+'">'+esc(c)+'</span>';
+    out += py ? '<span class="hzpy"><i>'+esc(py)+'</i>'+hzHtml+'</span>' : hzHtml;
     k++;
   });
   return out;
 }
 function scReadBar(p){
   var bar = detEl.querySelector('.sc-readbar'); if(!bar) return;
-  var st = {beat:false, memo:0};
+  var st = {beat:false, memo:0, py:scPyOn};
   var tips = ['', '隔一个字藏一个，试着读出来', '只留每句第一个字', '全藏起来了，点一句可以偷看一眼'];
   /* 竖排是跨诗的模式：按钮初始态跟 detEl 上的 class 走（换诗不重置） */
   var vb = bar.querySelector('[data-rb=vert]'); if(vb) vb.classList.toggle('on', detEl.classList.contains('sc-vertical'));
   function redraw(){
-    detEl.querySelectorAll('.sc-line').forEach(function(el){ var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); });
+    detEl.querySelectorAll('.sc-line').forEach(function(el){ var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i, p, st.py); });
+    var sl = detEl.querySelector('.sc-lines'); if(sl) sl.classList.toggle('py', st.py);
+    var pb = bar.querySelector('[data-rb=py]'); if(pb) pb.classList.toggle('on', st.py);
     bar.querySelector('[data-rb=beat]').classList.toggle('on', st.beat);
     var mb = bar.querySelector('[data-rb=memo]'); mb.classList.toggle('on', st.memo>0); mb.textContent = st.memo ? '🙈 背一背 '+st.memo+'/3' : '🙈 背一背';
     var t = document.getElementById('scmemotip'); if(t) t.textContent = tips[st.memo];
@@ -1311,7 +1384,8 @@ function scReadBar(p){
       if(b.classList.contains('on')){ stopRead(); return; }
       if(!('speechSynthesis' in window)){ b.textContent = '🔇 这台设备不能朗读'; return; }
       stopRead(); b.classList.add('on'); readFrom(0);
-    } else if(a==='vert'){ detEl.classList.toggle('sc-vertical'); detEl.classList.toggle('sway', detEl.classList.contains('sc-vertical')); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); }
+    } else if(a==='vert'){ var wasPy = st.py; if(!detEl.classList.contains('sc-vertical') && wasPy){ st.py = false; scPyOn = false; } detEl.classList.toggle('sc-vertical'); detEl.classList.toggle('sway', detEl.classList.contains('sc-vertical')); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); if(wasPy) redraw(); }
+    else if(a==='py'){ st.py = !st.py; scPyOn = st.py; if(st.py){ detEl.classList.remove('sc-vertical','sway'); var v2 = bar.querySelector('[data-rb=vert]'); if(v2) v2.classList.remove('on'); } redraw(); }
     else if(a==='beat'){ st.beat = !st.beat; redraw(); }
     else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
     else if(a==='wb'){ scWb(p, b); }
@@ -1321,8 +1395,8 @@ function scReadBar(p){
   detEl.querySelectorAll('.sc-line').forEach(function(el){
     el.addEventListener('click', function(){
       if(!st.memo) return;
-      var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, 0, i);
-      setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); }, 2000);
+      var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, 0, i, p, st.py);
+      setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i, p, st.py); }, 2000);
     });
   });
   var back = document.getElementById('scback'); if(back) back.addEventListener('click', function(){ stopRead(); scBeatBox(p, false); });

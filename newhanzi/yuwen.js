@@ -2,11 +2,14 @@
 (function () {
   'use strict';
 
+  /* 数据唯一源：yuwen/data.js 的 window.NHZ_YUWEN（file:// 与 http:// 通用）。
+     旧版 yuwen/*.json 已于 2026-11-05 删除（内容落后于 data.js，logic.json 早已缺失）；
+     此处不再保留 file 字段，任何代码不得再按文件名取数。 */
   var MODULES = [
-    { key: 'grammar', file: 'yuwen/grammar.json', label: '语法' },
-    { key: 'logic', file: 'yuwen/logic.json', label: '逻辑学' },
-    { key: 'reading', file: 'yuwen/reading.json', label: '阅读理解' },
-    { key: 'writing', file: 'yuwen/writing.json', label: '写作' }
+    { key: 'grammar', label: '语法' },
+    { key: 'logic', label: '逻辑学' },
+    { key: 'reading', label: '阅读理解' },
+    { key: 'writing', label: '写作' }
   ];
   var DATA = {};
   var active = 'grammar';
@@ -298,6 +301,18 @@
       }).join('') + '</div>';
     }
     } /* 4. 规则一句话结束：此前缺了这个右括号，导致文件尾多出一个 }) */
+    /* Q15 四型模板：对照表（结构化字段优先；无字段时由辨析的成对辨析派生，原文字不改写） */
+    var PT = window.NHZPatterns;
+    var derivedCompare = false;
+    if (PT) {
+      if (it['对照表']) body += PT.renderCompare(it['对照表']);
+      else if (PT.compareFromBianxi(it['辨析'])) {
+        derivedCompare = true;
+        body += PT.renderCompareRows(PT.compareFromBianxi(it['辨析']));
+      }
+      /* Q15 四型模板：图式（分类 → 中心 + 成员阵列） */
+      if (PT.schemaFromItem(it)) body += PT.renderSchema(PT.schemaFromItem(it));
+    }
     /* 4a. 分类：每个子类单独一块（类名 + 代表词 + 例句），不再只藏在一段话里 */
     if (it['分类'] && it['分类'].length) {
       var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
@@ -324,6 +339,13 @@
           it['怎么认'].map(function (s, si) {
             return '<p class="yw-exp">' + (si + 1) + '. ' + esc(s) + '</p>';
           }).join('');
+      }
+    }
+    /* Q15 四型模板：决策树（字段优先；程序型无字段时用「怎么认」排成判断流程，内容一字不改） */
+    if (PT) {
+      if (it['决策树']) body += PT.renderDecision(it['决策树']);
+      else if (tp === '程序' && it['怎么认'] && it['怎么认'].length) {
+        body += PT.renderDecisionNodes(PT.decisionFromSteps(it['怎么认']), '判断流程（按「怎么认」）');
       }
     }
     /* 1. 啊哈现象（类比） */
@@ -357,8 +379,8 @@
     }
     /* 4b. 深讲一点（语法深讲样板：词类） */
     if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
-    /* 4d. 辨析 */
-    if (it['辨析']) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
+    /* 4d. 辨析（已由对照表派生呈现的不再重复贴原文） */
+    if (it['辨析'] && !derivedCompare) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
     /* 4e. 例句解析：程序型标题为全程演示 */
     if (it['例句解析'] && it['例句解析'].length) body += stepHead(tp === '程序' ? '🎬 全程演示' : '例句解析') +
       it['例句解析'].map(function (e) {

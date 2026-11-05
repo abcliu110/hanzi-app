@@ -5,7 +5,8 @@
    2. 新增条目的幕构成：L1 1 幕、L2 2–4 幕、L3 1 幕、回练 1 幕（k:'review'，huilian:true）
    3. L3 幕必须有 src（允许写“待核……”，但会列入待核清单）
    4. 错句必须在同一幕内给出改正：ex 里 ok:false 必须带 fix；review 幕 ok:false 必须带 good
-   5. id 不与现有 99 项（newhanzi/wb/index.js 的场景 id）重复，标题不与现有 99 项名称重复，id 全局唯一
+   5. id 不与现有 99 项（newhanzi/wb/index.js 的场景 id，除本次新增 50 项外——它们已上线进
+      index.js，只防与其它场景 id 撞车）重复，标题不与现有 99 项名称重复，id 全局唯一
    6. l3-huilian.json：名称必须是现有 99 项之一、不重复；每项 1 幕 L3（带 src）+ 1 幕回练
    运行：node tools/content/check_yufa_neirong.js [--list-daihe]（tools/check_scripts.js 会调用） */
 const fs = require("fs"), path = require("path");
@@ -25,7 +26,15 @@ const WB = loadWindow("wb/index.js", "NHZ_WB_INDEX") || {};
 const YW = loadWindow("yuwen/data.js", "NHZ_YUWEN") || {};
 const OLD_NAMES = new Set();
 for (const c of (YW.grammar && YW.grammar.categories) || []) for (const it of c.items) OLD_NAMES.add(it.name);
-const OLD_IDS = new Set(Object.values(WB));
+/* 本次新增 50 项的 id：场景已上线进 index.js，校验“现有”时先排除，只防与其它场景 id 撞车 */
+const NEW_IDS = new Set();
+for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith(".json") && !x.startsWith("l3-huilian")).sort()) {
+  try {
+    const J = JSON.parse(fs.readFileSync(path.join(DIR, f), "utf8"));
+    if (Array.isArray(J.items)) for (const it of J.items) if (it && it.id) NEW_IDS.add(it.id);
+  } catch (e) { /* 解析失败由主循环报错，这里跳过 */ }
+}
+const OLD_IDS = new Set(Object.values(WB).filter((id) => !NEW_IDS.has(id)));
 if (OLD_NAMES.size !== 99) warn(`现有语法项不是 99 个，而是 ${OLD_NAMES.size} 个（data.js）`);
 
 const TPL = new Set(["title", "cards", "test", "mark", "vs", "slots", "fix", "link", "rel", "steps", "line", "end",

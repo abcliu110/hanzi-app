@@ -6,7 +6,7 @@
 const fs = require("fs"), path = require("path");
 const C = require("./common.js");
 const FILES = ["newhanzi/data/shici.js", "newhanzi/data/guwen_knowledge.js", "newhanzi/yuwen/data.js",
-  "newhanzi/yuwen/grammar.json", "newhanzi/bushou/data.js"];
+  "newhanzi/bushou/data.js"];
 const WARN = [/（）/, /^部首含义$/, /多与相关/];
 let err = 0, warn = 0, n = 0;
 for (const rel of FILES) {

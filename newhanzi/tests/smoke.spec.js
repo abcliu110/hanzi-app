@@ -691,7 +691,8 @@ for (const vp of [{ name: 'tablet', width: 768, height: 1024 }, { name: 'desktop
 /* sw.js 预缓存清单要覆盖全部页面：新增/删除页面后运行 python3 tools/gen_sw_core.py */
 test('sw.js precache list is up to date', async () => {
   const { execFileSync } = require('child_process');
-  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true }).toString();
+  // PYTHONUTF8：Windows 控制台默认 GBK，不设则中文输出被错解码，断言“最新”会误判
+  const out = execFileSync('python3', ['tools/gen_sw_core.py', '--check-pages'], { cwd: require('path').join(__dirname, '..'), shell: true, env: { ...process.env, PYTHONUTF8: '1' } }).toString();
   expect(out).toContain('最新');
 });
 

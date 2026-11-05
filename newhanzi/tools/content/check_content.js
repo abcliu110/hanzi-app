@@ -109,6 +109,20 @@ if (fs.existsSync(ZD)) for (const f of fs.readdirSync(ZD)) {
   for (const [a, b] of [["“", "”"], ["（", "）"], ["(", ")"]]) if (t.split(a).length !== t.split(b).length) err(tag + `${a}${b} 不配对`);
   const en = (t.match(/[a-z]{4,}/g) || []).filter((w) => !["beer"].includes(w));
   if (en.length) err(tag + "混入英文：" + en.join(","));
+  /* 四类复查（2026-11-05）：截断 / 英文缩写 / 六书矛盾 / 半句。
+     合法例外：ton、beer 为译音字说明，CUHK 为来源引用，Cl 为化学符号，
+     拼音注音（如 yǔ、le）不是英文单词，故英文规则只查 4 字母以上小写串
+     与 2 字母以上大写串；“象声字”不是六书类别，不与形声判矛盾。 */
+  const noSrc = t.replace(/（[^）]*）$/, "");
+  if (/[，、（：…]$/.test(noSrc)) err(tag + "疑似截断：去来源括号后以 ，、（：… 结尾");
+  for (const [a, b] of [["「", "」"], ["《", "》"], ["‘", "’"]]) if (t.split(a).length !== t.split(b).length) err(tag + `${a}${b} 不配对`);
+  const up = (t.replace(/CUHK/g, "").match(/[A-Z]{2,}/g) || []);
+  if (up.length) err(tag + "混入英文缩写：" + up.join(","));
+  const lsVal = ((k.dim || {})["六书"] || {}).value || "";
+  const lsTypes = ["形声", "会意", "象形", "指事", "假借", "转注"].filter((x) => lsVal.includes(x));
+  const present = ["形声", "会意", "象形", "指事", "假借", "转注"].filter((x) => t.includes(x));
+  if (lsTypes.length && present.length && !lsTypes.some((x) => present.includes(x))) err(tag + `讲解说法与六书 ${lsVal} 矛盾`);
+  if (!/[。！？][”’」]?$/.test(noSrc)) err(tag + "疑似半句：去来源括号后未以 。！？结尾");
 }
 
 if (errs.length) {
