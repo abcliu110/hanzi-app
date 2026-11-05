@@ -14,7 +14,7 @@ from fix_yuwen_io import load_bank, save_bank, bank_files, load_data, items
 
 TPL = re.compile(r'^(.+?)括号里填(.+?)；其他三个(字|词)不合(.+?)的用法。$', re.S)
 
-def main():
+def build_use():
     d, _ = load_data()
     USE = collections.defaultdict(list)   # 字词 → [说明]
     WHY = {}
@@ -34,6 +34,11 @@ def main():
     def use(w):
         v = USE.get(w)
         return '；'.join(v) if v else EXTRA[w]
+    return USE, WHY, use
+
+
+def main():
+    USE, WHY, use = build_use()
     st = collections.Counter()
     for fn in bank_files():
         name, b, _ = load_bank(fn); ch = False
