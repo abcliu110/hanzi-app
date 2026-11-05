@@ -21,10 +21,10 @@
 | A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | ✅ 见执行日志 |
 | A9 | P2 | xiufu/content.md | share.js 注释/逻辑写 seed%120，诗库现 192 首，改用 POEMS.length | ✅ 代码早已用 POEMS.length，只改注释 |
 | A10 | P2 | xiufu/content.md | shici.html 朝代筛选 chips 只有 唐/宋/五代/晋，补齐库里已有朝代（汉/南北朝/元/明/清/先秦） | ✅ 见执行日志 |
-| A11 | P3 | xiufu/anim.md「遗留」 | 部首区 120 个图示中 90 个内容空位（「口（）」空括号、「含口的字多与相关」缺关键词、31 处「部首含义」占位文字）——只删空位/占位，不编造含义 | 待做 |
+| A11 | P3 | xiufu/anim.md「遗留」 | 部首区 120 个图示中 90 个内容空位（「口（）」空括号、「含口的字多与相关」缺关键词、31 处「部首含义」占位文字）——只删空位/占位，不编造含义 | ↪ 移交 F6（bushou/** 已被审查代理领取，见第五节） |
 | A12 | P3 | xiufu/infra.md 第 5 条 | guwen.html 一次加载 15 个古文题库（~1.5MB），改按需加载（同语法页做法） | ✅ 见执行日志 |
-| A13 | P3 | xiufu/content.md | 拓展 84 首与通行本逐字核对（如蜀道难「噫吁戏/噫吁嚱」、离思「𥮾」） | 待做（量大，排后） |
-| A14 | P3 | xiufu/content.md | guwen.js 缺 9 篇小学课内文言（原文已在 tools/content/xiaoxue_wenyan.json，需写导读/译意，逐句有出处） | 待做（量大，排后） |
+| A13 | P3 | xiufu/content.md | 拓展 84 首与通行本逐字核对（如蜀道难「噫吁戏/噫吁嚱」、离思「𥮾」） | ↪ 移交 F3（data/shici.js 已被领取） |
+| A14 | P3 | xiufu/content.md | guwen.js 缺 9 篇小学课内文言（原文已在 tools/content/xiaoxue_wenyan.json，需写导读/译意，逐句有出处） | ↪ 移交 F2（data/guwen.js 已被领取） |
 | A15 | P2 | MASTER_PLAN 阶段一 | 渲染验证：yuwen.html 各节显示正常（Playwright 逐节打开无报错） | ✅ 见执行日志 |
 | A16 | P4 | gaijin/luoji P0-1 | 逻辑「套圈判官」euler 模板 + 三段论场景 | 待做（L） |
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | 待做（L） |
@@ -33,7 +33,7 @@
 | A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | 待做（M） |
 | A21 | P4 | gaijin/guwen P0-A / P0-B | 逐字对译点读（需逐句标注 对/停/式）；morph 句式拆装（与语法区共用 morph） | 待做（L） |
 | A22 | P4 | gaijin 三份 P1/P2 | 逻辑 P1-1…P2-5、古诗 P1-1…P2-5、古文 P1-A…P2-E | 待做（P0 之后） |
-| A23 | P2 | MASTER_PLAN 阶段一/三 | 误解标注 61→577、啊哈块补 54 处、每日复习接入、提取练习升级、选项级反馈全量 | 待做（人工标注量大） |
+| A23 | P2 | MASTER_PLAN 阶段一/三 | 误解标注 61→577、啊哈块补 54 处、每日复习接入、提取练习升级、选项级反馈全量 | 待做（误解标注涉及 quiz/data_* 已被 F1/F6 领取，本代理不做；复习/提取练习未动） |
 
 ## 二、待确认（需产品负责人拍板，本轮不做）
 
@@ -81,7 +81,8 @@
 - A5（嵌入）· 15aaf326 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
 - A7 · dd228f2e · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
 - A15 · cc78ceaf · smoke 新增 yuwen.html 99 条逐条打开用例（正文非空、无报错），通过；MASTER_PLAN 渲染验证标完成
-- A12 · 本提交 · guwen.html 15 个古文题库改为进入子模块时按需加载（首屏 0 个题库请求）；smoke 加用例
+- A12 · 9f25c9ca · guwen.html 15 个古文题库改为进入子模块时按需加载（首屏 0 个题库请求）；smoke 加用例
+- 移交 · 本提交 · A11/A13/A14 及误解标注涉及的文件已在第五节被审查代理领取，本代理不改，标「移交」
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
