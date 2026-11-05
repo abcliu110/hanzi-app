@@ -159,6 +159,10 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 .loading { text-align: center; color: var(--muted); padding: 60px 0; }
 .err { text-align: center; padding: 60px 20px; color: var(--muted); }
 .src-note { font-size: 12px; color: var(--muted); margin-top: 24px; text-align: center; }
+/* 文学常识区块（zika.js §7，数据见 data/wenxue.js） */
+.wx-text { font-weight: 700; font-size: 17px; margin-top: 6px; }
+.wx-py { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.wx-meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
 /* ---- 首页：识字表式列表 ---- */
 .progress-line { display: flex; align-items: center; gap: 10px; margin-top: 6px; }

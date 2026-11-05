@@ -193,6 +193,36 @@
     } catch (e) { sjInner = ''; }
     h += sec('诗句里的「' + r.zi + '」', '字 → 诗句', sjInner);
 
+    /* 7. 文学常识（古诗名句 / 成语 / 汉字趣闻 / 课本链接，见 data/wenxue.js） */
+    var wxInner = '';
+    try {
+      var wxList = (window.NHZ_WENXUE && window.NHZ_WENXUE[r.zi]) || [];
+      if (wxList.length) {
+        var wxOrder = {'古诗名句': 0, '成语': 1, '汉字趣闻': 2, '课本链接': 3};
+        var wxCls = {'古诗名句': 'blue', '成语': 'orange', '汉字趣闻': 'green', '课本链接': 'blue'};
+        wxList.slice().sort(function (a, b) {
+          return (wxOrder[a.type] == null ? 9 : wxOrder[a.type]) - (wxOrder[b.type] == null ? 9 : wxOrder[b.type]);
+        }).forEach(function (e) {
+          wxInner += '<div class="yiyi">';
+          wxInner += '<span class="badge2 ' + (wxCls[e.type] || 'blue') + '">' + esc(e.type) + '</span>';
+          if (e.type === '古诗名句') {
+            wxInner += '<div class="classic">' + esc(e.text) + '</div>';
+          } else {
+            wxInner += '<div class="wx-text">' + esc(e.text) + '</div>';
+          }
+          if (e.pinyin) wxInner += '<div class="wx-py">' + esc(e.pinyin) + '</div>';
+          if (e.explain) wxInner += '<div class="ex">' + esc(e.explain) + '</div>';
+          if (e.story) wxInner += '<div class="ex">📖 ' + esc(e.story) + '</div>';
+          var meta = '';
+          if (e.source) meta += esc(e.source);
+          if (e.textbook) meta += (meta ? ' · ' : '') + '📖 ' + esc(e.textbook);
+          if (meta) wxInner += '<div class="wx-meta">—— ' + meta + '</div>';
+          wxInner += '</div>';
+        });
+      }
+    } catch (e) { wxInner = ''; }
+    h += sec('文学常识', '诗句 · 成语 · 趣闻 · 课本', wxInner);
+
     h += '<div class="src-note">数据来源：通用规范汉字表 · Unihan · 《说文解字》· hanzi-writer-data · CC-CEDICT</div>';
 
     /* 切字前销毁旧笔顺播放器，避免孤儿 rAF 在已拆节点上继续跑（当前每字整页加载、尚未触发，属防御） */
