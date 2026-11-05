@@ -108,4 +108,5 @@ window.NHZ_WB_INDEX = {
   "古文:倒装句": "gw_daozhuang",
   "古文:判断句": "gw_panduan",
   "古文:被动句": "gw_beidong",
+  "古文:省略句": "gw_shenglue",
 };
