@@ -6,7 +6,7 @@
 生成：
   newhanzi/data/index.js            <- data/index.json      (window.NHZ_INDEX)
   newhanzi/data/zika/<字>.js        <- data/zika/<字>.json  (window.NHZ_ZIKA)
-  newhanzi/yuwen/data.js            <- yuwen/*.json         (window.NHZ_YUWEN，仅 --rebuild-yuwen 时)
+  newhanzi/yuwen/data.js            <- 直接编辑维护（window.NHZ_YUWEN，唯一源；旧版 yuwen/*.json 已于 2026-11-05 删除）
   newhanzi/yuwen/quiz_bank_index.js <- yuwen/quiz_bank_*.js (tools/gen_quiz_bank_index.py)
 """
 import json, os, sys
@@ -77,23 +77,21 @@ def main():
     print('zika: %d files converted/normalized' % n)
 
     # 3. 语文知识库
-    #    注意（2026-11-04 核查）：yuwen/data.js 已被直接编辑、内容远多于 yuwen/*.json（json 是旧版），
-    #    默认不再从 json 重建，避免回退内容；确认 json 已同步后才用 --rebuild-yuwen。
-    if '--rebuild-yuwen' not in sys.argv:
-        print('yuwen/data.js: 保持不动（如需从 json 重建加 --rebuild-yuwen）')
-    else:
+    #    yuwen/data.js 为唯一源（直接编辑维护）；旧版 yuwen/*.json 已于 2026-11-05 删除，
+    #    --rebuild-yuwen 已废弃：任何重建都不得从 json 覆盖 data.js（旧行为会让内容回退）。
+    if '--rebuild-yuwen' in sys.argv:
         build_yuwen()
+    else:
+        print('yuwen/data.js: 保持不动（唯一源；--rebuild-yuwen 已废弃，json 源已删除）')
 
     # 4. 语法题库清单（yuwen.html 按需加载题库用）
     import subprocess
     subprocess.run([sys.executable, os.path.join(ROOT, '..', 'tools', 'gen_quiz_bank_index.py')], check=True)
 
 def build_yuwen():
-    yuwen = {}
-    for key, fn in [('grammar', 'grammar.json'), ('logic', 'logic.json'), ('reading', 'reading.json'), ('writing', 'writing.json')]:
-        yuwen[key] = json.load(open(os.path.join(ROOT, 'yuwen', fn), encoding='utf-8'))
-    write_js(os.path.join(ROOT, 'yuwen', 'data.js'), 'NHZ_YUWEN', yuwen)
-    print('yuwen/data.js: %s' % ', '.join('%s=%d类' % (k, len(v['categories'])) for k, v in yuwen.items()))
+    # 已废弃：旧版 yuwen/*.json 源已于 2026-11-05 删除（且 logic.json 早已缺失），
+    # yuwen/data.js 为唯一源。绝不允许从 json 重建覆盖 data.js。
+    sys.exit('build_yuwen 已废弃：yuwen/*.json 源已删除，yuwen/data.js 为唯一源，请直接编辑 data.js')
 
 if __name__ == '__main__':
     main()

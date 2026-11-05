@@ -2,11 +2,14 @@
 (function () {
   'use strict';
 
+  /* 数据唯一源：yuwen/data.js 的 window.NHZ_YUWEN（file:// 与 http:// 通用）。
+     旧版 yuwen/*.json 已于 2026-11-05 删除（内容落后于 data.js，logic.json 早已缺失）；
+     此处不再保留 file 字段，任何代码不得再按文件名取数。 */
   var MODULES = [
-    { key: 'grammar', file: 'yuwen/grammar.json', label: '语法' },
-    { key: 'logic', file: 'yuwen/logic.json', label: '逻辑学' },
-    { key: 'reading', file: 'yuwen/reading.json', label: '阅读理解' },
-    { key: 'writing', file: 'yuwen/writing.json', label: '写作' }
+    { key: 'grammar', label: '语法' },
+    { key: 'logic', label: '逻辑学' },
+    { key: 'reading', label: '阅读理解' },
+    { key: 'writing', label: '写作' }
   ];
   var DATA = {};
   var active = 'grammar';

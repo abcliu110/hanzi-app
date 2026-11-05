@@ -31,7 +31,7 @@ R.suiran={correct:[],sick:[]};for(const b of B)b.bank.questions.forEach((q,i)=>{
 // 6 了/着/过 填空：选项同含了/着/过且空位紧跟动词后、后接宾语
 R.lzg=[];const lz=B.find(b=>b.point==='了/着/过');lz.bank.questions.forEach((q,i)=>{const st=q.q.split('\n').pop();if(/\(\s*\)[\u4e00-\u9fa5]+。$/.test(st)&&['了','着','过'].every(x=>q.options.includes(x)))R.lzg.push(i+' '+st+' 答:'+q.options[q.answer]);});
 // 7 术语
-const files=['yuwen/data.js','yuwen/grammar.json','quiz/data_yuwen.js','quiz/data_lab.js','games/yufa/data_juzi.js',...fs.readdirSync(L.ROOT+'/wb/s').map(f=>'wb/s/'+f),...fs.readdirSync(L.ROOT+'/yuwen').filter(f=>f.startsWith('quiz_bank')).map(f=>'yuwen/'+f)];
+const files=['yuwen/data.js','quiz/data_yuwen.js','quiz/data_lab.js','games/yufa/data_juzi.js',...fs.readdirSync(L.ROOT+'/wb/s').map(f=>'wb/s/'+f),...fs.readdirSync(L.ROOT+'/yuwen').filter(f=>f.startsWith('quiz_bank')).map(f=>'yuwen/'+f)];
 const terms=['程度补语','状态补语','情态补语','可能补语','偏正短语','偏正式','定中短语','状中短语','定中式','状中式','动宾短语','动宾式','述宾','补充短语','补充式','中补','述补','主谓短语','主谓式','形状形容词','借喻'];
 R.terms={};for(const t of terms){R.terms[t]={};for(const f of files){const s=fs.readFileSync(L.ROOT+'/'+f,'utf8');const c=s.split(t).length-1;if(c)R.terms[t][f]=c;}}
 // "得"字补语在各处被叫什么
