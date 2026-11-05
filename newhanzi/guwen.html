@@ -62,21 +62,6 @@ if (window.self !== window.top) {
 </script>
 <script src="data/guwen.js"></script>
 <script src="data/guwen_knowledge.js"></script>
-<script src="guwen/quiz_bank_guwen_xuci.js"></script>
-<script src="guwen/quiz_bank_guwen_shici.js"></script>
-<script src="guwen/quiz_bank_guwen_tongjia.js"></script>
-<script src="guwen/quiz_bank_guwen_guyin.js"></script>
-<script src="guwen/quiz_bank_guwen_duoyi.js"></script>
-<script src="guwen/quiz_bank_guwen_huoyong.js"></script>
-<script src="guwen/quiz_bank_guwen_yufa.js"></script>
-<script src="guwen/quiz_bank_guwen_lishi.js"></script>
-<script src="guwen/quiz_bank_guwen_wenxue.js"></script>
-<script src="guwen/quiz_bank_guwen_wenhua.js"></script>
-<script src="guwen/quiz_bank_guwen_songdu.js"></script>
-<script src="guwen/quiz_bank_guwen_fanyi.js"></script>
-<script src="guwen/quiz_bank_guwen_meiti.js"></script>
-<script src="guwen/quiz_bank_guwen_gaopinci.js"></script>
-<script src="guwen/quiz_bank_guwen_zongbiao.js"></script>
 <script>
 (function(){
   'use strict';
@@ -86,8 +71,20 @@ if (window.self !== window.top) {
      题库 key 用“子模块:点名”（如 xuci:而），不用裸点名：裸名在子模块间会撞（安在实词与一词多义、
      见/去/何/若/乃跨多个子模块），命名空间 key 才能保证题库挂到正确的点上。 */
   var K = window.NHZ_GUWEN_KNOWLEDGE || {categories: []};
-  /* 题库：每子模块一个 bank 脚本，在本页主脚本之前加载，file:// 下也能用；合并式写入，不覆盖 */
-  var bankData = window.NHZ_GUWEN_BANK || {};
+  /* 题库：每子模块一个 bank 脚本（guwen/quiz_bank_guwen_<子模块>.js），进入该子模块时才 <script> 加载
+     （file:// 下也能用；合并式写入，不覆盖）。bankData 与 window.NHZ_GUWEN_BANK 是同一个对象。 */
+  var bankData = window.NHZ_GUWEN_BANK = window.NHZ_GUWEN_BANK || {};
+  var bankLoaded = {};
+  function loadBank(mid, cb){
+    if(bankLoaded[mid] === true){ cb(); return; }
+    if(bankLoaded[mid]){ bankLoaded[mid].push(cb); return; }
+    bankLoaded[mid] = [cb];
+    var sc = document.createElement('script');
+    sc.src = 'guwen/quiz_bank_guwen_' + mid + '.js';
+    function fin(){ var q = bankLoaded[mid]; bankLoaded[mid] = true; (q || []).forEach(function(f){ f(); }); }
+    sc.onload = fin; sc.onerror = fin;
+    document.head.appendChild(sc);
+  }
   var bankState = {};
   var bankQuizData = {};
 /* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
@@ -516,7 +513,11 @@ window.NHZReview = window.NHZReview || (function () {
         if(mid && mid!==id) showMList(mid);
       });
     });
-    renderMItems();
+    if(bankLoaded[id] === true) renderMItems();
+    else {
+      document.getElementById('gwMItems').innerHTML = '<p class="gw-p">加载中…</p>';
+      loadBank(id, function(){ if(curMod === id && document.getElementById('gwMItems')) renderMItems(); });
+    }
   }
   /* ---------- 点详情（移动节点，非复制） ---------- */
   function showMDetail(idx){

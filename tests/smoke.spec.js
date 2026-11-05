@@ -82,6 +82,19 @@ test.describe('newhanzi smoke', () => {
     expect(total).toBeLessThan(211);
   });
 
+  test('guwen quiz banks load on demand', async ({ page }) => {
+    const reqs = [];
+    page.on('request', (r) => reqs.push(r.url()));
+    await page.goto('newhanzi/guwen.html');
+    await page.waitForTimeout(500);
+    expect(reqs.filter((u) => u.includes('quiz_bank_guwen_')).length).toBe(0);
+    await page.locator('[data-mod="tongjia"]').first().click();
+    await expect(page.locator('#gwMItems .yw-head').first()).toBeVisible({ timeout: 10000 });
+    expect(reqs.filter((u) => u.includes('quiz_bank_guwen_')).map((u) => u.split('/').pop())).toEqual(['quiz_bank_guwen_tongjia.js']);
+    await page.locator('#gwMItems .yw-head').first().click();
+    await expect(page.locator('.yw-bank').first()).toBeAttached();
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

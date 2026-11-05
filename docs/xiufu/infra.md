@@ -27,5 +27,5 @@
 2. **sync-to-source.yml**：在 abcliu110-jpg/hanzi-app 上任何推送都会 `git push --force` 覆盖 abcliu110/hanzi-app 同名分支。现在大家直接推 abcliu110，若有人再往 -jpg 推，会抹掉这边的提交。建议负责人确认 -jpg 是否已弃用，弃用就删该 workflow 或去掉 --force。本次未改。
 3. 发布方式：是否要加自动发布 gh-pages 的 workflow（DEPLOY.md 原就待确认）。
 4. docs/wenxue 文学常识功能落点（建议字卡文学区块）待确认。
-5. guwen.html 仍一次加载 15 个古文题库（~1.5MB，现只在打开古文时加载）；如需可同法按需加载。
+5. ~~guwen.html 仍一次加载 15 个古文题库~~ 2026-11-05 改为进入子模块时按需加载（`loadBank(mid)`，见 docs/TODO_STATUS.md A12）。
 6. build_filemode.py 会改写全部 data/zika/*.js（规范化），本次没有运行它，避免和改 data/zika 的 agent 冲突。
