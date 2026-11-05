@@ -295,6 +295,107 @@ def shuci():
     return n
 
 
+# ---------------- quiz/data_*.js 读写（保持各文件原有分隔格式） ----------------
+def load_quiz(name):
+    fn = os.path.join(ROOT, 'quiz', name)
+    s = open(fn, encoding='utf-8').read()
+    m = re.match(r'(window\.NHZ_QUIZ = ?)(.*?)(;?\s*)$', s, re.S)
+    body = m.group(2)
+    for sep in [(',', ':'), (', ', ': ')]:
+        if json.dumps(json.loads(body), ensure_ascii=False, separators=sep) == body:
+            return fn, m.group(1), json.loads(body), m.group(3), sep
+    raise ValueError(fn)
+
+
+def save_quiz(fn, pre, Q, tail, sep):
+    open(fn, 'w', encoding='utf-8').write(pre + json.dumps(Q, ensure_ascii=False, separators=sep) + tail)
+
+
+# ---------------- 补充式：「写完了」的「了」是助词，不是补语 ----------------
+BC = {
+    '结果补语': {'ph': [('写完', '完'), ('学会', '会'), ('写错', '错'), ('吃饱', '饱'), ('看懂', '懂'), ('打破', '破'), ('洗干净', '干净'), ('听明白', '明白')],
+              'what': '说明动作的结果',
+              'sent': [('小明写完了作业。', ['写', '完', '了', '作业'], '完'), ('弟弟吃饱了饭。', ['吃', '饱', '了', '饭'], '饱'),
+                       ('我看懂了这道题。', ['看', '懂', '了', '题'], '懂'), ('他打破了杯子。', ['打', '破', '了', '杯子'], '破')],
+              'fill': [('他___了作业。', '写完'), ('弟弟___了饭。', '吃饱'), ('我终于___了这首歌。', '学会')],
+              'true': ['结果补语说明动作的结果，如「写完」的「完」、「吃饱」的「饱」。', '「写完了」里，「完」是结果补语，「了」是助词，不算补语。', '「看懂、打破、洗干净」都带结果补语。'],
+              'false': ['「写完了」里的「了」是结果补语。', '结果补语说明动作的方向。', '「走出来」带的是结果补语。', '结果补语要用「得」连接，如「写得完」。']},
+    '程度补语': {'ph': [('跑得快', '快'), ('笑得开心', '开心'), ('读得流利', '流利'), ('唱得好听', '好听'), ('哭得伤心', '伤心'), ('说得清楚', '清楚'), ('写得工整', '工整'), ('跳得高', '高')],
+              'what': '用「得」连接，说明动作进行得怎么样',
+              'sent': [('小明跑得很快。', ['小明', '跑', '得', '很快'], '很快'), ('她唱得很好听。', ['她', '唱', '得', '很好听'], '很好听'),
+                       ('他哭得很伤心。', ['他', '哭', '得', '很伤心'], '很伤心'), ('妹妹写得很工整。', ['妹妹', '写', '得', '很工整'], '很工整')],
+              'fill': [('他___。', '跑得快'), ('她唱歌___。', '唱得好听'), ('他把课文___。', '读得流利')],
+              'true': ['「跑得快」「唱得好听」这类补语用「得」连接，说明动作进行得怎么样。', '「小明跑得很快」里，「很快」是补语，「得」是连接补语的助词。', '「说得清楚、写得工整」都是用「得」带补语。'],
+              'false': ['「吃饱」带的是用「得」连接的补语。', '「跑得快」里的「得」是补语。', '用「得」连接的补语表示动作的方向。', '「走出来」要用「得」连接。']},
+    '趋向补语': {'ph': [('走出来', '出来'), ('跳上去', '上去'), ('拿进去', '进去'), ('送过去', '过去'), ('飞下来', '下来'), ('跑回来', '回来'), ('站起来', '起来'), ('搬进来', '进来')],
+              'what': '说明动作的方向',
+              'sent': [('小明走出来了。', ['小明', '走', '出来', '了'], '出来'), ('小鸟飞下来了。', ['小鸟', '飞', '下来', '了'], '下来'),
+                       ('大家站起来了。', ['大家', '站', '起来', '了'], '起来'), ('哥哥跑回来了。', ['哥哥', '跑', '回来', '了'], '回来')],
+              'fill': [('小明从教室里___了。', '走出来'), ('小鸟从树上___了。', '飞下来'), ('哥哥从操场上___了。', '跑回来')],
+              'true': ['趋向补语说明动作的方向，如「走出来」的「出来」、「跳上去」的「上去」。', '「来、去、上、下、进、出、回、起来」常作趋向补语。', '「飞下来、送过去、搬进来」都带趋向补语。'],
+              'false': ['趋向补语说明动作的结果好不好。', '「写完」带的是趋向补语。', '趋向补语要用「得」连接。', '「小明走出来了」里的「了」是趋向补语。']},
+}
+
+
+def buchong():
+    """补充式库：「写完了」「吃饱了」把「了」算进结果补语（「了」是动态助词，黄廖：结果补语是「完」「饱」）。整库重写：
+    选短语题用不带「了」的述补短语、问「带哪种补语」；找补语题选项拆成单个词（写/完/了/作业），答「完」；解析逐项说。
+    data.js 补语例子「（完了是补语）」、quiz/data_lab.js「我把书看完了」补语答「完了」同步改为「完」。"""
+    name, d, fn = load_bank('buchong_duanyu')
+    C = list(BC); cnt = {}; out = []
+    lab = {p: c for c in C for p, _ in BC[c]['ph']}
+    for i, q in enumerate(d['questions']):
+        cls = q['类']; t = q['q']
+        typ = 'A' if t.startswith('下面哪个短语') else 'B' if '句子中' in t else 'C' if t.startswith('选') else 'D'
+        k = cnt.get((cls, typ), 0); cnt[(cls, typ)] = k + 1
+        rng = random.Random('bc|%d' % i); S = BC[cls]; oth = [c for c in C if c != cls]
+        if typ in ('A', 'C'):
+            if typ == 'A': ph, comp = S['ph'][k % 8]
+            else:
+                stem, ph = S['fill'][k % 3]; comp = dict(S['ph'])[ph]
+            ds = [BC[oth[0]]['ph'][(k + 1) % 8][0], BC[oth[1]]['ph'][(k + 3) % 8][0], BC[oth[k % 2]]['ph'][(k + 6) % 8][0]]
+            opts = [ph] + ds; rng.shuffle(opts)
+            rest = '，'.join('「%s」带%s' % (o, lab[o]) for o in opts if o != ph)
+            if typ == 'A':
+                exp = '「%s」里的「%s」%s，是%s。其他三个：%s。' % (ph, comp, S['what'], cls, rest)
+                nq = {'q': '下面哪个短语带%s？' % cls, 'options': opts, 'answer': opts.index(ph), '解析': exp}
+            else:
+                exp = '题目要带%s的短语：%s。「%s」里的「%s」%s。其他三个：%s。' % (cls, stem.replace('___', ph).rstrip('。'), ph, comp, S['what'], rest)
+                nq = {'q': '选带%s的短语填入___处：%s' % (cls, stem), 'options': opts, 'answer': opts.index(ph), '解析': exp}
+        elif typ == 'B':
+            sn, toks, ans = S['sent'][k % 4]
+            opts = toks[:]; rng.shuffle(opts)
+            extra = '「了」是助词，不算补语。' if '了' in toks else '「得」是连接补语的助词，不是补语本身。'
+            exp = '「%s」%s，是%s。%s' % (ans, S['what'], cls, extra)
+            nq = {'q': '%s 句子中的%s是？' % (sn, cls), 'options': opts, 'answer': opts.index(ans), '解析': exp}
+        else:
+            true = S['true'][k % 3]; f = S['false'][:]; random.Random('bcD|%s|%d' % (cls, k)).shuffle(f)
+            opts = [true] + f[:3]; rng.shuffle(opts)
+            nq = {'q': '下面说法正确的是？', 'options': opts, 'answer': opts.index(true),
+                  '解析': true + ' 其他三项都不对：' + '；'.join(x.rstrip('。') for x in f[:3]) + '。'}
+        assert len(set(nq['options'])) == 4, nq
+        nq['类'] = cls; out.append(nq)
+    n = sum(1 for a, b in zip(d['questions'], out) if a != b)
+    d['questions'] = out; save_bank(fn, name, d)
+    dd, tail = load_data()
+    for _, _, it in items(dd, 'grammar'):
+        if '例子' in it:
+            it['例子'] = ['作业写完了。（“完”是补语，“了”是助词）' if x == '作业写完了。（完了是补语）' else x for x in it['例子']]
+    save_data(dd, tail)
+    fq, pre, Q, tl, sep = load_quiz('data_lab.js')
+    for x in Q['modes']['choice']:
+        if x.get('q') == '“我把书看完了”里，补语是哪个词？':
+            x['opts'] = ['完', '我', '把', '书']; x['a'] = 0
+            x['exp'] = '“完”补充说明“看”的结果，是补语；“了”是助词，不算补语。'
+    js = json.dumps(Q, ensure_ascii=False, separators=sep)
+    for a, b in [('完了补充说明看的结果是补语', '完补充说明看的结果，是补语'), ('完了是补语', '完是补语'),
+                 ('C是补语，如完了√', 'C是补语，如“完”√'), ('比如“完了”', '比如“完”（“了”是助词）'),
+                 ('S把OVC：我＋把＋书＋看＋完了。', 'S把OVC：我＋把＋书＋看＋完（补语）＋了。')]:
+        js = js.replace(a, b)
+    save_quiz(fq, pre, json.loads(js), tl, sep)
+    return n
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         print(a, globals()[a]())
