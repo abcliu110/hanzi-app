@@ -40,6 +40,7 @@
 .gw-filterbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .gw-chips{padding:10px 0;display:flex;flex-wrap:wrap;gap:8px}
 .gw-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
+.gw-subchips{padding-top:0;align-items:center}.gw-subtag{font-size:14px;color:var(--muted,#6b7566)}
 .gw-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
 .gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
 .gw-kc-sum{font-size:15px;color:var(--muted);padding:0 4px;margin:4px 0 8px}
@@ -183,9 +184,9 @@ window.NHZReview = window.NHZReview || (function () {
   var currentItems = {};
   var MODS = [
     {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
-    {id:'xuci', icon:'🔤', t:'虚词', d:'21个点 · 用法、例句、辨析、题库'},
-    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
-    {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'21个点 · 用法、例句、辨析、题库', parent:'yufa'},
+    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先', parent:'yufa'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'虚词、实词、句子成分、特殊句式、固定句式'},
     {id:'tongjia', icon:'🔁', t:'通假', d:'16个点 · 通假字读本字'},
     {id:'guyin', icon:'⚖️', t:'古今异义', d:'16个点 · 古今意思大不同'},
     {id:'duoyi', icon:'🌿', t:'一词多义', d:'12个点 · 一字多义看语境'},
@@ -261,7 +262,8 @@ window.NHZReview = window.NHZReview || (function () {
   /* ---------- 子模块列表（语法模块式 panel 网格） ---------- */
   function showNav(){
     hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<div class="yw-grid">' + MODS.map(function(m){
+    /* 虚词、实词属于语法（parent:'yufa'），首页不与语法并列，从语法页进入 */
+    var h = '<div class="yw-grid">' + MODS.filter(function(m){ return !m.parent; }).map(function(m){
       var n = m.id==='pianmu' ? D.texts.length : (catById(m.id) ? catById(m.id).items.length : 0);
       var unit = m.id==='pianmu' ? '篇' : '点';
       return '<button class="yw-head" data-mod="'+esc(m.id)+'"><span class="yw-ico">'+m.icon+'</span><span class="yw-name">'+esc(m.t)+'</span><span class="yw-sub">'+n+unit+' · '+esc(m.d)+'</span><span class="yw-arrow">▾</span></button>';
@@ -768,9 +770,16 @@ window.NHZReview = window.NHZReview || (function () {
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
     if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
-    h += '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu';}).map(function(m){
-      return '<button class="gw-chip'+(m.id===id?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
+    var topId = meta.parent || id;
+    h += '<div class="gw-chips">' + MODS.filter(function(m){return m.id!=='pianmu' && !m.parent;}).map(function(m){
+      return '<button class="gw-chip'+(m.id===topId?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
     }).join('') + '</div>';
+    /* 语法下的分项：句子与句式（yufa 本身）、虚词、实词 */
+    if(topId==='yufa'){
+      h += '<div class="gw-chips gw-subchips"><span class="gw-subtag">语法分项：</span>' + [{id:'yufa', icon:'🧩', t:'句子与句式'}].concat(MODS.filter(function(m){return m.parent==='yufa';})).map(function(m){
+        return '<button class="gw-chip'+(m.id===id?' active':'')+'" data-mid="'+esc(m.id)+'">'+m.icon+' '+esc(m.t)+'</button>';
+      }).join('') + '</div>';
+    }
     h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+cat.items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
     h += levelFilterHtml(levelCounts(cat.items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
     if(cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
