@@ -396,6 +396,52 @@ def buchong():
     return n
 
 
+# ---------------- 名词库 #30 子类标签；连词库「也/又/既」 ----------------
+def noun30():
+    """名词库 #30：答「房子」、解析说事物名词，类却标处所名词 → 类改事物名词。"""
+    name, d, fn = load_bank('noun'); n = 0
+    for q in d['questions']:
+        m = re.match(r'“(.+?)”是(..)名词', q.get('解析', ''))
+        if m and q['类'] != m.group(2) + '名词' and m.group(2) + '名词' in ('事物名词', '人物名词', '处所名词', '时间名词', '方位名词'):
+            q['类'] = m.group(2) + '名词'; n += 1
+    save_bank(fn, name, d, recount_total=False)
+    return n
+
+
+BL_W = ['和', '与', '及', '以及', '跟', '同']
+BL_S = [('我和妹妹去公园。', ['我', '和', '妹妹', '公园'], '和'), ('老师与同学们一起劳动。', ['老师', '与', '同学们', '劳动'], '与'),
+        ('桌上有书本以及文具盒。', ['桌上', '书本', '以及', '文具盒'], '以及'), ('爸爸跟妈妈都来了。', ['爸爸', '跟', '妈妈', '来了'], '跟'),
+        ('小明同小刚是好朋友。', ['小明', '同', '小刚', '好朋友'], '同'), ('苹果和梨都很甜。', ['苹果', '和', '梨', '甜'], '和'),
+        ('哥哥与弟弟在下棋。', ['哥哥', '与', '弟弟', '下棋'], '与'), ('会上讨论了学习及纪律问题。', ['讨论', '学习', '及', '纪律'], '及')]
+
+
+def lianci():
+    """连词库：「也、又、既」是副词（黄廖；「既……又……」是副词配对的关联词语），不是并列连词。
+    并列连词题答案换成 和/与/及/以及/跟/同，句子题换成含这些连词的句子；别的题里把它们当干扰项时，标签改为「副词」；说法题「既、又、也都是并列连词」改成对的说法。"""
+    name, d, fn = load_bank('lianci'); n = 0; kb = 0
+    for i, q in enumerate(d['questions']):
+        old = json.dumps(q, ensure_ascii=False)
+        a = q['options'][q['answer']]
+        if q['类'] == '并列连词' and a in ('也', '又', '既'):
+            if q['q'].startswith('下面哪个词'):
+                new = next(w for w in BL_W[i % 6:] + BL_W if w not in q['options'])
+                q['options'][q['answer']] = new
+                q['解析'] = q['解析'].replace('「%s」是并列连词' % a, '「%s」是并列连词' % new, 1)
+            elif '句子中' in q['q']:
+                sn, toks, ans = BL_S[kb % 8]; kb += 1
+                opts = toks[:]; random.Random('lc|%d' % i).shuffle(opts)
+                q.update({'q': '%s 句子中的并列连词是？' % sn, 'options': opts, 'answer': opts.index(ans),
+                          '解析': '「%s」把前后两个并列的部分连接起来，是并列连词。' % ans})
+        q['options'] = ['和、与、及、以及都是并列连词。' if o == '既、又、也都是并列连词。' else o for o in q['options']]
+        q['解析'] = q['解析'].replace('既、又、也都是并列连词。', '和、与、及、以及都是并列连词。「也、又、既」是副词。')
+        for w in ('也', '又', '既'):
+            q['解析'] = q['解析'].replace('「%s」是并列连词' % w, '「%s」是副词' % w)
+        assert len(set(q['options'])) == len(q['options']), q
+        if json.dumps(q, ensure_ascii=False) != old: n += 1
+    save_bank(fn, name, d, recount_total=False)
+    return n
+
+
 if __name__ == '__main__':
     for a in sys.argv[1:]:
         print(a, globals()[a]())
