@@ -69,3 +69,30 @@ def recount(d):
 def save_bank(fn, name, d, recount_total=True):
     if recount_total: recount(d)
     open(fn, 'w', encoding='utf-8').write(dump(name, d, fn))
+
+
+# ---------- yuwen/data.js（讲解库，单行 JSON） ----------
+DATA = os.path.join(YW, 'data.js')
+_DPRE = 'window.NHZ_YUWEN ='
+
+def load_data():
+    s = open(DATA, encoding='utf-8').read()
+    assert s.startswith(_DPRE)
+    body = s[len(_DPRE):]
+    tail = body[len(body.rstrip().rstrip(';')):]
+    return json.loads(body.rstrip().rstrip(';')), tail
+
+def save_data(d, tail=';'):
+    open(DATA, 'w', encoding='utf-8').write(_DPRE + json.dumps(d, ensure_ascii=False, separators=(',', ':')) + tail)
+
+def items(d, sec=None):
+    """遍历讲解条目：yield (sec, category, item)"""
+    for s in ([sec] if sec else d):
+        for c in d[s].get('categories', []):
+            for it in c.get('items', []):
+                yield s, c, it
+
+def item(d, name, sec=None):
+    r = [it for s, c, it in items(d, sec) if it.get('name') == name]
+    assert len(r) == 1, (name, len(r))
+    return r[0]
