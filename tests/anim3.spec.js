@@ -56,7 +56,8 @@ test('古诗意象卡“↻ 重播”有效', async ({ page }) => {
   const i = await page.evaluate(() => (window.NHZ_SHICI.imagery || []).findIndex((g) => g['图示']));
   test.skip(i < 0, '暂无带图示的意象');
   await page.locator('.sc-card[data-go="imagery"]').click();
-  await page.locator(`.sc-poet[data-im="${i}"]`).first().click();
+  await page.locator(`.sc-imcard[data-im="${i}"]`).click();
+  await page.locator(`.sc-imcard[data-im="${i}"] .sc-imfull`).click();
   await expectReplay(page, '.sc-anim');
 });
 

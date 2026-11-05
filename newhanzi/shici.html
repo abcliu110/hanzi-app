@@ -101,6 +101,32 @@
 .sc-worklink{color:var(--accent-deep);cursor:pointer}
 /* 内容分型标签（复用yuwen.js配色体系） */
 .sc-typetag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:bold;color:var(--tc,#3d5a40);background:color-mix(in srgb,var(--tc,#3d5a40) 12%,transparent);border:1px solid color-mix(in srgb,var(--tc,#3d5a40) 30%,transparent);margin-bottom:8px}
+/* 意象卡牌（改进设计 P1-2）：翻面 + 点亮 + 三层展开 */
+.sc-imcount{margin-top:6px !important;color:var(--muted) !important}
+.sc-imcards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:6px 16px 16px;max-width:1080px;margin:0 auto;grid-auto-flow:dense}
+.sc-imcard{perspective:900px;cursor:pointer;min-height:210px}
+.sc-imcard.wide{grid-column:span 2}
+.sc-imin{position:relative;display:grid;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.sc-imcard.flip .sc-imin{transform:rotateY(180deg)}
+.sc-imface{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:12px;display:flex;flex-direction:column;align-items:center;min-height:210px;box-sizing:border-box}
+.sc-imback{transform:rotateY(180deg);align-items:stretch}
+.sc-imfront{justify-content:center;filter:grayscale(1);opacity:.55}
+.sc-imcard.lit .sc-imfront{filter:none;opacity:1;border-color:#c9a227;box-shadow:0 0 0 3px #fbe9a6}
+.sc-imart{width:100%;max-width:150px}.sc-imart svg{width:100%;height:auto;display:block}
+.sc-imzi2{font-size:28px;font-weight:700;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-imink{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 45% 40%,rgba(44,51,40,.18),rgba(44,51,40,.05) 60%,transparent 72%)}
+.sc-imink span{font-size:58px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-imstate{margin-top:8px;font-size:13px;color:var(--muted);text-align:center}
+.sc-imcard.lit .sc-imstate{color:#9a7a12;font-weight:700}
+.sc-imbzi{font-size:30px;font-weight:700;text-align:center;font-family:"Kaiti SC","STKaiti","KaiTi",serif}
+.sc-immean2{text-align:center;font-size:18px;font-weight:700;color:var(--accent-deep);margin:2px 0 6px}
+.sc-imdesc{margin:0;font-size:14px;line-height:1.7;color:var(--ink)}
+.sc-imopen,.sc-imfull{min-height:44px;margin-top:8px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent-soft);color:var(--accent-deep);font-size:15px;font-weight:700;cursor:pointer}
+.sc-imfull{background:transparent;border-style:dashed}
+.sc-imlines{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.sc-imsrc{font-size:13px;color:var(--muted)}
+@media (min-width:1200px){.sc-imcards{grid-template-columns:repeat(5,1fr)}}
+@media (prefers-reduced-motion:reduce){.sc-imin{transition:none}}
 @media (min-width:768px){
   .sc-grid{grid-template-columns:repeat(3,1fr);max-width:920px;margin:0 auto}
   .sc-imgrid{grid-template-columns:repeat(8,1fr);max-width:920px;margin:0 auto}
@@ -997,73 +1023,94 @@ function openFamous(i){
   });
 }
 
-var imSel = 0;
-function imageryNetworkSVG(){
-  var cx=180, cy=180, r1=100;
-  var n = D.imagery.length;
-  var s = '<svg id="imnet" viewBox="0 0 360 360" style="width:100%;max-width:400px;display:block;margin:0 auto">';
-  s += '<g id="imlinks"></g><g id="impoems"></g>';
-  D.imagery.forEach(function(g,i){
-    var a = (i/n)*Math.PI*2 - Math.PI/2;
-    var x = cx + r1*Math.cos(a), y = cy + r1*Math.sin(a);
-    s += '<g class="imnode" data-im="'+i+'" style="cursor:pointer">'
-       + '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="17" fill="#1c1c1e" stroke="#f5c518" stroke-width="1.5"/>'
-       + '<text x="'+x.toFixed(1)+'" y="'+(y+6).toFixed(1)+'" text-anchor="middle" font-size="17" fill="#f5c518">'+esc(g.zi)+'</text></g>';
-  });
-  return s + '</svg><div id="imexplorer"></div>';
+/* ===== 意象卡牌（docs/gaijin/shici-gaijin-sheji.md P1-2）=====
+   第一层：卡片正面（意象字；有「图示」的取其左半幅线稿）；
+   第二层：翻面看含义（imagery.mean + desc）；
+   第三层：展开 2–3 句诗，每句注明出处并可点开那首诗。
+   诗句只取诗库原句：imagery.line（在 imagery.poems 里核到原文的才用）→ imagery.poems 里含该字的句子 → data/shiju.js 倒排里含该字的诗。
+   点亮：孩子打开过（openPoem）含该字的诗、或该意象自带的诗，记在 localStorage nhz_shici_read。 */
+var SC_READ_KEY = 'nhz_shici_read';
+function scReadList(){ try{ var v = JSON.parse(localStorage.getItem(SC_READ_KEY) || '[]'); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+function scMarkRead(order){
+  try{ var a = scReadList(); if(a.indexOf(order) < 0){ a.push(order); localStorage.setItem(SC_READ_KEY, JSON.stringify(a)); } }catch(e){}
 }
-
-function imSelect(i){
-  imSel = i;
-  var g = D.imagery[i];
-  var cx=180, cy=180, r1=100, r2=152, n=D.imagery.length;
-  var a = (i/n)*Math.PI*2 - Math.PI/2;
-  var nx = cx + r1*Math.cos(a), ny = cy + r1*Math.sin(a);
-  var circles = document.querySelectorAll('#imnet .imnode circle');
-  for(var ci=0; ci<circles.length; ci++) circles[ci].setAttribute('fill', ci===i ? '#f5c518' : '#1c1c1e');
-  var texts = document.querySelectorAll('#imnet .imnode text');
-  for(var ti=0; ti<texts.length; ti++) texts[ti].setAttribute('fill', ti===i ? '#1c1c1e' : '#f5c518');
-  var ls='', ps='';
-  g.poems.forEach(function(o,pi){
-    var b = a + (pi-(g.poems.length-1)/2)*0.55;
-    var x2 = cx + r2*Math.cos(b), y2 = cy + r2*Math.sin(b);
-    var p = poemByOrder(o);
-    ls += '<line x1="'+nx.toFixed(1)+'" y1="'+ny.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="#f5c518" stroke-width="1.2" opacity="0.65"/>';
-    ps += '<g data-poem="'+o+'" style="cursor:pointer"><title>'+esc(p?p.title:'')+'</title><circle cx="'+x2.toFixed(1)+'" cy="'+y2.toFixed(1)+'" r="7" fill="#8a8578"/></g>';
-  });
-  document.getElementById('imlinks').innerHTML = ls;
-  var pg = document.getElementById('impoems');
-  pg.innerHTML = ps;
-  pg.querySelectorAll('[data-poem]').forEach(function(el){
-    el.addEventListener('click', function(e){ e.stopPropagation(); openPoem(parseInt(el.getAttribute('data-poem'),10)); });
-  });
-  var ex = document.getElementById('imexplorer');
-  ex.innerHTML = '<div class="sc-know"><h3>'+esc(g.zi)+' · '+esc(g.mean)+'</h3><p style="font-size:15px">“'+esc(g.line)+'”</p><p>'
-    + g.poems.map(function(o){ var p=poemByOrder(o); return p?'<span class="sc-worklink" data-o="'+o+'">《'+esc(p.title)+'》</span>':''; }).join(' · ')
-    + '</p><p><span class="sc-worklink" data-full="'+i+'">完整讲解 →</span></p></div>';
-  ex.querySelectorAll('[data-o]').forEach(function(el){
-    el.addEventListener('click', function(){ openPoem(parseInt(el.getAttribute('data-o'),10)); });
-  });
-  var fl = ex.querySelector('[data-full]');
-  fl.addEventListener('click', function(){ openImagery(parseInt(fl.getAttribute('data-full'),10)); });
+function imLit(g, read){
+  for(var i=0; i<read.length; i++){
+    if(g.poems.indexOf(read[i]) >= 0) return true;
+    var p = poemByOrder(read[i]);
+    if(p && p.lines.join('').indexOf(g.zi) >= 0) return true;
+  }
+  return false;
 }
-
+function imExamples(g){
+  var out = [], used = {};
+  function add(p, line){ if(out.length >= 3 || !p || used[p.order]) return; used[p.order] = 1; out.push({p:p, l:line}); }
+  var key = String(g.line||'').replace(/[。，！？；、\s]/g,'');
+  g.poems.forEach(function(o){
+    var p = poemByOrder(o); if(!p || !key) return;
+    var full = p.lines.join('');
+    if(full.replace(/[。，！？；、\s]/g,'').indexOf(key) >= 0) add(p, g.line);
+  });
+  /* 字面含该字但不是这个意象的词（地名、颜色、泛称），不拿来当例句 */
+  var NOT_IM = {'燕':['燕山','燕然'], '雪':['雪白'], '海':['四海']}[g.zi] || [];
+  function usable(l){
+    if(l.indexOf(g.zi) < 0) return false;
+    var t = l; NOT_IM.forEach(function(w){ t = t.split(w).join(''); });
+    return t.indexOf(g.zi) >= 0;
+  }
+  g.poems.concat(SHIJU[g.zi] || []).forEach(function(o){
+    var p = poemByOrder(o); if(!p) return;
+    var c = p.lines.filter(usable);
+    var pick = c.filter(function(l){ return l.replace(/[。，！？；、\s]/g,'').length > 3; })[0] || c[0];
+    if(pick) add(p, pick);
+  });
+  return out;
+}
+function imFront(g){
+  /* 正面只留「图示」左半幅的线稿：去掉文字（含义、诗句留给背面），视口裁到左半 */
+  var svg = g['图示'] ? String(g['图示']).replace(/<text[\s\S]*?<\/text>/g, '').replace(/viewBox="0 0 340 170"/, 'viewBox="0 0 170 150"') : '';
+  return svg ? '<div class="sc-imart">'+svg+'</div><div class="sc-imzi2">'+esc(g.zi)+'</div>'
+             : '<div class="sc-imink"><span>'+esc(g.zi)+'</span></div>';
+}
 function vImagery(){
   setTitle('意象地图');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
-  h += '<div class="sc-know"><p>点一个字，看看它连着哪几首诗。</p></div>';
-  h += imageryNetworkSVG();
-  h += D.imagery.map(function(g,i){
-    return '<div class="sc-poet" data-im="'+i+'"><div class="sc-pname">'+esc(g.zi)+' · '+esc(g.mean)+'</div><div class="sc-pbio">“'+esc(g.line)+'”</div></div>';
+  var read = scReadList(), lit = 0;
+  var cards = D.imagery.map(function(g,i){
+    var on = imLit(g, read); if(on) lit++;
+    var ex = imExamples(g);
+    var lines = ex.map(function(x){
+      var l = esc(x.l); if(x.l.indexOf(g.zi) >= 0) l = l.split(esc(g.zi)).join('<mark>'+esc(g.zi)+'</mark>');
+      return '<div class="sc-hitline">'+l+' <span class="sc-imsrc">——<span class="sc-worklink" data-o="'+x.p.order+'">'+esc(x.p.author)+'《'+esc(x.p.title)+'》</span></span></div>';
+    }).join('');
+    return '<div class="sc-imcard'+(on?' lit':'')+'" data-im="'+i+'"><div class="sc-imin">'
+      + '<div class="sc-imface sc-imfront">'+imFront(g)+'<div class="sc-imstate">'+(on?'✨ 已点亮':'读一首含“'+esc(g.zi)+'”的诗来点亮')+'</div></div>'
+      + '<div class="sc-imface sc-imback"><div class="sc-imbzi">'+esc(g.zi)+'</div><div class="sc-immean2">'+esc(g.mean)+'</div>'
+      + '<p class="sc-imdesc">'+esc(g.desc)+'</p>'
+      + (lines ? '<button type="button" class="sc-imopen" data-lines="'+i+'">看诗句 ▾</button><div class="sc-imlines" hidden>'+lines+'</div>' : '')
+      + '<button type="button" class="sc-imfull" data-full="'+i+'">完整讲解 →</button></div>'
+      + '</div></div>';
   }).join('');
+  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  h += '<div class="sc-know"><p>点卡片翻过来看它代表什么，再点「看诗句」读原句。读过含这个字的诗，卡片就会点亮。</p><p class="sc-imcount">已点亮 <b>'+lit+'</b> / '+D.imagery.length+'</p></div>';
+  h += '<div class="sc-imcards">'+cards+'</div>';
   listEl.innerHTML = h; showList(); wireBack();
-  listEl.querySelectorAll('#imnet .imnode').forEach(function(el){
-    el.addEventListener('click', function(){ imSelect(parseInt(el.getAttribute('data-im'),10)); });
+  listEl.querySelectorAll('.sc-imcard').forEach(function(card){
+    card.addEventListener('click', function(e){
+      var t;
+      if((t = e.target.closest('[data-o]'))){ e.stopPropagation(); openPoem(parseInt(t.getAttribute('data-o'),10)); return; }
+      if((t = e.target.closest('[data-full]'))){ e.stopPropagation(); openImagery(parseInt(t.getAttribute('data-full'),10)); return; }
+      if((t = e.target.closest('[data-lines]'))){
+        e.stopPropagation();
+        var box = card.querySelector('.sc-imlines'), open = box.hidden;
+        box.hidden = !open; card.classList.toggle('wide', open);
+        t.textContent = open ? '收起诗句 ▴' : '看诗句 ▾';
+        return;
+      }
+      var flip = !card.classList.contains('flip');
+      card.classList.toggle('flip', flip);
+      if(!flip){ var b = card.querySelector('.sc-imlines'); if(b){ b.hidden = true; card.classList.remove('wide'); card.querySelector('[data-lines]').textContent = '看诗句 ▾'; } }
+    });
   });
-  listEl.querySelectorAll('.sc-poet[data-im]').forEach(function(el){
-    el.addEventListener('click', function(){ openImagery(parseInt(el.getAttribute('data-im'),10)); });
-  });
-  imSelect(0);
 }
 
 function openImagery(i){
@@ -1172,6 +1219,7 @@ function vPoems(){
 function openPoem(order){
   var p = poemByOrder(order);
   if(!p){ vHome(); return; }
+  scMarkRead(order);
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */

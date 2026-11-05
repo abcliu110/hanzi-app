@@ -232,6 +232,33 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('shici imagery cards flip, light up and expand', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/shici.html');
+    await page.evaluate(() => localStorage.removeItem('nhz_shici_read'));
+    await page.locator('.sc-card[data-go="imagery"]').click();
+    await expect(page.locator('.sc-imcard')).toHaveCount(19);
+    await expect(page.locator('.sc-imcard.lit')).toHaveCount(0);
+    const moon = page.locator('.sc-imcard[data-im="0"]');
+    await moon.click();
+    await expect(moon).toHaveClass(/flip/);
+    await expect(moon.locator('.sc-immean2')).toHaveText('思乡');
+    await moon.locator('[data-lines]').click();
+    const lines = moon.locator('.sc-imlines .sc-hitline');
+    expect(await lines.count()).toBeGreaterThanOrEqual(2);
+    await expect(lines.first()).toContainText('床前明月光');
+    await moon.locator('.sc-imlines [data-o="1"]').click();
+    await expect(page.locator('#navtitle')).toHaveText('静夜思');
+    await page.goto('about:blank');
+    await page.goto('newhanzi/shici.html');
+    await page.locator('.sc-card[data-go="imagery"]').click();
+    // 《静夜思》含「月」「霜」，两张卡点亮
+    await expect(page.locator('.sc-imcard.lit')).toHaveCount(2);
+    await expect(page.locator('.sc-imcard.lit[data-im="0"]')).toHaveCount(1);
+    expect(errors).toEqual([]);
+  });
+
   test('shici scroll whiteboard mounts', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
