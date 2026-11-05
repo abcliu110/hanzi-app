@@ -80,3 +80,7 @@
 - A5（草稿）· 1e37d706 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
 - A5（嵌入）· 15aaf326 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
 - A7 · 本提交 · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
+
+## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
+
+新发现问题清单见 `docs/xiufu/shencha-2026-11-05/README.md`（总览 + 修复顺序）及 zika/shici/guwen/yuwen/bushou_ui 五份分报告。尚未拆成 A 编号；领取修复前请在此节登记，避免两个代理撞车。
