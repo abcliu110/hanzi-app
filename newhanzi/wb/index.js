@@ -158,4 +158,11 @@ window.NHZ_WB_INDEX = {
   "古文:一词多义:信": "gw_dy_xin",
   "古文:一词多义:食": "gw_dy_shi",
   "古文:一词多义:去": "gw_dy_qu",
+  /* 古文区 P2-D 历史人物时间轴（docs/gaijin/guwen-gaijin-sheji.md P2-D）：键为「古文:时间轴:作者」，文件 gw_timeline_<作者拼音>.js */
+  "古文:时间轴:司马迁": "gw_timeline_simaqian",
+  "古文:时间轴:韩愈": "gw_timeline_hanyu",
+  "古文:时间轴:柳宗元": "gw_timeline_liuzongyuan",
+  "古文:时间轴:苏轼": "gw_timeline_sushi",
+  "古文:时间轴:王安石": "gw_timeline_wanganshi",
+  "古文:时间轴:欧阳修": "gw_timeline_ouyangxiu",
 };
