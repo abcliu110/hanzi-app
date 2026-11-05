@@ -49,6 +49,24 @@ function getParam(name) {
   var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search || '');
   return m ? decodeURIComponent(m[1]) : '';
 }
+/* 简答宽松比对（A23-4 最小可用版，不做 NLP）：只保留汉字/字母/数字，
+   去掉全部空格与标点后逐字比对；同义改写判错，见数据文件头注。 */
+function normalizeShort(s) {
+  return String(s == null ? '' : s).replace(/[^\u3400-\u9fff\uf900-\ufaffA-Za-z0-9]/g, '');
+}
+function shortAnswers(q) {
+  if (!q) return [];
+  var a = q.a;
+  if (Array.isArray(a)) return a.slice();
+  var out = a != null ? [a] : [];
+  if (Array.isArray(q.alt)) out = out.concat(q.alt);
+  return out;
+}
+function shortOk(q, input) {
+  var v = normalizeShort(input);
+  if (!v) return false;
+  return shortAnswers(q).some(function (a) { return normalizeShort(a) === v; });
+}
 /* A22-12：从 engine.js 自身的 script 路径推导 wb 目录（quiz/index.html 下为 ../wb/，
    games/shici/huazhong.html 下为 ../../quiz/../wb/，浏览器按相对路径归一化） */
 function engineWbDir() {
@@ -75,6 +93,7 @@ var MODES = {
   map:     { name: '论证地图', icon: '🌳', desc: '把卡片挂到论证树上' },
   /* A22-9 古文产出题型（docs/gaijin/guwen-gaijin-sheji.md P1-C）：题目由 data/guwen.js 句.停/今/对 经 gw_chan.js 自动生成 */
   cut:     { name: '断句',     icon: '✂️', desc: '在字缝里点出朗读停顿' },
+  short:   { name: '简答',     icon: '✍️', desc: '自己写答案，宽松比对' },
   fill:    { name: '填今译',   icon: '🈳', desc: '选出画线字词的今译' },
   gworder: { name: '排今译',   icon: '🧩', desc: '把今译词块排回通顺的话' },
   /* A22-12 画中有诗（设计 docs/gaijin/shici-gaijin-sheji.md P1-3）：题面为 scroll 白板终帧，
@@ -95,7 +114,7 @@ function modeMeta(m, q) {
   }
   return MODES[m];
 }
-var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite', 'cut', 'fill', 'hua'];
+var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite', 'cut', 'fill', 'hua', 'short'];
 var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验', guwen: '古文' };
 
 /* ---------- 会话状态 ---------- */
@@ -324,6 +343,8 @@ function buildExp(m, q, pickedIdx) {
     x = q.tokens.map(function (t) { return esc(t.t) + ' → ' + esc(t.tag); }).join('<br>');
   } else if (m === 'match') {
     x = '全部配对完成！';
+  } else if (m === 'short') {
+    x = '正确答案：' + esc(Array.isArray(q.a) ? q.a[0] : q.a);
   }
   /* 第三刀：选项级反馈——答错时指出具体误解 */
   if (pickedIdx != null && q['误解标注'] && q['误解标注'].length) {
@@ -375,6 +396,8 @@ function finishQuestion(ok, expHtml) {
       answer: q.tokens.map(function (t) { return t.t + '→' + t.tag; }).join('；'), 解析: q.exp || '' };
     else if (m === 'match' && Array.isArray(q.pairs)) rec = { q: q.title, options: [],
       answer: q.pairs.map(function (p) { return p[0] + '→' + p[1]; }).join('；'), 解析: '' };
+    else if (m === 'short') rec = { q: q.q, options: [],
+      answer: Array.isArray(q.a) ? q.a[0] : q.a, 解析: q.exp || '' };
     if (rec && rec.q && rec.answer != null) NHZReview.record({
       q: rec.q, options: rec.options, answer: rec.answer, 解析: rec.解析, src: '练习',
       point: (S.title || TAB_NAMES[S.tab] || '') + ' · ' + (modeMeta(m, q) ? modeMeta(m, q).name : m) }, ok);
@@ -541,6 +564,13 @@ var Render = {
         return '<button class="qz-btn" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
       }).join('') + '</div>';
   },
+  /* short（A23-4）: {q, a:答案字符串或数组, alt:[同义答案], exp}；输入框 + 提交按钮，判分在 onTap */
+  short: function (q) {
+    return '<div class="qz-q">' + esc(q.q) + '</div>' +
+      '<div class="qz-sub">在下面写出答案再提交；空格和标点不影响判分</div>' +
+      '<textarea id="qzShortIn" rows="3" style="width:100%;box-sizing:border-box;font-size:17px;padding:10px;border:1px solid #ccc;border-radius:10px" placeholder="在这里写答案…"></textarea>' +
+      '<div class="qz-rowbtns"><button class="qz-btn primary" data-act="ssubmit">✓ 提交答案</button></div>';
+  },
   /* rewrite: {from, target, opts:[3], a, exp} */
   rewrite: function (q) {
     return '<div class="qz-sent">' + esc(q.from) + '</div>' +
@@ -571,6 +601,15 @@ function onTap(el) {
     }
     if (!ok) el.classList.add('wrong');
     finishQuestion(ok, buildExp(m, q, ok ? null : i));
+    return;
+  }
+  /* 简答：读输入框宽松比对，提交后锁题（与单选类同：finishQuestion 内锁） */
+  if (m === 'short' && act === 'ssubmit' && !S.locked) {
+    var inp = $('qbox').querySelector('#qzShortIn');
+    var okS = shortOk(q, inp ? inp.value : '');
+    var allS = $('qbox').querySelectorAll('[data-act]');
+    for (k = 0; k < allS.length; k++) allS[k].style.pointerEvents = 'none';
+    finishQuestion(okS, buildExp(m, q));
     return;
   }
   if (S.locked) return;
@@ -734,6 +773,14 @@ function loadData(tab) {
         });
         if (n) { S.modes = fm; S.title = (D.title || '') + ' · ' + pt; S.point = pt; }
       }
+      /* A23-4 简答：新文件 data_short.js 按 tab 挂载（不改旧 data 文件）；
+         ?text=篇名 时只留该篇的，?point=专题 时只留该专题的（无 point 的简答题不混入专题卷） */
+      if (window.NHZ_SHORT && window.NHZ_SHORT[tab] && !S.point) {
+        S.modes.short = window.NHZ_SHORT[tab].slice();
+      } else if (window.NHZ_SHORT && window.NHZ_SHORT[tab] && S.point) {
+        var sh = window.NHZ_SHORT[tab].filter(function (q) { return q && (q.t === S.point || q.point === S.point); });
+        if (sh.length) S.modes.short = sh;
+      }
     }
     renderHome();
   }
@@ -743,7 +790,12 @@ function loadData(tab) {
     el.src = src; el.onload = cb; el.onerror = cb;
     document.head.appendChild(el);
   }
+  function loadShort(cb) {
+    if (window.NHZ_SHORT) { cb(); return; }
+    addScript('data_short.js', cb);
+  }
   addScript('data_' + tab + '.js', function () {
+    loadShort(function () {
     if (tab !== 'guwen') { ready(); return; }
     /* 古文：再加载篇目数据与产出题生成器（A22-9） */
     addScript('../data/guwen.js', function () {
@@ -753,6 +805,7 @@ function loadData(tab) {
         } catch (e) { extra = null; }
         ready();
       });
+    });
     });
   });
   setTimeout(ready, 4000); /* 兜底：file:// 某些环境不上报 onerror */
@@ -796,6 +849,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     Render: Render, MODES: MODES, MODE_ORDER: MODE_ORDER, TAB_NAMES: TAB_NAMES, isMap: isMap,
     shuffle: shuffle, shuffleOpts: shuffleOpts, esc: esc, buildExp: buildExp,
+    normalizeShort: normalizeShort, shortOk: shortOk, shortAnswers: shortAnswers,
     wbLoad: wbLoad, wbSave: wbSave, wbAdd: wbAdd, wbList: wbList,
     wbRemove: wbRemove, wbCount: wbCount, WB_KEY: WB_KEY
   };
