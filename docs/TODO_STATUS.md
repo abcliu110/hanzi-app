@@ -207,4 +207,4 @@
 | F4 字卡上半 | data/zika/ 按 NHZ_INDEX 第 1–1750 字 | fix-zika-a.md |
 | F5 字卡下半 | data/zika/ 按 NHZ_INDEX 第 1751–3500 字 | fix-zika-b.md |
 | F6 部首+界面+识字题 | newhanzi/bushou/**、bushou.js、quiz/data_bushou.js、quiz/data_zika.js、quiz/engine.js（仅选项洗牌）、index/share/shici 页的数字文案 | fix-bushou-ui.md |
-
+- 测试修复 · pinyin.spec 厂 hǎn · newhanzi/tools/pinyin_fix.json rare 厂 由 [ān] 改为 [hǎn, ān]（与 5aa86d4d 同步，汉典确认），pinyin.spec 2 passed
