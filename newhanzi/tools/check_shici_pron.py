@@ -11,7 +11,7 @@
 import json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, os.path.join(ROOT, '..', 'tools', 'content'))
+sys.path.insert(0, os.path.join(ROOT, 'tools', 'content'))
 import fix_shici_io as io  # noqa: E402
 
 
