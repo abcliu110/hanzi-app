@@ -202,6 +202,7 @@ function renderHome() {
         '<div class="qz-mode-n">' + S.modes[m].length + ' 题</div></button>';
     }).join('') + '</div>';
   }
+  if (S.point) h += '<a class="qz-wrong" href="index.html?tab=' + encodeURIComponent(S.tab) + '" style="display:block;text-align:center;text-decoration:none">看全部题目 →</a>';
   var wc = wbCount(S.tab);
   if (wc > 0) {
     h += '<button class="qz-wrong" data-mode="wrong">📓 错题重练' +
@@ -549,6 +550,16 @@ function loadData(tab) {
     if (D && D.modes) {
       S.title = D.title || '';
       S.modes = D.modes;
+      /* ?point=专题名：只出该专题的题（逻辑题每题带 point）；没有匹配的题时退回全部 */
+      var pt = getParam('point');
+      if (pt) {
+        var fm = {}, n = 0;
+        Object.keys(D.modes).forEach(function (m) {
+          fm[m] = (D.modes[m] || []).filter(function (q) { return q && q.point === pt; });
+          n += fm[m].length;
+        });
+        if (n) { S.modes = fm; S.title = (D.title || '') + ' · ' + pt; S.point = pt; }
+      }
     }
     renderHome();
   }

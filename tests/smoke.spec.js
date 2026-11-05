@@ -73,6 +73,15 @@ test.describe('newhanzi smoke', () => {
     expect(body).not.toMatch(/intestine|是一个常用汉字|很快就记牢了/);
   });
 
+  test('logic quiz can filter by point', async ({ page }) => {
+    await page.goto('newhanzi/quiz/index.html?tab=logic&point=' + encodeURIComponent('三段论'));
+    await expect(page.locator('#qzTitle')).toContainText('三段论', { timeout: 15000 });
+    const ns = await page.locator('.qz-mode-n').allInnerTexts();
+    const total = ns.reduce((a, t) => a + parseInt(t, 10), 0);
+    expect(total).toBeGreaterThan(0);
+    expect(total).toBeLessThan(211);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

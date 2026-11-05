@@ -17,7 +17,7 @@
 | A4 | P2 | 同上 | 批 5：常见病句 20 项（草稿齐） | ✅ 见执行日志 |
 | A5 | P2 | yufa-neirong-08-l3-huilian.md / yufa-l3-buqi.md | 批次 9：虚词精讲 16 项先写 L3+回练草稿进 l3-huilian.json（src 必须可核），再嵌入场景（批 6） | ✅ 见执行日志 |
 | A6 | P2 | yufa-l3-buqi.md「已知」 | 「介词」场景旧幕第 4 幕标签为空 | ✅ 见执行日志 |
-| A7 | P2 | gaijin/README.md 进度 | 逻辑区：按 `point` 过滤直达（quiz engine.js） | 待做 |
+| A7 | P2 | gaijin/README.md 进度 | 逻辑区：按 `point` 过滤直达（quiz engine.js） | ✅ 见执行日志 |
 | A8 | P2 | xiufu/content.md「问题」 | index.html 年级下拉仍写「（待录入）」，1上–4上、5上已有数据，改文案 | ✅ 见执行日志 |
 | A9 | P2 | xiufu/content.md | share.js 注释/逻辑写 seed%120，诗库现 192 首，改用 POEMS.length | ✅ 代码早已用 POEMS.length，只改注释 |
 | A10 | P2 | xiufu/content.md | shici.html 朝代筛选 chips 只有 唐/宋/五代/晋，补齐库里已有朝代（汉/南北朝/元/明/清/先秦） | ✅ 见执行日志 |
@@ -78,4 +78,5 @@
 - A3 · 5545da64 · 修辞格 8 项补 L3+回练（R4 44→36）；新增 tools/wb/embed_l3.py；lint 0、check_wb 全过、基线其余 635 幕一致
 - A4 · cf8873cc · 病句 20 项补 L3+回练（R4 36→16）；lint 0、check_wb 全过、基线其余 590 幕一致
 - A5（草稿）· 1e37d706 · l3-huilian.json 批次 9 虚词精讲 16 项 L3+回练草稿（src 只用 cankao D 已核条目），99/99 complete
-- A5（嵌入）· 本提交 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
+- A5（嵌入）· 15aaf326 · 虚词精讲 16 项 L3+回练嵌入白板，R4 清零；lint 0/0、check_wb 全过、基线其余 668 幕一致
+- A7 · 本提交 · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
