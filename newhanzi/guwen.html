@@ -34,6 +34,11 @@
 .gw-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
 .gw-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
 .gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
+.gw-kc-sum{font-size:15px;color:var(--muted);padding:0 4px;margin:4px 0 8px}
+.gw-kc{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--surface);color:var(--ink);font-size:15px;cursor:pointer}
+.gw-kc b{color:var(--accent-deep)}
+.gw-kc .gw-kc-ex{display:block;margin-top:4px;font-family:Georgia,"Songti SC","SimSun",serif;font-size:16px;color:var(--muted)}
+.gw-from{display:inline-block;padding:6px 12px;border-radius:16px;border:1px solid var(--accent-deep);background:var(--surface);color:var(--accent-deep);font-size:14px;cursor:pointer;margin:4px 6px 4px 0}
 .gw-src{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
 a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,.gw-item:focus-visible,.yw-head:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 </style>
@@ -62,10 +67,13 @@ if (window.self !== window.top) {
 </script>
 <script src="data/guwen.js"></script>
 <script src="data/guwen_knowledge.js"></script>
+<script src="data/guwen_links.js"></script>
 <script>
 (function(){
   'use strict';
   var D = window.NHZ_GUWEN || {texts: []};
+  /* 篇目 ↔ 知识点双向链接：tools/content/build_guwen_links.py 离线生成（例句逐字命中原文），缺文件时两处区块都不显示 */
+  var LINKS = window.NHZ_GUWEN_LINKS || {byText: {}, byPoint: {}};
   /* 知识数据：语法模块式结构 {categories:[{id,name,icon,intro,items:[点]}]}。
      点字段与语法模块一致：讲解、口诀、例子、分类、深讲、怎么认、辨析、例句解析、易错、动手练（练习）、小测。
      题库 key 用“子模块:点名”（如 xuci:而），不用裸点名：裸名在子模块间会撞（安在实词与一词多义、
@@ -244,8 +252,52 @@ window.NHZReview = window.NHZReview || (function () {
     h += '<div class="gw-sec">📝 重点字词</div><div class="gw-words">'+t.重点.map(function(w){
       return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
     }).join('')+'</div>';
+    h += knowCardHtml(t.title);
     detEl.innerHTML = h;
     detEl.dataset.back = lastTextList || t.cat;
+  }
+  /* 本篇文言知识卡：按子模块顺序汇总「虚词 3 · 通假 1 …」，每条点开跳到该知识点 */
+  function knowCardHtml(title){
+    var rows = (LINKS.byText || {})[title];
+    if(!rows || !rows.length) return '';
+    var order = MODS.map(function(m){ return m.id; });
+    rows = rows.slice().sort(function(a, b){ return order.indexOf(a.mid) - order.indexOf(b.mid) || a.i - b.i; });
+    var cnt = {}, seq = [];
+    rows.forEach(function(r){ if(!cnt[r.mid]){ cnt[r.mid] = 0; seq.push(r.mid); } cnt[r.mid]++; });
+    var h = '<div class="gw-sec" id="gwKnowCard">🗂 本篇文言知识卡</div>';
+    h += '<p class="gw-kc-sum">本篇：' + seq.map(function(mid){ return esc(modMeta(mid).t) + ' ' + cnt[mid]; }).join(' · ') + '</p>';
+    h += rows.map(function(r){
+      var m = modMeta(r.mid);
+      return '<button class="gw-kc" data-gwpoint="'+esc(r.mid)+':'+r.i+'">'+m.icon+' '+esc(m.t)+' · <b>'+esc(r.name)+'</b> →' +
+        '<span class="gw-kc-ex">'+esc(r.ex)+'</span></button>';
+    }).join('');
+    h += '<p class="gw-src">知识卡按知识库例句与本篇原文逐字对上自动列出，没对上的知识点不硬凑。</p>';
+    return h;
+  }
+  /* 知识点 → 出自哪些篇目（知识点详情底部） */
+  function fromTextsHtml(modId, idx){
+    var key = String(idx).replace(/_(\d+)$/, ':$1');
+    var rows = (LINKS.byPoint || {})[key];
+    if(!rows || !rows.length) return '';
+    var seen = {};
+    rows = rows.filter(function(r){ if(seen[r.t]) return false; seen[r.t] = 1; return textIdx(r.t) >= 0; });
+    if(!rows.length) return '';
+    return '<div class="gw-sec">📜 例句出自本库篇目</div><div>' + rows.map(function(r){
+      return '<button class="gw-from" data-gwtext="'+esc(r.t)+'" title="'+esc(r.ex)+'">出自《'+esc(r.t)+'》→</button>';
+    }).join('') + '</div>';
+  }
+  function textIdx(title){
+    for(var i=0;i<D.texts.length;i++) if(D.texts[i].title===title) return i;
+    return -1;
+  }
+  function openPoint(mid, i){
+    showMList(mid);
+    loadBank(mid, function(){
+      if(curMod !== mid) return;
+      var key = mid + '_' + i;
+      if(!currentItems[key]) renderMItems();
+      if(currentItems[key]) showMDetail(key);
+    });
   }
   /* ---------- 题库（语法模块 bank 机制，key 为点 key） ---------- */
   function bankFiltered(bid){
@@ -448,6 +500,7 @@ window.NHZReview = window.NHZReview || (function () {
       }).join('');
     }
     if(it.note) body += '<p class="gw-src">'+esc(it.note)+'</p>';
+    body += fromTextsHtml(modId, idx);
     currentItems[idx] = {it: it, body: body, icon: icon};
     var bank = bk;
     return '<div class="yw-item">' +
@@ -552,6 +605,18 @@ window.NHZReview = window.NHZReview || (function () {
     if(card){
       var mid = card.getAttribute('data-mod');
       if(mid==='pianmu') showSections(); else showMList(mid);
+      return;
+    }
+    var gp = e.target.closest('[data-gwpoint]');
+    if(gp){
+      var pp = gp.getAttribute('data-gwpoint').split(':');
+      openPoint(pp[0], parseInt(pp[1], 10));
+      return;
+    }
+    var gt = e.target.closest('[data-gwtext]');
+    if(gt){
+      var ti = textIdx(gt.getAttribute('data-gwtext'));
+      if(ti >= 0){ lastTextList = '全部'; showDetail(ti); }
       return;
     }
     var go = e.target.closest('[data-go]');

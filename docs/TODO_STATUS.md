@@ -30,7 +30,7 @@
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | 待做（L） |
 | A18 | P4 | gaijin/luoji P0-3 | 谬误卡牌册（重组现有「常见谬误」内容） | 待做（M） |
 | A19 | P4 | gaijin/shici P0-2 / P0-3 | `scroll` 水墨长卷模板；节奏打拍器 + 平仄格 | 待做（L/M） |
-| A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | 进行中（断点：guwen.js 非严格 JSON，生成脚本草稿暂存仓库外 /workspace/work/wip/build_guwen_links.py；改为 node 执行 guwen.js 输出 JSON 后再生成 guwen_links.js，再改 guwen.html 双向链接） |
+| A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | ✅ 见执行日志 |
 | A21 | P4 | gaijin/guwen P0-A / P0-B | 逐字对译点读（需逐句标注 对/停/式）；morph 句式拆装（与语法区共用 morph） | 待做（L） |
 | A22 | P4 | gaijin 三份 P1/P2 | 逻辑 P1-1…P2-5、古诗 P1-1…P2-5、古文 P1-A…P2-E | 待做（P0 之后） |
 | A23 | P2 | MASTER_PLAN 阶段一/三 | 误解标注 61→577、啊哈块补 54 处、每日复习接入、提取练习升级、选项级反馈全量 | 待做（误解标注涉及 quiz/data_* 已被 F1/F6 领取，本代理不做；复习/提取练习未动） |
@@ -82,7 +82,9 @@
 - A7 · dd228f2e · quiz/engine.js 支持 ?point=专题名（无匹配退回全部，带「看全部题目」）；首页逻辑每个专题末尾加「练这个专题的题」；smoke 加用例
 - A15 · cc78ceaf · smoke 新增 yuwen.html 99 条逐条打开用例（正文非空、无报错），通过；MASTER_PLAN 渲染验证标完成
 - A12 · 9f25c9ca · guwen.html 15 个古文题库改为进入子模块时按需加载（首屏 0 个题库请求）；smoke 加用例
-- 移交 · 本提交 · A11/A13/A14 及误解标注涉及的文件已在第五节被审查代理领取，本代理不改，标「移交」
+- 移交 · dfe61bfd · A11/A13/A14 及误解标注涉及的文件已在第五节被审查代理领取，本代理不改，标「移交」
+
+- A20 · 本提交 · tools/content/build_guwen_links.py（node 执行 guwen.js 取数据，不改原数据）生成 data/guwen_links.js：30 篇命中、140 条链接、81 个知识点；guwen.html 篇目详情加「本篇文言知识卡」（汇总+点开跳知识点），知识点详情加「出自《篇名》→」；smoke 加双向跳转用例。**guwen.js / guwen_knowledge.js 改动后需重跑** `python3 tools/content/build_guwen_links.py`（`--check` 校验是否过期；因 F2 正在改这两个文件，暂不接入 CI 以免阻塞对方）
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 

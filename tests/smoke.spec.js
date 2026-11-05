@@ -95,6 +95,25 @@ test.describe('newhanzi smoke', () => {
     await expect(page.locator('.yw-bank').first()).toBeAttached();
   });
 
+  test('guwen text knowledge card links both ways', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="pianmu"]').first().click();
+    await page.locator('[data-go="全部"]').click();
+    await page.locator('.gw-item', { hasText: '学而时习之' }).first().click();
+    await expect(page.locator('#gwKnowCard')).toBeVisible();
+    await expect(page.locator('.gw-kc-sum')).toContainText('本篇：');
+    const card = page.locator('.gw-kc[data-gwpoint^="tongjia:"]').first();
+    await card.click();
+    await expect(page.locator('#gwmdetail')).toBeVisible({ timeout: 10000 });
+    const from = page.locator('#gwmdetail .gw-from[data-gwtext="学而时习之"]');
+    await expect(from).toBeVisible();
+    await from.click();
+    await expect(page.locator('#gwdetail h2')).toHaveText('学而时习之');
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });
