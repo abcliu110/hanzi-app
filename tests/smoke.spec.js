@@ -337,6 +337,17 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen guyin balance whiteboard', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="guyin"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '妻子' }).first().click();
+    await page.locator('#gwmdetail [data-gwwb-start]').click();
+    await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

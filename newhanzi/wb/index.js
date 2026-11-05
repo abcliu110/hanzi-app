@@ -112,4 +112,9 @@ window.NHZ_WB_INDEX = {
   "古文:是以": "gw_shiyi",
   "古文:然则": "gw_ranze",
   "古文:无乃…乎": "gw_wunai",
+  /* 古文区 P1-B 古今异义天平（A22-1）：每个词一个文件 gw_gy_<拼音>.js */
+  "古文:妻子": "gw_gy_qizi",
+  "古文:绝境": "gw_gy_juejing",
+  "古文:交通": "gw_gy_jiaotong",
+  "古文:卑鄙": "gw_gy_beibi",
 };
