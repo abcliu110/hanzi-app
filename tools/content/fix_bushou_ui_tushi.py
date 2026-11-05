@@ -30,6 +30,20 @@ for r in D:
         if k >= 0:
             s = s[:k] + s[k:].replace('>%s</text>' % a, '>%s</text>' % b, 1).replace('>%s</text>' % aw, '>%s</text>' % bw, 1)
             cnt['例字同步'] += 1
+    # 通用：图示里的单字例字已不在 examples 的，换成 examples 里还没上图的字（字和下一行例词一起换）
+    items = re.findall(r'<text x="70" y="\d+"[^>]*font-size="16"[^>]*>([^<]*)</text><text x="70" y="\d+"[^>]*>([^<]*)</text>', s)
+    ex = r['examples']; exz = [e['z'] for e in ex]
+    shown = {a for a, _ in items}
+    for a, aw in items[1:]:
+        if len(a) == 1 and a not in exz:
+            nxt = next((e for e in ex if e['z'] not in shown), None)
+            if not nxt:  # 没有可换的字：整组删掉（保留编号的连续性只对末项成立，所以只删末项）
+                if (a, aw) == items[-1]:
+                    s = re.sub(r'<g opacity="0">(?:(?!<g ).)*?>%s</text><text[^>]*>%s</text></g>' % (re.escape(a), re.escape(aw)), '', s, count=1)
+                    cnt['例字同步'] += 1
+                continue
+            s = s.replace('>%s</text>' % a, '>%s</text>' % nxt['z'], 1).replace('>%s</text>' % aw, '>%s</text>' % nxt['w'], 1)
+            shown.add(nxt['z']); cnt['例字同步'] += 1
     r['图示'] = s
 save(P, D, fmt)
 print(cnt)
