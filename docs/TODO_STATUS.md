@@ -91,6 +91,8 @@
 - 环境 · — · 09:30 左右沙箱重置，~/.ssh 与 Playwright 浏览器丢失；已生成新 deploy key（GitHub 仓库 Settings → Deploy keys「hark-sandbox-2026-11-05」读写），私钥备份在仓库外 /workspace/work/wip/.sshbak，提交脚本 wip/commit.sh 缺钥时自动恢复
 - A18 · e0e6527c · games/luoji/miuwu.html 谬误卡牌册：12 张卡分偷换类/因果类/转移类，定义、例子、口令逐条取自 yuwen/data.js 逻辑区（常见谬误、以偏概全、强加因果、自相矛盾）及设计 P0-3，无来源的卡不写口令只写要点；「出牌」16 句（取自同专题例子/练习/小测），答对解锁卡（localStorage nhz_fallacy_cards），答错进错题本；index「常见谬误」入口；check_scripts、smoke 过。卡背未接 data_logic.js 的误解标注（该文件属 F1，且误解标注未全量）；engine.js 内「答对一题解锁」未做（engine.js 有 F6 改动），改为卡牌页内出牌解锁
 - A19（P0-3）· 本提交 · shici.html 诗详情阅读条加「🎵 打拍器」：按节拍分组排格子（逐首校过的 beats 优先，否则纯五言 2/3、纯七言 2/2/3，杂言不出），60/80/100 三档，WebAudio 合成木鱼每组一下、句间空一拍，点「拍」离最近一拍 ≤1/4 拍算准、该组亮金并计准拍数；「平仄格」只给逐首校过的诗（页内 SC_PZ，目前仅《登鹳雀楼》，按设计 (e) 之二并逐字核平水韵），长条=平、圆点=仄、红「入」角标点开说明、🔔 韵脚。未改 data/shici.js（属 F3）；其余近体诗平仄需 F3 释放后按平水韵生成+人工校再加 pz 字段；quiz 新题型 beat/tone 未做（engine.js 有 F6 改动）
+- A17 修正 · 本提交 · 白板索引、场景名、首页入口改用专题全名「推理三兄弟：演绎/归纳/类比」（yuwen.js / index.html 按 it.name 精确匹配，短名不出按钮）；基线改键
+- F2 · 古文：题库答案与解析相反 6 题（所/安/于）+ 伤仲永例句补「环」，日志 fix-guwen.md
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
