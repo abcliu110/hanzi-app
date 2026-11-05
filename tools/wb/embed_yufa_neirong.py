@@ -186,6 +186,11 @@ def cards_scene(sc, it):
                     d['end'] = last
     if sc.get('ask'):
         warn('%s cards「%s」ask 丢弃（cards 模板不支持 ask）：%s' % (term, sc['tab'], sc['ask']))
+    if sc['lv'] == 3:
+        if sc.get('src'):
+            d['src'] = sc['src']
+        else:
+            warn('%s cards「%s」L3 缺 src' % (term, sc['tab']))
     return [d]
 
 
@@ -205,6 +210,25 @@ def vs_fragment(s, who):
         else:
             warn('%s vs 例句超 12 字未切：%s' % (who, t))
     return t
+
+
+def _match_say(say_list, ex):
+    """say 序号 -> 唯一匹配的 ex 序号（按例句去标点后前 6 字关键串）。
+
+    内容稿的 say 顺序通常跟 ex，但个别幕是反的（如 bu_chengdu「两个“坏了”」）；
+    关键串唯一命中时以命中为准，含糊时回落到位置对应。
+    """
+    keys = []
+    punct = set('。！？；，、：""''——…·')
+    for e in ex:
+        t = ''.join(c for c in strip_paren(e['s']) if c not in punct and not c.isspace())
+        keys.append(t[:6])
+    m = {}
+    for si, s in enumerate(say_list):
+        hits = [ei for ei, k in enumerate(keys) if k and k in s]
+        if len(hits) == 1:
+            m[si] = hits[0]
+    return m
 
 
 def vs_side(e, term, is_true):
@@ -227,8 +251,8 @@ def vs_side(e, term, is_true):
     else:
         t = term if is_true else '不是' + term
         n = None
-    if len(t) > 8:
-        warn('vs t 超 8 字：%s' % t)
+    if len(t) > 10:
+        warn('vs t 超 10 字：%s' % t)
     if n and len(n) > 54:
         warn('vs n 超 54 字：%s' % n)
     return {'t': t, 's': [vs_fragment(e['s'], term)], 'k': 0, 'n': n}
@@ -265,16 +289,26 @@ def vs_scene(sc, it):
     say = sc.get('say', [])
     # say 按 ex 顺序排，不按 L/R 顺序；L3 时 say[0] 常是「想一想：」提问，解释从 say[1] 起
     base = 1 if (sc['lv'] == 3 and say and say[0].startswith('想一想')) else 0
-    if base + L_idx < len(say):
-        L['say'] = say[base + L_idx]
-    if base + R_idx < len(say):
-        R['say'] = say[base + R_idx]
+    match = _match_say(say, ex)
+
+    def side_say(ei):
+        for si, mej in sorted(match.items()):
+            if mej == ei and si >= base:
+                return say[si]
+        return say[base + ei] if base + ei < len(say) else None
+
+    lsay, rsay = side_say(L_idx), side_say(R_idx)
+    if lsay:
+        L['say'] = lsay
+    if rsay:
+        R['say'] = rsay
     end = None
-    if len(say) > base + 2:
-        if len(say[base + 2]) <= 36:
-            end = say[base + 2]
+    ei_end = base + 2
+    if ei_end < len(say) and match.get(ei_end) is None:
+        if len(say[ei_end]) <= 36:
+            end = say[ei_end]
         else:
-            warn('%s vs say[%d] 超 36 字，end 丢弃' % (who, base + 2))
+            warn('%s vs say[%d] 超 36 字，end 丢弃' % (who, ei_end))
     d = {'k': 'vs', 'lv': sc['lv'], 'tab': sc['tab'], 'L': L, 'R': R}
     if say:
         d['h'] = h_of(say[0], sc['tab'], term)
@@ -324,7 +358,7 @@ def test_scene(sc, it):
         merged = []
         for r in rows:
             if r.get('note') == '改正' and merged and merged[-1].get('ok') is False:
-                merged[-1]['r'] = merged[-1]['r'] + '改成“' + r['w'] + '”。'
+                merged[-1]['r'] = merged[-1]['r'] + '改成“' + strip_end(r['w']) + '”。'
             else:
                 merged.append(r)
         rows = merged
@@ -333,9 +367,11 @@ def test_scene(sc, it):
     d = {'k': 'test', 'lv': sc['lv'], 'tab': sc['tab'], 'rows': rows}
     if len(rows) <= 3 and sc.get('ask'):
         d['h'] = sc['ask'] if len(sc['ask']) <= 27 else sc['tab']
-        rows[0]['q'] = sc['ask']
     elif len(rows) > 3 and sc.get('ask'):
-        warn('%s test 4 行，h/ask 丢弃（放不下）：%s' % (who, sc['ask']))
+        warn('%s test 4 行，h 丢弃（放不下）：%s' % (who, sc['ask']))
+    if sc.get('ask'):
+        # q 附在首行 r 拍上（4 行时 h 虽无，提问仍保留）
+        rows[0]['q'] = sc['ask']
     n = max(len(r['w']) for r in rows)
     size = round(460 / n)
     if size < 38:
@@ -390,6 +426,11 @@ def fix_scene(sc, it):
         d['h'] = h_of(say[0], sc['tab'], term)
     if sc.get('ask'):
         d['ask'] = sc['ask']
+    if sc['lv'] == 3:
+        if sc.get('src'):
+            d['src'] = sc['src']
+        else:
+            warn('%s fix「%s」L3 缺 src' % (who, sc['tab']))
     if oks:
         e0 = oks[0]
         if len(e0['s']) <= 36:
@@ -408,6 +449,17 @@ def review_scene(sc, it):
     why = None
     if '：' in good and len(good) > 14:
         good, why = good.split('：', 1)
+    if len(good) > 27:
+        # good 按 size 40 一行约 27 字；超长时按 ； 拆成 good + why（why 只作旁白）
+        for sep in ('；', '，'):
+            if sep in good:
+                a, b = good.split(sep, 1)
+                if a and len(a) <= 27:
+                    good, why = a, b
+                    break
+        if len(good) > 27:
+            warn('%s review good 超 27 字（size 40 一行约 27 字），需手工：%s'
+                 % (it['title']['term'], good))
     d = {'k': 'review', 'lv': 2, 'tab': sc.get('tab', '判对了吗'),
          'task': sc['task'], 'answer': strip_end(sc['answer']), 'ok': sc['ok']}
     if not sc['ok']:
@@ -416,7 +468,9 @@ def review_scene(sc, it):
         d['why'] = strip_end(why)
     rule = sc['rule']
     if len(rule) > 36:
-        rule = re.split(r'[；;]', rule)[0] + '。'
+        rule = re.split(r'[；;]', rule)[0]
+        if not rule.endswith(('。', '！', '？')):
+            rule += '。'
     d['rule'] = rule
     diff = sc.get('diff')
     if diff:
@@ -580,6 +634,96 @@ def main():
             print('  ! ' + w, file=sys.stderr)
 
 
+# ---------------- 手工辅助 ----------------
+
+def fix_multi(ends=None):
+    """多 bad fix → 每 bad 一幕 fix；ends[i] 为第 i 幕的 end（可省）。"""
+    def f(it, sc):
+        ex = sc['ex']
+        bads = [e for e in ex if not e.get('ok', True)]
+        say = sc.get('say', [])
+        out = []
+        for j, b in enumerate(bads):
+            bad, good, why = b['s'], b['fix'], b.get('why') or '不对。'
+            err, ok = char_diff(bad, good)
+            d = {'k': 'fix', 'lv': sc['lv'], 'tab': sc['tab'], 'bad': bad,
+                 'good': good, 'why': why}
+            if err:
+                d['err'] = err
+            if ok:
+                d['ok'] = ok
+            if say:
+                d['h'] = h_of(say[0], sc['tab'], it['title']['term'])
+            if sc.get('ask'):
+                d['ask'] = sc['ask']
+            if ends and j < len(ends) and ends[j]:
+                d['end'] = ends[j] if isinstance(ends[j], str) else sc['say'][ends[j]]
+            out.append(d)
+        return out
+    return f
+
+
+def vs2(L, R, end=None, h=None):
+    """手工 vs：L/R 由调用方给定 {t, s:[…], k:0, n?, say?}；h/ask/src 从 sc 取。
+
+    用于缺 note 的 vs（t/n 须从 say/tab 里人工确认，不可机械猜）。
+    L/R/end 里的 say 可写整数 i，取 sc['say'][i]；end 可写整数 i 或字符串。
+    h：None 时自动（say[0]≤22 字就用，否则用 tab）；传字符串/整数可指定。
+    """
+    def f(it, sc):
+        def res(side):
+            d = dict(side)
+            if isinstance(d.get('say'), int):
+                d['say'] = sc['say'][d['say']]
+            return d
+        d = {'k': 'vs', 'lv': sc['lv'], 'tab': sc['tab'], 'L': res(L), 'R': res(R)}
+        say = sc.get('say', [])
+        if isinstance(h, int):
+            d['h'] = sc['say'][h]
+        elif h:
+            d['h'] = h
+        elif say:
+            d['h'] = say[0] if len(say[0]) <= 22 else sc['tab']
+        if sc.get('ask'):
+            d['ask'] = sc['ask']
+        if sc.get('src'):
+            d['src'] = sc['src']
+        if isinstance(end, int):
+            d['end'] = sc['say'][end]
+        elif end:
+            d['end'] = end
+        return [d]
+    return f
+
+
+def vs1_to_test(note):
+    """1 例 vs → test（1 行）：L3 单例深讲沿用 L3→test 的既有做法。
+
+    row.w = 唯一例句；row.r = say[1]（解释句）；expl = say[2:]；note 由调用方给定。
+    """
+    def f(it, sc):
+        say = sc.get('say', [])
+        s = strip_end_punct(strip_paren(sc['ex'][0]['s']))
+        row = {'w': s, 'ok': True, 'r': say[1] if len(say) > 1 else '能说。',
+               'note': note}
+        if say:
+            row['say'] = re.sub(r'^想一想：', '', say[0])
+        d = {'k': 'test', 'lv': sc['lv'], 'tab': sc['tab'], 'rows': [row]}
+        if sc.get('ask'):
+            d['h'] = sc['ask'] if len(sc['ask']) <= 27 else sc['tab']
+            row['q'] = sc['ask']
+        n = max(len(r['w']) for r in d['rows'])
+        size = round(460 / n)
+        if size < 38:
+            d['size'] = size
+        if len(say) > 2:
+            d['expl'] = say[2:]
+        if sc.get('src'):
+            d['src'] = sc['src']
+        return [d]
+    return f
+
+
 # ================= MANUAL 手工场景 =================
 # MANUAL[item_id][scene_idx] = fn(it, sc) -> [engine scenes]。
 # 机械转不了的幕（1/3/4 例 vs、含 ok:false 的 vs、mark/morph/nest/steps/line/
@@ -598,6 +742,446 @@ def _jiedai_l3(it, sc):
 
 
 MANUAL['rh_jiedai'] = {4: _jiedai_l3}
+
+
+# ================= 01 句型句式 =================
+
+def _shuangbin_valence1(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 1, 'tab': sc['tab'], 'h': say[0],
+             'ask': sc.get('ask'),
+             'rows': [{'s': ['奶奶', '给', '我', '一个', '苹果'], 'v': 1,
+                       'args': [0, {'i': 2, 'tag': '给谁'}, {'i': 4, 'tag': '给什么'}],
+                       'say': say[1]}]}]
+
+
+def _shuangbin_slots(it, sc):
+    say = sc['say']
+    return [{'k': 'slots', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': say[0], 'slots': ['谁', '动词', '给谁', '给什么'], 'key': [2, 3],
+             'ex': [{'s': ['老师', '教', '我们', '一首歌'], 'hl': [2, 3], 'say': say[1]},
+                    {'s': ['小明', '送', '妹妹', '一张卡片'], 'hl': [2, 3]}],
+             'bad': {'s': ['奶奶', '给', '一个苹果', '我'], 'miss': 2,
+                     'say': '放反了：先说人，后说东西，不能倒过来。'}}]
+    # 注：有 bad 时不设 end（slots 模板 bad 行 y=514 与 end y=530 会重叠，既有场景亦如此）
+
+
+def _shuangbin_morph(it, sc):
+    a = {'k': 'morph', 'lv': 2, 'tab': sc['tab'], 'h': '第一次：加上“给”',
+         'from': [{'id': 'S', 'w': ['我']}, {'id': 'V', 'w': ['送']},
+                  {'id': 'R', 'w': ['妹妹'], 'tag': '给谁'},
+                  {'id': 'T', 'w': ['一张卡片'], 'tag': '给什么', 'np': 1}],
+         'to': ['S', 'V', {'id': 'g', 'w': ['给']}, 'R', 'T'],
+         'moveSay': '“给”从上方落到“送”后面。', 'toSay': '我送给妹妹一张卡片。',
+         'okSay': '意思没变，能说。'}
+    # 注：第二变 from 用「这张卡片」而非内容稿 ex 的「一张卡片」——「把」后须是确定的那一件
+    b = {'k': 'morph', 'lv': 2, 'tab': sc['tab'], 'h': '第二次：换成“把”字句',
+         'from': [{'id': 'S', 'w': ['我']}, {'id': 'V', 'w': ['送给']},
+                  {'id': 'R', 'w': ['妹妹']}, {'id': 'T', 'w': ['这张卡片'], 'np': 1}],
+         'to': ['S', {'id': 'b', 'w': ['把'], 'hub': 1}, 'T', 'V', {'id': 'le', 'w': ['了']}, 'R'],
+         'read': '我送给妹妹这张卡片。',
+         'moveSay': '“这张卡片”搬到“把”后面，“了”跟在动词后。',
+         'toSay': '我把这张卡片送给了妹妹。', 'okSay': '意思没变，能说。'}
+    return [a, b]
+
+
+def _shuangbin_valence3(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 3, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc.get('ask'), 'src': sc['src'],
+             'rows': [{'s': ['我', '借', '了', '他', '一本', '书'], 'v': 1,
+                       'args': [0, {'i': 3, 'tag': '借谁'}, {'i': [4, 5], 'tag': '借什么'}],
+                       'say': say[1]},
+                      {'s': ['我', '借给', '他', '一本', '书'], 'v': 1,
+                       'args': [0, {'i': 2, 'tag': '借给谁'}, {'i': [3, 4], 'tag': '借什么'}],
+                       'say': '加上“给”，书只能从我这儿到他那儿。'},
+                      {'s': ['我', '向', '他', '借', '了', '一本', '书'], 'v': 3,
+                       'args': [0, {'i': 2, 'tag': '向谁借'}, {'i': [5, 6], 'tag': '借什么'}],
+                       'say': '向他借，书从他那儿到我这儿。'}],
+             'end': say[3]}]
+
+
+MANUAL['jx_shuangbin'] = {0: _shuangbin_valence1, 1: _shuangbin_slots,
+                          3: _shuangbin_morph, 4: _shuangbin_valence3}
+
+
+def _liandong_steps(it, sc):
+    return [{'k': 'steps', 'lv': 1, 'tab': sc['tab'], 'h': sc['say'][0],
+             'items': ['跑过去', '开门'], 'end': '一个人，接连做了两件事。'}]
+
+
+def _liandong_line(it, sc):
+    say = sc['say']
+    return [{'k': 'line', 'lv': 3, 'tab': sc['tab'], 'h': say[0],
+             'say': say[1], 'src': sc['src'],
+             'pts': [{'x': '先坐车', 'w': '他坐公交车到学校', 'n': '先坐车，后到校'},
+                     {'x': '先到校', 'w': '他到学校坐公交车', 'n': '先到校，后坐车'}],
+             'end': say[3]}]
+
+
+MANUAL['jx_liandong'] = {0: _liandong_steps,
+    2: vs2({'t': '连动句', 's': ['我去食堂吃饭'], 'k': 0,
+            'say': '吃饭的是“我”，连动句。'},
+           {'t': '兼语句', 's': ['我请他吃饭'], 'k': 0,
+            'n': '不是连动句', 'say': '吃饭的是“他”，兼语句。'},
+           end=1),
+    4: _liandong_line}
+
+
+def _zhuweiwei_nest(it, sc):
+    return [{'k': 'nest', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'], 'style': 'box',
+             's': ['他', '身体', '很好'], 'tree': ['zw', 0, ['zw', 1, 2]],
+             'ask': sc.get('ask')}]
+    # say 省略：nest 按盒子自动生成旁白（「“身体”和“很好”装进一个盒子：谁+怎样。」）
+
+
+MANUAL['jx_zhuweiwei'] = {
+    0: _zhuweiwei_nest,
+    2: vs2({'t': '主谓谓语句', 's': ['他身体很好'], 'k': 0,
+            'n': '主语是“他”，谓语是“身体很好”', 'say': 2},
+           {'t': '普通主谓句', 's': ['他的身体很好'], 'k': 0,
+            'n': '主语是“他的身体”，谓语是“很好”', 'say': 1},
+           end=0),
+    3: vs2({'t': '先说这本书', 's': ['这本书我看完了'], 'k': 0,
+            'n': '话题是这本书', 'say': 1},
+           {'t': '先说我', 's': ['我这本书看完了'], 'k': 0,
+            'n': '话题是我', 'say': 1},
+           end='很多语法学家认为，汉语句首的大主语就是“话题”。'),
+}
+
+
+def _yinyu_steps1(it, sc):
+    return [{'k': 'steps', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'items': ['去掉冒号、引号', '换人称，看谁对谁说', '去掉语气词、称呼'],
+             'end': '小红对我说，她借我的书看完了。'}]
+
+
+def _yinyu_steps2(it, sc):
+    return [{'k': 'steps', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'items': ['问话转述：“吗？”变成“没有。”', '请求转述：“你快去”变成“让我快去”'],
+             'end': '问号、叹号都换成句号。'}]
+
+
+MANUAL['jx_yinyu'] = {
+    0: vs2({'t': '原话', 's': ['妈妈说：“我明天去学校”'], 'k': 0,
+            'n': '引号框住原话', 'say': 0},
+           {'t': '转述', 's': ['妈妈说她明天去学校'], 'k': 0,
+            'n': '引号没了，“我”变“她”', 'say': 1}),
+    1: _yinyu_steps1,
+    2: _yinyu_steps2,
+    4: vs2({'t': '当时在公园', 's': ['小明说：“我在这儿等你”'], 'k': 0,
+            'n': '“这儿”是小明站的地方'},
+           {'t': '现在在家里', 's': ['小明说他在那儿等我'], 'k': 0,
+            'n': '“这儿”改成“那儿”', 'say': 1},
+           end='语言学把它们叫“指示语”。'),
+}
+
+
+def _duochong_nest(it, sc):
+    say = sc['say']
+    return [{'k': 'nest', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'], 'style': 'box',
+             'size': 40, 'read': say[0],
+             's': ['虽然', '天', '很', '冷', '但是', '大家', '都', '来了', '而且', '来', '得', '很', '早'],
+             'tree': ['zhuanzhe', ['fuju', 0, 1, 2, 3],
+                      ['dijin', ['fuju', 4, 5, 6, 7], ['fuju', 8, 9, 10, 11, 12]]],
+             'ask': sc.get('ask')}]
+    # say 省略：nest 自动生成按盒子旁白；size 40（44 时最外框会出界）
+
+
+def _duochong_steps(it, sc):
+    return [{'k': 'steps', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'items': ['数一数有几个分句', '圈出关联词', '找第一层：哪个关联词“管”得最远', '在每一块里再分'],
+             'end': '第一层画“｜”，第二层画“‖”。'}]
+
+
+def _duochong_vs(it, sc):
+    # 内容稿是 vs，但要点是两句的切法不同（台阶线）：改成两幕 nest（stair），分句作词块，
+    # 只切两层，不切词内。act「两句的台阶形状对比」由两幕先后对照实现。
+    say = sc['say']
+    a = {'k': 'nest', 'lv': 3, 'tab': sc['tab'], 'h': '第一句：转折先分', 'style': 'stair',
+         's': ['虽然下雨了', '但是比赛照常进行', '因为场馆有屋顶'],
+         'tree': ['zhuanzhe', 0, ['yinguo', 1, 2]], 'ask': sc.get('ask'), 'src': sc['src']}
+    b = {'k': 'nest', 'lv': 3, 'tab': sc['tab'], 'h': '第二句：因果先成块', 'style': 'stair',
+         's': ['因为下雨了', '比赛推迟了', '但是观众都没走'],
+         'tree': ['zhuanzhe', ['yinguo', 0, 1], 2], 'src': sc['src'], 'end': say[3]}
+    return [a, b]
+
+
+def _duochong_fix(it, sc):
+    # fix 模板 bad/good 按 size 42 一行约 27 字；带 ①②③ 的原句 28/29 字会出界，
+    # 去掉序号标记（｜‖ 切分位置才是要点，say/why 里的 ①②③ 指代仍成立）。
+    ex = sc['ex'][0]
+    bad = ex['s'].replace('①', '').replace('②', '').replace('③', '')
+    good = ex['fix'].replace('①', '').replace('②', '').replace('③', '')
+    err, ok = char_diff(bad, good)
+    d = {'k': 'fix', 'lv': 2, 'tab': sc['tab'], 'bad': bad, 'good': good,
+         'why': ex.get('why') or '不对。'}
+    if err:
+        d['err'] = err
+    if ok:
+        d['ok'] = ok
+    say = sc.get('say', [])
+    if say:
+        d['h'] = h_of(say[0], sc['tab'], it['title']['term'])
+    return [d]
+
+
+MANUAL['jx_duochong'] = {0: _duochong_nest, 1: _duochong_steps,
+                         2: _duochong_fix, 3: _duochong_vs}
+
+
+def _jinsuo_morph0(it, sc):
+    say = sc['say']
+    return [{'k': 'morph', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'from': [{'id': 'r', 'w': ['如果']}, {'id': 'a', 'w': ['你', '去']},
+                      {'id': 'b', 'w': ['我', '就', '去']}],
+             'to': ['a', 'b'], 'read': say[0],
+             'moveSay': '把“如果”和逗号拿掉，压一压。', 'toSay': '你去我就去。',
+             'okSay': '意思没变，能说。', 'ask': sc.get('ask'), 'end': say[2]}]
+
+
+def _jinsuo_morph2(it, sc):
+    a = {'k': 'morph', 'lv': 2, 'tab': sc['tab'], 'h': '“不见不散”松开',
+         'from': [{'id': 'a', 'w': ['不见']}, {'id': 'b', 'w': ['不散']}],
+         'to': [{'id': 'if', 'w': ['如果']}, 'a', {'id': 'mian', 'w': ['面']},
+                {'id': 'jiu', 'w': ['就']}, 'b', {'id': 'qu', 'w': ['去']}],
+         'moveSay': '两块向两边拉开，“如果”“就”从上方落入，“面”“去”补上。',
+         'toSay': '如果不见面，就不散去。', 'okSay': '意思没变，能说。'}
+    b = {'k': 'morph', 'lv': 2, 'tab': sc['tab'], 'h': '“再忙也要吃早饭”松开',
+         'from': [{'id': 'a', 'w': ['再忙']}, {'id': 'b', 'w': ['也要', '吃', '早饭']}],
+         'to': [{'id': 'jishi', 'w': ['即使']}, 'a', 'b'],
+         'moveSay': '补进“即使”，松开成复句。', 'toSay': '即使再忙，也要吃早饭。',
+         'okSay': '意思没变，能说。'}
+    return [a, b]
+
+
+MANUAL['jx_jinsuo'] = {
+    0: _jinsuo_morph0,
+    2: _jinsuo_morph2,
+    3: vs2({'t': '紧缩复句', 's': ['他一进门就喊妈妈'], 'k': 0,
+            'n': '“一…就”连着两件事', 'say': 0},
+           {'t': '连动句', 's': ['他进门喊妈妈'], 'k': 0,
+            'n': '没有关联格式，是单句', 'say': 1}),
+    4: vs2({'t': '发生过一次', 's': ['他一到家就睡了'], 'k': 0,
+            'n': '到家，紧接着睡了', 'say': 1},
+           {'t': '常常这样', 's': ['我一紧张就结巴'], 'k': 0,
+            'n': '只要紧张，就会结巴', 'say': 2},
+           end=3),
+}
+
+MANUAL['jx_julei'] = {
+    4: vs2({'t': '感叹或祈使', 's': ['火！'], 'k': 0,
+            'n': '大喊“火！”，提醒大家', 'say': '大喊“火！”，是提醒大家。'},
+           {'t': '疑问', 's': ['火？'], 'k': 0,
+            'n': '指着问“火？”，是疑问', 'say': '指着问“火？”，是疑问。'},
+           end='“火！”是非主谓句，句类靠语调定。'),
+}
+
+
+# ================= 02 补语细分 =================
+
+MANUAL['bu_chengdu'] = {
+    4: vs2({'t': '程度补语', 's': ['小狗累坏了'], 'k': 0,
+            'n': '小狗没有坏，只是累到极点', 'say': 2},
+           {'t': '结果补语', 's': ['杯子摔坏了'], 'k': 0,
+            'n': '杯子真的坏了', 'say': 1},
+           end=3),
+    # 注：say[1] 讲 ex[1]（杯子）、say[2] 讲 ex[0]（小狗），顺序是反的，已按 ex 对位；
+    # act 里的状态图（完整→碎了 / 程度条）vs 模板画不出，只保留文字对照。
+}
+
+MANUAL['bu_dongliang'] = {
+    2: vs2({'t': '一次', 's': ['这本书我看了一次'], 'k': 0,
+            'n': '看过一回，不一定看完', 'say': 0},
+           {'t': '一遍', 's': ['这本书我看了一遍'], 'k': 0,
+            'n': '从第一页看到最后一页', 'say': 1},
+           h='一次和一遍'),
+    4: vs2({'t': '名量', 's': ['他嘴里含着一口苹果'], 'k': 0,
+            'n': '量苹果有多少', 'say': 1},
+           {'t': '动量', 's': ['他咬了一口苹果'], 'k': 0,
+            'n': '量咬了几次', 'say': 2},
+           end='“口、脚、眼、拳”借来数动作，叫借用动量词。'),
+}
+
+
+def _bu_jieguo_morph(it, sc):
+    say = sc['say']
+    return [{'k': 'morph', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'from': [{'id': 'S', 'w': ['弟弟']}, {'id': 'b', 'w': ['把']},
+                      {'id': 'O', 'w': ['杯子']}, {'id': 'V', 'w': ['打']}],
+             'to': ['S', 'b', 'O', 'V', {'id': 'r', 'w': ['碎']}, {'id': 'le', 'w': ['了']}],
+             'read': '弟弟把杯子打。', 'ask': sc.get('ask'),
+             'moveSay': '“碎”从上方落到“打”后面，紧贴着不留空。',
+             'toSay': '弟弟把杯子打碎了。', 'okSay': say[1],
+             'state': {'a': '杯子好好的', 'b': '杯子碎了',
+                       'say': '打之前，杯子好好的；打之后，杯子碎了。'}}]
+
+
+MANUAL['bu_jieguo'] = {
+    0: _bu_jieguo_morph,
+    4: vs2({'t': '累的是“我”', 's': ['我写累了'], 'k': 0,
+            'n': '结果挂在主语上', 'say': '写累了：累的是“我”。'},
+           {'t': '错的是字', 's': ['我写错了'], 'k': 0,
+            'n': '结果挂在动作上', 'say': '写错了：错的是写的字。'},
+           end='衣服洗干净了：干净的是衣服。'),
+}
+
+
+def _bu_keneng_morph(it, sc):
+    def one(h, a, b, toSay, okSay, moveSay='“不”从上方落进缝里。'):
+        return {'k': 'morph', 'lv': 2, 'tab': sc['tab'], 'h': h,
+                'from': [{'id': 'a', 'w': [a]}, {'id': 'b', 'w': [b]}],
+                'to': ['a', {'id': 'bu', 'w': ['不']}, 'b'],
+                'read': a + b + '。', 'moveSay': moveSay, 'toSay': toSay, 'okSay': okSay}
+    return [one('做完 → 做不完', '做', '完', '做不完。', '插进“不”，就成了可能补语。'),
+            one('上去 → 上不去', '上', '去', '上不去。', '插进“不”，就成了可能补语。'),
+            one('吃了 → 吃不了', '吃', '了', '吃不了。', '“了”读 liǎo：吃不了。',
+                '“不”从上方落进缝里，“了”读 liǎo。')]
+
+
+MANUAL['bu_keneng'] = {
+    1: _bu_keneng_morph,
+    4: vs2({'t': '否定：学不会', 's': ['这门课我学不会'], 'k': 0,
+            'n': '常常单独用', 'say': '否定的“学不会”常常单独用。'},
+           {'t': '肯定：学得会', 's': ['你学得会吗？——学得会'], 'k': 0,
+            'n': '多半在问答里', 'say': '肯定的“学得会”多半在问答里。'},
+           end='肯定的意思，平时多用“能”：我能学会。'),
+}
+
+
+def _bu_shiliang_line(it, sc):
+    say = sc['say']
+    return [{'k': 'line', 'lv': 1, 'tab': sc['tab'], 'h': say[0], 'say': say[1],
+             'pts': [{'x': '下水', 'w': '开始游'},
+                     {'x': '上岸', 'w': '游完了', 'n': '半个小时'}],
+             'end': '说时间长短的词跟在动词后面，就是时量补语。'}]
+
+
+MANUAL['bu_shiliang'] = {
+    0: _bu_shiliang_line,
+    4: vs2({'t': '只说三年', 's': ['他学了三年汉语'], 'k': 0,
+            'n': '现在可能不学了', 'say': 1},
+           {'t': '到现在三年', 's': ['他学了三年汉语了'], 'k': 0,
+            'n': '而且还在学', 'say': 2},
+           end=3),
+}
+
+
+# ================= 03 词与短语 =================
+
+MANUAL['cd_chongdie'] = {
+    4: vs2({'t': '定语：程度轻', 's': ['她有一双大大的眼睛'], 'k': 0,
+            'n': '“大大的”带一点喜爱', 'say': 1},
+           {'t': '状语：程度重', 's': ['他的成绩大大地提高了'], 'k': 0,
+            'n': '“大大地”是程度很深', 'say': 2},
+           end='定语、谓语位置程度轻，状语、补语位置程度重。'),
+}
+
+
+def _dezi_morph(it, sc):
+    return [{'k': 'morph', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'from': [{'id': 'S', 'w': ['我']}, {'id': 'V', 'w': ['要']},
+                      {'id': 'A', 'w': ['红', '的']}, {'id': 'N', 'w': ['苹果']}],
+             'to': ['S', 'V', 'A'], 'read': '我要红的苹果。', 'ask': sc.get('ask'),
+             'moveSay': '“苹果”淡出，省掉了。', 'toSay': '我要红的。',
+             'okSay': '“红的”就是“红的苹果”，大家都知道。'}]
+
+
+def _dezi_mark(it, sc):
+    say = sc['say']
+    a = {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+         's': ['开车', '的', '是', '我', '爸爸'], 'say': '开车的是我爸爸。',
+         'm': [{'i': [0, 1], 'role': 'zhu', 'say': '“开车的”作主语。'}]}
+    b = {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+         's': ['这本', '书', '是', '图书馆', '的'], 'say': '这本书是图书馆的。',
+         'm': [{'i': [3, 4], 'role': 'bin', 'say': '“图书馆的”作宾语。'}],
+         'end': say[0]}
+    return [a, b]
+
+
+MANUAL['cd_dezi'] = {
+    0: _dezi_morph,
+    3: _dezi_mark,
+    4: vs2({'t': '送的东西', 's': ['这本书是送你的'], 'k': 0,
+            'n': '送的是东西', 'say': '可以是送给你的东西。'},
+           {'t': '送你的人', 's': ['送你的在门口等着'], 'k': 0,
+            'n': '送的是人', 'say': '也可以是送你回家的人。'},
+           end='“的”字短语会把意思“转”到人或东西身上。'),
+}
+
+
+def _fangwei_slots(it, sc):
+    say = sc['say']
+    return [{'k': 'slots', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': say[1].split('。')[0] + '。', 'slots': ['球', '在', '箱子', '方位词'],
+             'key': 3,
+             'ex': [{'s': ['球', '在', '箱子', '里']},
+                    {'s': ['球', '在', '箱子', '上']},
+                    {'s': ['球', '在', '箱子', '旁边'], 'say': '这些说位置的词叫方位词。'}]}]
+    # 注：3 例 + end 会纵向重叠（末行 y=514 与 end y=530），规则改放末例 say；ask 无 bad 位可挂，丢弃
+
+
+MANUAL['cd_fangwei'] = {
+    0: _fangwei_slots,
+    2: fix_multi(ends=[None, 2]),
+    4: vs2({'t': '在桌子上', 's': ['在桌子上'], 'k': 0,
+            'n': '“在”和“上”合起来框', 'say': '“在”只说“在某处”，“上”说明是哪个位置。'},
+           {'t': '在北京', 's': ['在北京'], 'k': 0,
+            'n': '“北京”本身是地方', 'say': '普通名词本身不是地方，要靠方位词把它变成地方。'},
+           end=2),
+}
+
+
+def _jiebin_mark0(it, sc):
+    return [{'k': 'mark', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             's': ['小狗', '在', '操场上', '跑'], 'say': sc['say'][0], 'ask': sc.get('ask'),
+             'm': [{'i': 1, 'sym': 'prep', 'say': '“在”是介词，像领路的人。'},
+                   {'i': [1, 2], 'role': 'zhuang', 'say': '“在操场上”作状语，告诉我们在哪儿跑。'}]}]
+
+
+def _jiebin_cards(it, sc):
+    return [{'k': 'cards', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'items': [{'n': '状语', 'w': '他在图书馆看书。'},
+                       {'n': '补语', 'w': '他住在学校旁边。'},
+                       {'n': '定语', 'w': '我借了一本关于恐龙的书。'},
+                       {'n': '“在”是动词', 'w': '他在家。'}]}]
+
+
+MANUAL['cd_jiebin'] = {
+    0: _jiebin_mark0,
+    2: _jiebin_cards,
+    4: vs2({'t': '动词', 's': ['我给他一本书'], 'k': 0,
+            'n': '“给”自己就是动作', 'say': 1},
+           {'t': '介词', 's': ['我给他写信'], 'k': 0,
+            'n': '“给他”只交代对象', 'say': 2},
+           end='汉语的介词大多是从动词变来的。'),
+}
+
+
+def _nengyuan_cards(it, sc):
+    return [{'k': 'cards', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'items': [{'n': '学会的本领', 'w': '我会游泳。'},
+                       {'n': '达到的程度', 'w': '我能游一千米。'},
+                       {'n': '条件不允许', 'w': '我今天感冒了，不能游泳。'},
+                       {'n': '可能', 'w': '明天会下雨。'}]}]
+
+
+MANUAL['cd_nengyuan'] = {
+    1: _nengyuan_cards,
+    4: vs2({'t': '推测', 's': ['他应该到家了'], 'k': 0,
+            'n': '大概已经到家了', 'say': 1},
+           {'t': '要求', 's': ['你应该早点到家'], 'k': 0,
+            'n': '你该早点回来', 'say': 2},
+           end='能愿动词有推测和义务两种用法。'),
+}
+
+MANUAL['cd_tongwei'] = {
+    4: vs2({'t': '同位短语', 's': ['我们学生要爱护课桌'], 'k': 0,
+            'n': '我们就是学生，能说', 'say': 1},
+           {'t': '偏正短语', 's': ['我们学校有一个大操场'], 'k': 0,
+            'n': '“我们学校”是“我们的学校”', 'say': 2},
+           end='同位短语也可看作特殊的偏正结构。'),
+}
 
 
 if __name__ == '__main__':

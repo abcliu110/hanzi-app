@@ -200,4 +200,26 @@ window.NHZ_WB_INDEX = {
   "古文:时间轴:欧阳修": "gw_timeline_ouyangxiu",
   /* Q13 新增 50 项（docs/yufa-neirong/05）：修辞补齐 */
   "借代": "rh_jiedai",
+  /* Q13 新增 50 项（docs/yufa-neirong/01）：句型句式 */
+  "双宾语句": "jx_shuangbin",
+  "连动句": "jx_liandong",
+  "主谓谓语句": "jx_zhuweiwei",
+  "四种句类": "jx_julei",
+  "引语转述": "jx_yinyu",
+  "多重复句": "jx_duochong",
+  "紧缩复句": "jx_jinsuo",
+  /* Q13 新增 50 项（docs/yufa-neirong/02）：补语细分 */
+  "结果补语": "bu_jieguo",
+  "可能补语": "bu_keneng",
+  "程度补语": "bu_chengdu",
+  "时量补语": "bu_shiliang",
+  "动量补语": "bu_dongliang",
+  /* Q13 新增 50 项（docs/yufa-neirong/03）：词与短语 */
+  "重叠": "cd_chongdie",
+  "能愿动词": "cd_nengyuan",
+  "方位词": "cd_fangwei",
+  "同位短语": "cd_tongwei",
+  "介宾短语": "cd_jiebin",
+  "“的”字短语": "cd_dezi",
+  "“所”字结构": "cd_suozi",
 };
