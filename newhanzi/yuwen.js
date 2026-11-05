@@ -146,6 +146,22 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  /* 逻辑 P2-4 讨论卡（仅逻辑区）：完成只记 localStorage，不判分 */
+  function logicTalkDone() {
+    try { return JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}'); } catch (e) { return {}; }
+  }
+  function logicTalkHtml(it) {
+    var card = it['讨论卡']; if (!card) return '';
+    var done = !!logicTalkDone()[it.name];
+    return '<div class="yw-talk" data-talk-name="' + esc(it.name) + '">' +
+      '<div class="yw-step"><span class="yw-stepnum">💬</span><span class="yw-steptitle">和家人聊一聊</span></div>' +
+      '<p class="yw-exp">' + esc(card['问题'] || '') + '</p>' +
+      '<p class="yw-exp">💡 提示：' + esc(card['提示'] || '') + '</p>' +
+      '<p class="yw-exp">请举一个反例：想一个让这个说法站不住的例子，讲给家人听。</p>' +
+      '<button type="button" class="back" data-talk-done="1"' + (done ? ' disabled' : '') + '>' +
+      (done ? '✓ 已完成，和家人聊过了' : '✓ 聊完了，记完成') + '</button></div>';
+  }
+
   /* 题库按类过滤：未选类时返回全部题；选类后只返回该类的题 */
   function bankFiltered(bid) {
     var st = bankState[bid];
@@ -404,6 +420,8 @@
           }).join('') + '</div><div class="quiz-fb"></div></div>';
       }).join('') + '</div>';
     }
+    /* 逻辑 P2-4 讨论卡：只在逻辑区、详情末尾加一块（语法/阅读/写作不受影响） */
+    if (active === 'logic' && it['讨论卡']) body += logicTalkHtml(it);
     var iconMap = {'名词':'<span style="color:#1a1a1a">▲</span>','动词':'🔴','形容词':'<span style="color:#3b82f6">▲</span>','数词':'🔢','量词':'📏','代词':'➕','副词':'⚡','介词':'🔗','连词':'⛓️','助词':'📌','语气词':'💬','叹词':'❗','主语':'👤','谓语':'🏃','宾语':'🎯','定语':'🏷️','状语':'📍','补语':'➕','比喻':'🪞','拟人':'🧍','夸张':'🎈','排比':'📚','对偶':'⚖️','反复':'🔁','设问':'❓','反问':'‼️'};
     var icon = iconMap[it.name] || '📖';
     currentItems[idx] = {it: it, body: body, icon: icon};
@@ -508,6 +526,20 @@
   });
 
   document.addEventListener('click', function (e) {
+    /* 逻辑 P2-4 讨论卡完成：只记 localStorage，不判分 */
+    var tk = e.target.closest('[data-talk-done]');
+    if (tk) {
+      e.stopPropagation();
+      var card = tk.closest('[data-talk-name]');
+      var nm = card ? card.getAttribute('data-talk-name') : '';
+      try {
+        var done = JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}');
+        done[nm] = 1;
+        localStorage.setItem('nhz_logic_talk_done', JSON.stringify(done));
+      } catch (err) {}
+      tk.disabled = true; tk.textContent = '✓ 已完成，和家人聊过了';
+      return;
+    }
     var h = e.target.closest('.yw-head');
     if (h && listEl.style.display !== 'none') {
       var idx = h.getAttribute('data-idx');

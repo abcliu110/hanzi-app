@@ -178,6 +178,41 @@
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   var logicAnimData = {};
+  /* 逻辑 P2-4 讨论卡：完成状态只记 localStorage，不判分 */
+  function logicTalkDone(){
+    try { return JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}'); } catch(e){ return {}; }
+  }
+  function logicTalkHtml(it){
+    var card = it['讨论卡']; if(!card) return '';
+    var done = !!logicTalkDone()[it.name];
+    return '<div class="yw-talk" data-talk-name="'+esc(it.name).replace(/"/g,'&quot;')+'">' +
+      '<div class="yw-step"><span class="yw-stepnum">💬</span><span class="yw-steptitle">和家人聊一聊</span></div>' +
+      '<p class="yw-exp">'+esc(card['问题']||'')+'</p>' +
+      '<p class="yw-exp">💡 提示：'+esc(card['提示']||'')+'</p>' +
+      '<p class="yw-exp">请举一个反例：想一个让这个说法站不住的例子，讲给家人听。</p>' +
+      '<button type="button" class="back" data-talk-done="1"'+(done?' disabled':'')+'>'+
+      (done?'✓ 已完成，和家人聊过了':'✓ 聊完了，记完成')+'</button></div>';
+  }
+  function renderLogicList(){
+    var D = (window.NHZ_YUWEN||{}).logic;
+    var el = document.getElementById('logiclist');
+    if(!D || !el) return;
+    var h = '';
+    var shown = 0;
+    D.categories.forEach(function(c,ci){
+      var items = c.items;
+      if(!items.length) return;
+      shown += items.length;
+      h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+items.length+'条</span></div>'+
+        items.map(lessonHtml).join('');
+    });
+    if(!shown) h += '<div class="noresult">该档暂无专题，换个档位试试</div>';
+    h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：逻辑大闯关 →</a>';
+    h += '<a href="games/luoji/zebra.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🦓 斑马谜题格：点线索卡排除，剩唯一解 →</a>';
+    /* 逻辑P1-5 每日一句：首页逻辑区「逻辑一分钟」入口 */
+    h += '<a href="games/luoji/daily.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">⏱️ 逻辑一分钟：每日一句 →</a>';
+    el.innerHTML = h;
+  }
   function lessonHtml(it, idx){
     var b='', step=0;
     function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
@@ -247,6 +282,8 @@
     if(LOGIC_TOYS[it.name]) b += '<a class="yw-topicquiz" href="'+LOGIC_TOYS[it.name][0]+'" style="display:inline-block;margin:8px 8px 8px 0;padding:10px 14px;border-radius:10px;border:1px solid var(--accent-deep,#3d5a40);color:var(--accent-deep,#3d5a40);text-decoration:none">'+esc(LOGIC_TOYS[it.name][1])+' →</a>';
     /* 逻辑专题：直达题库里同 point 的题（quiz/data_logic.js 每题有 point） */
     if(it.name) b += '<a class="yw-topicquiz" href="quiz/index.html?tab=logic&point='+encodeURIComponent(it.name)+'" style="display:inline-block;margin:8px 0;padding:10px 14px;border-radius:10px;border:1px solid #f5c518;color:#f5c518;text-decoration:none">🎮 练这个专题的题 →</a>';
+    /* 逻辑 P2-4 讨论卡：专题末尾，不判分 */
+    if(it['讨论卡']) b += logicTalkHtml(it);
     return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+
       (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
       '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
@@ -278,20 +315,7 @@
       }
     }
     if(m==='logic' && !panels.logic.dataset.done && window.NHZ_YUWEN){
-      var D = (window.NHZ_YUWEN||{}).logic;
-      var el = document.getElementById('logiclist');
-      if(D&&el){
-        var h='';
-        D.categories.forEach(function(c,ci){
-          h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+c.items.length+'条</span></div>'+
-            c.items.map(lessonHtml).join('');
-        });
-        h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：逻辑大闯关 →</a>';
-        h += '<a href="games/luoji/zebra.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🦓 斑马谜题格：点线索卡排除，剩唯一解 →</a>';
-        /* 逻辑P1-5 每日一句：首页逻辑区「逻辑一分钟」入口 */
-        h += '<a href="games/luoji/daily.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">⏱️ 逻辑一分钟：每日一句 →</a>';
-        el.innerHTML = h;
-      }
+      renderLogicList();
       panels.logic.dataset.done='1';
     }
     window.scrollTo(0,0);
@@ -384,6 +408,20 @@
     })(true);
   }
   document.addEventListener('click', function(e){
+    /* 逻辑 P2-4 讨论卡完成：只记 localStorage，不判分 */
+    var tk = e.target.closest('[data-talk-done]');
+    if(tk){
+      e.stopPropagation();
+      var card = tk.closest('[data-talk-name]');
+      var nm = card ? card.getAttribute('data-talk-name') : '';
+      try {
+        var done = JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}');
+        done[nm] = 1;
+        localStorage.setItem('nhz_logic_talk_done', JSON.stringify(done));
+      } catch(err){}
+      tk.disabled = true; tk.textContent = '✓ 已完成，和家人聊过了';
+      return;
+    }
     var h = e.target.closest('.yw-head');
     if(h){ h.parentElement.classList.toggle('open'); return; }
     var wbs = e.target.closest('[data-lwb-start]');
