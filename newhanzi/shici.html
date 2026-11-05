@@ -165,6 +165,8 @@ if (window.self !== window.top) {
 <script src="data/shangxi.js"></script>
 <script src="data/shiju.js"></script>
 <script src="wb/index.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
 <script>
 (function(){
 var D = window.NHZ_SHICI || {poems:[]};
@@ -942,6 +944,18 @@ function openKnow(idx){
     h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+k['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
   }
   var dHtml = escD(k.d);
+  /* Q15 四型模板：图式/对照表/决策树/时间轴，均取自本卡 d 文本里的对应块；已转成模板的块从正文里去掉，避免同一内容贴两遍 */
+  var PT = window.NHZPatterns;
+  if (PT) {
+    var scRows = PT.schemaFromShiciText(k.d);
+    if (scRows) { h += PT.renderSchema(scRows); dHtml = dHtml.replace(/<b>\[图式\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var cmpRows = PT.compareFromShiciText(k.d);
+    if (cmpRows) { h += PT.renderGrid(cmpRows); dHtml = dHtml.replace(/<b>\[对照表\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var decT = PT.decisionFromShiciText(k.d);
+    if (decT) { h += PT.renderDecision(decT); dHtml = dHtml.replace(/<b>\[决策树\]<\/b>[\s\S]*?(?=<br><br>|<b>📜|$)/, ''); }
+    var tlEv = PT.timelineFromShici(k);
+    if (tlEv) h += PT.renderTimeline(tlEv);
+  }
   var tp = knowType(k.m, k.t);
   /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
   var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
