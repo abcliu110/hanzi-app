@@ -107,4 +107,5 @@ window.NHZ_WB_INDEX = {
   /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */
   "古文:倒装句": "gw_daozhuang",
   "古文:判断句": "gw_panduan",
+  "古文:被动句": "gw_beidong",
 };
