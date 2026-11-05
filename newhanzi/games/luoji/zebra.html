@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>斑马谜题格 · 演绎推理</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+table.grid{border-collapse:collapse;margin:12px auto;user-select:none;-webkit-user-select:none}
+table.grid th,table.grid td{border:2px solid var(--line);text-align:center}
+table.grid th{padding:10px 8px;font-size:17px;background:var(--accent-soft);color:var(--accent-deep);min-width:92px}
+table.grid th.corner{background:var(--surface)}
+table.grid td{width:92px;height:72px;font-size:34px;font-weight:700;cursor:pointer;background:var(--surface)}
+table.grid td.x{color:var(--red)}
+table.grid td.x.mine{color:#9a8a8a}
+table.grid td.o{color:var(--green);background:#e2f0e6}
+table.grid td.flash{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.clue{display:block;width:100%;text-align:left;min-height:52px;padding:10px 14px;margin:8px 0;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.clue b{color:var(--accent-deep)}
+.clue.used{opacity:.55;border-style:dashed;cursor:default}
+.clue.hl{border-color:var(--orange);box-shadow:0 0 0 3px rgba(196,106,43,.25)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn.on{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+.win{font-size:19px;font-weight:700;color:var(--green)}
+.legend{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🦓 斑马谜题格 · 演绎推理</h1></div>
+  <div class="card" id="box"></div>
+  <div class="rule">演绎推理就是“排除法”：每条线索都是一定的前提，不是猜的。“不喜欢苹果”言外之意就是“苹果不是他的”，对应格打 ×；一行（或一列）只剩一格没打 ×，那格就是答案。自己点空格也能打 ×（灰 ×，再点取消），点错答案格会有提示并记进错题本。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 题目说明：纯逻辑自洽的抽象题，不涉真实人物事实。
+     人物用通用名小明/小红/小刚；每人恰好对应一种，每种恰好一人（3×3 排除格）。
+     clue.type: 'x' = 该格不可能；'o' = 该格就是答案（同行同列其余格全排除）。
+     sol[r] = 该行答案所在的列；why[r] = 该答案格被点错时给的提示。 */
+  var LEVELS = [
+    { title: '第一关：谁爱吃什么水果', rows: ['小明', '小红', '小刚'], cols: ['苹果', '香蕉', '橙子'],
+      sol: [1, 2, 0],
+      why: ['小红定了橙子，小明又不喜欢苹果，所以小明只剩香蕉。',
+            '线索说了：小红最爱吃橙子。',
+            '橙子归小红、香蕉归小明，苹果只剩小刚。'],
+      clues: [
+        { text: '小明不喜欢苹果。', say: '所以「小明 × 苹果」这一格打 ×。', type: 'x', r: 0, c: 0 },
+        { text: '小红不喜欢香蕉。', say: '所以「小红 × 香蕉」这一格打 ×。', type: 'x', r: 1, c: 1 },
+        { text: '小刚不喜欢橙子。', say: '所以「小刚 × 橙子」这一格打 ×。', type: 'x', r: 2, c: 2 },
+        { text: '小红最爱吃橙子。', say: '所以「小红 √ 橙子」定下来：小红这一行、橙子这一列的其他格全打 ×。', type: 'o', r: 1, c: 2 }
+      ] },
+    { title: '第二关：谁参加什么运动', rows: ['小明', '小红', '小刚'], cols: ['跳绳', '踢球', '跑步'],
+      sol: [2, 0, 1],
+      why: ['跳绳归小红、踢球归小刚，跑步只剩小明。',
+            '线索说了：小红最爱跳绳。',
+            '小刚不参加跑步，跳绳又归小红，所以小刚只剩踢球。'],
+      clues: [
+        { text: '小明不参加跳绳。', say: '所以「小明 × 跳绳」这一格打 ×。', type: 'x', r: 0, c: 0 },
+        { text: '小刚不参加跑步。', say: '所以「小刚 × 跑步」这一格打 ×。', type: 'x', r: 2, c: 2 },
+        { text: '小红最爱跳绳。', say: '所以「小红 √ 跳绳」定下来：小红这一行、跳绳这一列的其他格全打 ×。', type: 'o', r: 1, c: 0 }
+      ] }
+  ];
+  var box = document.getElementById('box');
+  var li = 0, mark = [], locked = [], used = [], won = false, mistakeDone = false, winDone = false, hintIdx = -1, flashCell = null;
+  function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function reset(){
+    mark = []; locked = []; used = [];
+    for (var r = 0; r < 3; r++) { mark.push(['', '', '']); locked.push([false, false, false]); }
+    LEVELS[li].clues.forEach(function(){ used.push(false); });
+    won = false; mistakeDone = false; winDone = false; hintIdx = -1; flashCell = null;
+  }
+  function setX(r, c, lock){
+    if (mark[r][c] === '') { mark[r][c] = 'x'; locked[r][c] = !!lock; return true; }
+    return false;
+  }
+  function setO(r, c){
+    if (mark[r][c] === 'o') return false;
+    mark[r][c] = 'o'; locked[r][c] = true;
+    for (var k = 0; k < 3; k++) { if (k !== c) setX(r, k, true); if (k !== r) setX(k, c, true); }
+    return true;
+  }
+  /* 自动推导（只用“真排除”推，不会推出错答案）：
+     ① 已定格的同行同列全排除；② 一行/一列只剩一格未排除，且该行/列还没定格，则该格就是答案。循环到不动为止。 */
+  function deduce(){
+    var changed = true;
+    while (changed) {
+      changed = false;
+      var r, c, k, un, hasO;
+      for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) {
+        if (mark[r][c] === 'o') for (k = 0; k < 3; k++) {
+          if (k !== c && setX(r, k, true)) changed = true;
+          if (k !== r && setX(k, c, true)) changed = true;
+        }
+      }
+      for (r = 0; r < 3; r++) {
+        un = []; hasO = false;
+        for (c = 0; c < 3; c++) { if (mark[r][c] === 'o') hasO = true; if (mark[r][c] === '') un.push(c); }
+        if (!hasO && un.length === 1 && setO(r, un[0])) changed = true;
+      }
+      for (c = 0; c < 3; c++) {
+        un = []; hasO = false;
+        for (r = 0; r < 3; r++) { if (mark[r][c] === 'o') hasO = true; if (mark[r][c] === '') un.push(r); }
+        if (!hasO && un.length === 1 && setO(un[0], c)) changed = true;
+      }
+    }
+  }
+  function checkWin(){
+    var L = LEVELS[li], ok = true;
+    for (var r = 0; r < 3; r++) if (mark[r][L.sol[r]] !== 'o') ok = false;
+    if (ok && !won) {
+      won = true;
+      if (!winDone) {
+        winDone = true;
+        NHZReview.record({ q: '斑马谜题格：' + L.title + '。' + L.rows.join('、') + '各对应一种' + L.cols.join('、') + '，答案是什么？',
+          options: L.rows.map(function(row, i){ return row + '——' + L.cols[L.sol[i]]; }),
+          answer: L.rows.map(function(row, i){ return row + '——' + L.cols[L.sol[i]]; }).join('；'),
+          解析: '点线索卡逐条排除：一行（或一列）只剩一格时，那格就是答案。',
+          src: '逻辑', point: '推理三兄弟：演绎/归纳/类比' }, true);
+      }
+    }
+    return ok;
+  }
+  function render(fb, cls){
+    var L = LEVELS[li], h = '';
+    h += '<div class="btns">' + LEVELS.map(function(lv, i){
+      return '<button class="btn' + (i === li ? ' on' : '') + '" data-lv="' + i + '">' + esc(lv.title) + '</button>';
+    }).join('') + '</div>';
+    h += '<div class="prog">' + esc(L.title) + ' · 每人恰好一种，每种恰好一人</div>';
+    h += '<div class="ask">点下面的线索卡，格子会自动打 ×；也可以直接点空格自己打 ×。</div>';
+    h += '<table class="grid"><tr><th class="corner"></th>' + L.cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr>';
+    L.rows.forEach(function(row, r){
+      h += '<tr><th>' + esc(row) + '</th>';
+      for (var c = 0; c < 3; c++) {
+        var v = mark[r][c], cls2 = v === 'o' ? 'o' : (v === 'x' ? (locked[r][c] ? 'x' : 'x mine') : '');
+        if (flashCell && flashCell.r === r && flashCell.c === c) cls2 += ' flash';
+        h += '<td class="' + cls2 + '" data-cell="' + r + '-' + c + '">' + (v === 'x' ? '×' : (v === 'o' ? '✓' : '')) + '</td>';
+      }
+      h += '</tr>';
+    });
+    h += '</table><div class="legend">× = 不可能（红 × 是线索定的，灰 × 是自己打的，再点可取消） · ✓ = 定下来的答案</div>';
+    h += '<div class="ask">线索卡（点一下就用上）：</div>';
+    L.clues.forEach(function(cl, i){
+      h += '<button class="clue' + (used[i] ? ' used' : '') + (hintIdx === i ? ' hl' : '') + '" data-clue="' + i + '"' + (used[i] ? ' disabled' : '') + '>' +
+        '<b>线索' + (i + 1) + '：</b>' + esc(cl.text) + (used[i] ? ' ✓ 已用' : '') + '</button>';
+    });
+    h += '<div class="btns"><button class="btn" id="hint">💡 提示：下一条线索</button><button class="btn" id="again">↻ 重来本关</button></div>';
+    h += '<div class="fb ' + (cls || '') + '" id="fb">' + (fb || '') + '</div>';
+    if (won) {
+      h += '<div class="win">🎉 解出来了！答案是：' + L.rows.map(function(row, i){ return esc(row) + '——' + esc(L.cols[L.sol[i]]); }).join('，') + '。</div>' +
+        '<p>推理链：每条“不喜欢 / 不参加”排除一格，“最爱”定下一格；一行（或一列）只剩一格时，那格就被逼出来了——这就是演绎：前提都对，结论不可能错。</p>' +
+        '<div class="btns"><button class="btn main" id="nextlv">' + (li + 1 < LEVELS.length ? '下一关 →' : '再玩一轮') + '</button>' +
+        '<a class="btn" href="../../quiz/index.html?tab=logic" target="_top" style="text-decoration:none">练逻辑的题 →</a></div>';
+    }
+    box.innerHTML = h;
+  }
+  box.addEventListener('click', function(e){
+    var t = e.target, L = LEVELS[li];
+    var lv = t.closest ? t.closest('[data-lv]') : null;
+    if (lv) { li = parseInt(lv.getAttribute('data-lv'), 10); reset(); render(); return; }
+    if (t.id === 'again') { reset(); render('已重来，再点线索卡从头排除。'); return; }
+    if (t.id === 'nextlv') { li = (li + 1) % LEVELS.length; reset(); render(); return; }
+    if (t.id === 'hint') {
+      var ni = -1;
+      for (var i = 0; i < L.clues.length; i++) if (!used[i]) { ni = i; break; }
+      if (ni < 0) { render('线索都用完了：看看哪一行（或一列）只剩一格没打 ×，那格就是答案。', 'ok'); return; }
+      hintIdx = ni;
+      render('先看这条线索（已高亮）：「' + L.clues[ni].text + '」——点它，格子会自动打 ×。', 'ok');
+      return;
+    }
+    var cl = t.closest ? t.closest('[data-clue]') : null;
+    if (cl) {
+      var ci = parseInt(cl.getAttribute('data-clue'), 10), clue = L.clues[ci];
+      if (used[ci] || won) return;
+      used[ci] = true; hintIdx = -1; flashCell = null;
+      if (clue.type === 'o') setO(clue.r, clue.c); else setX(clue.r, clue.c, true);
+      deduce();
+      var w = checkWin();
+      render(w ? '🎉 最后一条线索用上，格子全推出来了！' : clue.say, w ? 'ok' : 'ok');
+      return;
+    }
+    var cell = t.closest ? t.closest('[data-cell]') : null;
+    if (cell) {
+      if (won) return;
+      var parts = cell.getAttribute('data-cell').split('-');
+      var r = parseInt(parts[0], 10), c = parseInt(parts[1], 10);
+      flashCell = null;
+      if (mark[r][c] === 'o' || (mark[r][c] === 'x' && locked[r][c])) {
+        render('这格是线索或推导定下来的，不能改；点别的空格试试。', 'bad'); return;
+      }
+      if (mark[r][c] === 'x') { mark[r][c] = ''; locked[r][c] = false; render('已取消自己打的 ×。'); return; }
+      if (c === L.sol[r]) {
+        flashCell = { r: r, c: c };
+        if (!mistakeDone) {
+          mistakeDone = true;
+          NHZReview.record({ q: '斑马谜题格：' + L.title + '。' + L.rows[r] + '对应哪种' + '？',
+            options: L.cols.slice(), answer: L.cols[L.sol[r]],
+            解析: L.why[r] + '答案格不能打 ×。',
+            src: '逻辑', point: '推理三兄弟：演绎/归纳/类比' }, false);
+        }
+        render('✗ 这一格是答案，不能打 ×，已经帮你记进错题本了。提示：' + L.why[r], 'bad');
+        return;
+      }
+      mark[r][c] = 'x'; locked[r][c] = false;
+      deduce();
+      var w2 = checkWin();
+      render(w2 ? '🎉 自己排除的最后一格，答案全推出来了！' : '✓ 「' + L.rows[r] + ' × ' + L.cols[c] + '」已排除。看看哪一行（或一列）只剩一格了。', w2 ? 'ok' : 'ok');
+      return;
+    }
+  });
+  reset();
+  render();
+})();
+</script>
+</body>
+</html>
