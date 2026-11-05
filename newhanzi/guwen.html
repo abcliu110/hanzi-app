@@ -804,9 +804,10 @@ window.NHZReview = window.NHZReview || (function () {
     var items = cat ? (curGroup ? yufaGroupItems(curGroup) : cat.items) : [];
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
     var h = meta.parent ? '<button class="gw-backbtn" data-mid="yufa">← 回语法</button>' : '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
-    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    /* 标题只出现一次：点数并入副标题，不再另起「名称 + N点」的列表头 */
+    var cntTxt = items.length + '点' + (curLevel !== '全部' ? ' · ' + curLevel + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '');
+    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(cat ? cntTxt + ' · ' + String(meta.d).replace(/^\d+个点 · /, '') : meta.d)+'</div></div>';
     if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
-    h += '<div class="ghead">'+esc(meta.t)+'<span class="gcount">'+items.length+'点' + (curLevel !== '全部' ? ' · ' + esc(curLevel) + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '') + '</span></div>';
     h += levelFilterHtml(levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
     if(cat.intro && !curGroup) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
