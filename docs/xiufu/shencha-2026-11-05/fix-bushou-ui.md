@@ -35,6 +35,7 @@
 - 21 选项洗牌复核 · 批 1 已改 engine.js，本次只加校验：fix_bushou_ui_check_quiz.js 抽出 shuffleOpts 每题洗 20 次（8380 次，opts[a] 内容与误解标注全部不变）；tests/smoke.spec.js 新增「zika choice shuffles…」按答案文本点选 6 题全判对 · 判分 onTap 用洗后 q.a，错题本/统一错题本存原题 _q · 复查：数据 choice 30/30/30/30，Playwright 通过
 - 3/17 例字不含部件、与题库归部矛盾 · fix_bushou_ui_examples.py：页 头→额 脸→颈；己 删巴巷卷并去重；麦 删霡卖来荞衇麹麺；隶 删肆隸穅；曰 删帽慢；夕 删歹岁；月 删明（spot[7]）；鸟 删鸣（spot[20]）；耳 删听（不含耳）闻（choice[40]）；王 删皇（spot[28]）；页/月/鸟/耳 semantic 列举同步，只用 chars 里已有的字 · 10 部 · 复查 example_not_in_chars 807→780、zimap_conflict 449→429；其余 400+ 处属「含部件但字典归别部」的口径问题，未逐条动（待负责人定例字口径）
 - 4 阝左右耳刀 · fix_bushou_ui_fu.py：benzi/bianti/meaning/semantic/evo 改为左阜右邑两段（依据《说文》阜「大陸，山無石者」邑「國也」、《现汉》阜=土山）；例字 阳院陆降险 / 都部郊邻邮（去掉 3500 外的 邢 郡）；chars 先左后右并入「邑」（50 字）；删 #邑 条目（223→222）；zi_map 邑→阝，index 邑 bu=阝 bu2=邑；图示标题/提示/2-5 项改左右耳刀 · 2 条目 · 复查：bushou 页截图正常、smoke 通过；说文栏仍只引「邑」（阜的说文原文未接入，待核出处后可加）
+- 15 部首题解析与事实矛盾 · fix_bushou_ui_bushou_quiz.py：blank 明/森/休/相 解析改会意（依《说文》）、法 改「非形声，平之如水故从氵」、迷 偏旁氵→辶；rewrite 历/反 题面改「给X加上Y」；judge 服 解析改「月原是舟」、心字底「大多仍写心，少数⺗」、拿/全 改判断字形位置（手在字底不写扌 / 全是人字头）T；choice 心字底改问「恭下面的⺗是谁的变形」答心，误解标注重写 · 13 题 · 复查：形声模板 40→35 处（剩余 35 题均为形声字），check_quiz OK，smoke quiz 通过
 
 ## 未修 / 断点
 - 进行中（按任务顺序）：归部错误 → 阝拆左右耳刀 → 部首题解析会意讲成形声 → 界面数字文案 → A11 占位 → 其余。
