@@ -20,6 +20,7 @@ NH = os.path.dirname(HERE)
 FIX = json.load(open(os.path.join(HERE, 'pinyin_fix.json'), encoding='utf-8'))
 PRIMARY = {**FIX['reviewed_keep'], **FIX['primary']}
 RARE = FIX['rare']
+ADDED = FIX.get('added_common', {})
 # 主读音本身就是轻声的字（不带声调符号也合法）
 NEUTRAL_OK = set('们吧吗呢么的了着子啦瘩呐哟哩罢家头边过里地底价殖匙裳啰咱嘛'.replace(' ', ''))
 
@@ -118,6 +119,9 @@ def check():
         if set(map(norm, rare)) != want_rare: errs.append(f'{z}: 罕用读音应为 {sorted(want_rare)}，现为 {rare}')
         if first in want_rare: errs.append(f'{z}: 罕用音 {first} 做了主读音')
         if any(norm(x) in want_rare for x in lk.get(z, '').split(',')): errs.append(f'{z}: 查表含罕用音')
+        for r in ADDED.get(z, []):
+            if norm(r) not in map(norm, common): errs.append(f'{z}: 应补常用读音 {r}，字卡现为 {common}')
+            if norm(r) not in map(norm, lk.get(z, '').split(',')): errs.append(f'{z}: 查表缺补列读音 {r}')
         if pinyin and z not in reviewed:
             d = pinyin(z, style=Style.TONE)[0][0]
             if d != first and d in map(norm, common + rare):
