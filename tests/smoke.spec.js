@@ -362,6 +362,26 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic domino page (A22-2)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/games/luoji/domino.html');
+    await page.locator('#dpush').click();
+    await expect(page.locator('#dfb')).toContainText('全倒了', { timeout: 8000 });
+    await page.locator('#drow .tile[data-i="2"]').click();
+    await page.locator('#dpush2').click();
+    await expect(page.locator('#dfb')).toContainText('推不倒', { timeout: 8000 });
+    await page.locator('#box [data-a="0"]').click();
+    await expect(page.locator('#fb')).toContainText('判对了', { timeout: 8000 });
+    await page.locator('#next').click();
+    await page.locator('#box [data-a="0"]').click();
+    await expect(page.locator('#fb')).toContainText('再看看', { timeout: 8000 });
+    await expect(page.locator('.gapnote')).toBeVisible();
+    const wrong = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_wrong') || '[]').filter((w) => w.point === '强加因果').length);
+    expect(wrong).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
   test('logic argument map whiteboard (A22-7 tree)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
