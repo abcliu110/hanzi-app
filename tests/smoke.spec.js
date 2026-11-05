@@ -243,6 +243,22 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen yuanwen tap-to-gloss', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="pianmu"]').first().click();
+    await page.locator('[data-go="全部"]').click();
+    await page.locator('.gw-item', { hasText: '守株待兔' }).first().click();
+    await expect(page.locator('.gw-yw .zd')).toHaveCount(11);
+    await expect(page.locator('.gw-yw')).toHaveText(/宋人有耕者。田中有株/);
+    await page.locator('.gw-yw .zd[data-zd="走"]').click();
+    await expect(page.locator('#gwGloss')).toContainText('走：跑');
+    await expect(page.locator('.gw-yw .pu')).toHaveCount(4);
+    await page.locator('.gw-yw .pu').first().click();
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });
