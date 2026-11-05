@@ -1,0 +1,13 @@
+# F1 语法修复线 · 交接日志（fix-yuwen）
+
+- 线名：f1（F1 语法）；负责文件：`newhanzi/yuwen/**`、`quiz/data_yuwen.js`、`quiz/data_logic.js`、`quiz/data_lab.js`、`games/yufa/**`、`yuedu-xiezuo.js`
+- 问题清单：`docs/xiufu/shencha-2026-11-05/yuwen.md`（下称「报告」）
+- 工具：`tools/content/fix_yuwen_io.py`（quiz_bank_*.js 读写，往返字节一致，含旧格式 noun/dai；`delete_questions` 同步 types 计数、`total` 自动重算）；各批次脚本 `tools/content/fix_yuwen_b*_*.py`（幂等，可重复运行）
+- 复查：把 `scripts/yuwen_*.js` 复制到别处，`yuwen_load.js` 的 ROOT 改指工作副本 `newhanzi`、输出路径改到同目录，然后 `node yuwen_scan_quiz.js && node yuwen_scan_quiz2.js && node yuwen_scan_jiangjie.js`（本线用 `/workspace/work/hanzi-fix/f1/scan/`）
+- 修复顺序（负责人指定）：确定多解 388 → 通顺句判病句 294 → 规则跨库矛盾 ~350 → 读音/修辞硬错 → 解析干扰项标签错位 2338 → 其余模板/套话；之后 A17「如果…就…」逻辑专题 + 十五贯白板改挂
+
+## 已修
+
+| # | 问题 | 处理 | 数量 | 复查结果 |
+|---|---|---|---|---|
+| 1 | 确定多解·同干异答（报告 §1） | `fix_yuwen_b1_multi.py`：关联词 7 库「选关联词填入」双空题改为题干保留后一个关联词、只空前一个（先…然后空后一个），选项单词，干扰项只用配不上的词（虽然—但是、不但—而且、只有—才、无论—都…），同义词（如果/假如/要是、只有/唯有/除非、不但/不仅、虽然/尽管、无论/不管、然后/再/接着、因为/由于）不再同时出现，解析写配对理由；了/着/过 选词填空加语境（正…呢→着、从来没…过→过、V了…就…→了₁且去掉「过」项、了₂ 补后半句）；比喻填空题干写明「组成明喻/暗喻/借喻」，「苹果红着脸笑了」（拟人）换「一群花朵走进了教室」；反问填空题干注明要表达的意思，「难道他不是神仙吗」换「…你的好朋友」；无论+疑问词单空题去掉同样能填的「也」 | 改写 675（关联词 450、了着过 100、比喻 75、反问 50）+ 15 | yuwen_scan_quiz2 multi 388→0；check 通过；smoke yuwen 题库 3 例过 |
