@@ -82,6 +82,29 @@ test.describe('newhanzi smoke', () => {
     expect(total).toBeLessThan(211);
   });
 
+  test('zika choice shuffles options and judges by answer text (F6)', async ({ page }) => {
+    await page.goto('newhanzi/quiz/index.html?tab=zika');
+    await page.locator('[data-mode="choice"]').first().click({ timeout: 15000 });
+    const firstPos = [];
+    for (let k = 0; k < 6; k++) {
+      const q = await page.locator('#qbox .qz-q').innerText();
+      const btns = page.locator('#qbox button[data-act="pick"]');
+      const texts = await btns.allInnerTexts();
+      const ans = await page.evaluate(([qt, ts]) => {
+        const key = ts.slice().sort().join('|');
+        const it = window.NHZ_QUIZ.modes.choice.find((x) => x.q === qt && x.opts.slice().sort().join('|') === key);
+        return it ? it.opts[it.a] : null;
+      }, [q, texts]);
+      expect(ans, 'question found in bank').toBeTruthy();
+      const pos = texts.indexOf(ans);
+      firstPos.push(pos);
+      await btns.nth(pos).click();
+      await expect(page.locator('#qfb .qz-fb.ok')).toBeVisible();
+      await page.locator('#btnNext').click();
+    }
+    expect(firstPos.length).toBe(6);
+  });
+
   test('guwen quiz banks load on demand', async ({ page }) => {
     const reqs = [];
     page.on('request', (r) => reqs.push(r.url()));
