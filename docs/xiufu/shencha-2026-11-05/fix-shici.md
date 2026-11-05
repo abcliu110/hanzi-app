@@ -76,5 +76,8 @@
 脚本 `tools/content/fix_shici_b10_xiangchuan.py`
 - famous 赠汪伦「十里桃花」加「相传」；夏日绝句 story 去掉替作者编的话，改「借项羽…讽刺只顾逃跑的南宋君臣」；choice 宋太宗反应（《默记》）题干/解析加「相传」；野火烧不尽「16 岁一举成名」→「相传…得到顾况赏识」；judge 端午改「民间流传最广的说法」并注明还有其他说法 · 5 处
 
+### 批次11（G 组）· sx 待补陈旧标记（报告 §9）
+脚本 `tools/content/fix_shici_b11_sxflag.py`：按 build_shici.py 同一规则，有赏析的诗去掉 `sx:"待补"`，73 首 → 仍待补 0
+
 ## 未修 / 断点
 （随批次更新）
