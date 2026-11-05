@@ -135,6 +135,23 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic fanpai flip flow', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/games/luoji/fanpai.html');
+    await page.locator('[data-k="P"]').click();
+    await page.locator('[data-k="Q"]').click();
+    await page.locator('#flip').click();
+    await expect(page.locator('#fb')).toContainText('你选了 P 和 Q');
+    await expect(page.locator('.grid .red')).toBeVisible();
+    await page.locator('#next').click();
+    await page.locator('[data-k="P"]').click();
+    await page.locator('[data-k="nQ"]').click();
+    await page.locator('#flip').click();
+    await expect(page.locator('#fb')).toContainText('✓');
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

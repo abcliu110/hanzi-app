@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翻牌验证 · 如果…就…</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top .home{background:var(--accent-soft);border:2px solid var(--accent-deep);color:var(--accent-deep)}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.prem{font-size:19px;margin:4px 0}
+.prem b{color:var(--accent-deep)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"Kaiti SC","STKaiti","KaiTi",serif;pointer-events:none}
+#sdot{pointer-events:none}
+.hot{cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+.fc{min-height:110px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;font-weight:700;cursor:pointer;padding:8px}
+.fc.sel{border-color:var(--orange);background:var(--accent-soft)}
+.fc.hit{border-color:var(--red);color:var(--red)}
+.fc.miss{opacity:.6}
+.fc small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:110px 1fr 1fr;gap:6px;margin:12px 0;font-size:16px}
+.grid div{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);text-align:center}
+.grid .hd{background:transparent;border:none;color:var(--muted)}
+.grid .red{border:2px solid var(--red);color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🃏 翻牌验证 · 如果…就…</h1></div>
+  <div class="card" id="box"></div>
+  <div class="rule">“如果 P，就 Q”只怕一种情况：P 成立、Q 却不成立。要检验规则，只翻可能藏着这种情况的牌。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 题目与反馈文案取自 docs/gaijin/luoji-gaijin-sheji.md (e)-2「翻牌验证」：十五贯（统编选必上第四单元素材）+ 生活版图书馆。 */
+  var QS = [
+    {rule:'如果是凶手，就有十五贯', P:'是凶手', nP:'不是凶手', Q:'有十五贯', nQ:'没有十五贯',
+     red:'凶手 × 没有十五贯', exp:'只有“凶手却没有十五贯”能推翻规则。'},
+    {rule:'如果在图书馆，就要小声说话', P:'在图书馆', nP:'在操场', Q:'在小声说话', nQ:'在大声喊',
+     red:'在图书馆 × 在大声喊', exp:'只有“在图书馆却在大声喊”能推翻规则。'}
+  ];
+  var ORDER = ['P', 'nP', 'Q', 'nQ'];
+  var box = document.getElementById('box'), qi = 0, sel = {}, done = false, score = 0;
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function backOf(q, k){
+    if (k === 'P') return '背面若是「' + q.nQ + '」就抓现行';
+    if (k === 'nQ') return '背面若是「' + q.P + '」就抓现行';
+    if (k === 'Q') return '背面是什么都推不翻规则';
+    return '背面是什么都推不翻规则';
+  }
+  function render(fb, cls){
+    var q = QS[qi];
+    var h = '<div class="prog">第 ' + (qi + 1) + ' / ' + QS.length + ' 题</div>';
+    h += '<div class="ask">规则：' + esc(q.rule) + '。<br>要检验这条规则，最少要翻哪几张牌？（点选，再点“翻！”）</div>';
+    h += '<div class="cards">' + ORDER.map(function(k){
+      var c = 'fc' + (sel[k] ? ' sel' : '') + (done ? ((k === 'P' || k === 'nQ') ? ' hit' : ' miss') : '');
+      return '<button class="' + c + '" data-k="' + k + '"' + (done ? ' disabled' : '') + '>' + esc(q[k]) + (done ? '<small>' + esc(backOf(q, k)) + '</small>' : '') + '</button>';
+    }).join('') + '</div>';
+    if (done) {
+      h += '<div class="grid"><div class="hd"></div><div class="hd">' + esc(q.Q) + '</div><div class="hd">' + esc(q.nQ) + '</div>' +
+        '<div class="hd">' + esc(q.P) + '</div><div>规则成立</div><div class="red">抓现行</div>' +
+        '<div class="hd">' + esc(q.nP) + '</div><div>规则没说</div><div>规则没说</div></div>';
+    }
+    h += '<div class="btns">' + (done ? '<button class="btn main" id="next">' + (qi + 1 < QS.length ? '下一题 →' : '看结果') + '</button>' : '<button class="btn main" id="flip">翻！</button>') + '</div>';
+    h += '<div class="fb ' + (cls || '') + '" id="fb">' + (fb || '') + '</div>';
+    box.innerHTML = h;
+  }
+  box.addEventListener('click', function(e){
+    var q = QS[qi];
+    if (e.target.id === 'again') { qi = 0; score = 0; sel = {}; done = false; render(); return; }
+    if (e.target.id === 'next') {
+      qi++; sel = {}; done = false;
+      if (qi >= QS.length) {
+        box.innerHTML = '<div class="ask">翻完了：' + QS.length + ' 题答对 ' + score + ' 题。</div><p>“如果 P 就 Q”：只翻 P 和“非 Q”。看见 Q 就倒推 P，正是过于执犯的错。</p><div class="btns"><button class="btn main" id="again">再来一轮</button></div>';
+      } else render();
+      return;
+    }
+    var c = e.target.closest('[data-k]');
+    if (c && !done) { var k = c.getAttribute('data-k'); sel[k] = !sel[k]; render(); return; }
+    if (e.target.id === 'flip' && !done) {
+      var pick = ORDER.filter(function(k){ return sel[k]; });
+      if (!pick.length) { document.getElementById('fb').textContent = '先点选要翻的牌。'; return; }
+      var right = pick.length === 2 && sel.P && sel.nQ, msg;
+      if (right) msg = '✓ 你只翻了会出现反例的两张，标准的袁滋式检验。';
+      else if (pick.length === 2 && sel.P && sel.Q) msg = '✗ 你选了 P 和 Q，这是大多数人的选法；可是「' + q.Q + '」那张不管背面是什么，都推不翻规则。' + q.exp;
+      else msg = '✗ ' + q.exp + '所以要翻「' + q.P + '」和「' + q.nQ + '」。';
+      if (right) score++;
+      NHZReview.record({ q: '翻牌验证：规则“' + q.rule + '”，四张牌「' + q.P + '」「' + q.nP + '」「' + q.Q + '」「' + q.nQ + '」，最少翻哪几张？',
+        options: ['「' + q.P + '」和「' + q.Q + '」', '「' + q.P + '」和「' + q.nQ + '」', '四张都翻'], answer: '「' + q.P + '」和「' + q.nQ + '」',
+        解析: q.exp, src: '逻辑', point: '推理三兄弟' }, right);
+      done = true;
+      render(msg, right ? 'ok' : 'bad');
+    }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

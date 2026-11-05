@@ -13,6 +13,7 @@
  *   fix    病句：圈错 → 说原因 → 改对     link   两个分句 + 关联词 + 关系箭头
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
+ *   chain  逻辑条件箭头链（顺推 / 倒推打叉 / 否定后件回灭）
  *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
@@ -1097,6 +1098,62 @@
       }, { ask: b.ask || false });
     });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 545, d.end, { size: 26, color: ACC }, t, 1.2); return 1.2; });
+  };
+
+  /* chain（逻辑区「如果…就…」条件箭头链，设计 docs/gaijin/luoji-gaijin-sheji.md (e)-2）：
+   * {h, nodes:['杀人凶手','身上有十五贯'], beats:[
+   *   {draw:'rule', line, say},                 // 画出方框和顺向箭头 P → Q
+   *   {lit:1, line, say},                       // 点亮第 i 个方框（橙）
+   *   {reverse:'bad', crowd:['商人',…], tag, ask, say},   // 结果框上冒出其他人；画一支反向箭头并打红叉（肯定后件 ✗）
+   *   {cross:3, line, say},                     // 第 i 个方框打红叉（结果不成立）
+   *   {backfire:'ok', tag, ask, say}]}          // 红叉沿箭头往回走，方框依次变灰，第一个框打叉（否定后件 ✓）
+   * 每拍的 line 依次写在方框下方，tag 用红 / 绿色写在最后一行。 */
+  TPL.chain = function (c, q, d) {
+    if (d.h) heading(c, q, d.h, d.sub);
+    var N = d.nodes || [], n = N.length, bw = n > 2 ? 230 : 300, gap = n > 2 ? 50 : 220;
+    var X = lay(N.map(function () { return bw; }), gap, W / 2), Y = 230, BH = 76, row = 0, boxes = [], labs = [];
+    function line(s, t, col) { var y = 424 + row * 50; row++; return c.T(W / 2, y, s, { size: 28, color: col || INK }, t, Math.min(1.4, Math.max(.5, len(s) * .1))); }
+    (d.beats || []).forEach(function (b) {
+      q.beat(b.say || b.line || b.tag, function (t) {
+        var dd = 1, tt = t;
+        if (b.draw) {
+          N.forEach(function (s, i) {
+            boxes[i] = c.box(X[i], Y, bw, BH, t + i * .5, { stroke: INK, strokeWidth: 2.4 });
+            labs[i] = c.T(X[i] + bw / 2, Y + BH / 2 + 10, s, { size: 28 }, t + i * .5 + .3, .5);
+            if (i) c.arrow(X[i - 1] + bw + 6, Y + BH / 2, X[i] - 6, Y + BH / 2, 0, t + i * .5 - .1, INK);
+          });
+          tt = t + n * .5 + .3; dd = n * .5 + .6;
+        }
+        if (b.line) { line(b.line, tt); dd += 1; }
+        if (b.lit !== undefined && labs[b.lit]) {
+          c.recolor(labs[b.lit], t, ACC);
+          c.R('rectangle', [X[b.lit] - 8, Y - 8, bw + 16, BH + 16], { stroke: ACC, strokeWidth: 3.5 }, t, .5);
+        }
+        if (b.cross !== undefined) c.cross(X[b.cross] + bw - 18, Y + 14, t + .3);
+        if (b.reverse) {
+          var qi = n - 1, qx = X[qi] + bw / 2;
+          (b.crowd || []).forEach(function (s, k) {
+            var cx = qx + (k - (b.crowd.length - 1) / 2) * 120;
+            c.T(cx, Y - 40, s, { size: 24, color: GRAY }, t + k * .35, .4);
+          });
+          var ax1 = X[qi] - 6, ax0 = X[0] + bw + 6, ay = Y + BH + 30;
+          c.arrow(ax1, ay, ax0, ay, -30, t + 1.2, BAD);
+          c.cross((ax0 + ax1) / 2, ay + 18, t + 2);
+          dd = Math.max(dd, 2.6);
+        }
+        if (b.backfire) {
+          for (var i = n - 1; i >= 0; i--) {
+            var tk = t + (n - 1 - i) * .5;
+            if (labs[i]) c.recolor(labs[i], tk, GRAY);
+          }
+          c.cross(X[0] + bw - 18, Y + 14, t + n * .5);
+          dd = Math.max(dd, n * .5 + .8);
+        }
+        if (b.tag) { line(b.tag, t + dd - .4, b.reverse === 'bad' || b.backfire === 'bad' ? BAD : OK); dd += 1; }
+        return dd;
+      }, { ask: b.ask || false });
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 540, d.end, { size: 26, color: ACC }, t, 1.2); return 1.2; });
   };
 
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
