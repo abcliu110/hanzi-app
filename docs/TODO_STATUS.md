@@ -84,3 +84,15 @@
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
 新发现问题清单见 `docs/xiufu/shencha-2026-11-05/README.md`（总览 + 修复顺序）及 zika/shici/guwen/yuwen/bushou_ui 五份分报告。尚未拆成 A 编号；领取修复前请在此节登记，避免两个代理撞车。
+
+**已领取（2026-11-05 09:10 JST，审查代理 hark-shencha 全部修复，其他代理请勿改下列文件）：**
+
+| 线 | 负责文件 | 进度日志 |
+|---|---|---|
+| F1 语法 | newhanzi/yuwen/**、quiz/data_yuwen.js、quiz/data_logic.js、quiz/data_lab.js、games/yufa/**、yuedu-xiezuo.js | docs/xiufu/shencha-2026-11-05/fix-yuwen.md |
+| F2 古文 | data/guwen.js、data/guwen_knowledge.js、newhanzi/guwen/**、quiz/data_guwen.js | fix-guwen.md |
+| F3 古诗 | data/shici.js、data/shiju.js、data/shangxi.js、quiz/data_shici.js、games/shici/** | fix-shici.md |
+| F4 字卡上半 | data/zika/ 按 NHZ_INDEX 第 1–1750 字 | fix-zika-a.md |
+| F5 字卡下半 | data/zika/ 按 NHZ_INDEX 第 1751–3500 字 | fix-zika-b.md |
+| F6 部首+界面+识字题 | newhanzi/bushou/**、bushou.js、quiz/data_bushou.js、quiz/data_zika.js、quiz/engine.js（仅选项洗牌）、index/share/shici 页的数字文案 | fix-bushou-ui.md |
+
