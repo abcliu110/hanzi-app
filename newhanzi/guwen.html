@@ -170,7 +170,7 @@ window.NHZReview = window.NHZReview || (function () {
   var quizRecorded = {}; /* 动手练/小测只记首次作答（反馈仍可重答，不改反馈） */
   var currentItems = {};
   var MODS = [
-    {id:'pianmu', icon:'📜', t:'古文篇目', d:'50篇 · 论语、寓言、史记、世说、唐宋八大家'},
+    {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
     {id:'xuci', icon:'🔤', t:'虚词', d:'21个点 · 用法、例句、辨析、题库'},
     {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
     {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式'},
@@ -187,14 +187,15 @@ window.NHZReview = window.NHZReview || (function () {
     {id:'zongbiao', icon:'📊', t:'汇总总表', d:'按分类的字表总汇'}
   ];
   var SECTIONS = [
-    {id:'论语选读', icon:'📖', t:'论语选读', d:'6 篇 · 孔子的话，学与思'},
-    {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'13 篇 · 小故事，大道理'},
-    {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'4 篇 · 陋室铭、爱莲说、桃花源记'},
-    {id:'史记选读', icon:'📚', t:'史记选读', d:'6 篇 · 鸿门宴、完璧归赵、破釜沉舟'},
-    {id:'世说新语', icon:'💬', t:'世说新语', d:'5 篇 · 咏雪、陈太丘、管宁割席'},
-    {id:'唐宋八大家', icon:'🖋️', t:'唐宋八大家', d:'7 篇 · 师说、小石潭记、马说'},
-    {id:'先秦散文', icon:'🏛️', t:'先秦散文', d:'6 篇 · 孟子庄子荀子、左传战国策'},
-    {id:'魏晋散文', icon:'🎋', t:'魏晋散文', d:'3 篇 · 出师表、陈情表、兰亭集序'}
+    {id:'论语选读', icon:'📖', t:'论语选读', d:'孔子的话，学与思'},
+    {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'小故事，大道理'},
+    {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'陋室铭、爱莲说、桃花源记'},
+    {id:'史记选读', icon:'📚', t:'史记选读', d:'鸿门宴、完璧归赵、破釜沉舟'},
+    {id:'世说新语', icon:'💬', t:'世说新语', d:'咏雪、陈太丘、杨氏之子'},
+    {id:'唐宋八大家', icon:'🖋️', t:'唐宋八大家', d:'师说、小石潭记、书戴嵩画牛'},
+    {id:'先秦散文', icon:'🏛️', t:'先秦散文', d:'孟子庄子荀子、左传战国策'},
+    {id:'魏晋散文', icon:'🎋', t:'魏晋散文', d:'出师表、陈情表、兰亭集序'},
+    {id:'小学课文', icon:'🎒', t:'小学课文', d:'司马光、精卫填海、囊萤夜读、曹冲称象等课本小古文'}
   ];
   var navEl = document.getElementById('gwnav');
   var listEl = document.getElementById('gwlist');
@@ -231,7 +232,8 @@ window.NHZReview = window.NHZReview || (function () {
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
     h += '<div class="gw-grid">' + SECTIONS.map(function(s){
-      return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></div>';
+      var n = D.texts.filter(function(t){ return t.cat === s.id; }).length;
+      return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+n+' 篇 · '+esc(s.d)+'</p></div>';
     }).join('') + '</div>';
     h += '<button class="gw-backbtn" data-go="全部">📜 全部篇目（共'+D.texts.length+'篇）</button>';
     listEl.innerHTML = h;
@@ -262,6 +264,7 @@ window.NHZReview = window.NHZReview || (function () {
       return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
     }).join('')+'</div>';
     h += knowCardHtml(t.title);
+    if(t.出处 && t.出处.length) h += '<p class="gw-src">导读、译意、重点字词依据：' + t.出处.map(esc).join('；') + '</p>';
     detEl.innerHTML = h;
     detEl.dataset.back = lastTextList || t.cat;
   }
