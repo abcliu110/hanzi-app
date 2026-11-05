@@ -178,32 +178,33 @@ test.describe('newhanzi smoke', () => {
   test('logic fallacy card play unlocks card', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
+    // 页面出题种子取 Date.now()，测试里固定 Date.now，使每次加载（含 reload）出同一道题、同一手牌。
+    // 按现有题库，这个时间出的第一张手牌是错牌，会走「打错→按反馈亮出的正确牌重做」分支；题库变了两条分支都能过
+    await page.addInitScript(() => { const t = 1700000000001; Date.now = () => t; });
     await page.goto('newhanzi/games/luoji/miuwu.html');
     await page.evaluate(() => localStorage.removeItem('nhz_fallacy_cards'));
     await page.reload();
     await expect(page.locator('.fcard.lock')).toHaveCount(12);
     await page.locator('[data-tab="play"]').click();
-    // 找出正确的牌：句子 → 卡 id 由页面数据决定，逐张试第一张不对就看反馈里的正确卡名
+    const sent = (await page.locator('#sent').textContent()).trim();
     await page.locator('[data-play]').first().click();
     await expect(page.locator('#fb')).toContainText('是「');
     await expect(page.locator('.hand .fcard.ok')).toHaveCount(1);
-    const okName = (await page.locator('.hand .fcard.ok b').textContent()).trim();
-    let unlocked = 0;
-    for (let i = 0; i < 20 && unlocked === 0; i++) {
-      await page.locator('#nextq').click();
-      const btn = page.locator('[data-play]', { hasText: okName });
-      if (await btn.count()) {
-        const sent = await page.locator('#sent').textContent();
-        await btn.first().click();
-        if ((await page.locator('#fb').textContent()).startsWith('✓')) unlocked = 1;
-        else if (!sent) break;
-      } else {
-        await page.locator('[data-play]').first().click();
-        if ((await page.locator('#fb').textContent()).startsWith('✓')) unlocked = 1;
-      }
+    const okId = await page.locator('.hand .fcard.ok').getAttribute('data-play');
+    if (!(await page.locator('#fb').textContent()).startsWith('✓')) {
+      // 第一张打错：错题不解锁；按反馈里亮出的正确牌重做同一题
+      await expect(page.locator('#fb')).toContainText('✗');
+      await page.reload();
+      await expect(page.locator('.fcard.lock')).toHaveCount(12);
+      await page.locator('[data-tab="play"]').click();
+      await expect(page.locator('#sent')).toHaveText(sent);
+      await page.locator('[data-play="' + okId + '"]').click();
     }
+    await expect(page.locator('#fb')).toContainText('✓');
+    await expect(page.locator('#fb')).toContainText('解锁新卡');
     await page.locator('[data-tab="deck"]').click();
-    if (unlocked) await expect(page.locator('.fcard.lock')).toHaveCount(11);
+    await expect(page.locator('.fcard.lock')).toHaveCount(11);
+    await expect(page.locator('[data-card="' + okId + '"]')).not.toHaveClass(/lock/);
     expect(errors).toEqual([]);
   });
 
