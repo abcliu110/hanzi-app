@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>谬误卡牌册</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top .home{background:var(--accent-soft);border:2px solid var(--accent-deep);color:var(--accent-deep)}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.prem{font-size:19px;margin:4px 0}
+.prem b{color:var(--accent-deep)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"Kaiti SC","STKaiti","KaiTi",serif;pointer-events:none}
+#sdot{pointer-events:none}
+.hot{cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+
+.tabs{display:flex;gap:8px;margin:6px 0 10px}
+.tab{min-height:44px;padding:8px 18px;border-radius:22px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;cursor:pointer}
+.tab.on{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.fam{font-size:16px;font-weight:700;margin:14px 0 6px;color:var(--accent-deep)}
+.deck{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fcard{min-height:150px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:10px;text-align:left;cursor:pointer;font-size:15px;line-height:1.5}
+.fcard .ico{font-size:28px;display:block}
+.fcard b{font-size:17px;display:block;margin:2px 0}
+.fcard.lock{opacity:.5}
+.fcard.back{border-color:var(--orange)}
+.fcard .kl{color:var(--orange);font-weight:700}
+.sent{font-size:20px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0}
+.hand{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.hand .fcard{min-height:110px}
+.hand .fcard.ok{border-color:var(--green)} .hand .fcard.bad{border-color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🃏 谬误卡牌册</h1></div>
+  <div class="tabs"><button class="tab on" data-tab="deck">卡册</button><button class="tab" data-tab="play">出牌</button></div>
+  <div class="card" id="box"></div>
+  <div class="rule">卡片内容整理自本应用「常见谬误」「以偏概全」「强加因果」「自相矛盾」四个专题的讲解、例子和“怎么认”。出牌答对一题解锁一张卡。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 卡片：定义 / 例子 / 口令逐条取自 yuwen/data.js 逻辑区（常见谬误 讲解·深讲·例子·怎么认；以偏概全、强加因果、自相矛盾 的讲解·例子·怎么认），
+     稻草人 / 滑坡 / 人身攻击 的口令另见 docs/gaijin/luoji-gaijin-sheji.md P0-3。没有来源的卡不写口令，只写「要点」。
+     家族分 3 类（设计 P0-3：偷换类 / 因果类 / 转移类）。 */
+  var CARDS = [
+    {id:'touhuan', fam:'偷换类', ico:'🔀', n:'偷换概念', def:'中途换了词的意思', ex:'辩论“作业该不该多”时把“作业”偷换成“学习”', kl:'词的意思中途换了吗？'},
+    {id:'daocao', fam:'偷换类', ico:'🎯', n:'稻草人', def:'先曲解对方再打', ex:'你说“该减少作业”，他反驳“你就是不想学习”', kl:'他真这么说过吗？'},
+    {id:'yipian', fam:'偷换类', ico:'🔍', n:'以偏概全', def:'拿部分当全部', ex:'我班三个同学近视，所以全班都近视', kl:'结论是凭几个例子下的？'},
+    {id:'heibai', fam:'偷换类', ico:'⚫', n:'非黑即白', def:'中间还有别的情况，却说只有两种', ex:'不喜欢数学，就是讨厌学习'},
+    {id:'maodun', fam:'偷换类', ico:'⚔️', n:'自相矛盾', def:'前后说法打架', ex:'他是众多死难者中幸免的一个', kl:'两半能不能同时是真的？'},
+    {id:'huapo', fam:'因果类', ico:'⛷️', n:'滑坡', def:'把可能说成必然', ex:'这次考砸→考不上高中→找不到工作→人生完蛋', kl:'每一步都必然吗？'},
+    {id:'qiangjia', fam:'因果类', ico:'🧲', n:'强加因果', def:'没有因果硬说因果', ex:'早上没吃鸡蛋，所以没考好', kl:'原因真能推出结果吗？'},
+    {id:'daozhi', fam:'因果类', ico:'🔄', n:'因果倒置', def:'因果说反了', ex:'因为他成绩好，所以老师喜欢他（也可能是老师喜欢才成绩好）'},
+    {id:'xunhuan', fam:'因果类', ico:'⭕', n:'循环论证', def:'用结论证明结论', ex:'这本书好，因为它就是好书'},
+    {id:'renshen', fam:'转移类', ico:'👤', n:'人身攻击', def:'不驳观点驳人', ex:'他学习不好，他的话不可信', kl:'驳的是话还是人？'},
+    {id:'quanwei', fam:'转移类', ico:'🎓', n:'诉诸权威', def:'只看头衔，不看论证', ex:'专家都说对，所以一定对'},
+    {id:'ganqing', fam:'转移类', ico:'😢', n:'诉诸感情', def:'用同情代替论证', ex:'你忍心看我不及格吗？所以这道题应该算我对'}
+  ];
+  /* 出牌题：句子取自同一批专题的例子、练习、小测（与卡面例子不重复的优先） */
+  var QS = [
+    {s:'今天不上补习班，明天就考不上大学', a:'huapo'},
+    {s:'他普通话不标准，他讲的道理肯定不对', a:'renshen'},
+    {s:'你这么胖，还好意思谈健康饮食？', a:'renshen'},
+    {s:'我去过一次北京很堵，所以北京天天堵', a:'yipian'},
+    {s:'他北方人，北方人都豪爽', a:'yipian'},
+    {s:'他穿了红衣服，所以比赛赢了', a:'qiangjia'},
+    {s:'因为他是北方人，所以思想守旧', a:'qiangjia'},
+    {s:'大约五十多个同学参加了比赛', a:'maodun'},
+    {s:'这场球赛胜负未分，结果双方打成平局', a:'maodun'},
+    {s:'这本书好，因为它就是好书', a:'xunhuan'},
+    {s:'不喜欢数学，就是讨厌学习', a:'heibai'},
+    {s:'专家都说对，所以一定对', a:'quanwei'},
+    {s:'你忍心看我不及格吗？所以这道题应该算我对', a:'ganqing'},
+    {s:'因为他成绩好，所以老师喜欢他', a:'daozhi'},
+    {s:'辩论“作业该不该多”时把“作业”偷换成“学习”', a:'touhuan'},
+    {s:'你说“该减少作业”，他反驳“你就是不想学习”', a:'daocao'}
+  ];
+  var KEY = 'nhz_fallacy_cards';
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function save(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+  function byId(id){ for (var i = 0; i < CARDS.length; i++) if (CARDS[i].id === id) return CARDS[i]; return null; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  var box = document.getElementById('box'), tab = 'deck', flipped = {}, cur = null, answered = false, seed = Date.now() % 997;
+  function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  function front(c){ return '<span class="ico">' + c.ico + '</span><b>' + esc(c.n) + '</b>' + esc(c.def); }
+  function back(c){ return '<b>' + esc(c.n) + '</b>例：' + esc(c.ex) + (c.kl ? '<br><span class="kl">口令：' + esc(c.kl) + '</span>' : '<br><span class="kl">要点：' + esc(c.def) + '</span>'); }
+  function deck(){
+    var got = load(), n = CARDS.filter(function(c){ return got[c.id]; }).length;
+    var h = '<div class="prog">已收集 ' + n + ' / ' + CARDS.length + ' 张 · 点已解锁的卡翻到背面</div>';
+    ['偷换类', '因果类', '转移类'].forEach(function(f){
+      h += '<div class="fam">' + f + '</div><div class="deck">' + CARDS.filter(function(c){ return c.fam === f; }).map(function(c){
+        if (!got[c.id]) return '<button class="fcard lock" data-card="' + c.id + '"><span class="ico">🔒</span><b>' + esc(c.n) + '</b>出牌答对解锁</button>';
+        return '<button class="fcard' + (flipped[c.id] ? ' back' : '') + '" data-card="' + c.id + '">' + (flipped[c.id] ? back(c) : front(c)) + '</button>';
+      }).join('') + '</div>';
+    });
+    box.innerHTML = h;
+  }
+  function next(){
+    cur = QS[Math.floor(rnd() * QS.length)]; answered = false;
+    var others = CARDS.filter(function(c){ return c.id !== cur.a; });
+    var hand = [byId(cur.a)];
+    while (hand.length < 4) { var o = others.splice(Math.floor(rnd() * others.length), 1)[0]; hand.push(o); }
+    hand.sort(function(){ return rnd() - .5; });
+    cur.hand = hand; play();
+  }
+  function play(fb, cls){
+    var h = '<div class="ask">这句话犯了哪种谬误？从手牌里打出一张。</div><div class="sent" id="sent">' + esc(cur.s) + '</div>';
+    h += '<div class="hand">' + cur.hand.map(function(c){
+      var k = answered ? (c.id === cur.a ? ' ok' : (cur.pick === c.id ? ' bad' : '')) : '';
+      return '<button class="fcard' + k + '" data-play="' + c.id + '"' + (answered ? ' disabled' : '') + '>' + front(c) + '</button>';
+    }).join('') + '</div>';
+    h += '<div class="fb ' + (cls || '') + '" id="fb">' + (fb || '') + '</div>';
+    if (answered) h += '<div class="btns"><button class="btn main" id="nextq">下一句 →</button></div>';
+    box.innerHTML = h;
+  }
+  function show(){ document.querySelectorAll('.tab').forEach(function(b){ b.className = 'tab' + (b.getAttribute('data-tab') === tab ? ' on' : ''); }); if (tab === 'deck') deck(); else next(); }
+  document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('[data-tab]'); if (b) { tab = b.getAttribute('data-tab'); show(); } });
+  box.addEventListener('click', function(e){
+    var cd = e.target.closest('[data-card]');
+    if (cd) { var id = cd.getAttribute('data-card'); if (load()[id]) { flipped[id] = !flipped[id]; deck(); } return; }
+    if (e.target.id === 'nextq') { next(); return; }
+    var p = e.target.closest('[data-play]');
+    if (p && !answered) {
+      answered = true; cur.pick = p.getAttribute('data-play');
+      var c = byId(cur.a), ok = cur.pick === cur.a, got = load(), fresh = ok && !got[c.id];
+      if (ok) { got[c.id] = 1; save(got); }
+      NHZReview.record({ q: '这句话犯了哪种谬误？“' + cur.s + '”', options: cur.hand.map(function(x){ return x.n; }), answer: c.n,
+        解析: c.n + '：' + c.def + (c.kl ? '。口令：' + c.kl : ''), src: '逻辑', point: c.id === 'yipian' ? '以偏概全' : c.id === 'qiangjia' ? '强加因果' : c.id === 'maodun' ? '自相矛盾' : '常见谬误' }, ok);
+      play(ok ? '✓ 对，是「' + c.n + '」：' + c.def + '。' + (fresh ? '解锁新卡！' : '') : '✗ 这是「' + c.n + '」：' + c.def + (c.kl ? '。口令：' + c.kl : '') + '。', ok ? 'ok' : 'bad');
+    }
+  });
+  show();
+})();
+</script>
+</body>
+</html>

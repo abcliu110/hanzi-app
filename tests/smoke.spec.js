@@ -152,6 +152,38 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic fallacy card play unlocks card', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/games/luoji/miuwu.html');
+    await page.evaluate(() => localStorage.removeItem('nhz_fallacy_cards'));
+    await page.reload();
+    await expect(page.locator('.fcard.lock')).toHaveCount(12);
+    await page.locator('[data-tab="play"]').click();
+    // 找出正确的牌：句子 → 卡 id 由页面数据决定，逐张试第一张不对就看反馈里的正确卡名
+    await page.locator('[data-play]').first().click();
+    await expect(page.locator('#fb')).toContainText('是「');
+    await expect(page.locator('.hand .fcard.ok')).toHaveCount(1);
+    const okName = (await page.locator('.hand .fcard.ok b').textContent()).trim();
+    let unlocked = 0;
+    for (let i = 0; i < 20 && unlocked === 0; i++) {
+      await page.locator('#nextq').click();
+      const btn = page.locator('[data-play]', { hasText: okName });
+      if (await btn.count()) {
+        const sent = await page.locator('#sent').textContent();
+        await btn.first().click();
+        if ((await page.locator('#fb').textContent()).startsWith('✓')) unlocked = 1;
+        else if (!sent) break;
+      } else {
+        await page.locator('[data-play]').first().click();
+        if ((await page.locator('#fb').textContent()).startsWith('✓')) unlocked = 1;
+      }
+    }
+    await page.locator('[data-tab="deck"]').click();
+    if (unlocked) await expect(page.locator('.fcard.lock')).toHaveCount(11);
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

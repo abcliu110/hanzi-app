@@ -20,6 +20,7 @@
 | 古文 P0-C 本篇文言知识卡 + 双向链接 | ✅ 构建脚本 tools/content/build_guwen_links.py → data/guwen_links.js（例句去标点后 ≥4 字、逐字是原文连续子串才算命中；同篇同点只列一次）；篇目页「本篇：虚词 n · 通假 n …」，点开跳知识点；知识点详情「出自《篇名》→」跳回篇目。知识库/篇目数据改动后重跑脚本 | 见 git log |
 | 逻辑 P0-1 套圈判官 | ✅ `euler` 模板 + 三段论白板（wb/s/lj_sanduanlun.js）+ 互动页 games/luoji/taoquan.html（4 题，判分只看拓扑，无效题演示反例，进错题本）。四概念偷换题缺有出处例句，暂不做 | 见 git log |
 | 逻辑 P0-2 十五贯 | ✅ `chain` 模板 + 白板 wb/s/lj_shiwuguan.js（暂挂「推理三兄弟」，待新增「如果…就…」专题）+ 翻牌页 games/luoji/fanpai.html（十五贯 + 图书馆） | 见 git log |
+| 逻辑 P0-3 谬误卡牌 | ✅ games/luoji/miuwu.html：12 卡 3 家族 + 出牌题型，答对解锁（页内），错题本；卡背误解标注待 data_logic 全量后再接 | 见 git log |
 
 ## 白板冻结
 MASTER_PLAN 冻结清单：负责人 2026-11-04 对本三区设计中的白板项（逻辑 euler/chain、古诗词 scroll、古文寓言情景剧与 morph）解除冻结。`morph` 与语法区设计稿共用一个实现，先协调再写，避免两边各做一套。
