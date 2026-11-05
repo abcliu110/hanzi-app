@@ -32,4 +32,6 @@
 
 - 2026-11-05 接手人 hark-shencha2（F1 Y 语法线）。已完成：多解、通顺判病、规则矛盾（批 1–3）、作息与苹果借喻（4a）、形状形容词（4b）、名词谓语（4c）、数词（4d）、补语「了」（4e）、标签错位（5）、排比/对偶/歧义/比较句/名词/连词硬错（4f）、讲解对外汉语材料（6）、乱码干扰项（7）、模板解析接讲解说明（8）。
 - 下一步：§8 余下模板（1565 处「其他三个分别是另一类X或普通句/他类病句或正确句子」、5425 处「其他三个说法不对」、约 125 题子类说明不唯一）、§9 重复、§10 说法题拼接句（「我吃饭了了₂变化式」「X式是缺少主语」类，scan glue 581 含误报）、§11 讲解空节、§12 术语统一（等 Q14 拍板）。另：连词库「我同爸爸去市场」的「同」更像介词，待核。
-- 复查脚本工作副本：/workspace/work/f1scan（yuwen_load.js ROOT 已改指本 worktree）；playwright 在本沙箱缺系统库跑不了，用 `python3 tools/content/fix_yuwen_validate.py` + `npm run check`。
+- 复查脚本工作副本：/workspace/work/f1scan（yuwen_load.js ROOT 已改指本 worktree）；每批跑 `npm run check` + `python3 tools/content/fix_yuwen_validate.py` + `PW_NO_SERVER=1 PORT=4201 npx playwright test tests/smoke.spec.js -g "yuwen|logic|lab"`（自起 http.server 4201；沙箱重启后可能要重装 openssh-client / playwright chromium 与依赖）。
+
+- 未修且需拍板/人工的：§12 术语统一（「跑得快」程度/状态补语，等 Q14）；§9 同题重复（去重会改题数，影响 index/total，需确认）；§11 reading/writing 27 条缺「深讲」（需写新内容，按统编教材逐条写）；games/yufa 三个数据文件、data_logic.js 未全量规则检查；连词库「我同爸爸去市场」「同」更像介词；批 7 删乱码后部分题只剩 2–3 个选项，后续可补真实错误改法。
