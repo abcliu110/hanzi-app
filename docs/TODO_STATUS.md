@@ -86,7 +86,8 @@
 
 - A20 · e4fefe6d · tools/content/build_guwen_links.py（node 执行 guwen.js 取数据，不改原数据）生成 data/guwen_links.js：30 篇命中、140 条链接、81 个知识点；guwen.html 篇目详情加「本篇文言知识卡」（汇总+点开跳知识点），知识点详情加「出自《篇名》→」；smoke 加双向跳转用例。**guwen.js / guwen_knowledge.js 改动后需重跑** `python3 tools/content/build_guwen_links.py`（`--check` 校验是否过期；因 F2 正在改这两个文件，暂不接入 CI 以免阻塞对方）
 - A16 · 121bc76d · wb-engine.js 新模板 `euler`（大/中/小圈拓扑 in/out、check 闪圈打 ✓、counter 反例红叉、aside 旁注）；wb/s/lj_sanduanlun.js「三段论」2 tab 4 幕（分镜按设计 (e)-1，例句取 yuwen/data.js 与设计稿），登记 wb/index.js（yuwen 页逻辑专题自动出「播放白板动画」）；互动页 games/luoji/taoquan.html：4 题（2 有效 2 无效：铜、鸭嘴兽、鸽子、人/狗），放 M 圈→点位置放 S→判「一定成立吗」，无效题演示反例，首答进错题本（point=三段论）；index.html 逻辑专题加入口；lint 0 错、check_wb 700/1100 过、基线其余 761 幕一致（新增三段论基线）；smoke 加用例。设计里的「四概念偷换」题现有内容无出处例句，未做
-- A17 · 本提交 · wb-engine.js 新模板 `chain`（方框+顺向箭头、lit 点亮、reverse 反向箭头打叉+旁人、cross、backfire 否定后件回灭）；wb/s/lj_shiwuguan.js 3 tab 5 幕（过于执/袁滋/对照，分镜与素材按设计 (e)-2，统编选必上第四单元）。logic 区没有「如果…就…」专题（新增专题要改 yuwen/data.js，已被 F1 领取），先挂「推理三兄弟」；互动页 games/luoji/fanpai.html 翻牌验证 2 题（十五贯、图书馆），翻后显示 2×2 真值格与「抓现行」格，反馈文案按设计，首答进错题本；index 逻辑专题入口；lint 0 错、check_wb 过、基线 770 幕一致；smoke 加用例。待办：F1 释放 yuwen/** 后新增「如果…就…」专题并改挂
+- A17 · ac1fed22 · wb-engine.js 新模板 `chain`（方框+顺向箭头、lit 点亮、reverse 反向箭头打叉+旁人、cross、backfire 否定后件回灭）；wb/s/lj_shiwuguan.js 3 tab 5 幕（过于执/袁滋/对照，分镜与素材按设计 (e)-2，统编选必上第四单元）。logic 区没有「如果…就…」专题（新增专题要改 yuwen/data.js，已被 F1 领取），先挂「推理三兄弟：演绎/归纳/类比」（专题全名，修正见下一条）；互动页 games/luoji/fanpai.html 翻牌验证 2 题（十五贯、图书馆），翻后显示 2×2 真值格与「抓现行」格，反馈文案按设计，首答进错题本；index 逻辑专题入口；lint 0 错、check_wb 过、基线 770 幕一致；smoke 加用例。待办：F1 释放 yuwen/** 后新增「如果…就…」专题并改挂
+- A17 修正 · 本提交 · 白板索引、场景名、首页入口改用专题全名「推理三兄弟：演绎/归纳/类比」（yuwen.js / index.html 按 it.name 精确匹配，短名不出按钮）；基线改键
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 

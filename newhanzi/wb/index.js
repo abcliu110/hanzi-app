@@ -101,5 +101,5 @@ window.NHZ_WB_INDEX = {
   "又/再辨析": "xc_youzai",
   /* 逻辑区（docs/gaijin/luoji-gaijin-sheji.md） */
   "三段论": "lj_sanduanlun",
-  "推理三兄弟": "lj_shiwuguan",
+  "推理三兄弟：演绎/归纳/类比": "lj_shiwuguan",
 };
