@@ -40,7 +40,7 @@
       '<div class="bs-head">' +
       '<span class="bs-char">' + esc(r.bushou) + '</span>' +
       '<span class="bs-info"><span class="bs-meaning">' + esc(head_sub) + '</span>' +
-      '<span class="bs-sub">' + (r.benzi ? '本字「' + esc(r.benzi) + '」 · ' : '') + r.count + '字</span></span>' +
+      (r.benzi ? '<span class="bs-sub">本字「' + esc(r.benzi) + '」</span>' : '') + '</span>' +
       '<span class="bs-count">' + r.count + '字</span>' +
       '<span class="bs-arrow">▾</span></div>' +
       '<div class="bs-body">';
