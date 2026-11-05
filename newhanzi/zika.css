@@ -416,6 +416,10 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
 /* 模块页返回按钮沿用全局 .back 醒目样式，不再单设小字样式 */
 .module-view .topbar h1{font-size:20px;letter-spacing:2px}
 .module-view .topbar .sub{font-size:13px;color:var(--muted)}
+.module-view .topbar h1 .crumb{color:var(--muted);text-decoration:none;font-weight:normal}
+.module-view .topbar h1 .crumb:hover{text-decoration:underline}
+.module-view .topbar h1 .crumb.cur{color:inherit;font-weight:bold}
+.module-view .topbar h1 .crumb-sep{margin:0 6px;color:var(--muted)}
 .module-view .app-main{min-width:0}
 .page-home .app-shell { min-height: 100vh; }
 .page-home .side-nav { display: none; }

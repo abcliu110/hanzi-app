@@ -277,8 +277,7 @@ window.NHZReview = window.NHZReview || (function () {
   function showSections(){
     curListCat = null;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
-    h += '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→分类排）</button>'; /* P2-B */
+    var h = '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→分类排）</button>'; /* P2-B */
     h += levelFilterHtml(levelCounts(D.texts, textLevel));
     h += '<div class="gw-grid">' + SECTIONS.map(function(s){
       var n = D.texts.filter(function(t){ return t.cat === s.id && textMatch(t); }).length;
@@ -293,8 +292,7 @@ window.NHZReview = window.NHZReview || (function () {
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var base = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
     var items = base.filter(textMatch);
-    var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
-    h += levelFilterHtml(levelCounts(base, textLevel));
+    var h = levelFilterHtml(levelCounts(base, textLevel));
     if(!items.length){
       h += '<p class="gw-p">本分类下没有「'+esc(curLevel)+'」篇目，切换学段或回分类看看。</p>';
     }
@@ -369,8 +367,7 @@ window.NHZReview = window.NHZReview || (function () {
         '<div class="gw-imeta">'+esc(x.t.author)+' · '+esc(x.t.source)+' · '+esc(x.t.cat) +
         (x.t.ce ? ' · ' + esc(x.t.ce) : '') + '</div></div>';
     }
-    var h = '<button class="gw-backbtn" data-go="__sections">← 回分类</button>';
-    h += '<div class="gw-head"><h2>🗺️ 古文进阶路线</h2><div class="gw-meta">共 '+D.texts.length+' 篇 · 点击篇目进详情</div></div>';
+    var h = '<div class="gw-head"><h2>🗺️ 古文进阶路线</h2><div class="gw-meta">共 '+D.texts.length+' 篇 · 点击篇目进详情</div></div>';
     h += '<div class="gw-route-sec">第一段 · 有册次（'+g.withCe.length+' 篇，按册次 3上→6下）</div>';
     h += g.withCe.map(itemHtml).join('');
     h += '<div class="gw-route-sec">第二段 · 未标册次（'+g.groups.reduce(function(s, gr){ return s + gr.items.length; }, 0)+' 篇，按分类排）</div>';
@@ -391,8 +388,7 @@ window.NHZReview = window.NHZReview || (function () {
     var t = D.texts[idx]; if(!t) return;
     curText = idx; try{ speechSynthesis.cancel(); }catch(e){}
     hideAll(); detEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<button class="gw-backbtn" data-go="__back">← 回篇目</button>';
-    h += '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
+    var h = '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
     /* 古文区 P2-A 论语语境卡：只给 cat='论语选读' 的篇目加播放按钮，点了才加载引擎和场景（复用知识点详情的白板按钮写法与点击处理） */
     if(t.cat==='论语选读' && window.NHZ_WB_INDEX && window.NHZ_WB_INDEX['古文:语境:'+t.title])
       h += '<div class="gw-sec">🎬 语境卡</div><div class="gw-wb" data-gwwb="'+esc('古文:语境:'+t.title)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放语境卡</button></div>';
@@ -782,8 +778,7 @@ window.NHZReview = window.NHZReview || (function () {
     curMod = 'yufa'; curGroup = null;
     var cat = catById('yufa'), meta = modMeta('yufa');
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
-    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    var h = '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
     if(cat && cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
     /* 语法子面板顺序：总说（入门）→ 字词（实词、一词多义、古今异义、通假、词类活用、虚词）→ 句子（句子成分、特殊句式、固定句式） */
     var YUFA_ORDER = ['g:总说','m:shici','m:duoyi','m:guyin','m:tongjia','m:huoyong','m:xuci','g:句子成分','g:特殊句式','g:固定句式'];
@@ -812,7 +807,7 @@ window.NHZReview = window.NHZReview || (function () {
     }
     var items = cat ? (curGroup ? yufaGroupItems(curGroup) : cat.items) : [];
     hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
-    var h = meta.parent ? '<button class="gw-backbtn" data-mid="yufa">← 回语法</button>' : '<button class="gw-backbtn" data-go="__nav">← 回子模块</button>';
+    var h = '';
     /* 标题只出现一次：点数并入副标题，不再另起「名称 + N点」的列表头 */
     var cntTxt = items.length + '点' + (curLevel !== '全部' ? ' · ' + curLevel + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '');
     h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(cat ? cntTxt + ' · ' + String(meta.d).replace(/^\d+个点 · /, '') : meta.d)+'</div></div>';
@@ -829,12 +824,6 @@ window.NHZReview = window.NHZReview || (function () {
     if(inp) inp.addEventListener('input', function(){ curFilter = inp.value; renderMItems(); });
     var jb = document.getElementById('gwJrBtn');
     if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
-    mlistEl.querySelectorAll('.gw-backbtn[data-mid]').forEach(function(el){
-      el.addEventListener('click', function(){
-        var mid = el.getAttribute('data-mid');
-        if(mid && (mid!==id || curGroup)) showMList(mid);
-      });
-    });
     if(bankLoaded[id] === true) renderMItems();
     else {
       document.getElementById('gwMItems').innerHTML = '<p class="gw-p">加载中…</p>';
@@ -850,14 +839,11 @@ window.NHZReview = window.NHZReview || (function () {
     var bodyEl = itemEl ? itemEl.querySelector('.yw-body') : null;
     hideAll(); mdetEl.style.display='block'; window.scrollTo(0,0);
     mdetEl.innerHTML =
-      '<div style="display:flex;gap:10px;margin-bottom:16px">' +
-      '<button class="gw-backbtn" style="margin:0" id="gwMBack">← 回列表</button></div>' +
       '<div class="yw-detail-head"><span class="yw-ico-lg">'+rec.icon+'</span>' +
       '<div><h2>'+esc(it.name || '')+'</h2>' +
       (it['口诀'] ? '<p class="yw-kj-lg">'+esc(it['口诀'])+'</p>' : '') + '</div></div>' +
       '<div class="yw-detail-body" id="gwDetailBody"></div>';
     if(bodyEl) document.getElementById('gwDetailBody').appendChild(bodyEl);
-    document.getElementById('gwMBack').addEventListener('click', hideMDetail);
   }
   function hideMDetail(){
     var bodyEl = document.querySelector('#gwDetailBody .yw-body');
@@ -914,13 +900,14 @@ window.NHZReview = window.NHZReview || (function () {
     var gp = e.target.closest('[data-gwpoint]');
     if(gp){
       var pp = gp.getAttribute('data-gwpoint').split(':');
+      navPendingCross = navCrumbs(); /* 跨链接：返回回到点进来的那一页 */
       openPoint(pp[0], parseInt(pp[1], 10));
       return;
     }
     var gt = e.target.closest('[data-gwtext]');
     if(gt){
       var ti = textIdx(gt.getAttribute('data-gwtext'));
-      if(ti >= 0){ lastTextList = '全部'; showDetail(ti); }
+      if(ti >= 0){ navPendingCross = navCrumbs(); lastTextList = '全部'; showDetail(ti); }
       return;
     }
     var go = e.target.closest('[data-go]');
@@ -1034,6 +1021,88 @@ window.NHZReview = window.NHZReview || (function () {
       return;
     }
   });
+
+  /* ---------- 导航：只有一个「返回」= 回上一级（负责人 2026-11-05/06：不要轻易回首页，不要内容里另放返回按钮） ----------
+     每次换页记下当前视图 navView，按层级算出面包屑 navCrumbs()：[{t, go}]，最后一项是当前页。
+     被首页 iframe 嵌入时把面包屑 postMessage 给首页，首页顶栏的「← 返回」调 NHZNav.up()，只有在本模块最外层才回首页；
+     单独打开本页时，本页顶栏的「← 返回」同样先回上一级。跨链接（篇目↔知识点）进来的页，返回回到点进来的那一页。 */
+  var navView = {k:'nav'}, navPendingCross = null;
+  function navNode(v){
+    var t, go;
+    if(v.k==='nav') return {t:'古文', go:function(){ showNav(); }};
+    if(v.k==='sec') return {t:'古文篇目', go:function(){ showSections(); }};
+    if(v.k==='list') return {t: v.cat==='全部' ? '全部篇目' : v.cat, go:function(){ showList(v.cat); }};
+    if(v.k==='route') return {t:'进阶路线', go:function(){ showRoute(); }};
+    if(v.k==='text') return {t:(D.texts[v.idx]||{}).title || '篇目', go:function(){ routeBack = v.from==='route'; lastTextList = v.cat; showDetail(v.idx); }};
+    if(v.k==='yhub') return {t:'语法', go:function(){ showMList('yufa'); }};
+    if(v.k==='mlist') return {t: v.group || modMeta(v.id).t, go:function(){ showMList(v.id, false, v.group || undefined); }};
+    if(v.k==='pt') return {t: v.name, go:function(){ showMList(v.base.id, false, v.base.group || undefined); if(currentItems[v.key]) showMDetail(v.key); }};
+    return {t:'古文', go:function(){ showNav(); }};
+  }
+  function navChain(v){
+    if(v.cross) return v.cross.concat([navNode(v)]);
+    var c;
+    switch(v.k){
+      case 'nav': return [navNode(v)];
+      case 'sec': return navChain({k:'nav'}).concat([navNode(v)]);
+      case 'list': case 'route': return navChain({k:'sec'}).concat([navNode(v)]);
+      case 'text': c = v.from==='route' ? navChain({k:'route'}) : navChain({k:'list', cat:v.cat}); return c.concat([navNode(v)]);
+      case 'yhub': return navChain({k:'nav'}).concat([navNode(v)]);
+      case 'mlist': c = (v.group || modMeta(v.id).parent==='yufa') ? navChain({k:'yhub'}) : navChain({k:'nav'}); return c.concat([navNode(v)]);
+      case 'pt': return navChain(v.base).concat([navNode(v)]);
+    }
+    return navChain({k:'nav'});
+  }
+  function navCrumbs(){ return navChain(navView); }
+  function navNotify(){
+    var cr = navCrumbs(), names = cr.map(function(c){ return c.t; });
+    var tt = document.getElementById('navtitle'); if(tt) tt.textContent = names.join(' › ');
+    if(window.parent && window.parent !== window){
+      try{ window.parent.postMessage({nhzNav:1, page:'guwen', crumbs:names}, '*'); }catch(e){}
+    }
+  }
+  function navSet(v, crossOk){
+    if(crossOk && navPendingCross){ v.cross = navPendingCross; }
+    navPendingCross = crossOk ? null : navPendingCross;
+    navView = v; navNotify();
+  }
+  window.NHZNav = {
+    crumbs: function(){ return navCrumbs().map(function(c){ return c.t; }); },
+    /* 回上一级；已在最外层返回 false（由调用方决定是否回首页） */
+    up: function(){ var c = navCrumbs(); if(c.length < 2) return false; c[c.length-2].go(); return true; },
+    go: function(i){ var c = navCrumbs(); if(i >= 0 && i < c.length - 1){ c[i].go(); return true; } return false; }
+  };
+  (function(){
+    var oNav = showNav; showNav = function(){ navPendingCross = null; oNav.apply(this, arguments); navSet({k:'nav'}); };
+    var oSec = showSections; showSections = function(){ navPendingCross = null; oSec.apply(this, arguments); navSet({k:'sec'}); };
+    var oList = showList; showList = function(cat){ navPendingCross = null; oList.apply(this, arguments); navSet({k:'list', cat:cat}); };
+    var oRoute = showRoute; showRoute = function(){ navPendingCross = null; oRoute.apply(this, arguments); navSet({k:'route'}); };
+    var oDet = showDetail; showDetail = function(idx){
+      var from = routeBack ? 'route' : 'list', cat = lastTextList || '全部';
+      oDet.apply(this, arguments); navSet({k:'text', idx:idx, from:from, cat:cat}, true);
+    };
+    var oHub = showYufaHub; showYufaHub = function(){ navPendingCross = null; oHub.apply(this, arguments); navSet({k:'yhub'}); };
+    var oML = showMList; showMList = function(id, keep, group){
+      if(id==='yufa' && !group){ oML.apply(this, arguments); return; }
+      oML.apply(this, arguments);
+      /* openPoint 先进列表再进点详情：列表这一步不消耗跨链接来源 */
+      /* 跨链接途中不通知首页，免得中间这一步把历史层级改乱 */
+      if(navPendingCross) navView = {k:'mlist', id:id, group:group || null};
+      else navSet({k:'mlist', id:id, group:group || null});
+    };
+    var oMD = showMDetail; showMDetail = function(key){
+      var base = navView.k==='mlist' ? {k:'mlist', id:navView.id, group:navView.group} : {k:'mlist', id:curMod, group:curGroup};
+      oMD.apply(this, arguments);
+      var rec = currentItems[key];
+      if(mdetEl.style.display !== 'none') navSet({k:'pt', key:key, name: rec && rec.it ? (rec.it.name || '详情') : '详情', base:base}, true);
+    };
+    var oHide = hideMDetail; hideMDetail = function(){ oHide.apply(this, arguments); if(navView.k==='pt') navSet(navView.base); };
+  })();
+  /* 单独打开本页时：顶栏「← 返回」先回上一级，最外层才回首页 */
+  (function(){
+    var bk = document.querySelector('.topbar .back');
+    if(bk) bk.addEventListener('click', function(e){ if(window.NHZNav.up()){ e.preventDefault(); } });
+  })();
   if(!K.categories || !K.categories.length){
     navEl.innerHTML = '<p class="gw-p">知识库加载失败，请确认 data/guwen_knowledge.js 存在。</p>';
   }else{
