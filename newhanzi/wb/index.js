@@ -222,4 +222,11 @@ window.NHZ_WB_INDEX = {
   "介宾短语": "cd_jiebin",
   "“的”字短语": "cd_dezi",
   "“所”字结构": "cd_suozi",
+  /* Q13 新增 50 项（docs/yufa-neirong/04）：深层语法 */
+  "配价": "sx_peijia",
+  "语义指向": "sx_zhixiang",
+  "层次分析": "sx_cengci",
+  "省略与 ∅": "sx_shenglue",
+  "话题与焦点": "sx_huati_jiaodian",
+  "语序与重音": "sx_yuxu_zhongyin",
 };
