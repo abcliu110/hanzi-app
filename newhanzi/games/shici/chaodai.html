@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>朝代长河 · 古诗词</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:16px;line-height:1.7}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 60px}
+.back{display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none}
+h1{font-size:21px;margin:14px 0 4px}
+.sub{font-size:14px;color:var(--muted);margin:0 0 12px}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.river{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:6px 2px 18px;-webkit-overflow-scrolling:touch}
+.seg{flex:0 0 88%;scroll-snap-align:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
+.seg h2{margin:0;font-size:24px}
+.seg .time{font-size:14px;color:var(--muted)}
+.seg .tag{display:inline-block;font-size:12px;background:var(--accent-soft);color:var(--accent-deep);border-radius:999px;padding:2px 10px;margin:6px 0}
+.seg p{font-size:15px}
+.poem{margin-top:14px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;text-align:center}
+.poem .t{font-size:19px;font-weight:700}
+.poem .a{font-size:13px;color:var(--muted);margin:2px 0 8px}
+.poem .l{font-size:18px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;line-height:2;margin:0}
+.poem a{display:inline-block;margin-top:10px;color:var(--accent-deep);font-weight:700}
+.nav{display:flex;gap:10px;justify-content:center;margin:4px 0 12px}
+.nav button{min-height:48px;padding:8px 22px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent-soft);color:var(--accent-deep);font-size:16px;font-weight:700;cursor:pointer}
+.dots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}
+.dots button{border:0;background:var(--line);color:var(--ink);border-radius:999px;padding:4px 14px;font-size:13px;cursor:pointer}
+.dots button.on{background:var(--accent-deep);color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../../shici.html">← 返回</a>
+  <h1>🌊 朝代长河</h1>
+  <p class="sub">从诗经一路漂到元曲，每一段停下来读一首代表诗。朝代分段与诗库首页的朝代介绍一致。</p>
+  <div class="nav">
+    <button type="button" id="btnPrev">← 上一段</button>
+    <button type="button" id="btnNext">下一段 →</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="river" id="river"></div>
+  <div class="tip">代表诗全部取自诗库收录篇目；楚辞段诗库暂未收录整首，只引朝代介绍里的一句；元曲段诗库暂无元曲篇目，以元朝诗人王冕《墨梅》作代表，两处都在段内写明了。</div>
+</div>
+<script src="../../data/shici.js"></script>
+<script>
+(function(){
+'use strict';
+/* 朝代分段：直接用 data/shici.js 的 dynasties（与 shici.html 首页朝代介绍同一数组）。
+   代表诗：诗经 189《采薇（节选）》、汉乐府 124《江南》、唐诗 1《静夜思》、
+   宋词 91《水调歌头·明月几时有》、元曲段用元朝 165《墨梅》作代表（见段内说明）。 */
+var REP = {'诗经':189, '汉乐府':124, '唐诗':1, '宋词':91, '元曲':165};
+var D = window.NHZ_SHICI || {poems:[], dynasties:[]};
+var byOrder = {};
+D.poems.forEach(function(p){ byOrder[p.order] = p; });
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+var river = document.getElementById('river'), dots = document.getElementById('dots');
+river.innerHTML = D.dynasties.map(function(d, i){
+  var p = REP[d.name] ? byOrder[REP[d.name]] : null;
+  var poemHtml = '';
+  if(d.name === '楚辞'){
+    poemHtml = '<div class="poem"><div class="t">楚辞 · 代表名句</div><p class="l">路漫漫其修远兮，吾将上下而求索。</p>' +
+      '<p style="font-size:13px;color:var(--muted)">出自本段朝代介绍（屈原《离骚》名句）；诗库暂未收录楚辞整首，这里不另编全诗。</p></div>';
+  } else if(p){
+    poemHtml = '<div class="poem"><div class="t">《' + esc(p.title) + '》</div><div class="a">' + esc(p.author) + ' · ' + esc(p.dynasty || '') + ' · ' + esc(p.ticai || '') + '</div>' +
+      p.lines.map(function(l){ return '<p class="l">' + esc(l) + '</p>'; }).join('') +
+      (d.name === '元曲' ? '<p style="font-size:13px;color:var(--muted)">元曲段说明：诗库暂无元曲篇目，以元朝诗人王冕这首七绝作元朝代表。</p>' : '') +
+      '<a href="../../shici.html#poem-' + p.order + '">去读这首诗 →</a></div>';
+  } else {
+    poemHtml = '<div class="poem"><p style="font-size:14px">本段暂无诗库篇目。</p></div>';
+  }
+  return '<section class="seg" data-i="' + i + '"><h2>' + esc(d.name) + '</h2><div class="time">' + esc(d.time || '') + '</div>' +
+    '<span class="tag">' + esc(d.tag || '') + '</span><p>' + esc(d.desc || '') + '</p>' +
+    (d.why ? '<p>为什么有这样的诗：' + esc(d.why) + '</p>' : '') + poemHtml + '</section>';
+}).join('');
+dots.innerHTML = D.dynasties.map(function(d, i){
+  return '<button type="button" data-i="' + i + '"' + (i === 0 ? ' class="on"' : '') + '>' + esc(d.name) + '</button>';
+}).join('');
+function go(i){
+  var segs = river.querySelectorAll('.seg');
+  if(!segs.length) return;
+  i = Math.max(0, Math.min(segs.length - 1, i));
+  segs[i].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  dots.querySelectorAll('button').forEach(function(b, bi){ b.classList.toggle('on', bi === i); });
+}
+function current(){
+  var segs = river.querySelectorAll('.seg'), best = 0, bestD = 1e9;
+  segs.forEach(function(s, i){
+    var d = Math.abs(s.getBoundingClientRect().left - river.getBoundingClientRect().left);
+    if(d < bestD){ bestD = d; best = i; }
+  });
+  return best;
+}
+document.getElementById('btnPrev').addEventListener('click', function(){ go(current() - 1); });
+document.getElementById('btnNext').addEventListener('click', function(){ go(current() + 1); });
+dots.addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-i]'); if(b) go(+b.getAttribute('data-i'));
+});
+river.addEventListener('scroll', function(){
+  var i = current();
+  dots.querySelectorAll('button').forEach(function(b, bi){ b.classList.toggle('on', bi === i); });
+}, {passive:true});
+})();
+</script>
+</body>
+</html>

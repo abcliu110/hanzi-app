@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>背诵评测 · 古诗词</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:16px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:14px 14px 60px}
+.back{display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none}
+h1{font-size:21px;margin:14px 0 4px}
+.sub{font-size:14px;color:var(--muted);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+select,input{width:100%;min-height:48px;font-size:16px;padding:8px 12px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);margin:6px 0}
+.poem{text-align:center;padding:8px 4px}
+.poem .t{font-size:21px;font-weight:700}
+.poem .a{font-size:13px;color:var(--muted);margin:2px 0 10px}
+.poem .l{font-size:20px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;line-height:2.1;margin:0;cursor:pointer}
+.poem .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.row button{flex:1;min-height:52px;font-size:16px;font-weight:700;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.row button.on{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.row button.primary{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.result{font-size:15px}
+.result .ok{color:#2e7d4f;font-weight:700}
+a.poemlink{color:var(--accent-deep);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../../shici.html">← 返回</a>
+  <h1>🎤 背诵评测（自评 + 家长确认）</h1>
+  <p class="sub">不接语音识别：孩子先自己背、自己打分，家长听完确认属实后，才记入复习账本。</p>
+  <div class="card">
+    <input id="search" placeholder="搜诗名或作者，如：静夜思 / 李白">
+    <select id="picker"></select>
+    <div class="row">
+      <button type="button" id="btnRandom">🎲 随机一首</button>
+      <button type="button" id="btnHide">🙈 藏字背一背</button>
+    </div>
+    <div class="poem" id="poemBox"></div>
+    <div class="tip" id="hideTip">点“藏字背一背”逐档藏字：全显 → 隔字藏 → 只留句首字 → 全藏；背诵时点一句可偷看 2 秒。</div>
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 6px">第一步：孩子自评</h3>
+    <div class="row" id="rateRow">
+      <button type="button" data-rate="good">😄 会背了</button>
+      <button type="button" data-rate="mid">😐 不太熟</button>
+      <button type="button" data-rate="bad">😣 不会背</button>
+    </div>
+    <div id="parentBox" style="display:none">
+      <h3 style="margin:12px 0 6px">第二步：家长确认</h3>
+      <p style="margin:0 0 8px;font-size:15px" id="parentText"></p>
+      <div class="row">
+        <button type="button" class="primary" id="btnConfirm">✅ 我是家长，确认属实，记入账本</button>
+        <button type="button" id="btnDeny">↩ 不属实，重新背</button>
+      </div>
+      <div class="tip">只有家长点了确认，才会写账本；孩子自己点自评不会写任何记录。</div>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 6px">📒 这首诗的账本状态</h3>
+    <div class="result" id="ledger"></div>
+    <div class="tip">账本就是复习页用的那一套（localStorage：nhz_srs / nhz_wrong / nhz_srs_face），不另起新模型、不实现 SRS_MODEL_SPEC 三态：会 = 已有则推进间隔、新则安排明天第一次复习；不太熟 = 已有则回到 1 天、新则安排明天第一次复习；不会 = 记入错题本、明天复习。复习页（fuxi.html）到期时会用同一账本提醒。</div>
+  </div>
+</div>
+<script src="../../data/shici.js"></script>
+<script>
+(function(){
+'use strict';
+/* ---- 账本小垫片：与 newhanzi/fuxi.js 的 NHZReview 同键、同 id 算法、同间隔表 ----
+   fuxi.js 是复习页整页脚本（含 #app 渲染），本页不加载它，改用这段等价垫片只写账本；
+   若将来本页被集成进已有 NHZReview 的页面，优先用现成的 window.NHZReview。 */
+var Ledger = window.NHZReview || (function(){
+  var WK = 'nhz_wrong', SK = 'nhz_srs', FK = 'nhz_srs_face', IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb){ try{ var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }catch(e){ return fb; } }
+  function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function hash(s){ var h = 0; for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'q' + (h < 0 ? -h : h); }
+  function idOf(it){ return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function schedule(id, ivIdx, it){
+    if(!id) return;
+    var srs = load(SK, {}), now = Date.now();
+    var iv = Math.max(0, Math.min(ivIdx == null ? 0 : ivIdx, IV.length - 1));
+    srs[id] = {iv:iv, next: now + IV[iv] * 86400000}; save(SK, srs);
+    if(it && it.q){
+      var faces = load(FK, {});
+      faces[id] = {id:id, q:it.q, options:it.options || [], answer:it.answer, 解析:it['解析'] || '', src:it.src || '', point:it.point || ''};
+      save(FK, faces);
+    }
+  }
+  function review(id, remembered){
+    var srs = load(SK, {}), now = Date.now();
+    if(!srs[id]) return false;
+    if(remembered){ var iv = Math.min(srs[id].iv + 1, IV.length - 1); srs[id] = {iv:iv, next: now + IV[iv] * 86400000}; }
+    else srs[id] = {iv:0, next: now + IV[0] * 86400000};
+    save(SK, srs); return true;
+  }
+  function record(it, correct){
+    if(!it || !it.q) return;
+    var id = idOf(it), wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if(correct){ if(srs[id]){ var iv = Math.min(srs[id].iv + 1, IV.length - 1); srs[id] = {iv:iv, next: now + IV[iv] * 86400000}; save(SK, srs); } }
+    else{
+      var found = false;
+      for(var i = 0; i < wrong.length; i++) if(wrong[i].id === id){ wrong[i] = {id:id, q:it.q, options:it.options || [], answer:it.answer, 解析:it['解析'] || '', src:it.src, point:it.point, addedAt: wrong[i].addedAt || now}; found = true; break; }
+      if(!found) wrong.push({id:id, q:it.q, options:it.options || [], answer:it.answer, 解析:it['解析'] || '', src:it.src, point:it.point, addedAt: now});
+      save(WK, wrong); srs[id] = {iv:0, next: now + IV[0] * 86400000}; save(SK, srs);
+    }
+  }
+  return {idOf:idOf, schedule:schedule, review:review, record:record,
+    loadSrs:function(){ return load(SK, {}); }, loadWrong:function(){ return load(WK, []); }};
+})();
+var D = window.NHZ_SHICI || {poems:[]};
+var poems = D.poems.slice().sort(function(a, b){ return a.order - b.order; });
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function isHan(c){ return /[\u3400-\u9fff]/.test(c); }
+var cur = null, hide = 0, rate = null;
+var picker = document.getElementById('picker'), search = document.getElementById('search');
+function itemFor(p){
+  return {q:'背诵《' + p.title + '》', answer:p.lines.join(''), src:'古诗词·背诵评测', point:p.author};
+}
+function fmtDate(t){
+  var d = new Date(t);
+  return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+}
+function renderPicker(){
+  var kw = (search.value || '').trim();
+  var list = poems.filter(function(p){ return !kw || p.title.indexOf(kw) >= 0 || p.author.indexOf(kw) >= 0; });
+  picker.innerHTML = list.map(function(p){
+    return '<option value="' + p.order + '"' + (cur && cur.order === p.order ? ' selected' : '') + '>' + esc(p.title) + ' · ' + esc(p.author) + '</option>';
+  }).join('') || '<option value="">（没有匹配的诗）</option>';
+}
+function lineHTML(l, h){
+  var out = '', k = 0;
+  Array.from(l).forEach(function(c){
+    if(!isHan(c)){ out += esc(c); return; }
+    var hid = h === 3 || (h === 2 && k > 0) || (h === 1 && k % 2 === 1);
+    out += '<span class="hz' + (hid ? ' hid' : '') + '">' + esc(c) + '</span>'; k++;
+  });
+  return out;
+}
+function renderPoem(){
+  var box = document.getElementById('poemBox');
+  if(!cur){ box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="t">《' + esc(cur.title) + '》</div><div class="a">' + esc(cur.author) + ' · ' + esc(cur.dynasty || '') + ' · ' + esc(cur.ticai || '') +
+    ' · <a class="poemlink" href="../../shici.html#poem-' + cur.order + '">去读这首诗 →</a></div>' +
+    cur.lines.map(function(l, i){ return '<p class="l" data-li="' + i + '">' + lineHTML(l, hide) + '</p>'; }).join('');
+  box.querySelectorAll('.l').forEach(function(pEl){
+    pEl.addEventListener('click', function(){
+      if(!hide) return;
+      var i = +pEl.getAttribute('data-li');
+      pEl.innerHTML = lineHTML(cur.lines[i], 0);
+      setTimeout(function(){ if(hide) pEl.innerHTML = lineHTML(cur.lines[i], hide); }, 2000);
+    });
+  });
+  renderLedger();
+}
+function renderLedger(){
+  var el = document.getElementById('ledger');
+  if(!cur){ el.innerHTML = ''; return; }
+  var it = itemFor(cur), id = Ledger.idOf(it);
+  var srs = Ledger.loadSrs()[id], wrong = Ledger.loadWrong().some(function(w){ return w.id === id; });
+  el.innerHTML = srs
+    ? '复习账本：已安排，下次复习 ' + fmtDate(srs.next) + '（间隔档 ' + srs.iv + '）。' + (wrong ? '同时在错题本里。' : '')
+    : '复习账本：暂无记录。' + (wrong ? '在错题本里（明天复习）。' : '');
+}
+function resetRate(){
+  rate = null;
+  document.getElementById('parentBox').style.display = 'none';
+  document.querySelectorAll('#rateRow button').forEach(function(b){ b.classList.remove('on'); });
+}
+function selectPoem(order){
+  var p = null;
+  poems.forEach(function(x){ if(x.order === order) p = x; });
+  if(!p) return;
+  cur = p; hide = 0; resetRate();
+  document.getElementById('result').innerHTML = '';
+  document.getElementById('btnHide').textContent = '🙈 藏字背一背';
+  renderPicker(); renderPoem();
+}
+picker.addEventListener('change', function(){ selectPoem(+picker.value); });
+search.addEventListener('input', renderPicker);
+document.getElementById('btnRandom').addEventListener('click', function(){
+  selectPoem(poems[Math.floor(Math.random() * poems.length)].order);
+});
+document.getElementById('btnHide').addEventListener('click', function(){
+  if(!cur) return;
+  hide = (hide + 1) % 4;
+  this.textContent = hide ? '🙈 藏字 ' + hide + '/3（再点换一档）' : '🙈 藏字背一背';
+  renderPoem();
+});
+document.getElementById('rateRow').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-rate]'); if(!b || !cur) return;
+  rate = b.getAttribute('data-rate');
+  document.querySelectorAll('#rateRow button').forEach(function(x){ x.classList.toggle('on', x === b); });
+  var label = rate === 'good' ? '会背了' : rate === 'mid' ? '不太熟' : '不会背';
+  document.getElementById('parentText').textContent = '孩子自评：' + label + '《' + cur.title + '》。家长听孩子背完后，确认属实再点确认。';
+  document.getElementById('parentBox').style.display = 'block';
+  document.getElementById('result').innerHTML = '';
+});
+document.getElementById('btnDeny').addEventListener('click', function(){
+  resetRate();
+  document.getElementById('result').innerHTML = '已取消本次记账，重新背一遍再自评。';
+});
+document.getElementById('btnConfirm').addEventListener('click', function(){
+  if(!cur || !rate) return;
+  var it = itemFor(cur), id = Ledger.idOf(it), msg = '';
+  if(rate === 'good'){
+    if(Ledger.loadSrs()[id]){ Ledger.review(id, true); msg = '已记入账本：记得，间隔推进，下次复习 ' + fmtDate(Ledger.loadSrs()[id].next) + '。'; }
+    else{ Ledger.schedule(id, 0, it); msg = '已记入账本：新学记得，明天第一次复习。'; }
+  } else if(rate === 'mid'){
+    if(Ledger.loadSrs()[id]){ Ledger.review(id, false); msg = '已记入账本：不太熟，回到 1 天，明天再背一次。'; }
+    else{ Ledger.schedule(id, 0, it); msg = '已记入账本：新学不太熟，明天第一次复习。'; }
+  } else {
+    Ledger.record(it, false);
+    msg = '已记入账本：不会背，进错题本，明天复习。';
+  }
+  document.getElementById('result').innerHTML = '<span class="ok">✅ 家长已确认，' + esc(msg) + '</span>';
+  resetRate(); renderLedger();
+});
+/* 支持 ?order=N 深链（与 shici.html#poem-N 对应） */
+var m = location.search.match(/order=(\d+)/);
+var start = m ? +m[1] : 1;
+var found = poems.some(function(p){ return p.order === start; });
+selectPoem(found ? start : 1);
+renderPicker();
+})();
+</script>
+</body>
+</html>

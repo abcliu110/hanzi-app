@@ -27,6 +27,12 @@
 .sc-line .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
 .sc-memo-tip{text-align:center;color:#6b7c6b;font-size:14px;margin-top:4px}
 .sc-lines p{margin:0}
+/* 古籍竖排（改进设计 P2-5）：只改诗详情原文区；竖排时轻微飘动，减动效偏好下关闭 */
+.sc-vertical .sc-lines{writing-mode:vertical-rl;text-orientation:upright;height:340px;overflow:auto;margin:0 auto}
+.sc-vertical .sc-lines p{margin:0 12px}
+.sc-vertical.sway .sc-lines{animation:scsway 7s ease-in-out infinite}
+@keyframes scsway{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+@media (prefers-reduced-motion: reduce){.sc-vertical.sway .sc-lines{animation:none}}
 /* 打拍器 + 平仄格（改进设计 P0-3） */
 .sc-beat{margin:10px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .sc-beat .bk-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
@@ -1223,7 +1229,7 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
@@ -1280,6 +1286,8 @@ function scReadBar(p){
   var bar = detEl.querySelector('.sc-readbar'); if(!bar) return;
   var st = {beat:false, memo:0};
   var tips = ['', '隔一个字藏一个，试着读出来', '只留每句第一个字', '全藏起来了，点一句可以偷看一眼'];
+  /* 竖排是跨诗的模式：按钮初始态跟 detEl 上的 class 走（换诗不重置） */
+  var vb = bar.querySelector('[data-rb=vert]'); if(vb) vb.classList.toggle('on', detEl.classList.contains('sc-vertical'));
   function redraw(){
     detEl.querySelectorAll('.sc-line').forEach(function(el){ var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); });
     bar.querySelector('[data-rb=beat]').classList.toggle('on', st.beat);
@@ -1303,7 +1311,8 @@ function scReadBar(p){
       if(b.classList.contains('on')){ stopRead(); return; }
       if(!('speechSynthesis' in window)){ b.textContent = '🔇 这台设备不能朗读'; return; }
       stopRead(); b.classList.add('on'); readFrom(0);
-    } else if(a==='beat'){ st.beat = !st.beat; redraw(); }
+    } else if(a==='vert'){ detEl.classList.toggle('sc-vertical'); detEl.classList.toggle('sway', detEl.classList.contains('sc-vertical')); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); }
+    else if(a==='beat'){ st.beat = !st.beat; redraw(); }
     else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
     else if(a==='wb'){ scWb(p, b); }
     else if(a==='metro'){ b.classList.toggle('on'); scBeatBox(p, b.classList.contains('on')); }
