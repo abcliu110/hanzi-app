@@ -13,6 +13,7 @@
  *   fix    病句：圈错 → 说原因 → 改对     link   两个分句 + 关联词 + 关系箭头
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
+ *   scroll 古诗诗画同生（一句一拍、只画本句物件、颜色字上色、收卷）
  *   chain  逻辑条件箭头链（顺推 / 倒推打叉 / 否定后件回灭）
  *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
@@ -1154,6 +1155,72 @@
       }, { ask: b.ask || false });
     });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 540, d.end, { size: 26, color: ACC }, t, 1.2); return 1.2; });
+  };
+
+  /* scroll（古诗「诗画同生」，设计 docs/gaijin/shici-gaijin-sheji.md P0-2 / (e) 之一）：
+   * {keep:['window','willow',…], beats:[{line:'两个黄鹂鸣翠柳', say, draw:['willow','oriole'], color:{'黄':'oriole','翠':'willow'}, hl:'含', note:'…', cmp:'…', ask}],
+   *  lines:['…','…'], marks:[{t:'近', at:'willow'}]}
+   * 一拍一句：句子在顶部写出，同时只画这一句里的物件；color 里的字变色并给对应物件上色；hl 给句中一字画橙圈；
+   * keep 是前几幕已画的物件（开幕即在）；lines / marks 用于收卷。物件只用几何线稿，不画人。 */
+  var SCOL = { '黄': '#c99a06', '翠': '#3f8e6b', '白': '#8a9aa2', '青': '#5f9fb3' };
+  var SFILL = { '黄': '#e8c13a', '翠': '#8cc09a', '白': '#ffffff', '青': '#cfe6ee' };
+  var SOBJ = {
+    window: { at: [610, 300], f: function (c, t) { c.R('rectangle', [460, 170, 300, 250], { stroke: INK, strokeWidth: 3 }, t, .7); c.R('line', [460, 300, 760, 300], { stroke: INK, strokeWidth: 1.6 }, t + .5, .3); c.R('line', [610, 170, 610, 300], { stroke: INK, strokeWidth: 1.6 }, t + .6, .3); return 1; } },
+    willow: { at: [190, 260], f: function (c, t, fill) {
+      c.R('path', ['M185 520 Q180 400 195 250'], { stroke: INK, strokeWidth: 5 }, t, .5);
+      c.R('path', ['M195 250 Q150 230 110 260 M195 250 Q240 225 285 255'], { stroke: INK, strokeWidth: 2.6 }, t + .4, .4);
+      for (var i = 0; i < 9; i++) { var x = 110 + i * 22; c.R('path', ['M' + x + ' ' + (258 - Math.abs(4 - i) * 3) + ' Q' + (x + 6) + ' 330 ' + (x - 4) + ' ' + (400 + (i % 3) * 18)], { stroke: fill || INK, strokeWidth: 2 }, t + .8 + i * .08, .3); }
+      return 1.8; } },
+    oriole: { at: [175, 300], f: function (c, t, fill) {
+      [[150, 300], [230, 286]].forEach(function (p, k) {
+        c.R('ellipse', [p[0], p[1], 38, 24], { stroke: INK, strokeWidth: 2, fill: fill, fillStyle: fill ? 'solid' : undefined }, t + k * .4, .4);
+        c.R('linearPath', [[[p[0] + 18, p[1] - 4], [p[0] + 30, p[1]], [p[0] + 18, p[1] + 4]]], { stroke: INK, strokeWidth: 2 }, t + k * .4 + .3, .2);
+      });
+      return 1.1; } },
+    sing: { at: [270, 270], f: function (c, t) { for (var i = 0; i < 3; i++) c.R('path', ['M' + (262 + i * 10) + ' ' + (262 - i * 6) + ' q8 10 0 20'], { stroke: ACC, strokeWidth: 2.4 }, t + i * .25, .3); return 1; } },
+    sky: { at: [370, 240], f: function (c, t, fill) { c.R('ellipse', [370, 240, 170, 210], { stroke: 'none', fill: fill || SFILL['青'], fillStyle: 'solid' }, t, .6); return .6; } },
+    egret: { at: [370, 240], f: function (c, t, fill) {
+      for (var i = 0; i < 5; i++) { var x = 312 + i * 28, y = 330 - i * 38; c.R('ellipse', [x, y, 22, 12], { stroke: INK, strokeWidth: 1.6, fill: fill || '#ffffff', fillStyle: 'solid' }, t + i * .3, .25); c.R('linearPath', [[[x - 14, y - 10], [x, y - 2], [x + 14, y - 10]]], { stroke: INK, strokeWidth: 1.6 }, t + i * .3 + .1, .2); }
+      return 1.7; } },
+    snowpeak: { at: [610, 360], f: function (c, t, fill) {
+      c.R('linearPath', [[[470, 410], [540, 320], [590, 370], [650, 300], [750, 410]]], { stroke: INK, strokeWidth: 2.4 }, t, .7);
+      c.R('polygon', [[[630, 322], [650, 300], [670, 324], [652, 318]]], { stroke: INK, strokeWidth: 1.4, fill: fill || '#ffffff', fillStyle: 'solid' }, t + .6, .3);
+      c.R('polygon', [[[528, 336], [540, 320], [553, 336], [541, 332]]], { stroke: INK, strokeWidth: 1.4, fill: fill || '#ffffff', fillStyle: 'solid' }, t + .7, .3);
+      return 1.1; } },
+    door: { at: [875, 335], f: function (c, t) { c.R('rectangle', [820, 200, 110, 270], { stroke: INK, strokeWidth: 3 }, t, .6); c.R('circle', [912, 340, 10], { stroke: INK, strokeWidth: 2 }, t + .5, .2); return .9; } },
+    boat: { at: [1040, 470], f: function (c, t) {
+      c.R('line', [800, 490, 1190, 490], { stroke: GRAY, strokeWidth: 2 }, t, .4);
+      c.R('path', ['M965 462 L1115 462 Q1100 486 1040 488 Q985 486 965 462 Z'], { stroke: INK, strokeWidth: 2.4 }, t + .3, .5);
+      c.R('line', [1040, 462, 1040, 380], { stroke: INK, strokeWidth: 2.4 }, t + .7, .3);
+      c.R('linearPath', [[[1044, 386], [1090, 450], [1044, 450]]], { stroke: INK, strokeWidth: 2 }, t + .9, .3);
+      return 1.3; } },
+    far: { at: [1150, 430], f: function (c, t) { c.R('path', ['M1120 470 L1188 470'], { stroke: ACC, strokeWidth: 2.4, strokeLineDash: [8, 6] }, t, .4); c.R('linearPath', [[[1176, 462], [1190, 470], [1176, 478]]], { stroke: ACC, strokeWidth: 2.4 }, t + .4, .2); c.T(1150, 440, '万里', { size: 24, color: ACC }, t + .5, .4); return 1; } }
+  };
+  TPL.scroll = function (c, q, d) {
+    var fills = {};
+    (d.keep || []).forEach(function (o) { var nm = o.o || o; if (o.fill) fills[nm] = SFILL[o.fill]; if (SOBJ[nm]) SOBJ[nm].f(c, -5, fills[nm]); });   /* 前几幕的物件：负时刻画完，开幕即在 */
+    var row = 0;
+    if (d.lines) q.beat(d.linesSay || d.lines.join(''), function (t) { d.lines.forEach(function (l, i) { c.T(W / 2, 52 + i * 44, l, { size: 32 }, t + i * .8, .8); }); return d.lines.length * .8 + .4; });
+    (d.beats || []).forEach(function (b) {
+      q.beat(b.say || b.line, function (t) {
+        var dd = .8, toks = null, tt = t;
+        if (b.line) { toks = c.sentence(70, Array.from(b.line), t, { size: 40, gap: 4, step: .18 }); tt = t + b.line.length * .18 + .2; dd = tt - t + .4; }
+        var col = b.color || {};
+        (b.draw || []).forEach(function (o) {
+          var nm = o.o || o, fl = null;
+          for (var ch in col) if (col[ch] === nm) fl = SFILL[ch];
+          if (SOBJ[nm]) { var du = SOBJ[nm].f(c, tt, fl); tt += du * .6; dd = Math.max(dd, tt - t + du * .4); }
+        });
+        if (toks) for (var ch2 in col) { var j = b.line.indexOf(ch2); if (j >= 0) c.recolor(toks[j].g, t + dd - .2, SCOL[ch2] || ACC); }
+        if (toks && b.hl) { var k = b.line.indexOf(b.hl); if (k >= 0) c.ring(toks[k].cx, 58, 62, 62, t + dd, ACC); dd += .7; }
+        if (b.note) { c.T(b.noteX || W / 2, b.noteY || 140, b.note, { size: 26, color: ACC }, t + dd, .8); dd += 1; }
+        if (b.cmp) { wrap(c, b.cmp, W / 2, 530, W - 200, 28, ACC, t + dd); dd += 1.4; }
+        return dd;
+      }, { ask: b.ask || false });
+    });
+    (d.marks || []).forEach(function (m, i) {
+      q.beat(m.say || null, function (t) { var p = (SOBJ[m.at] || {}).at || [W / 2, 300]; c.R('circle', [p[0], p[1], 46], { stroke: ACC, strokeWidth: 3 }, t, .4); c.T(p[0], p[1] + 12, m.t, { size: 34, color: ACC, bold: 1 }, t + .3, .3); return .9; }, { gap: .15 });
+    });
   };
 
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */

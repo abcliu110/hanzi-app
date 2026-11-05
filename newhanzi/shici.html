@@ -132,6 +132,7 @@ if (window.self !== window.top) {
 <script src="data/shici.js"></script>
 <script src="data/shangxi.js"></script>
 <script src="data/shiju.js"></script>
+<script src="wb/index.js"></script>
 <script>
 (function(){
 var D = window.NHZ_SHICI || {poems:[]};
@@ -1174,7 +1175,7 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="metro">🎵 打拍器</button></div><div id="scbeat"></div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
@@ -1256,6 +1257,7 @@ function scReadBar(p){
       stopRead(); b.classList.add('on'); readFrom(0);
     } else if(a==='beat'){ st.beat = !st.beat; redraw(); }
     else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
+    else if(a==='wb'){ scWb(p, b); }
     else if(a==='metro'){ b.classList.toggle('on'); scBeatBox(p, b.classList.contains('on')); }
   });
   /* 背诵模式下点一句：偷看 2 秒 */
@@ -1289,6 +1291,29 @@ function scBeatGroups(p){
     else return null;
   }
   return out;
+}
+/* 诗画白板（P0-2 scroll 模板）：wb/index.js 里登记「诗:题目|作者」的诗才出按钮；点了才加载引擎与场景 */
+function scWbName(p){ var k = '诗:'+p.title+'|'+p.author; return (window.NHZ_WB_INDEX||{})[k] ? k : null; }
+var scLoaded = {};
+function scLoad(list, cb){
+  var i = 0;
+  (function next(ok){
+    if(!ok) return cb(false);
+    if(i >= list.length) return cb(true);
+    var src = list[i++]; if(scLoaded[src]) return next(true);
+    var sc = document.createElement('script'); sc.src = src;
+    sc.onload = function(){ scLoaded[src] = 1; next(true); }; sc.onerror = function(){ next(false); };
+    document.body.appendChild(sc);
+  })(true);
+}
+function scWb(p, btn){
+  var box = document.getElementById('scwb'), name = scWbName(p); if(!box || !name) return;
+  if(btn.classList.contains('on')){ btn.classList.remove('on'); box.innerHTML = ''; return; }
+  btn.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
+  scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[name] + '.js'], function(ok){
+    if(!ok || !window.NHZWB || !window.NHZWB.has(name)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; btn.classList.remove('on'); return; }
+    box.innerHTML = ''; var pl = window.NHZWB.mount(box, name); if(pl) pl.play();
+  });
 }
 var scAudio = null;
 function scTick(strong){

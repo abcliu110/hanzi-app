@@ -102,4 +102,6 @@ window.NHZ_WB_INDEX = {
   /* 逻辑区（docs/gaijin/luoji-gaijin-sheji.md） */
   "三段论": "lj_sanduanlun",
   "推理三兄弟：演绎/归纳/类比": "lj_shiwuguan",
+  /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
+  "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
 };

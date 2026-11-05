@@ -231,6 +231,18 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('shici scroll whiteboard mounts', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/shici.html#poem-136');
+    await page.locator('[data-rb="wb"]').click();
+    await expect(page.locator('#scwb svg').first()).toBeVisible({ timeout: 10000 });
+    await page.goto('about:blank');
+    await page.goto('newhanzi/shici.html#poem-38');
+    await expect(page.locator('[data-rb="wb"]')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });
