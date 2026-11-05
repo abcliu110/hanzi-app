@@ -266,7 +266,13 @@ test.describe('newhanzi smoke', () => {
     await page.locator('[data-rb="wb"]').click();
     await expect(page.locator('#scwb svg').first()).toBeVisible({ timeout: 10000 });
     await page.goto('about:blank');
+    // 《登鹳雀楼》已在 3384bb59 登记为 scroll 白板（sc_deng_guanque_wang），不再是无白板反例
     await page.goto('newhanzi/shici.html#poem-38');
+    await page.locator('[data-rb="wb"]').click();
+    await expect(page.locator('#scwb svg').first()).toBeVisible({ timeout: 10000 });
+    await page.goto('about:blank');
+    // 未登记白板的诗（《咏鹅》）仍不出白板按钮
+    await page.goto('newhanzi/shici.html#poem-42');
     await expect(page.locator('[data-rb="wb"]')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
