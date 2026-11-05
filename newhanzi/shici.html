@@ -27,6 +27,24 @@
 .sc-line .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
 .sc-memo-tip{text-align:center;color:#6b7c6b;font-size:14px;margin-top:4px}
 .sc-lines p{margin:0}
+/* 打拍器 + 平仄格（改进设计 P0-3） */
+.sc-beat{margin:10px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.sc-beat .bk-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
+.sc-beat .bk-ctl button{min-height:44px;padding:6px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;cursor:pointer}
+.sc-beat .bk-ctl button.on{background:var(--accent-deep,#3f6b4f);border-color:var(--accent-deep,#3f6b4f);color:#fff}
+.sc-beat .bk-row{display:flex;justify-content:center;gap:10px;margin:6px 0}
+.sc-beat .bk-g{display:flex;gap:2px;padding:4px 6px;border:2px solid var(--line);border-radius:10px;background:var(--card)}
+.sc-beat .bk-g.lit{border-color:#c46a2b;background:#fff3c4}
+.sc-beat .bk-g.gold{border-color:#c9a227;background:#fbe9a6}
+.sc-beat .bk-c{position:relative;display:flex;flex-direction:column;align-items:center;width:34px;font-size:22px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-beat .bk-pz{height:10px;display:flex;align-items:center}
+.sc-beat .bk-pz i{display:block;background:#4a7a59;border-radius:3px}
+.sc-beat .bk-pz i.ping{width:26px;height:5px}
+.sc-beat .bk-pz i.ze{width:7px;height:7px;border-radius:50%;background:#8f1d3f}
+.sc-beat .bk-ru{position:absolute;top:-6px;right:-4px;font-size:11px;line-height:1;padding:2px 3px;border-radius:5px;background:#b85a52;color:#fff;cursor:pointer;font-family:sans-serif}
+.sc-beat .bk-rhyme{position:absolute;top:-8px;left:-4px;font-size:12px}
+.sc-beat .bk-tap{min-height:64px;min-width:160px;font-size:22px;font-weight:700;border-radius:16px;border:2px solid #c46a2b;background:#fff3c4;color:#7a3e12;cursor:pointer}
+.sc-beat .bk-msg{text-align:center;font-size:15px;color:var(--muted);min-height:1.6em;margin-top:6px}
 .sc-poet{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
 .sc-poet .sc-pname{font-size:17px;font-weight:700}
 .sc-poet .sc-pbio{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.7}
@@ -1156,7 +1174,7 @@ function openPoem(order){
   setTitle(p.title);
   var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
   /* 逐句锚点：每句可点，点击滚动到对应讲解 */
-  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button></div>';
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="metro">🎵 打拍器</button></div><div id="scbeat"></div>';
   h += '<div class="sc-lines">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i)+'</p>';}).join('')+'</div><div class="sc-memo-tip" id="scmemotip"></div>';
   /* 名篇精讲赏析 */
   try{
@@ -1238,6 +1256,7 @@ function scReadBar(p){
       stopRead(); b.classList.add('on'); readFrom(0);
     } else if(a==='beat'){ st.beat = !st.beat; redraw(); }
     else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
+    else if(a==='metro'){ b.classList.toggle('on'); scBeatBox(p, b.classList.contains('on')); }
   });
   /* 背诵模式下点一句：偷看 2 秒 */
   detEl.querySelectorAll('.sc-line').forEach(function(el){
@@ -1247,7 +1266,101 @@ function scReadBar(p){
       setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i); }, 2000);
     });
   });
-  var back = document.getElementById('scback'); if(back) back.addEventListener('click', stopRead);
+  var back = document.getElementById('scback'); if(back) back.addEventListener('click', function(){ stopRead(); scBeatBox(p, false); });
+}
+
+/* ===== 打拍器 + 平仄格（docs/gaijin/shici-gaijin-sheji.md P0-3）=====
+   节拍分组：有逐首校过的 beats 用它；否则纯五言 2/3、纯七言 2/2/3（与「节奏」按钮同规则），别的句式不出打拍器。
+   平仄格只给逐首校过 pz / ru 的诗（SC_PZ，下标按去标点后的字序）；其余诗只做节奏，不自动标平仄。
+   木鱼声用 WebAudio 合成，每组敲一下，句间空一拍；孩子点「拍」，离最近的一拍不超过 1/4 拍算准，那组亮金。 */
+var SC_PZ = {
+  /* 王之涣《登鹳雀楼》：节奏、平仄、入声、韵脚取自设计 (e) 之二，按平水韵逐字核过（白日入欲目一 为入声，流、楼 押尤韵） */
+  '登鹳雀楼|王之涣': { beats:['白日/依山/尽','黄河/入海/流','欲穷/千里/目','更上/一层/楼'],
+    pz:'仄仄平平仄|平平仄仄平|仄平平仄仄|仄仄仄平平', ru:[0,1,7,10,14,17], rhyme:[9,19] }
+};
+function scBeatGroups(p){
+  var d = SC_PZ[p.title+'|'+p.author];
+  if(d && d.beats) return d.beats.map(function(b){ return b.split('/'); });
+  var out = [];
+  for(var i=0;i<p.lines.length;i++){
+    var hz = Array.from(p.lines[i]).filter(scHanzi).join('');
+    if(hz.length===5) out.push([hz.slice(0,2), hz.slice(2)]);
+    else if(hz.length===7) out.push([hz.slice(0,2), hz.slice(2,4), hz.slice(4)]);
+    else return null;
+  }
+  return out;
+}
+var scAudio = null;
+function scTick(strong){
+  try{
+    scAudio = scAudio || new (window.AudioContext || window.webkitAudioContext)();
+    var t = scAudio.currentTime, o = scAudio.createOscillator(), g = scAudio.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(strong ? 880 : 660, t); o.frequency.exponentialRampToValueAtTime(220, t + .08);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.5, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .12);
+    o.connect(g); g.connect(scAudio.destination); o.start(t); o.stop(t + .14);
+  }catch(e){}
+}
+function scBeatBox(p, on){
+  var box = document.getElementById('scbeat'); if(!box) return;
+  if(box._stop) box._stop();
+  if(!on){ box.innerHTML = ''; return; }
+  var G = scBeatGroups(p);
+  if(!G){ box.innerHTML = '<div class="sc-beat"><div class="bk-msg">这首诗句式长短不一，暂不出打拍器（节拍只给纯五言、纯七言）。</div></div>'; return; }
+  var d = SC_PZ[p.title+'|'+p.author], pz = d ? d.pz.replace(/\|/g,'') : '', st = { bpm:80, pz:false, timer:null, sched:[], hit:0, total:0 };
+  function grid(){
+    var k = 0, gi = 0;
+    return G.map(function(row){
+      return '<div class="bk-row">' + row.map(function(grp){
+        var h = '<div class="bk-g" data-g="'+(gi++)+'">' + Array.from(grp).map(function(c){
+          var i = k++, ru = d && d.ru.indexOf(i) >= 0, rh = d && d.rhyme.indexOf(i) >= 0;
+          return '<span class="bk-c">' + (rh ? '<span class="bk-rhyme" title="韵脚">🔔</span>' : '') + esc(c) +
+            (st.pz && d ? '<span class="bk-pz"><i class="'+(pz[i]==='平'?'ping':'ze')+'"></i></span>' + (ru ? '<span class="bk-ru" data-ru="'+esc(c)+'">入</span>' : '') : '') + '</span>';
+        }).join('') + '</div>';
+        return h;
+      }).join('') + '</div>';
+    }).join('');
+  }
+  function draw(msg){
+    box.innerHTML = '<div class="sc-beat"><div class="bk-ctl">' + [60,80,100].map(function(b){ return '<button type="button" data-bpm="'+b+'" class="'+(st.bpm===b?'on':'')+'">'+b+' 拍/分</button>'; }).join('') +
+      (d ? '<button type="button" data-pzt="1" class="'+(st.pz?'on':'')+'">平仄格</button>' : '') +
+      '<button type="button" data-go="1">'+(st.timer?'⏹ 停':'▶ 开始')+'</button></div>' + grid() +
+      '<div class="bk-ctl"><button type="button" class="bk-tap" data-tap="1">拍！</button></div>' +
+      '<div class="bk-msg" id="bkmsg">' + (msg || (d ? '跟着木鱼点「拍」；打开「平仄格」：长条是平声，圆点是仄声，红「入」是入声字。' : '跟着木鱼点「拍」。这首诗只做节奏，平仄格还没逐首核对，暂不显示。')) + '</div></div>';
+  }
+  function stop(){ if(st.timer){ clearTimeout(st.timer); st.timer = null; } box.querySelectorAll('.bk-g.lit').forEach(function(x){ x.classList.remove('lit'); }); }
+  box._stop = stop;
+  function start(){
+    stop(); st.hit = 0; st.total = 0; st.sched = [];
+    var iv = 60000 / st.bpm, t0 = performance.now() + 400, n = 0, seq = [];
+    G.forEach(function(row, ri){ row.forEach(function(){ seq.push(n++); }); seq.push(-1); });
+    var times = seq.map(function(g, i){ return { g:g, t:t0 + i * iv }; });
+    st.sched = times.filter(function(x){ return x.g >= 0; }); st.total = st.sched.length;
+    draw(); box.querySelectorAll('.bk-g.gold').forEach(function(x){ x.classList.remove('gold'); });
+    var i = 0;
+    (function step(){
+      if(i >= times.length){ st.timer = null; draw('打完了：准拍 '+st.hit+' / '+st.total+'。'); return; }
+      var x = times[i++];
+      st.timer = setTimeout(function(){
+        box.querySelectorAll('.bk-g.lit').forEach(function(e){ e.classList.remove('lit'); });
+        if(x.g >= 0){ var el = box.querySelector('.bk-g[data-g="'+x.g+'"]'); if(el) el.classList.add('lit'); scTick(false); }
+        step();
+      }, Math.max(0, x.t - performance.now()));
+    })();
+  }
+  box.onclick = function(e){
+    var b;
+    if((b = e.target.closest('[data-bpm]'))){ st.bpm = +b.getAttribute('data-bpm'); var run = !!st.timer; stop(); draw(); if(run) start(); return; }
+    if(e.target.closest('[data-pzt]')){ st.pz = !st.pz; var keep = box.querySelectorAll('.bk-g.gold'); var golds = [].map.call(keep, function(x){ return x.getAttribute('data-g'); }); if(!st.timer){ draw(); golds.forEach(function(g){ var el = box.querySelector('.bk-g[data-g="'+g+'"]'); if(el) el.classList.add('gold'); }); } return; }
+    if(e.target.closest('[data-go]')){ if(st.timer){ stop(); draw(); } else start(); return; }
+    if((b = e.target.closest('[data-ru]'))){ var m = document.getElementById('bkmsg'); if(m) m.textContent = '「'+b.getAttribute('data-ru')+'」在古代是入声字，算仄声。今天普通话里入声消失了，有的入声字读成第一、二声，按普通话判就容易错当平声。'; return; }
+    if(e.target.closest('[data-tap]')){
+      if(!st.timer) return;
+      var now = performance.now(), iv = 60000 / st.bpm, best = null;
+      st.sched.forEach(function(x){ if(!x.done && Math.abs(x.t - now) <= iv / 4 && (!best || Math.abs(x.t - now) < Math.abs(best.t - now))) best = x; });
+      if(best){ best.done = 1; st.hit++; var el = box.querySelector('.bk-g[data-g="'+best.g+'"]'); if(el) el.classList.add('gold'); }
+    }
+  };
+  draw();
 }
 
 function go(v){

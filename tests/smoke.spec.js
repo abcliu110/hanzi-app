@@ -184,6 +184,30 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('shici metronome and pingze grid', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/shici.html#poem-38');
+    await page.locator('[data-rb="metro"]').click();
+    await expect(page.locator('#scbeat .bk-g')).toHaveCount(12);
+    await page.locator('#scbeat [data-pzt]').click();
+    await expect(page.locator('#scbeat .bk-ru')).toHaveCount(6);
+    await expect(page.locator('#scbeat .bk-pz i.ping')).toHaveCount(9);
+    await page.locator('#scbeat [data-ru]').first().click();
+    await expect(page.locator('#bkmsg')).toContainText('入声');
+    await page.locator('#scbeat [data-bpm="100"]').click();
+    await page.locator('#scbeat [data-go]').click();
+    await expect(page.locator('#scbeat .bk-g.lit')).toHaveCount(1, { timeout: 3000 });
+    await page.locator('#scbeat [data-go]').click();
+    // 没有逐首校过平仄的诗只做节奏
+    await page.goto('about:blank');
+    await page.goto('newhanzi/shici.html#poem-136');
+    await page.locator('[data-rb="metro"]').click();
+    await expect(page.locator('#scbeat .bk-g')).toHaveCount(12);
+    await expect(page.locator('#scbeat [data-pzt]')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

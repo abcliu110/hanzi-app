@@ -29,7 +29,7 @@
 | A16 | P4 | gaijin/luoji P0-1 | 逻辑「套圈判官」euler 模板 + 三段论场景 | ✅ 见执行日志 |
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | ✅ 见执行日志 |
 | A18 | P4 | gaijin/luoji P0-3 | 谬误卡牌册（重组现有「常见谬误」内容） | ✅ 见执行日志 |
-| A19 | P4 | gaijin/shici P0-2 / P0-3 | `scroll` 水墨长卷模板；节奏打拍器 + 平仄格 | 待做（L/M） |
+| A19 | P4 | gaijin/shici P0-2 / P0-3 | `scroll` 水墨长卷模板；节奏打拍器 + 平仄格 | 打拍器+平仄格 ✅（见执行日志）；scroll 待做 |
 | A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | ✅ 见执行日志 |
 | A21 | P4 | gaijin/guwen P0-A / P0-B | 逐字对译点读（需逐句标注 对/停/式）；morph 句式拆装（与语法区共用 morph） | 待做（L） |
 | A22 | P4 | gaijin 三份 P1/P2 | 逻辑 P1-1…P2-5、古诗 P1-1…P2-5、古文 P1-A…P2-E | 待做（P0 之后） |
@@ -89,7 +89,8 @@
 - A17 · ac1fed22 · wb-engine.js 新模板 `chain`（方框+顺向箭头、lit 点亮、reverse 反向箭头打叉+旁人、cross、backfire 否定后件回灭）；wb/s/lj_shiwuguan.js 3 tab 5 幕（过于执/袁滋/对照，分镜与素材按设计 (e)-2，统编选必上第四单元）。logic 区没有「如果…就…」专题（新增专题要改 yuwen/data.js，已被 F1 领取），先挂「推理三兄弟：演绎/归纳/类比」（专题全名，修正见下一条）；互动页 games/luoji/fanpai.html 翻牌验证 2 题（十五贯、图书馆），翻后显示 2×2 真值格与「抓现行」格，反馈文案按设计，首答进错题本；index 逻辑专题入口；lint 0 错、check_wb 过、基线 770 幕一致；smoke 加用例。待办：F1 释放 yuwen/** 后新增「如果…就…」专题并改挂
 - A17 修正 · b916d42f · 白板索引、场景名、首页入口改用专题全名「推理三兄弟：演绎/归纳/类比」（yuwen.js / index.html 按 it.name 精确匹配，短名不出按钮）；基线改键
 - 环境 · — · 09:30 左右沙箱重置，~/.ssh 与 Playwright 浏览器丢失；已生成新 deploy key（GitHub 仓库 Settings → Deploy keys「hark-sandbox-2026-11-05」读写），私钥备份在仓库外 /workspace/work/wip/.sshbak，提交脚本 wip/commit.sh 缺钥时自动恢复
-- A18 · 本提交 · games/luoji/miuwu.html 谬误卡牌册：12 张卡分偷换类/因果类/转移类，定义、例子、口令逐条取自 yuwen/data.js 逻辑区（常见谬误、以偏概全、强加因果、自相矛盾）及设计 P0-3，无来源的卡不写口令只写要点；「出牌」16 句（取自同专题例子/练习/小测），答对解锁卡（localStorage nhz_fallacy_cards），答错进错题本；index「常见谬误」入口；check_scripts、smoke 过。卡背未接 data_logic.js 的误解标注（该文件属 F1，且误解标注未全量）；engine.js 内「答对一题解锁」未做（engine.js 有 F6 改动），改为卡牌页内出牌解锁
+- A18 · e0e6527c · games/luoji/miuwu.html 谬误卡牌册：12 张卡分偷换类/因果类/转移类，定义、例子、口令逐条取自 yuwen/data.js 逻辑区（常见谬误、以偏概全、强加因果、自相矛盾）及设计 P0-3，无来源的卡不写口令只写要点；「出牌」16 句（取自同专题例子/练习/小测），答对解锁卡（localStorage nhz_fallacy_cards），答错进错题本；index「常见谬误」入口；check_scripts、smoke 过。卡背未接 data_logic.js 的误解标注（该文件属 F1，且误解标注未全量）；engine.js 内「答对一题解锁」未做（engine.js 有 F6 改动），改为卡牌页内出牌解锁
+- A19（P0-3）· 本提交 · shici.html 诗详情阅读条加「🎵 打拍器」：按节拍分组排格子（逐首校过的 beats 优先，否则纯五言 2/3、纯七言 2/2/3，杂言不出），60/80/100 三档，WebAudio 合成木鱼每组一下、句间空一拍，点「拍」离最近一拍 ≤1/4 拍算准、该组亮金并计准拍数；「平仄格」只给逐首校过的诗（页内 SC_PZ，目前仅《登鹳雀楼》，按设计 (e) 之二并逐字核平水韵），长条=平、圆点=仄、红「入」角标点开说明、🔔 韵脚。未改 data/shici.js（属 F3）；其余近体诗平仄需 F3 释放后按平水韵生成+人工校再加 pz 字段；quiz 新题型 beat/tone 未做（engine.js 有 F6 改动）
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
