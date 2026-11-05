@@ -183,13 +183,14 @@ window.NHZReview = window.NHZReview || (function () {
   var currentItems = {};
   var MODS = [
     {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
-    {id:'xuci', icon:'🔤', t:'虚词', d:'21个点 · 用法、例句、辨析、题库', parent:'yufa'},
-    {id:'shici', icon:'📝', t:'实词', d:'120个点 · 含55个初中优先'},
-    {id:'yufa', icon:'🧩', t:'语法', d:'句子成分、特殊句式、固定句式、虚词、词类活用'},
-    {id:'tongjia', icon:'🔁', t:'通假', d:'16个点 · 通假字读本字'},
-    {id:'guyin', icon:'⚖️', t:'古今异义', d:'16个点 · 古今意思大不同'},
-    {id:'duoyi', icon:'🌿', t:'一词多义', d:'12个点 · 一字多义看语境'},
-    {id:'huoyong', icon:'🔄', t:'词类活用', d:'按类型 · 换词性换意思', parent:'yufa'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'句式、实词、虚词、词类活用、通假、古今异义、一词多义'},
+    /* 以下属于语法（parent:'yufa'），首页不出现，从语法页的子面板进入；顺序即语法页面板顺序 */
+    {id:'shici', icon:'📝', t:'实词', d:'含55个初中优先', parent:'yufa'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'用法、例句、辨析、题库', parent:'yufa'},
+    {id:'huoyong', icon:'🔄', t:'词类活用', d:'换词性换意思', parent:'yufa'},
+    {id:'tongjia', icon:'🔁', t:'通假', d:'通假字读本字', parent:'yufa'},
+    {id:'guyin', icon:'⚖️', t:'古今异义', d:'古今意思大不同', parent:'yufa'},
+    {id:'duoyi', icon:'🌿', t:'一词多义', d:'一字多义看语境', parent:'yufa'},
     {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
     {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
     {id:'wenhua', icon:'🏺', t:'文化常识', d:'器物、度量衡、历法、节日、地理'},
@@ -261,9 +262,11 @@ window.NHZReview = window.NHZReview || (function () {
   /* ---------- 子模块列表（语法模块式 panel 网格） ---------- */
   function showNav(){
     hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
-    /* 虚词、词类活用属于语法（parent:'yufa'），首页不与语法并列，从语法页的子面板进入 */
+    /* 属于语法的子模块（parent:'yufa'）首页不与语法并列，从语法页的子面板进入 */
     var h = '<div class="yw-grid">' + MODS.filter(function(m){ return !m.parent; }).map(function(m){
       var n = m.id==='pianmu' ? D.texts.length : (catById(m.id) ? catById(m.id).items.length : 0);
+      /* 语法卡的点数 = 语法条目 + 其下各子面板条目 */
+      if(m.id==='yufa') MODS.forEach(function(c){ if(c.parent==='yufa' && catById(c.id)) n += catById(c.id).items.length; });
       var unit = m.id==='pianmu' ? '篇' : '点';
       return '<button class="yw-head" data-mod="'+esc(m.id)+'"><span class="yw-ico">'+m.icon+'</span><span class="yw-name">'+esc(m.t)+'</span><span class="yw-sub">'+n+unit+' · '+esc(m.d)+'</span><span class="yw-arrow">▾</span></button>';
     }).join('') + '</div>';
@@ -762,7 +765,7 @@ window.NHZReview = window.NHZReview || (function () {
       return itemHtml(it, curMod+'_'+idx, meta.icon, curMod);
     }).join('') + '</div>';
   }
-  /* 语法页 = 子面板：句子成分、特殊句式、固定句式（yufa 条目按 subtitle 分组）+ 虚词、词类活用（parent:'yufa' 的子模块）+ 总说 */
+  /* 语法页 = 子面板：句子成分、特殊句式、固定句式（yufa 条目按 subtitle 分组）+ parent:'yufa' 的子模块（实词、虚词、词类活用、通假、古今异义、一词多义）+ 总说 */
   var YUFA_GROUPS = [
     {g:'句子成分', icon:'🧱', d:'主谓宾定状补，古今不同处'},
     {g:'特殊句式', icon:'🔀', d:'判断、被动、倒装、省略'},
