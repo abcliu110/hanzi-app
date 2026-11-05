@@ -14,6 +14,7 @@
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
  *   scroll 古诗诗画同生（一句一拍、只画本句物件、颜色字上色、收卷）
+ *   route  诗人足迹地图（简化中国 + 按年份连站 + 点站弹卡，A22-13）
  *   chain  逻辑条件箭头链（顺推 / 倒推打叉 / 否定后件回灭）
  *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）；pair 两圈四关系 全同 / 包含 / 交叉 / 全异（A22-3）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
@@ -1604,6 +1605,145 @@
     (d.marks || []).forEach(function (m, i) {
       q.beat(m.say || null, function (t) { var p = (SOBJ[m.at] || {}).at || [W / 2, 300]; c.R('circle', [p[0], p[1], 46], { stroke: ACC, strokeWidth: 3 }, t, .4); c.T(p[0], p[1] + 12, m.t, { size: 34, color: ACC, bold: 1 }, t + .3, .3); return .9; }, { gap: .15 });
     });
+  };
+
+  /* route（古诗「诗人足迹地图」，设计 docs/gaijin/shici-gaijin-sheji.md P1-1）：
+   * {t:'李白', sub:'701–762 · 8 站', places:[{name:'峨眉山', x:482, y:331, year:725, poems:['峨眉山月歌'], note, tag}],
+   *  say:'开场白', end:'收尾一句'}
+   * 第 0 拍画简化中国轮廓（只画大致边境 + 黄河长江示意线，不追求精确）+ 年份轴；之后每站一拍：
+   * rough 线连上站、站点圆点 + 地名 + 年份（tag 有值时缀 tag，如「通行说法」）、点站点圆点弹出卡片
+   * （该地诗题 + 同地其他诗人，读 window.NHZ_POET_TRAILS，未加载则只显示本诗人）。
+   * 坐标：x 西→东、y 南→北，均为 0–1000；底部年份轴即时间滑块的刻度，拖动进度条按年份回放。
+   * places 缺省时按 d.t 到 window.NHZ_POET_TRAILS 里找该诗人的 trail。 */
+  var ROUTE_CHINA = [[1000, 1000], [885, 914], [754, 914], [508, 914], [213, 886], [0, 629], [66, 400], [180, 286], [393, 171], [508, 114], [590, 86], [721, 171], [770, 343], [787, 543], [820, 629], [1000, 1000]];
+  var ROUTE_YELLOW = [[393, 514], [492, 514], [525, 571], [590, 657], [656, 600], [705, 543], [738, 557]];
+  var ROUTE_YANGTZE = [[377, 429], [492, 400], [541, 343], [607, 357], [656, 371], [738, 400], [770, 386]];
+  var ROUTE_RIVER = '#5f9fb3';
+  function routeXY(p) { return [80 + p[0] * 1.04, 510 - p[1] * 0.40]; }
+  /* 文本框模型（与 check_wb.py 的帧检查同口径：实测字高≈字号×1.45，升部≈字号×1.15）；
+   * 两框相交面积 > 较小者 25% 才算重叠，否则放行（避免 combined 矩形误杀）。 */
+  function routeBox(cx, w, base, size) { return { x0: cx - w / 2, x1: cx + w / 2, y0: base - size * 1.15, y1: base + size * 0.3 }; }
+  function routeHit(a, b) {
+    var ix = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)), iy = Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+    return ix * iy > 0.25 * Math.min((a.x1 - a.x0) * (a.y1 - a.y0), (b.x1 - b.x0) * (b.y1 - b.y0));
+  }
+  TPL.route = function (c, q, d) {
+    var places = d.places;
+    if (!places || !places.length) {
+      var TR = window.NHZ_POET_TRAILS || { poets: [] }, found = null;
+      TR.poets.forEach(function (p) { if (p.name === d.t) found = p; });
+      places = found ? found.trail.map(function (s) { return { name: s.place, x: s.x, y: s.y, year: s.year, poems: s.poems || [], note: s.note, tag: s.tag }; }) : [];
+    }
+    var n = places.length, pts = places.map(function (p) { return routeXY([p.x, p.y]); });
+    var yMin = n ? places[0].year : 0, yMax = n ? places[0].year : 0, i, j;
+    places.forEach(function (p) { if (p.year < yMin) yMin = p.year; if (p.year > yMax) yMax = p.year; });
+    var span = Math.max(1, yMax - yMin);
+    function ax(year) { return 80 + (year - yMin) / span * 1040; }
+    var AXIS_Y = 528, popup = null, marker = null;
+    /* 标签错峰的已占文本框：先把标题、副标题、两河名、年份轴刻度字都算进去，站名标签不再撞上它们 */
+    var placed = [];
+    (function () {
+      placed.push(routeBox(W / 2, textW(d.t + '的一生足迹', 36), 46, 36));
+      if (d.sub) placed.push(routeBox(W / 2, textW(d.sub, 22), 74, 22));
+      var yel = routeXY([656, 600]), yzt = routeXY([656, 371]);
+      placed.push(routeBox(yel[0], textW('黄河', 18), yel[1] - 12, 18));
+      placed.push(routeBox(yzt[0], textW('长江', 18), yzt[1] + 26, 18));
+      var lastA = -1e9;
+      places.forEach(function (p) { var a = ax(p.year); if (Math.abs(a - lastA) >= 36) { placed.push(routeBox(a, textW(String(p.year), 16), AXIS_Y + 22, 16)); lastA = a; } });
+    })();
+    /* 弹出卡片：点站点时填内容并显示，点卡片收起（stopPropagation，不触发播放切换） */
+    function showPopup(st, sp) {
+      if (!popup) return;
+      var others = [], TR2 = window.NHZ_POET_TRAILS || { poets: [] };
+      TR2.poets.forEach(function (p) {
+        if (p.name === d.t) return;
+        (p.trail || []).forEach(function (s) { if (s.place === st.name && others.indexOf(p.name) < 0) others.push(p.name); });
+      });
+      var lines = [], title = st.name + ' · ' + st.year + '年' + (st.tag ? ' · ' + st.tag : '');
+      lines.push(title);
+      if (st.poems && st.poems.length) lines.push('此地写的诗：' + st.poems.map(function (t0) { return '《' + t0 + '》'; }).join('、'));
+      else lines.push('此地写的诗：诗库未收此地之作');
+      if (st.note) lines.push(st.note);
+      if (others.length) lines.push('也来过这里：' + others.join('、'));
+      lines.push('点一下卡片收起');
+      var est = 0; lines.forEach(function (ln) { est += Math.max(1, Math.ceil((ln.length * 22) / 260)); });
+      var h = 24 + est * 28 + 14, w = 300, px = sp[0] + 26, py = sp[1] - 16;
+      if (px + w > 1180) px = sp[0] - w - 26;
+      if (py + h > 528) py = 528 - h;
+      if (py < 92) py = 92;
+      c.into(popup, function () {
+        while (popup.firstChild) popup.removeChild(popup.firstChild);
+        c.E('rect', { x: px, y: py, width: w, height: h, rx: 12, fill: '#ffffff', stroke: INK, 'stroke-width': 2 });
+        var yy = py + 30;
+        lines.forEach(function (ln, k) {
+          var col = k === 0 ? INK : k === lines.length - 1 ? GRAY : INK, sz = k === 0 ? 24 : 20;
+          yy += wrap(c, ln, px + w / 2, yy, w - 24, sz, col, 0) * sz * 1.3 - 6;
+        });
+      });
+      popup.style.display = '';
+    }
+    /* 第 0 拍：标题 + 简化中国 + 两河 + 年份轴 + 年份标记 */
+    q.beat(d.say || (d.t + '的一生足迹：从' + (n ? places[0].name : '') + '到' + (n ? places[n - 1].name : '') + '，共' + n + '站。'), function (t) {
+      c.T(W / 2, 46, d.t + '的一生足迹', { size: 36, bold: 1 }, t, .8);
+      if (d.sub) c.T(W / 2, 74, d.sub, { size: 22, color: GRAY }, t + .3, .6);
+      c.R('linearPath', [ROUTE_CHINA.map(routeXY)], { stroke: INK, strokeWidth: 2.2 }, t + .5, 1.4);
+      c.R('linearPath', [ROUTE_YELLOW.map(routeXY)], { stroke: ROUTE_RIVER, strokeWidth: 2 }, t + 1.2, .8);
+      c.R('linearPath', [ROUTE_YANGTZE.map(routeXY)], { stroke: ROUTE_RIVER, strokeWidth: 2 }, t + 1.6, .8);
+      var hainan = routeXY([590, 29]), taiwan = routeXY([800, 171]);
+      c.R('ellipse', [hainan[0], hainan[1], 26, 34], { stroke: INK, strokeWidth: 1.8 }, t + 2.0, .3);
+      c.R('ellipse', [taiwan[0], taiwan[1], 14, 30], { stroke: INK, strokeWidth: 1.8 }, t + 2.2, .3);
+      var yel = routeXY([656, 600]), yzt = routeXY([656, 371]);
+      c.T(yel[0], yel[1] - 12, '黄河', { size: 18, color: ROUTE_RIVER }, t + 2.0, .4);
+      c.T(yzt[0], yzt[1] + 26, '长江', { size: 18, color: ROUTE_RIVER }, t + 2.2, .4);
+      c.R('line', [ax(yMin) - 30, AXIS_Y, ax(yMax) + 30, AXIS_Y], { stroke: INK, strokeWidth: 2 }, t + 2.4, .5);
+      var lastAx = -1e9;
+      places.forEach(function (p) {
+        var a = ax(p.year);
+        c.R('line', [a, AXIS_Y - 6, a, AXIS_Y + 6], { stroke: INK, strokeWidth: 2 }, t + 2.6, .2);
+        if (Math.abs(a - lastAx) >= 36) { c.T(a, AXIS_Y + 22, String(p.year), { size: 16, color: GRAY }, t + 2.8, .3); lastAx = a; }
+      });
+      marker = c.G(function () { c.E('circle', { cx: ax(yMin), cy: AXIS_Y, r: 10, fill: ACC, stroke: '#ffffff', 'stroke-width': 2 }); });
+      c.show(marker, t + 2.4);
+      popup = c.G(function () {});
+      popup.style.display = 'none';
+      popup.addEventListener('click', function (ev) { ev.stopPropagation(); popup.style.display = 'none'; });
+      return 3.1;
+    });
+    /* 每站一拍：连线 → 圆点 → 地名 + 年份（标签错峰防重叠）→ 年份标记移到本站 */
+    places.forEach(function (st, si) {
+      var sp = pts[si];
+      var say = st.say || (st.year + '年，' + d.t + '来到' + st.name + '。' + ((st.poems && st.poems.length) ? '在这里写下了' + st.poems.map(function (t0) { return '《' + t0 + '》'; }).join('、') + '。' : '') + (st.note || ''));
+      q.beat(say, function (t) {
+        if (si > 0) c.R('line', [pts[si - 1][0], pts[si - 1][1], sp[0], sp[1]], { stroke: ACC, strokeWidth: 3 }, t, .8);
+        c.R('circle', [sp[0], sp[1], 28], { fill: ACC, fillStyle: 'solid', stroke: ACC }, t + .6, .4);
+        var yStr = st.year + '年' + (st.tag ? ' · ' + st.tag : '');
+        var offs = [-30, 34, 68, 102, 136, -64, -98, -132, 170, -166], dy = sp[1] - 30, k, placedOk = false;
+        function tryDy(d) {
+          var nb = routeBox(sp[0], textW(st.name, 22), d, 22), yb = routeBox(sp[0], textW(yStr, 18), d + 26, 18);
+          for (j = 0; j < placed.length; j++) if (routeHit(nb, placed[j]) || routeHit(yb, placed[j])) return false;
+          placed.push(nb); placed.push(yb); return true;
+        }
+        for (k = 0; k < offs.length && !placedOk; k++) { dy = sp[1] + offs[k]; placedOk = tryDy(dy); }
+        for (k = 1; k <= 12 && !placedOk; k++) { dy = sp[1] - 30 - k * 34; placedOk = tryDy(dy); }
+        for (k = 1; k <= 12 && !placedOk; k++) { dy = sp[1] + 170 + k * 34; placedOk = tryDy(dy); }
+        if (!placedOk) dy = sp[1] - 30;
+        var lab = c.G(function () {
+          c.T(sp[0], dy, st.name, { size: 22, bold: 1 }, t + 1.0, .4);
+          c.T(sp[0], dy + 26, yStr, { size: 18, color: GRAY }, t + 1.2, .3);
+        });
+        var hitC = c.E('circle', { cx: sp[0], cy: sp[1], r: 30, fill: '#ffffff', 'fill-opacity': 0 });
+        c.show(hitC, t + .6); c.show(lab, t + 1.0);
+        function open(ev) { if (ev) ev.stopPropagation(); showPopup(st, sp); }
+        hitC.addEventListener('click', open);
+        lab.addEventListener('click', open);
+        if (marker) c.move(marker, { t: t + .6, x: ax(st.year) - ax(yMin), y: 0, d: .8 });
+        return 1.6;
+      });
+    });
+    /* 收尾拍：只念不画，字幕里回顾全程 */
+    var chain = places.map(function (p) { return p.name; }).join(' → ');
+    var total = 0; places.forEach(function (p) { total += (p.poems || []).length; });
+    q.beat(d.end || (d.t + '一生 ' + n + ' 站，写下 ' + total + ' 首诗：一路走过' + chain + '。'), null);
   };
 
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
