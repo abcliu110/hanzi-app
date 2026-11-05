@@ -108,6 +108,8 @@ window.NHZ_WB_INDEX = {
   "举例论证": "lj_map_juli",
   "道理论证": "lj_map_daoli",
   "对比论证": "lj_map_duibi",
+  /* 逻辑区 P1-4 四大规律法庭（A22-4，vs + 法槌） */
+  "四大逻辑规律": "lj_fating",
   /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
   /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */

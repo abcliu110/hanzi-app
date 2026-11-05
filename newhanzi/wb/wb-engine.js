@@ -19,6 +19,7 @@
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
  *   tree   逻辑论证地图（论点 / 论据 / 补强卡挂树 + 虚拟论敌气泡，A22-7）
+ *   （vs 的一栏加 gavel:1 时在栏右上角敲一下法槌，用于逻辑「四大规律法庭」判决，A22-4）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
  */
 (function () {
@@ -303,6 +304,17 @@
     });
     return out;
   };
+  /* 法槌（A22-4 四大规律法庭）：槌头抬起 → t0 起 .35 秒落下敲在底座上 → 两道震线。(x,y) 为底座顶边中心，占 x-73…x+32 */
+  Ctx.prototype.gavel = function (x, y, t0) {
+    var s = this, o = { stroke: INK, strokeWidth: 2.4, roughness: .6 }, hd = this.G(function () {
+      s.R('rectangle', [x - 24, y - 46, 14, 44], o, t0 - .5, .3);
+      s.R('rectangle', [x - 73, y - 28, 49, 9], o, t0 - .3, .2);
+    });
+    this.R('rectangle', [x - 34, y, 68, 10], o, t0 - .5, .3);
+    this.add(function (t) { var a = -40 * (1 - ease(P(t, t0, .35))); hd.setAttribute('transform', 'rotate(' + Math.round(a * 100) / 100 + ' ' + (x - 73) + ' ' + (y - 24) + ')'); });
+    this.R('line', [x - 2, y - 12, x + 20, y - 28], { stroke: INK, strokeWidth: 3, roughness: .5 }, t0 + .35, .15);
+    this.R('line', [x + 2, y - 2, x + 30, y - 6], { stroke: INK, strokeWidth: 3, roughness: .5 }, t0 + .45, .15);
+  };
   /* 想一想：右上角倒计时圈 */
   Ctx.prototype.think = function (t0) {
     var s = this, cx = W - 56, cy = 50;
@@ -448,6 +460,7 @@
       q.beat(side.say || (side.t + '：' + (side.s ? side.s.join('') : '') + (side.n ? '。' + side.n : '')), function (t) {
         c.box(cx - 270, top, 540, 360, t, { stroke: si ? BLUE : INK });
         if (side.t) c.T(cx, top + 70, side.t, { size: 52, bold: 1, color: si ? BLUE : INK }, t + .3, .5);
+        if (side.gavel) c.gavel(cx + 230, top + 112, t + .6);
         var y = top + 180, toks = side.s ? c.sentence(y, side.s, t + .8, { size: side.size || 40, cx: cx }) : null;
         if (toks && side.k !== undefined) [].concat(side.k).forEach(function (k) { c.recolor(toks[k].g, t + .8 + side.s.length * .3 + .3, ACC); c.under(toks[k].x0 - 3, toks[k].x1 + 3, y + 14, t + .8 + side.s.length * .3 + .3); });
         if (side.n) wrap(c, side.n, cx, top + 270, 480, 26, si ? BLUE : INK, t + 1.6 + (side.s ? side.s.length * .3 : 0));

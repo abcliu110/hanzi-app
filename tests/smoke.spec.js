@@ -511,6 +511,21 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic four laws court whiteboard (A22-4 vs + gavel)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/index.html');
+    await page.locator('#view-home .panel[data-m="logic"]').click();
+    const name = '四大逻辑规律';
+    await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+    const wb = page.locator('#logiclist .yw-wb[data-lwb="' + name + '"]');
+    await wb.locator('[data-lwb-start]').click();
+    await expect(wb.locator('svg').first()).toBeVisible({ timeout: 10000 });
+    await expect(wb.locator('.wb-tabs button')).toHaveCount(6);
+    await expect(wb.locator('.wb-tabs')).toContainText('充足理由律');
+    expect(errors).toEqual([]);
+  });
+
   test('logic tag questions render as argument map (A22-7)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
