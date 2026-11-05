@@ -220,3 +220,5 @@
 | F6 部首+界面+识字题 | newhanzi/bushou/**、bushou.js、quiz/data_bushou.js、quiz/data_zika.js、quiz/engine.js（仅选项洗牌）、index/share/shici 页的数字文案 | fix-bushou-ui.md |
 - 测试修复 · pinyin.spec 厂 hǎn · newhanzi/tools/pinyin_fix.json rare 厂 由 [ān] 改为 [hǎn, ān]（与 5aa86d4d 同步，汉典确认），pinyin.spec 2 passed
 - A22-11 · bb1de579 · shici.html 意象地图圆环改为 19 张可翻卡（平板 4 列/桌面 5 列）：正面意象字（月柳雁取「图示」左半线稿、去文字），翻面看 mean+desc，「看诗句」展开 3 句原句（作者《题》可点开那首诗），「完整讲解」进原详情；例句只取 imagery.line（核到原文才用）→ imagery.poems → shiju 倒排含该字的句，排除燕山/燕然/雪白/四海这类非意象用法；openPoem 记 localStorage nhz_shici_read，读过含该字或该意象自带的诗即点亮；smoke 加用例、anim3 改入口，shici/意象相关 58 例过，1280/820 截图 0 报错。内容疑点：imagery「柳」挂《咏柳》、「竹」挂《竹里馆》，两诗原文不含该字（意象成立，倒排点亮按该意象自带诗也算）；「柳」图示 SVG 文字引「碧玉妆成一树高」但 line 字段是「客舍青青柳色新」，未改（shici.js 属 F3）
+- Z 字卡 · 1c2a4f9f · 六书 vs《说文》不一致 68 字逐字核汉典：改 chip 7 字（世 唬 思 染 氓 琴 量）、换错字头说文条 2 字（折 征）、56 卡补六书依据写明各家说法，误报 14 字不动（fix_zika_z_liushu.py）
+- Z 字卡 · 本提交 · 拼音轻声去「·」6 字（呐 子 慌 末 著 阿，字卡 + pinyin_lookup.js），朗读不再读出「·」（fix_zika_z_qingsheng.py），日志 fix-zika-b.md
