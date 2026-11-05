@@ -250,4 +250,10 @@ window.NHZ_WB_INDEX = {
   "以（文言）": "wy_yi",
   "于（文言）": "wy_yu",
   "乎（文言）": "wy_hu",
+  /* Q13 新增 50 项（docs/yufa-neirong/07）：标点符号 */
+  "引号": "bd_yinhao",
+  "冒号": "bd_maohao",
+  "顿号与分号": "bd_dunfen",
+  "破折号": "bd_pozhe",
+  "省略号": "bd_shenglue",
 };
