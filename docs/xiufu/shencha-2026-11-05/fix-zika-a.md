@@ -25,3 +25,5 @@ node /tmp/zs/zika_load.js && python3 /tmp/zs/zika_scan.py   # 再按本段字表
 
 ## 未修 / 断点
 （随批次更新）
+
+- 2026-11-05 起由接手线 Z（hark-shencha2）统一处理 1–3500 字的剩余问题，日志与断点写在 fix-zika-b.md「接手线 Z 日志」。形近字已按全量重做（见 fix-zika-b.md）。
