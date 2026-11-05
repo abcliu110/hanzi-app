@@ -12,6 +12,22 @@
   'use strict';
   var banner = null;
   var deferred = null;
+  var DISMISS_KEY = 'nhz_install_dismissed'; /* sessionStorage：本会话内点过[不用了]/[知道了]后不再出现 */
+
+  function dismissedThisSession() {
+    try { return sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { return false; }
+  }
+  function dismissForSession() {
+    try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+  }
+  /* 与 eye-care.js 的横幅共用同一排位：底部从 12px 起向上叠放，不重叠 */
+  function restack() {
+    var els = document.querySelectorAll('[data-nhz-banner]'), b = 12;
+    Array.prototype.forEach.call(els, function (el) {
+      el.style.bottom = b + 'px';
+      b += el.offsetHeight + 8;
+    });
+  }
 
   function isStandalone() {
     return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
@@ -22,17 +38,19 @@
     return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   }
   function hide() {
-    if (banner) { banner.remove(); banner = null; }
+    if (banner) { banner.remove(); banner = null; restack(); }
   }
   function show(html) {
-    if (banner || isStandalone()) return;
+    if (banner || isStandalone() || dismissedThisSession()) return;
     banner = document.createElement('div');
     banner.setAttribute('role', 'status');
+    banner.setAttribute('data-nhz-banner', 'install');
     banner.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:998;' +
       'background:var(--card);border:1px solid var(--line);border-radius:12px;' +
       'padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.08)';
     banner.innerHTML = html;
     document.body.appendChild(banner);
+    restack();
   }
 
   window.addEventListener('beforeinstallprompt', function (e) {
@@ -50,7 +68,7 @@
       if (d.prompt) d.prompt();
       hide();
     });
-    if (dismissBtn) dismissBtn.addEventListener('click', hide);
+    if (dismissBtn) dismissBtn.addEventListener('click', function () { dismissForSession(); hide(); });
   });
 
   window.addEventListener('appinstalled', function () {
@@ -62,6 +80,6 @@
     show('<span style="flex:1;font-size:15px">📲 iPhone 安装：点底部分享按钮 → “添加到主屏幕”，就能像 App 一样打开识字星球。</span>' +
       '<button type="button" id="pwaIosOk" style="background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:bold;color:var(--ink);cursor:pointer">知道了</button>');
     var okBtn = document.getElementById('pwaIosOk');
-    if (okBtn) okBtn.addEventListener('click', hide);
+    if (okBtn) okBtn.addEventListener('click', function () { dismissForSession(); hide(); });
   }
 })();

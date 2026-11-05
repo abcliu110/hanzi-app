@@ -63,5 +63,5 @@
 ## 6. 相关
 
 - 产品 Spec：`SPEC.md`
-- 仓库级说明：`../docs/frontend-ui.md`
+- 仓库级说明：`docs/frontend-ui.md`
 - Agent 规则：`../.cursor/rules/frontend-ui.mdc`、本目录若有规则以仓库规则为准

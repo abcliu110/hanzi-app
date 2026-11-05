@@ -742,9 +742,9 @@ function onTap(el) {
 
 /* ---------- 数据加载（script 注入，file:// 可用） ---------- */
 function loadData(tab) {
-  var done = false;
-  function ready() {
-    if (done) return; done = true;
+  var settled = false, extra = null;
+  /* 每次都按当前 window.NHZ_* 重算，可重复调用：数据晚到时再调一次即可生效 */
+  function apply() {
     var D = window.NHZ_QUIZ;
     if (D && D.modes) {
       S.title = D.title || '';
@@ -782,9 +782,13 @@ function loadData(tab) {
         if (sh.length) S.modes.short = sh;
       }
     }
-    renderHome();
   }
-  var extra = null;
+  /* 数据真正加载完成（含古文篇目）时调用。答题中途到达时只更新题库，不把用户踢回首页 */
+  function ready() {
+    settled = true;
+    apply();
+    if (S.view === 'home') renderHome();
+  }
   function addScript(src, cb) {
     var el = document.createElement('script');
     el.src = src; el.onload = cb; el.onerror = cb;
@@ -808,7 +812,13 @@ function loadData(tab) {
     });
     });
   });
-  setTimeout(ready, 4000); /* 兜底：file:// 某些环境不上报 onerror */
+  /* 兜底（4 秒）：file:// 某些环境既不报 onload 也不报 onerror 时先显示已有内容。
+     不标记 settled，所以数据之后到达时 ready() 仍会应用，不会锁死题库 */
+  setTimeout(function () {
+    if (settled) return;
+    apply();
+    renderHome();
+  }, 4000);
 }
 
 /* ---------- 初始化 ---------- */

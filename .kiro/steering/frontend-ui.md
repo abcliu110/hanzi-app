@@ -1,0 +1,14 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/*.{html,css,js,md}']
+---
+
+# 前端 UI 规范（必读）
+
+完整说明：`newhanzi/docs/frontend-ui.md`、`newhanzi/FRONTEND_UI.md`。
+
+- `newhanzi/` 使用护眼 token（`zika.css`）：`--bg #e4eedf`、`--card #f2f6ee`、`--surface #f8faf5`、`--ink #2c3328`、`--accent #4a7a59`、`--accent-deep #3d5a40`、`--accent-soft #d3e5d6`、`--line #d5dfd0`。
+- 仓库根旧页使用 `--xzq-*`（`xzq-theme.css`），不要与 newhanzi token 混用。
+- 每个 newhanzi 页面都要做平板 ≥768 与桌面 ≥1200，不只首页。
+- 禁止主色奶油纸与亮蓝紫；Grid hero 注意 `align-self: start`。
+- 语义红用柔和 `#b85a52`，尊重 `prefers-reduced-motion` / 深色模式。

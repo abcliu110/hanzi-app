@@ -6,7 +6,7 @@ alwaysApply: false
 
 # 前端 UI 规范（必读）
 
-完整说明：`docs/frontend-ui.md`、`newhanzi/FRONTEND_UI.md`。
+完整说明：`newhanzi/docs/frontend-ui.md`、`newhanzi/FRONTEND_UI.md`。
 
 - `newhanzi/` 使用护眼 token（`zika.css`）：`--bg #e4eedf`、`--card #f2f6ee`、`--surface #f8faf5`、`--ink #2c3328`、`--accent #4a7a59`、`--accent-deep #3d5a40`、`--accent-soft #d3e5d6`、`--line #d5dfd0`。
 - 仓库根旧页使用 `--xzq-*`（`xzq-theme.css`），不要与 newhanzi token 混用。

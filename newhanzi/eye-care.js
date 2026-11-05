@@ -29,10 +29,25 @@
   var minutes = 0;
   var banner = null;
 
+  /* 与 install.js 的横幅共用同一排位：底部从 12px 起向上叠放，不重叠 */
+  function restack() {
+    var els = document.querySelectorAll('[data-nhz-banner]'), b = 12;
+    Array.prototype.forEach.call(els, function (el) {
+      el.style.bottom = b + 'px';
+      b += el.offsetHeight + 8;
+    });
+  }
+  function removeBanner() {
+    banner.remove();
+    banner = null;
+    restack();
+  }
+
   function show() {
     if (banner) return;
     banner = document.createElement('div');
     banner.setAttribute('role', 'status');
+    banner.setAttribute('data-nhz-banner', 'eye');
     banner.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:999;' +
       'background:var(--card);border:1px solid var(--line);border-radius:12px;' +
       'padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.08)';
@@ -41,17 +56,16 @@
       '<button type="button" id="eyeOk" style="background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:bold;color:var(--ink);cursor:pointer">知道了</button>' +
       '<button type="button" id="eyeMute" style="background:none;border:none;padding:8px 4px;font-size:14px;color:var(--ink);opacity:.75;cursor:pointer;text-decoration:underline">今日不再提醒</button>';
     document.body.appendChild(banner);
+    restack();
     document.getElementById('eyeOk').addEventListener('click', function () {
-      banner.remove();
-      banner = null;
+      removeBanner();
       minutes = 0; /* 仅关闭本次，下个 20 分钟块再提醒 */
     });
     document.getElementById('eyeMute').addEventListener('click', function () {
       var d = load();
       d.muted = todayStr();
       save(d);
-      banner.remove();
-      banner = null;
+      removeBanner();
       clearInterval(timer); /* 当天不再提醒：停掉计时，避免下一 tick 又弹 */
     });
   }

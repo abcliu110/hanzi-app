@@ -250,8 +250,9 @@
           var raw = localStorage.getItem(k);
           var map = raw ? JSON.parse(raw) : {};
           if (Array.isArray(map)) {
+            // 老数组格式没有学习日期，记作 'legacy'，不能盖上今天的日期
             var m2 = {};
-            map.forEach(function (x) { m2[x] = todayStr(); });
+            map.forEach(function (x) { m2[x] = 'legacy'; });
             map = m2;
           }
           if (!map[zi]) {

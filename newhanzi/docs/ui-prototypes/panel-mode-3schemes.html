@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>面板模式 · 三方案可点原型</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  :root{
+    --bg:#e8efe4; --paper:#f4f7f1; --card:#fbfcf9; --ink:#2c3328; --muted:#6b7566;
+    --acc:#4a7a59; --deep:#3d5a40; --line:#d5dfd0; --soft:#d3e5d6;
+    --warn:#8a5a48;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:#d9e4d4;color:var(--ink);min-height:100vh}
+  .page{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+  .intro h1{font-size:22px;color:var(--deep)}
+  .intro p{margin-top:6px;font-size:14px;color:var(--muted);line-height:1.6}
+  .scheme-switch{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+  .scheme-switch button{
+    border:1.5px solid var(--line);background:var(--card);color:var(--deep);
+    border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px;
+  }
+  .scheme-switch button.on{background:var(--deep);border-color:var(--deep);color:#fff}
+  .scheme-note{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.55;min-height:2.6em}
+  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .phone{
+    background:#1f2923;border-radius:28px;padding:12px;box-shadow:0 16px 40px rgba(30,50,35,.18);
+  }
+  .phone .bezel{background:var(--paper);border-radius:20px;overflow:hidden;min-height:640px;display:flex;flex-direction:column;position:relative}
+  .label{font-size:12px;color:#c8d6c4;text-align:center;margin-bottom:8px;font-weight:700}
+  .topbar{padding:14px 16px 10px;background:linear-gradient(135deg,var(--acc),#6fa87d);color:#f4faf5}
+  .topbar .tag{font-size:11px;opacity:.9}
+  .topbar h2{font-size:18px;margin-top:2px}
+  .body{padding:12px 14px 18px;flex:1;overflow:auto}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mcard{
+    background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px;
+    cursor:pointer;text-align:left;font:inherit;color:inherit;
+  }
+  .mcard:active{transform:scale(.98)}
+  .mcard .ic{font-size:22px}
+  .mcard b{display:block;margin:4px 0 2px;font-size:15px;color:var(--deep)}
+  .mcard span{font-size:12px;color:var(--muted);line-height:1.4}
+  .hero{
+    background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px;
+  }
+  .hero .row{display:flex;justify-content:space-between;align-items:baseline}
+  .hero strong{font-size:28px;color:var(--deep)}
+  .hero small{color:var(--muted);font-size:12px}
+  .seg{
+    display:flex;gap:6px;background:var(--soft);padding:4px;border-radius:12px;margin:10px 0 12px;
+  }
+  .seg button{
+    flex:1;border:0;background:transparent;border-radius:10px;padding:8px 6px;
+    font-weight:700;font-size:13px;color:var(--deep);cursor:pointer;
+  }
+  .seg button.on{background:var(--card);box-shadow:0 1px 3px rgba(45,80,50,.12)}
+  .list{display:grid;gap:8px}
+  .rowitem{
+    display:flex;gap:10px;align-items:center;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+  }
+  .zi{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--deep)}
+  .back{
+    border:0;background:transparent;color:#f4faf5;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:4px;
+  }
+  .screen{display:none;flex-direction:column;flex:1;min-height:0}
+  .screen.on{display:flex}
+  /* Scheme 1: simple shell */
+  .s1 .hint{font-size:12px;color:var(--muted);margin:8px 0 10px}
+  /* Scheme 2: stack panel */
+  .s2 .panel-frame{background:var(--paper);flex:1;display:flex;flex-direction:column}
+  /* Scheme 3: desktop dual */
+  .desk{display:none}
+  @media (min-width:900px){
+    .s3-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .s3-wrap .phone:first-child .desk-note{display:block}
+  }
+  .desk-note{display:none;font-size:12px;color:#c8d6c4;margin-top:8px;line-height:1.45}
+  .dual{
+    display:grid;grid-template-columns:92px 1fr;min-height:640px;background:var(--paper);border-radius:20px;overflow:hidden;
+  }
+  .dual .side{background:var(--card);border-right:1px solid var(--line);padding:12px 8px;display:flex;flex-direction:column;gap:6px}
+  .dual .side button{
+    border:0;background:transparent;text-align:left;padding:10px 8px;border-radius:10px;
+    font-size:12px;font-weight:700;color:var(--deep);cursor:pointer;
+  }
+  .dual .side button.on{background:var(--soft)}
+  .dual .main{padding:12px;overflow:auto}
+  .foot-nav{
+    display:flex;border-top:1px solid var(--line);background:var(--card);
+  }
+  .foot-nav button{
+    flex:1;border:0;background:transparent;padding:10px 4px;font-size:11px;color:var(--muted);cursor:pointer;
+  }
+  .foot-nav button.on{color:var(--deep);font-weight:800}
+  .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--deep);font-weight:700}
+  .proto-bar{position:sticky;top:0;z-index:5;background:rgba(217,228,212,.92);backdrop-filter:blur(8px);padding:10px 0 8px;margin:-4px 0 8px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>面板模式 · 三方案可点原型</h1>
+    <p>无常驻顶部 Tab。选定方向：首页模块入口卡片 → 点进面板。下面三个方案都可点进「识字」面板，并切换一级 / 二级 / 全部。</p>
+  </div>
+
+  <div class="proto-bar">
+    <div class="scheme-switch" id="schemeSwitch">
+      <button type="button" class="on" data-s="1">方案 1 · 纯卡片壳</button>
+      <button type="button" data-s="2">方案 2 · 面板栈</button>
+      <button type="button" data-s="3">方案 3 · 桌面双栏</button>
+    </div>
+    <p class="scheme-note" id="schemeNote"></p>
+  </div>
+
+  <!-- ===== Scheme 1 ===== -->
+  <div class="phones scheme" id="scheme1">
+    <div>
+      <div class="label">汉字 App · 方案 1</div>
+      <div class="phone s1">
+        <div class="bezel">
+          <div class="screen on" data-screen="home">
+            <div class="topbar">
+              <div class="tag">识字星球</div>
+              <h2>今天学什么</h2>
+            </div>
+            <div class="body">
+              <div class="hero">
+                <div class="row"><strong>128</strong><small>已学 / 3500</small></div>
+                <small>今日新字 6 · 待复习 3</small>
+              </div>
+              <p class="hint">点卡片进入独立面板页（无侧栏、无顶 Tab、无底栏）</p>
+              <div class="cards" data-enter="shizi">
+                <button class="mcard" type="button" data-go="shizi"><span class="ic">字</span><b>识字</b><span>字卡 · 一级/二级表</span></button>
+                <button class="mcard" type="button" data-go="yuwen"><span class="ic">语</span><b>语法</b><span>词类 · 句子</span></button>
+                <button class="mcard" type="button" data-go="bushou"><span class="ic">部</span><b>部首</b><span>偏旁含义</span></button>
+                <button class="mcard" type="button" data-go="shici"><span class="ic">诗</span><b>古诗词</b><span>诗库与练习</span></button>
+                <button class="mcard" type="button" data-go="logic"><span class="ic">逻</span><b>逻辑</b><span>概念与推理</span></button>
+                <button class="mcard" type="button" data-go="lab"><span class="ic">实</span><b>实验</b><span>互动小实验</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="screen" data-screen="shizi">
+            <div class="topbar">
+              <button class="back" type="button" data-back>← 回首页</button>
+              <h2>识字面板</h2>
+            </div>
+            <div class="body">
+              <div class="seg" data-level>
+                <button type="button" class="on" data-lv="1">一级</button>
+                <button type="button" data-lv="2">二级</button>
+                <button type="button" data-lv="all">全部</button>
+              </div>
+              <div class="list" data-list></div>
+            </div>
+          </div>
+          <div class="screen" data-screen="other">
+            <div class="topbar">
+              <button class="back" type="button" data-back>← 回首页</button>
+              <h2 data-other-title>模块面板</h2>
+            </div>
+            <div class="body"><p style="color:var(--muted);font-size:14px;line-height:1.6">原型占位：该模块进入独立面板页，结构与识字相同（标题 + 内容区 + 返回）。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">英语 App · 方案 1</div>
+      <div class="phone s1">
+        <div class="bezel">
+          <div class="screen on" data-screen="home">
+            <div class="topbar">
+              <div class="tag">萌星英语 · 规律版</div>
+              <h2>今天学什么</h2>
+            </div>
+            <div class="body">
+              <div class="hero"><div class="row"><strong>7</strong><small>旗舰单元</small></div><small>其它单元目录待入模</small></div>
+              <div class="cards">
+                <button class="mcard" type="button" data-go="phon"><span class="ic">拼</span><b>拼读</b><span>字母组合规律</span></button>
+                <button class="mcard" type="button" data-go="vocab"><span class="ic">词</span><b>词汇</b><span>词库与联系</span></button>
+                <button class="mcard" type="button" data-go="grammar"><span class="ic">法</span><b>语法</b><span>GR 规律面板</span></button>
+                <button class="mcard" type="button" data-go="verb"><span class="ic">动</span><b>动词</b><span>时态 · 词形</span></button>
+                <button class="mcard" type="button" data-go="spoken"><span class="ic">口</span><b>口语</b><span>场景对话</span></button>
+                <button class="mcard" type="button" data-go="etym"><span class="ic">源</span><b>词源</b><span>身世档案</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="screen" data-screen="shizi">
+            <div class="topbar"><button class="back" type="button" data-back>← 回首页</button><h2>拼读面板</h2></div>
+            <div class="body">
+              <div class="seg" data-level>
+                <button type="button" class="on" data-lv="1">一级</button>
+                <button type="button" data-lv="2">二级</button>
+                <button type="button" data-lv="all">全部</button>
+              </div>
+              <div class="list" data-list></div>
+            </div>
+          </div>
+          <div class="screen" data-screen="other">
+            <div class="topbar"><button class="back" type="button" data-back>← 回首页</button><h2 data-other-title>模块面板</h2></div>
+            <div class="body"><p style="color:var(--muted);font-size:14px">原型占位面板。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scheme 2 ===== -->
+  <div class="phones scheme" id="scheme2" style="display:none">
+    <div>
+      <div class="label">汉字 App · 方案 2（推荐）</div>
+      <div class="phone s2">
+        <div class="bezel">
+          <div class="screen on" data-screen="home">
+            <div class="topbar">
+              <div class="tag">识字星球 · 面板栈</div>
+              <h2>模块入口</h2>
+            </div>
+            <div class="body">
+              <div class="hero">
+                <div class="row"><strong>128</strong><span class="badge">进度面板</span></div>
+                <small style="display:block;margin-top:6px">进入模块后整页替换为面板；返回弹出栈回首页</small>
+              </div>
+              <div class="cards">
+                <button class="mcard" type="button" data-go="shizi"><span class="ic">字</span><b>识字</b><span>含一级/二级/全部</span></button>
+                <button class="mcard" type="button" data-go="yuwen"><span class="ic">语</span><b>语法</b><span>点进全屏面板</span></button>
+                <button class="mcard" type="button" data-go="bushou"><span class="ic">部</span><b>部首</b><span>点进全屏面板</span></button>
+                <button class="mcard" type="button" data-go="shici"><span class="ic">诗</span><b>古诗词</b><span>点进全屏面板</span></button>
+                <button class="mcard" type="button" data-go="logic"><span class="ic">逻</span><b>逻辑</b><span>点进全屏面板</span></button>
+                <button class="mcard" type="button" data-go="lab"><span class="ic">实</span><b>实验</b><span>点进全屏面板</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="screen panel-frame" data-screen="shizi">
+            <div class="topbar">
+              <button class="back" type="button" data-back>← 首页</button>
+              <h2>识字 · 内容面板</h2>
+            </div>
+            <div class="body">
+              <div class="seg" data-level>
+                <button type="button" class="on" data-lv="1">一级</button>
+                <button type="button" data-lv="2">二级</button>
+                <button type="button" data-lv="all">全部</button>
+              </div>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:8px">分段控件只切换面板内容，不是顶部导航 Tab</p>
+              <div class="list" data-list></div>
+            </div>
+          </div>
+          <div class="screen" data-screen="other">
+            <div class="topbar"><button class="back" type="button" data-back>← 首页</button><h2 data-other-title>模块面板</h2></div>
+            <div class="body"><p style="color:var(--muted);font-size:14px;line-height:1.6">全屏面板栈：当前模块占满主区，无底部常驻导航。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">英语 App · 方案 2</div>
+      <div class="phone s2">
+        <div class="bezel">
+          <div class="screen on" data-screen="home">
+            <div class="topbar"><div class="tag">萌星英语</div><h2>学习区入口</h2></div>
+            <div class="body">
+              <div class="cards">
+                <button class="mcard" type="button" data-go="shizi"><span class="ic">拼</span><b>拼读</b><span>一级/二级/全部规律</span></button>
+                <button class="mcard" type="button" data-go="vocab"><span class="ic">词</span><b>词汇</b><span>全屏面板</span></button>
+                <button class="mcard" type="button" data-go="grammar"><span class="ic">法</span><b>语法</b><span>全屏面板</span></button>
+                <button class="mcard" type="button" data-go="verb"><span class="ic">动</span><b>动词</b><span>全屏面板</span></button>
+                <button class="mcard" type="button" data-go="spoken"><span class="ic">口</span><b>口语</b><span>全屏面板</span></button>
+                <button class="mcard" type="button" data-go="etym"><span class="ic">源</span><b>词源</b><span>全屏面板</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="screen" data-screen="shizi">
+            <div class="topbar"><button class="back" type="button" data-back>← 首页</button><h2>拼读 · 内容面板</h2></div>
+            <div class="body">
+              <div class="seg" data-level>
+                <button type="button" class="on" data-lv="1">一级</button>
+                <button type="button" data-lv="2">二级</button>
+                <button type="button" data-lv="all">全部</button>
+              </div>
+              <div class="list" data-list></div>
+            </div>
+          </div>
+          <div class="screen" data-screen="other">
+            <div class="topbar"><button class="back" type="button" data-back>← 首页</button><h2 data-other-title>模块面板</h2></div>
+            <div class="body"><p style="color:var(--muted);font-size:14px">全屏面板占位。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scheme 3 ===== -->
+  <div class="scheme" id="scheme3" style="display:none">
+    <div class="phones">
+      <div>
+        <div class="label">手机 · 同方案 2（进面板）</div>
+        <div class="phone">
+          <div class="bezel">
+            <div class="screen on" data-screen="home">
+              <div class="topbar"><div class="tag">识字星球 · 响应式</div><h2>入口卡片</h2></div>
+              <div class="body">
+                <div class="cards">
+                  <button class="mcard" type="button" data-go="shizi"><span class="ic">字</span><b>识字</b><span>手机：全屏面板</span></button>
+                  <button class="mcard" type="button" data-go="yuwen"><span class="ic">语</span><b>语法</b><span>手机：全屏面板</span></button>
+                  <button class="mcard" type="button" data-go="bushou"><span class="ic">部</span><b>部首</b><span>…</span></button>
+                  <button class="mcard" type="button" data-go="shici"><span class="ic">诗</span><b>古诗词</b><span>…</span></button>
+                </div>
+              </div>
+            </div>
+            <div class="screen" data-screen="shizi">
+              <div class="topbar"><button class="back" type="button" data-back>← 首页</button><h2>识字面板</h2></div>
+              <div class="body">
+                <div class="seg" data-level>
+                  <button type="button" class="on" data-lv="1">一级</button>
+                  <button type="button" data-lv="2">二级</button>
+                  <button type="button" data-lv="all">全部</button>
+                </div>
+                <div class="list" data-list></div>
+              </div>
+            </div>
+            <div class="screen" data-screen="other">
+              <div class="topbar"><button class="back" type="button" data-back>← 首页</button><h2 data-other-title>模块</h2></div>
+              <div class="body"><p style="color:var(--muted);font-size:14px">手机全屏面板。</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">桌面 ≥900px · 左目录 + 右面板</div>
+        <div class="dual" id="dualDemo">
+          <aside class="side" id="dualSide">
+            <button type="button" class="on" data-mod="shizi">识字</button>
+            <button type="button" data-mod="yuwen">语法</button>
+            <button type="button" data-mod="bushou">部首</button>
+            <button type="button" data-mod="shici">古诗</button>
+            <button type="button" data-mod="logic">逻辑</button>
+            <button type="button" data-mod="lab">实验</button>
+          </aside>
+          <div class="main">
+            <h3 style="font-size:16px;color:var(--deep);margin-bottom:8px" id="dualTitle">识字面板</h3>
+            <div class="seg" data-level id="dualLevel">
+              <button type="button" class="on" data-lv="1">一级</button>
+              <button type="button" data-lv="2">二级</button>
+              <button type="button" data-lv="all">全部</button>
+            </div>
+            <div class="list" id="dualList"></div>
+            <p class="desk-note" style="display:block;color:var(--muted);margin-top:12px">桌面用左侧模块目录（非常驻顶 Tab）；右侧始终是内容面板。手机仍走入口卡片 → 全屏面板。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var NOTES = {
+    1: '方案 1：首页只有卡片；点进后是独立面板页，返回即回首页。结构最简单，大屏不加侧栏。',
+    2: '方案 2（推荐）：同样是入口卡片 → 全屏面板栈；强调「进/出」状态与一级/二级/全部分段控件（内容切换，不是导航 Tab）。',
+    3: '方案 3：手机同方案 2；桌面左侧模块目录 + 右侧内容面板。注意：左栏是模块目录，不是顶部 Tab。'
+  };
+  var SAMPLE = {
+    1: ['天','地','人','你','我','他','山','水','火','木','金','土'],
+    2: ['巍','峨','澄','澈','朦','胧','磐','礴','凛','冽','粼','漪'],
+    all: ['天','地','巍','峨','人','你','澄','澈','山','水','朦','胧']
+  };
+  var TITLES = {shizi:'识字',yuwen:'语法',bushou:'部首',shici:'古诗词',logic:'逻辑',lab:'实验',phon:'拼读',vocab:'词汇',grammar:'语法',verb:'动词',spoken:'口语',etym:'词源'};
+
+  function fillList(el, lv) {
+    if (!el) return;
+    var arr = SAMPLE[lv] || SAMPLE[1];
+    el.innerHTML = arr.map(function (z) {
+      return '<div class="rowitem"><div class="zi">' + z + '</div><div><b>' + z + '</b><div style="font-size:12px;color:var(--muted)">示例条目 · ' + (lv === 'all' ? '全部' : (lv + '级')) + '</div></div></div>';
+    }).join('');
+  }
+
+  function bindPhone(root) {
+    if (!root) return;
+    root.querySelectorAll('.list[data-list]').forEach(function (el) { fillList(el, '1'); });
+    root.addEventListener('click', function (e) {
+      var go = e.target.closest('[data-go]');
+      var back = e.target.closest('[data-back]');
+      var lv = e.target.closest('[data-lv]');
+      var bezel = e.target.closest('.bezel');
+      if (!bezel) return;
+      if (go) {
+        var id = go.getAttribute('data-go');
+        bezel.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('on'); });
+        if (id === 'shizi' || id === 'phon') {
+          var sh = bezel.querySelector('[data-screen="shizi"]');
+          if (sh) sh.classList.add('on');
+        } else {
+          var ot = bezel.querySelector('[data-screen="other"]');
+          if (ot) {
+            ot.classList.add('on');
+            var t = ot.querySelector('[data-other-title]');
+            if (t) t.textContent = (TITLES[id] || id) + '面板';
+          }
+        }
+      }
+      if (back) {
+        bezel.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('on'); });
+        var home = bezel.querySelector('[data-screen="home"]');
+        if (home) home.classList.add('on');
+      }
+      if (lv) {
+        var seg = lv.parentElement;
+        seg.querySelectorAll('button').forEach(function (b) { b.classList.remove('on'); });
+        lv.classList.add('on');
+        var list = bezel.querySelector('.list[data-list]');
+        fillList(list, lv.getAttribute('data-lv'));
+      }
+    });
+  }
+
+  document.querySelectorAll('.phone').forEach(bindPhone);
+
+  // dual desktop
+  fillList(document.getElementById('dualList'), '1');
+  document.getElementById('dualSide').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-mod]');
+    if (!b) return;
+    document.querySelectorAll('#dualSide button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    document.getElementById('dualTitle').textContent = (TITLES[b.getAttribute('data-mod')] || '') + '面板';
+  });
+  document.getElementById('dualLevel').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-lv]');
+    if (!b) return;
+    document.querySelectorAll('#dualLevel button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    fillList(document.getElementById('dualList'), b.getAttribute('data-lv'));
+  });
+
+  var note = document.getElementById('schemeNote');
+  function showScheme(s) {
+    document.querySelectorAll('#schemeSwitch button').forEach(function (x) {
+      x.classList.toggle('on', x.getAttribute('data-s') === s);
+    });
+    note.textContent = NOTES[s] || NOTES[1];
+    document.getElementById('scheme1').style.display = s === '1' ? '' : 'none';
+    document.getElementById('scheme2').style.display = s === '2' ? '' : 'none';
+    document.getElementById('scheme3').style.display = s === '3' ? '' : 'none';
+  }
+  var q = new URLSearchParams(location.search).get('s') || '1';
+  showScheme(q);
+  document.getElementById('schemeSwitch').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-s]');
+    if (!b) return;
+    var s = b.getAttribute('data-s');
+    showScheme(s);
+    var u = new URL(location.href);
+    u.searchParams.set('s', s);
+    history.replaceState(null, '', u);
+  });
+})();
+</script>
+</body>
+</html>

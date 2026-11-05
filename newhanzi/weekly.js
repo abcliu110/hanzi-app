@@ -35,12 +35,16 @@
 
   var learned = load('nhz_learned', {});
   var weekChars = 0, totalChars = 0;
-  if (!Array.isArray(learned)) {
-    Object.keys(learned).forEach(function (z) {
-      totalChars++;
-      if (inWeek(learned[z], mon, sun)) weekChars++;
-    });
+  /* 老数组格式没有学习日期：计入总数（与首页“已学”一致），不计入本周 */
+  if (Array.isArray(learned)) {
+    var l2 = {};
+    learned.forEach(function (z) { l2[z] = 'legacy'; });
+    learned = l2;
   }
+  Object.keys(learned).forEach(function (z) {
+    totalChars++;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(learned[z]) && inWeek(learned[z], mon, sun)) weekChars++;
+  });
 
   var srs = load('nhz_srs', {});
   var steady = 0, learning = 0;

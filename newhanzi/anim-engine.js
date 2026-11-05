@@ -161,12 +161,25 @@ const AnimEngine = (function() {
    * 用于：四声曲线、"于"的方向、时间轴
    * 数据：{path: "M...", points: [{x, y, label, color}], ball: bool}
    */
+  /* 路径长度：调用方给了 length 就用它；否则在浏览器里量 d 的真实长度（游离的 path 也能量）；
+     量不了（非浏览器环境等）退回 500，与旧行为一致 */
+  function pathLength(d, explicit) {
+    if (explicit > 0) return explicit;
+    try {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      el.setAttribute('d', d);
+      const L = el.getTotalLength();
+      if (L > 0) return Math.ceil(L);
+    } catch (e) { /* 忽略：走兜底 */ }
+    return 500;
+  }
+
   function path(data) {
-    const {path: d, points = [], label} = data;
+    const {path: d, points = [], label, length} = data;
     let svg = `<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
     
     // 路径自己画出来
-    const len = 500; // 估算
+    const len = pathLength(d, length);
     svg += `<path d="${d}" fill="none" stroke="${C.blue}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${len}">`;
     svg += `<animate attributeName="stroke-dashoffset" values="${len};0" dur="1.5s" begin="0.5s" fill="freeze"/></path>`;
     

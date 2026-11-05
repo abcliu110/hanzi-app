@@ -16,6 +16,8 @@
   var onlyNew = false;
   var gradeFilter = ''; /* 按年级筛选：''=全部，'1上'...'6下'，'none'=未分级（不在 grade_map 中） */
   var learned = {}; // 字 -> 首次学习日期 YYYY-MM-DD（兼容老数组格式）
+  /* 老数组格式没有学习日期：记作 'legacy'，计入已学总数，不计入今日/本周 */
+  var LEGACY_DATE = 'legacy';
   function todayStr() {
     var d = new Date();
     return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
@@ -23,7 +25,7 @@
   try {
     var raw = JSON.parse(localStorage.getItem(LS_LEARNED) || 'null');
     if (Array.isArray(raw)) {
-      raw.forEach(function (z) { learned[z] = todayStr(); });
+      raw.forEach(function (z) { learned[z] = LEGACY_DATE; });
     } else if (raw) {
       learned = raw;
     }
@@ -155,10 +157,11 @@
       var hits = items.filter(function (e) {
         return e.z.indexOf(q) >= 0 || e.tl.indexOf(q) === 0 || e.py.indexOf(q) >= 0;
       }).slice(0, 300);
-      html = '<div class="ghead">搜索到 ' + hits.length + ' 个字' +
-        (hits.length >= 300 ? '（只显示前 300）' : '') + '</div>' +
-        hits.map(rowHtml).join('') ||
-        '<div class="noresult">没有找到相关汉字<br><small>换个字或拼音试试</small></div>';
+      html = hits.length
+        ? '<div class="ghead">搜索到 ' + hits.length + ' 个字' +
+          (hits.length >= 300 ? '（只显示前 300）' : '') + '</div>' +
+          hits.map(rowHtml).join('')
+        : '<div class="noresult">没有找到相关汉字<br><small>换个字或拼音试试</small></div>';
       railEl.innerHTML = '';
       railEl.style.display = 'none';
     } else {
