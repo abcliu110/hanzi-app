@@ -54,7 +54,7 @@ npm run check   # 所有 HTML 内联脚本语法检查（等同 node --check）
 npm test        # Playwright：打开新 app 页面查控制台报错和 4xx、站内链接、返回按钮
 ```
 已经自己开了服务器时：`PW_NO_SERVER=1 npx playwright test`（默认端口 4173）。
-GitHub Actions（`.github/workflows/ci.yml`）在每次 push 时运行以上检查。
+CI workflow 已于 2026-11-05 按负责人要求删除，检查改为本地运行。
 
 ## 部首字段说明
 - 全部 3,499 字的部首（除原有的现代部首外）取自 Unicode Unihan 数据库（kRSUnicode，康熙部首；简化偏旁如讠、钅、纟按简化形，艹、辶按今形）。像氵/水、扌/手这类位置变体统一写康熙部首原形
