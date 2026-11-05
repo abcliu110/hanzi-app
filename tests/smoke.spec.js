@@ -114,6 +114,27 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic taoquan judge flow', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/games/luoji/taoquan.html');
+    await page.evaluate(() => localStorage.removeItem('nhz_wrong'));
+    // 第 1 题 铜：有效
+    await page.locator('[data-a="in"]').click();
+    await page.locator('ellipse[data-r="m"]').click({ position: { x: 130, y: 120 } });
+    await page.locator('[data-c="1"]').click();
+    await expect(page.locator('#fb')).toContainText('✓');
+    await page.locator('#next').click();
+    // 第 2 题 鸭嘴兽：答「一定成立」是错的，出反例并进错题本
+    await page.locator('[data-a="in"]').click();
+    await page.locator('ellipse[data-r="m"]').click({ position: { x: 130, y: 120 } });
+    await page.locator('[data-c="1"]').click();
+    await expect(page.locator('#fb')).toContainText('反例');
+    const wrong = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_wrong') || '[]'));
+    expect(wrong.some((w) => w.point === '三段论')).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

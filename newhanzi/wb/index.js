@@ -99,4 +99,6 @@ window.NHZ_WB_INDEX = {
   "不/没": "xc_bumei",
   "还是/或者": "xc_haishi",
   "又/再辨析": "xc_youzai",
+  /* 逻辑区（docs/gaijin/luoji-gaijin-sheji.md） */
+  "三段论": "lj_sanduanlun",
 };

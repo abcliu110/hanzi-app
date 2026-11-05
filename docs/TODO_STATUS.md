@@ -26,7 +26,7 @@
 | A13 | P3 | xiufu/content.md | 拓展 84 首与通行本逐字核对（如蜀道难「噫吁戏/噫吁嚱」、离思「𥮾」） | ↪ 移交 F3（data/shici.js 已被领取） |
 | A14 | P3 | xiufu/content.md | guwen.js 缺 9 篇小学课内文言（原文已在 tools/content/xiaoxue_wenyan.json，需写导读/译意，逐句有出处） | ↪ 移交 F2（data/guwen.js 已被领取） |
 | A15 | P2 | MASTER_PLAN 阶段一 | 渲染验证：yuwen.html 各节显示正常（Playwright 逐节打开无报错） | ✅ 见执行日志 |
-| A16 | P4 | gaijin/luoji P0-1 | 逻辑「套圈判官」euler 模板 + 三段论场景 | 待做（L） |
+| A16 | P4 | gaijin/luoji P0-1 | 逻辑「套圈判官」euler 模板 + 三段论场景 | ✅ 见执行日志 |
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | 待做（L） |
 | A18 | P4 | gaijin/luoji P0-3 | 谬误卡牌册（重组现有「常见谬误」内容） | 待做（M） |
 | A19 | P4 | gaijin/shici P0-2 / P0-3 | `scroll` 水墨长卷模板；节奏打拍器 + 平仄格 | 待做（L/M） |
@@ -84,7 +84,8 @@
 - A12 · 9f25c9ca · guwen.html 15 个古文题库改为进入子模块时按需加载（首屏 0 个题库请求）；smoke 加用例
 - 移交 · dfe61bfd · A11/A13/A14 及误解标注涉及的文件已在第五节被审查代理领取，本代理不改，标「移交」
 
-- A20 · 本提交 · tools/content/build_guwen_links.py（node 执行 guwen.js 取数据，不改原数据）生成 data/guwen_links.js：30 篇命中、140 条链接、81 个知识点；guwen.html 篇目详情加「本篇文言知识卡」（汇总+点开跳知识点），知识点详情加「出自《篇名》→」；smoke 加双向跳转用例。**guwen.js / guwen_knowledge.js 改动后需重跑** `python3 tools/content/build_guwen_links.py`（`--check` 校验是否过期；因 F2 正在改这两个文件，暂不接入 CI 以免阻塞对方）
+- A20 · e4fefe6d · tools/content/build_guwen_links.py（node 执行 guwen.js 取数据，不改原数据）生成 data/guwen_links.js：30 篇命中、140 条链接、81 个知识点；guwen.html 篇目详情加「本篇文言知识卡」（汇总+点开跳知识点），知识点详情加「出自《篇名》→」；smoke 加双向跳转用例。**guwen.js / guwen_knowledge.js 改动后需重跑** `python3 tools/content/build_guwen_links.py`（`--check` 校验是否过期；因 F2 正在改这两个文件，暂不接入 CI 以免阻塞对方）
+- A16 · 本提交 · wb-engine.js 新模板 `euler`（大/中/小圈拓扑 in/out、check 闪圈打 ✓、counter 反例红叉、aside 旁注）；wb/s/lj_sanduanlun.js「三段论」2 tab 4 幕（分镜按设计 (e)-1，例句取 yuwen/data.js 与设计稿），登记 wb/index.js（yuwen 页逻辑专题自动出「播放白板动画」）；互动页 games/luoji/taoquan.html：4 题（2 有效 2 无效：铜、鸭嘴兽、鸽子、人/狗），放 M 圈→点位置放 S→判「一定成立吗」，无效题演示反例，首答进错题本（point=三段论）；index.html 逻辑专题加入口；lint 0 错、check_wb 700/1100 过、基线其余 761 幕一致（新增三段论基线）；smoke 加用例。设计里的「四概念偷换」题现有内容无出处例句，未做
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 

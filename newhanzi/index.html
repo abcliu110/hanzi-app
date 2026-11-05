@@ -239,6 +239,9 @@
     if(it['口诀']) b += '<div class="yw-summary">📌 小结：'+esc(it['口诀'])+'<br>快速回忆：合上页面，试着说出「'+esc(it.name||'')+'」的要点，再展开对照。</div>';
     if(lx.length > 1) b += sh('动手练')+quizBlock(lx.slice(1));
     if(it['小测']&&it['小测'].length) b += sh('动手小测')+quizBlock(it['小测']);
+    /* 逻辑专题互动页（docs/gaijin/luoji-gaijin-sheji.md P0） */
+    var LOGIC_TOYS = { '三段论': ['games/luoji/taoquan.html', '⭕ 套圈判官：自己摆圈判推理'] };
+    if(LOGIC_TOYS[it.name]) b += '<a class="yw-topicquiz" href="'+LOGIC_TOYS[it.name][0]+'" style="display:inline-block;margin:8px 8px 8px 0;padding:10px 14px;border-radius:10px;border:1px solid var(--accent-deep,#3d5a40);color:var(--accent-deep,#3d5a40);text-decoration:none">'+esc(LOGIC_TOYS[it.name][1])+' →</a>';
     /* 逻辑专题：直达题库里同 point 的题（quiz/data_logic.js 每题有 point） */
     if(it.name) b += '<a class="yw-topicquiz" href="quiz/index.html?tab=logic&point='+encodeURIComponent(it.name)+'" style="display:inline-block;margin:8px 0;padding:10px 14px;border-radius:10px;border:1px solid #f5c518;color:#f5c518;text-decoration:none">🎮 练这个专题的题 →</a>';
     return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+

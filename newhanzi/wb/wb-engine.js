@@ -13,6 +13,7 @@
  *   fix    病句：圈错 → 说原因 → 改对     link   两个分句 + 关联词 + 关系箭头
  *   rel    短语/成分：两块之间的关系箭头    steps  步骤卡
  *   line   时间轴                       end    口诀收尾
+ *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
@@ -1032,6 +1033,70 @@
     });
     if (two) q.beat(d.both || '一句话，两种装法，两种意思。', function (t) { pics.forEach(function (g) { if (g) c.key(g, 'opacity', t, 1, { d: .4 }); }); return .8; });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
+  /* euler（逻辑区「套圈判官」，设计 docs/gaijin/luoji-gaijin-sheji.md (e)-1）：
+   * {sets:[{id:'P',t:'导电的东西'},{id:'M',t:'金属'},{id:'S',t:'铜'}],   // 依次：大圈 P、中圈 M、小圈 S
+   *  beats:[{line:'大前提：…', rel:['M','in','P'], say, ask},
+   *         {line:'小前提：…', rel:['S','in','M'|'P'], ask},             // S in P 时小圈落在 M 的边上（画虚线，表示“说不准”）
+   *         {line:'结论：…', check:['S','in','P'|'M'], ok:1},            // 结论被前提逼出：大圈闪橙、打 ✓
+   *         {line:'所以…？', counter:['S','out','M'], ok:0},             // 反例：小圈挪到 M 外，红叉 + 红字
+   *         {line:'所有鸟都会飞…', aside:'形式对，前提错，结论照样错'}]}   // 旁注：红字 + 波浪线，不动圈
+   * 左栏逐行写前提 / 结论，右边画圈；只比拓扑关系（in / out），不做任意坐标。 */
+  TPL.euler = function (c, q, d) {
+    var S = d.sets || [], ids = {}, CX = 850, CY = 300;
+    S.forEach(function (o, i) { ids[o.id] = i; });
+    var POS = [{ x: CX, y: CY, w: 580, h: 420 }, { x: 790, y: 330, w: 300, h: 220 }, { x: 785, y: 360, w: 120, h: 80 }];
+    var EDGE = { x: 945, y: 330 }, OUT = { x: 1040, y: 220 }, HOVER = { x: CX, y: 54 };
+    var drawn = {}, sG = null, sAt = null, sO = null, row = 0;
+    function lbl(i) { return (S[i] && S[i].t) || ''; }
+    function circle(i, t, o) {
+      o = o || {}; var p = o.at || POS[i], big = i === 0;
+      var g = c.G(function () {
+        c.R('ellipse', [p.x, p.y, p.w, p.h], { stroke: big ? BLUE : i === 1 ? INK : ACC, strokeWidth: big ? 3 : 2.6, strokeLineDash: o.dash ? [10, 8] : undefined }, t, .7);
+        c.T(p.x, i === 2 ? p.y + 10 : p.y - p.h / 2 + 40, lbl(i), { size: i === 2 ? 26 : 30, color: big ? BLUE : i === 1 ? INK : ACC }, t + .4, .5);
+      });
+      drawn[i] = 1; return g;
+    }
+    function line(s, t, col, size) { var y = 150 + row * 72; row++; return c.T(60, y, s, { size: size || (textW(s, 30) > 460 ? 24 : 30), anchor: 'start', color: col || INK }, t, Math.min(1.4, Math.max(.5, len(s) * .1))); }
+    (d.beats || []).forEach(function (b) {
+      var rel = b.rel || b.check || b.counter;
+      q.beat(b.say || b.line, function (t) {
+        var g = b.line ? line(b.line, t, b.aside ? BAD : INK) : null, tt = t + (b.line ? .9 : 0), dd = 1.2;
+        if (b.aside) {   /* 旁注一行（如「形式对、前提错」的对照例），只写字不动圈 */
+          if (g) c.R('linearPath', [[[g.x0, g.y + 12], [g.x0 + (g.x1 - g.x0) / 3, g.y + 20], [g.x0 + 2 * (g.x1 - g.x0) / 3, g.y + 12], [g.x1, g.y + 20]]], { stroke: BAD, strokeWidth: 3 }, tt, .5);
+          if (b.aside !== true) line(b.aside, tt + .4, BAD);
+          dd += 1.2;
+        } else if (b.rel) {
+          var a = ids[rel[0]], p = ids[rel[2]];
+          if (!drawn[p]) { circle(p, tt); tt += .8; dd += .8; }
+          if (a === 2) {
+            var dest = p === 1 ? POS[2] : EDGE;
+            if (b.ask) {   /* 想一想时小圈先悬在上方，揭晓时落下 */
+              sG = circle(2, t - THINK, { at: { x: HOVER.x, y: HOVER.y, w: 120, h: 80 }, dash: p !== 1 });
+              c.move(sG, { t: tt, x: dest.x - HOVER.x, y: dest.y - HOVER.y, d: .9 }); sO = HOVER;
+            } else {
+              sO = dest;
+              sG = circle(2, tt, { at: { x: dest.x, y: dest.y, w: 120, h: 80 }, dash: p !== 1 });
+            }
+            sAt = dest; dd += .9;
+          } else if (!drawn[a]) { circle(a, tt); dd += .8; }
+        } else if (b.check) {
+          var host = ids[rel[2]], hp = POS[host];
+          c.R('ellipse', [hp.x, hp.y, hp.w + 14, hp.h + 14], { stroke: ACC, strokeWidth: 4 }, tt, .6);
+          if (g && b.ok) c.check(g.x1 + 40, g.y - 12, tt + .4); else if (g) c.cross(g.x1 + 40, g.y - 12, tt + .4);
+          dd += .8;
+        } else if (b.counter && sG && sAt) {
+          c.move(sG, { t: tt, x: OUT.x - sO.x, y: OUT.y - sO.y, d: .9 });
+          c.cross((POS[1].x + POS[1].w / 2 + OUT.x - 60) / 2, (OUT.y + POS[1].y) / 2, tt + 1);
+          if (g) c.cross(g.x1 + 40, g.y - 12, tt + 1.2);
+          c.T(60, 520, b.tag || '反例：前提都对，结论却错', { size: 28, anchor: 'start', color: BAD }, tt + 1.4, .9);
+          dd += 2.4;
+        }
+        return dd;
+      }, { ask: b.ask || false });
+    });
+    if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 545, d.end, { size: 26, color: ACC }, t, 1.2); return 1.2; });
   };
 
   /* ---------- 编排：每幕的 build 与时长（不建 DOM 也能算时长） ---------- */
