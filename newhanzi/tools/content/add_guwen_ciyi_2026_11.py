@@ -187,7 +187,8 @@ elif which == 'duoyi':
                 newex = [s for s, _ in exl if not any(s in e or e in s for e in alls)]
                 if not newex:
                     continue
-                fl = next((f for f in tgt.get('分类', []) if f['类'] == mean), None)
+                toks = set(re.split(r'[、，；]', mean))
+                fl = next((f for f in tgt.get('分类', []) if f['类'] == mean or toks & set(re.split(r'[、，；]', f['类']))), None)
                 if fl is None:
                     fl = {'类': mean, '说明': '', '代表': '', '例子': []}
                     tgt.setdefault('分类', []).append(fl)
@@ -195,7 +196,7 @@ elif which == 'duoyi':
                 fl['例子'] += newex
                 tgt['例子'] += newex
                 for s in newex:
-                    tgt.setdefault('例句解析', []).append({'句': s, '析': f"'{zi}'在这里是'{mean}'的意思。"})
+                    tgt.setdefault('例句解析', []).append({'句': s, '析': f"'{zi}'在这里是'{fl['类']}'的意思。"})
                 ch = True
             if ch:
                 merged.append(zi)
