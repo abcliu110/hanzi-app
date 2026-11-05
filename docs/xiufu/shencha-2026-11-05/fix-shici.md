@@ -19,5 +19,9 @@
 - shiju 字→诗索引按 build_shici.py 第 8 步重建。
 - 复查结果：`shici_scan_sync.py` quiz 0、feihua 0、zj 剩 2（白云歌、秋浦歌，归批次3整条重写）。
 
+### 批次2 · 《夏日绝句》体裁（报告 §4 choice#39、§9）
+脚本 `tools/content/fix_shici_b2_xiari.py`
+- 夏日绝句 · 诗库 ticai 七绝→五绝；题库 choice「《夏日绝句》是什么体裁？」答案 七绝→五绝，解析与误解标注重写 · 2 处 · 复查 `shici_scan_poems.py` ticai_mismatch 1→0
+
 ## 未修 / 断点
 （随批次更新）
