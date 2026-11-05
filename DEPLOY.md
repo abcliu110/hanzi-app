@@ -39,7 +39,8 @@ Pages 只能发布分支根或 `/docs`，不能直接发布 `newhanzi/` 子目�
    这是按仓库名推导的**预期地址**，部署完成前会 404；
    只有完成上面两步后它才是真实可用的公开链接。
 4. 之后每次更新：重跑 `python3 tools/build_site.py`，再同步到 `gh-pages` 分支并推送
-   （后续可加一个 workflow 自动同步，本次未做——需用户确认是否要自动发布）。
+   （2026-11-05 已加 `.github/workflows/gh-pages.yml` 自动同步：master 推送 newhanzi/
+   改动后自动执行上述打包并发布到 `gh-pages` 分支；手动发布仍按本节步骤走）。
 
 ## 方案 B（免配置）：拖拽部署
 
