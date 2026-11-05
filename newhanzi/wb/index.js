@@ -229,4 +229,10 @@ window.NHZ_WB_INDEX = {
   "省略与 ∅": "sx_shenglue",
   "话题与焦点": "sx_huati_jiaodian",
   "语序与重音": "sx_yuxu_zhongyin",
+  /* Q13 新增 50 项（docs/yufa-neirong/05）：修辞补齐 */
+  "对比": "rh_duibi",
+  "反语": "rh_fanyu",
+  "顶真": "rh_dingzhen",
+  "互文": "rh_huwen",
+  "通感": "rh_tonggan",
 };
