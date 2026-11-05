@@ -59,6 +59,7 @@ body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system
       <div class="col" id="right"></div>
     </div>
     <div class="pairbar" id="pairbar"></div>
+    <div class="pairbar" id="linkbar"></div>
     <div class="btnrow">
       <button class="btn ghost" id="btnSkip">换一组 →</button>
     </div>
@@ -84,6 +85,7 @@ function newRound(){
   $("score").textContent = "得分 " + score;
   selL = null; doneCount = 0;
   render();
+  $("linkbar").innerHTML = "";
 }
 function render(){
   var L = $("left"), R = $("right");
@@ -121,6 +123,8 @@ function tapR(b,i){
     selL = null; doneCount++;
     $("score").textContent = "得分 " + score;
     $("pairbar").textContent = "已配对 " + doneCount + " / " + ROUND_N;
+    var zi = pairs[i].y.slice(-1);
+    $("linkbar").innerHTML = '📖 含「' + zi + '」的诗句 → <a href="../../../shici.html#zilian-' + encodeURIComponent(zi) + '">去诗库字链看看</a>';
     if(doneCount >= ROUND_N){ setTimeout(newRound, 600); }
   } else {
     b.classList.add("err");
