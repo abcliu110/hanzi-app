@@ -1184,5 +1184,273 @@ MANUAL['cd_tongwei'] = {
 }
 
 
+# ---------- 04 组：深层 ----------
+def _cengci_nest1(it, sc):
+    # 妈妈买的新书包：zw(妈妈/买) + pz(新/书包)，再 de(妈妈买/的)，根 pz
+    return [{'k': 'nest', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'], 's': ['妈妈', '买', '的', '新', '书包'],
+             'tree': ['pz', ['de', ['zw', 0, 1], 2], ['pz', 3, 4]]}]
+
+
+def _cengci_stair(it, sc):
+    # 小明认真地写作业：zw(小明/谓语)，谓语再切 pz(认真地/动宾)，动宾再切 db(写/作业)
+    return [{'k': 'nest', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'style': 'stair', 's': ['小明', '认真地', '写', '作业'],
+             'tree': ['zw', 0, ['pz', 1, ['db', 2, 3]]]}]
+
+
+def _cengci_reads(it, sc):
+    say = sc['say']
+    return [{'k': 'nest', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             's': ['三个', '班', '的', '同学'],
+             'reads': [{'tree': ['pz', 0, ['pz', ['de', 1, 2], 3]],
+                        'pic': {'t': '三个人'}, 'say': say[0]},
+                       {'tree': ['pz', ['pz', 0, 1], ['de', 2, 3]],
+                        'pic': {'t': '三个班的一群人'}, 'say': say[1]}],
+             'both': say[2]}]
+
+
+def _cengci_reads3(it, sc):
+    say = sc['say']
+    return [{'k': 'nest', 'lv': 3, 'tab': sc['tab'], 'h': sc['tab'],
+             'style': 'box', 'ask': sc['ask'], 'src': sc['src'],
+             's': ['进口', '零件'],
+             'reads': [{'tree': ['db', 0, 1], 'pic': {'t': '动宾：把零件买进来'},
+                        'say': '一种是动宾：进口零件——把零件买进来。'},
+                       {'tree': ['pz', 0, 1], 'pic': {'t': '偏正：进口的零件'},
+                        'say': '一种是偏正：进口的零件。'}],
+             'both': '层次相同，关系不同，也会产生歧义。'}]
+
+
+MANUAL['sx_cengci'] = {
+    0: _cengci_nest1,
+    1: _cengci_stair,
+    3: _cengci_reads,
+    4: _cengci_reads3,
+}
+
+
+def _huati_vs(it, sc):
+    say = sc['say']
+    return [{'k': 'vs', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'],
+             'L': {'t': '问', 's': ['谁', '打碎了', '杯子'], 'k': 0,
+                   'n': '问的是“谁”', 'say': say[0]},
+             'R': {'t': '答', 's': ['是', '弟弟', '打碎的'], 'k': 1,
+                   'n': '最要紧的是“弟弟”', 'say': say[1]}}]
+
+
+MANUAL['sx_huati_jiaodian'] = {
+    0: _huati_vs,
+    4: vs2({'t': '答对了', 's': ['我是昨天来的'], 'k': 0,
+            'n': '焦点是“昨天”，正好回答“什么时候”', 'say': 1},
+           {'t': '答错了', 's': ['是我昨天来的'], 'k': 0,
+            'n': '焦点变成了“我”，像问“谁来的”', 'say': 2},
+           end='同样几个词，焦点放错，就答非所问。'),
+}
+
+
+def _peijia_l1(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'],
+             'rows': [{'s': ['下雨', '了'], 'v': 0, 'args': [], 'say': say[0]},
+                      {'s': ['弟弟', '游泳'], 'v': 1, 'args': [0], 'say': say[1]},
+                      {'s': ['我', '喜欢', '画画'], 'v': 1, 'args': [0, 2], 'say': say[2]},
+                      {'s': ['奶奶', '给', '我', '一个', '苹果'], 'v': 1,
+                       'args': [0, {'i': 2, 'tag': '给谁'}, {'i': 4, 'tag': '给什么'}],
+                       'say': say[3]}]}]
+
+
+def _peijia_empties(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'end': say[2],
+             'empties': [{'s': ['奶奶', '给', '我'], 'v': 1, 'args': [0, 2],
+                          'missWord': '一个苹果', 'missAt': 3, 'say': say[0],
+                          'fixSay': '补上“一个苹果”，话就说完了。'},
+                         {'s': ['这次', '比赛', '使', '我'], 'v': 2,
+                          'args': [[0, 1], 3], 'missWord': '明白了坚持的意义',
+                          'missAt': 4, 'say': say[1],
+                          'fixSay': '补上“明白了坚持的意义”。'}]}]
+
+
+def _peijia_move(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'end': say[2],
+             'rows': [{'s': ['我', '吃', '了', '苹果'], 'v': 1, 'args': [0, 3],
+                       'say': '我吃了苹果。“吃”两只手。'},
+                      {'s': ['苹果', '我', '吃', '了'], 'v': 2, 'args': [1, 0],
+                       'say': say[1]}]}]
+
+
+def _peijia_l3(it, sc):
+    say = sc['say']
+    return [{'k': 'valence', 'lv': 3, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'], 'src': sc['src'],
+             'end': '动词必须带的名词叫“论元”。',
+             'rows': [{'s': ['门口', '站着', '一位', '老师'], 'v': 1, 'args': [3],
+                       'say': say[1]},
+                      {'s': ['一位', '老师', '站在', '门口'], 'v': 2, 'args': [1],
+                       'say': '一位老师站在门口。“站”抓的还是“老师”。'}]}]
+
+
+MANUAL['sx_peijia'] = {
+    0: _peijia_l1,
+    1: _peijia_empties,
+    3: _peijia_move,
+    4: _peijia_l3,
+}
+
+
+def _shenglue_vs(it, sc):
+    say = sc['say']
+    return [{'k': 'vs', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'], 'end': say[2],
+             'L': {'t': '问', 's': ['你吃饭了吗'], 'k': 0,
+                   'n': '问“你”吃没吃', 'say': say[0]},
+             'R': {'t': '答', 's': ['（我）吃了'], 'k': 0,
+                   'n': '“我”省掉了', 'say': say[1]}}]
+
+
+def _shenglue_mark(it, sc):
+    # 承前省一幕、蒙后省一幕；∅ 用 tag 标“省了谁”，箭头指回/指向
+    return [{'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '小明进了门，∅放下书包。',
+             's': ['小明', '进了', '门', '∅', '放下', '书包'],
+             'm': [{'i': 3, 'tag': '省了“小明”', 'say': '这里省了“小明”。'}],
+             'arrows': [{'f': 3, 't': 0, 'note': '承前',
+                         'say': '∅ 指回前面的“小明”。'}]},
+            {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '∅一进门，他就喊饿。', 'end': '∅ 读作“空”，表示这里本来有一个词。',
+             's': ['∅', '一', '进门', '他', '就', '喊', '饿'],
+             'm': [{'i': 0, 'tag': '省了“他”', 'say': '这里省了“他”。'}],
+             'arrows': [{'f': 0, 't': 3, 'note': '蒙后',
+                         'say': '∅ 指向后面的“他”。'}]}]
+
+
+MANUAL['sx_shenglue'] = {
+    0: _shenglue_vs,
+    1: _shenglue_mark,
+    2: vs2({'t': '省略', 's': ['小明拿起书，∅走了出去'], 'k': 0,
+            'n': '补得出“小明”', 'say': 0},
+           {'t': '残缺', 's': ['使班级卫生有了很大改善'], 'k': 0,
+            'n': '主语补不出唯一的词', 'say': 1},
+           end='能补出唯一的词，才叫省略。'),
+}
+
+
+def _yuxu_morph(it, sc):
+    say = sc['say']
+    return [{'k': 'morph', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'], 'read': say[0],
+             'from': [{'id': 'gou', 'w': ['狗']}, {'id': 'v', 'w': ['咬']},
+                      {'id': 'mao', 'w': ['猫']}],
+             'to': ['mao', 'v', 'gou'],
+             'moveSay': '把“狗”和“猫”换个位置。', 'toSay': '猫咬狗。',
+             'okSay': '字一样，事情完全反过来了。',
+             'roleTo': {'mao': 'zhu', 'gou': 'bin'},
+             'roleSay': '“猫”到了前面，成了动手的；“狗”到了后面，成了被动手的。'}]
+
+
+def _yuxu_cards(it, sc):
+    say = sc['say']
+    return [{'k': 'cards', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'end': say[2],
+             'items': [{'n': '不很好：不太好', 'w': '这道菜不很好吃。'},
+                       {'n': '很不好：非常差', 'w': '这道菜很不好吃。'},
+                       {'n': '一会儿再说：过一阵再说', 'w': '我们一会儿再说。'},
+                       {'n': '再说一会儿：继续说一阵', 'w': '我们再说一会儿。'}]}]
+
+
+MANUAL['sx_yuxu_zhongyin'] = {
+    0: _yuxu_morph,
+    1: _yuxu_cards,
+    4: vs2({'t': '确定的信', 's': ['信来了'], 'k': 0,
+            'n': '大家在等的那封信', 'say': 1},
+           {'t': '新来的一封', 's': ['来信了'], 'k': 0,
+            'n': '事先不知道是谁的', 'say': 2},
+           end='动词前的名词常是已知的，动词后的常是新出现的。'),
+}
+
+
+def _zhixiang_mark1(it, sc):
+    say = sc['say']
+    return [{'k': 'mark', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'ask': sc['ask'], 'say': say[0],
+             's': ['他', '高高兴兴', '地', '吃', '了', '一碗', '面'],
+             'm': [{'i': 1, 'role': 'zhuang',
+                    'say': '“高高兴兴”挨着“吃”，可是高兴的是谁？是“他”。'}],
+             'arrows': [{'f': 1, 't': 0, 'note': '高兴的是“他”',
+                         'say': '箭头越过“吃”，弯回“他”。'}]},
+            {'k': 'mark', 'lv': 1, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '姐姐浓浓地泡了一杯茶。',
+             's': ['姐姐', '浓浓', '地', '泡', '了', '一杯', '茶'],
+             'm': [{'i': 1, 'role': 'zhuang', 'say': '“浓浓”挨着“泡”，修饰“泡”。'}],
+             'arrows': [{'f': 1, 't': 6, 'note': '浓的是“茶”',
+                         'say': '箭头向右，越过“泡了一杯”，落到“茶”。'}]}]
+
+
+def _zhixiang_mark2(it, sc):
+    say = sc['say']
+    return [{'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '我们都喜欢猫。',
+             's': ['我们', '都', '喜欢', '猫'],
+             'm': [{'i': 1, 'sym': 'adv', 'say': '“都”是副词。'}],
+             'arrows': [{'f': 1, 't': 0, 'note': '指“我们”',
+                         'say': '“都”指“我们”：每个人都喜欢。'}]},
+            {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '这些书我都看过。',
+             's': ['这些', '书', '我', '都', '看过'],
+             'm': [{'i': 3, 'sym': 'adv', 'say': '“都”是副词。'}],
+             'arrows': [{'f': 3, 't': 0, 'note': '指“这些书”',
+                         'say': '“都”指“这些书”：每本都看过。'}]},
+            {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '你都买了什么？',
+             's': ['你', '都', '买', '了', '什么'],
+             'm': [{'i': 1, 'sym': 'adv', 'say': '“都”是副词。'}],
+             'arrows': [{'f': 1, 't': 4, 'note': '指“什么”',
+                         'say': '“都”指后面的“什么”：要你把买的东西全说出来。'}]}]
+
+
+def _zhixiang_mark3(it, sc):
+    return [{'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '我吃饱了。',
+             's': ['我', '吃', '饱', '了'],
+             'm': [{'i': 2, 'role': 'bu', 'say': '“饱”是补语。'}],
+             'arrows': [{'f': 2, 't': 0, 'note': '说的是“我”',
+                         'say': '饱的是“我”。'}]},
+            {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '衣服洗干净了。',
+             's': ['衣服', '洗', '干净', '了'],
+             'm': [{'i': 2, 'role': 'bu', 'say': '“干净”是补语。'}],
+             'arrows': [{'f': 2, 't': 0, 'note': '说的是“衣服”',
+                         'say': '干净的是“衣服”。'}]},
+            {'k': 'mark', 'lv': 2, 'tab': sc['tab'], 'h': sc['tab'],
+             'say': '我把作业写完了。',
+             's': ['我', '把', '作业', '写', '完', '了'],
+             'm': [{'i': 4, 'role': 'bu', 'say': '“完”是补语。'}],
+             'arrows': [{'f': 4, 't': 3, 'note': '说的是动作',
+                         'say': '“完”说的是“写”这个动作做完了。'}]}]
+
+
+MANUAL['sx_zhixiang'] = {
+    0: _zhixiang_mark1,
+    1: _zhixiang_mark2,
+    2: _zhixiang_mark3,
+    3: vs2({'t': '只吃一个', 's': ['我只吃了一个苹果'], 'k': 0,
+            'n': '“只”指“一个”：吃得少', 'say': 0},
+           {'t': '只有我吃', 's': ['只有我吃了苹果'], 'k': 0,
+            'n': '“只”指“我”：别人都没吃', 'say': 1},
+           end='位置一换，指向就换，意思也跟着变。'),
+    4: vs2({'t': '车上的是“他”', 's': ['他在车上看书'], 'k': 0,
+            'n': '“在车上”指人所在的地方', 'say': 1},
+           {'t': '本子上的是画', 's': ['他在本子上画画'], 'k': 0,
+            'n': '人并不在本子上', 'say': 2},
+           end='能说“把画画在本子上”，不能说“把书看在车上”。'),
+}
+
+
 if __name__ == '__main__':
     main()
