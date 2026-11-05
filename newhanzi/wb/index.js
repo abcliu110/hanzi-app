@@ -139,6 +139,13 @@ window.NHZ_WB_INDEX = {
   "古文:涕": "gw_gy_ti",
   "古文:臭": "gw_gy_xiu",
   "古文:颜色": "gw_gy_yanse",
+  /* 古文区 P2-A 论语语境卡 */
+  "古文:语境:学而时习之": "gw_yujing_xueershixizhi",
+  "古文:语境:温故而知新": "gw_yujing_wenguerzhixin",
+  "古文:语境:三人行必有我师": "gw_yujing_sanrenxingbiyouwoshi",
+  "古文:语境:学而不思则罔": "gw_yujing_xueerbusizewang",
+  "古文:语境:吾日三省吾身": "gw_yujing_wurisanxingwushen",
+  "古文:语境:己所不欲勿施于人": "gw_yujing_jisuobuyuwushiyuren",
   /* 古文区 P1-A 一词多义星图·过渡版（A22-5）：键为「古文:一词多义:字」，避免与古今异义「古文:去」同名；行 无可用义项对未做 */
   "古文:一词多义:安": "gw_dy_an",
   "古文:一词多义:故": "gw_dy_gu",
