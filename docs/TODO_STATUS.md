@@ -30,7 +30,7 @@
 | A17 | P4 | gaijin/luoji P0-2 | 「十五贯」chain + flip | 待做（L） |
 | A18 | P4 | gaijin/luoji P0-3 | 谬误卡牌册（重组现有「常见谬误」内容） | 待做（M） |
 | A19 | P4 | gaijin/shici P0-2 / P0-3 | `scroll` 水墨长卷模板；节奏打拍器 + 平仄格 | 待做（L/M） |
-| A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | 待做（M） |
+| A20 | P4 | gaijin/guwen P0-C | 篇目页「本篇文言知识卡」+ 知识点双向链接（数据已有 xiaoxue 字段） | 进行中（断点：guwen.js 非严格 JSON，生成脚本草稿暂存仓库外 /workspace/work/wip/build_guwen_links.py；改为 node 执行 guwen.js 输出 JSON 后再生成 guwen_links.js，再改 guwen.html 双向链接） |
 | A21 | P4 | gaijin/guwen P0-A / P0-B | 逐字对译点读（需逐句标注 对/停/式）；morph 句式拆装（与语法区共用 morph） | 待做（L） |
 | A22 | P4 | gaijin 三份 P1/P2 | 逻辑 P1-1…P2-5、古诗 P1-1…P2-5、古文 P1-A…P2-E | 待做（P0 之后） |
 | A23 | P2 | MASTER_PLAN 阶段一/三 | 误解标注 61→577、啊哈块补 54 处、每日复习接入、提取练习升级、选项级反馈全量 | 待做（误解标注涉及 quiz/data_* 已被 F1/F6 领取，本代理不做；复习/提取练习未动） |
