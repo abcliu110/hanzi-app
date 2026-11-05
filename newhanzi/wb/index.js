@@ -104,4 +104,6 @@ window.NHZ_WB_INDEX = {
   "推理三兄弟：演绎/归纳/类比": "lj_shiwuguan",
   /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
+  /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */
+  "古文:倒装句": "gw_daozhuang",
 };

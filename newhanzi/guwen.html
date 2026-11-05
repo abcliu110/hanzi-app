@@ -74,6 +74,7 @@ if (window.self !== window.top) {
 <script src="data/guwen.js"></script>
 <script src="data/guwen_knowledge.js"></script>
 <script src="data/guwen_links.js"></script>
+<script src="wb/index.js"></script>
 <script>
 (function(){
   'use strict';
@@ -286,6 +287,18 @@ window.NHZReview = window.NHZReview || (function () {
     if(buf) flush('');
     return out;
   }
+  var gwJs = {};
+  function gwLoad(list, cb){
+    var i = 0;
+    (function next(ok){
+      if(!ok) return cb(false);
+      if(i >= list.length) return cb(true);
+      var src = list[i++]; if(gwJs[src]) return next(true);
+      var sc = document.createElement('script'); sc.src = src;
+      sc.onload = function(){ gwJs[src] = 1; next(true); }; sc.onerror = function(){ next(false); };
+      document.body.appendChild(sc);
+    })(true);
+  }
   function glossFor(t, key){
     var w = (t.重点 || []).filter(function(x){ return x[0] === key; })[0];
     var rows = ((LINKS.byText || {})[t.title] || []).filter(function(r){ return r.name === key || r.name.indexOf(key) === 0; });
@@ -422,6 +435,10 @@ window.NHZReview = window.NHZReview || (function () {
       '故事': { analogy:'💡 啊哈现象', rule:'时间轴', ex:'关键节点', bad:'易错诊所' },
       '清单': { analogy:'💡 啊哈现象', rule:'一览', ex:'例组', bad:'易错诊所' }
     }[tp] || { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' };
+    /* 白板（gaijin/guwen P0-B 句式拆装，键「古文:知识点名」）：点了才加载引擎和场景 */
+    if((window.NHZ_WB_INDEX || {})['古文:' + it.name]){
+      body += '<div class="yw-step"><span class="yw-stepnum">🎬</span><span class="yw-steptitle">白板动画</span></div><div class="gw-wb" data-gwwb="'+esc('古文:' + it.name)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放白板动画</button></div>';
+    }
     /* 规则一句话 */
     if(it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)){
       body += stepHead(T.rule);
@@ -649,6 +666,17 @@ window.NHZReview = window.NHZReview || (function () {
     if(card){
       var mid = card.getAttribute('data-mod');
       if(mid==='pianmu') showSections(); else showMList(mid);
+      return;
+    }
+    var wbs = e.target.closest('[data-gwwb-start]');
+    if(wbs){
+      e.stopPropagation();
+      var wbox = wbs.closest('[data-gwwb]'), wname = wbox.getAttribute('data-gwwb');
+      wbs.disabled = true; wbs.textContent = '加载中…';
+      gwLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[wname] + '.js'], function(ok){
+        if(!ok || !window.NHZWB || !window.NHZWB.has(wname)){ wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
+        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.play();
+      });
       return;
     }
     var zd = e.target.closest('[data-zd]');
