@@ -18,6 +18,7 @@
  *   euler  逻辑套圈判官（大圈 / 中圈 / 小圈，拓扑 in / out，反例）
  *   （link 加 back:1 时关系箭头从右指向左，用于“先果后因”）
  *   新模板：review 回练、trunk 抽骨架、morph 变魔术（第 2 期）、nest 套盒子（第 3 期）
+ *   tree   逻辑论证地图（论点 / 论据 / 补强卡挂树 + 虚拟论敌气泡，A22-7）
  * 词类符号 sym：noun adj pron verb adv prep conj interj（蒙氏），num quant aux part（灰底标签）。
  */
 (function () {
@@ -1035,6 +1036,79 @@
     });
     if (two) q.beat(d.both || '一句话，两种装法，两种意思。', function (t) { pics.forEach(function (g) { if (g) c.key(g, 'opacity', t, 1, { d: .4 }); }); return .8; });
     if (d.end) q.beat(d.end, function (t) { c.T(W / 2, 528, d.end, { size: 30, color: ACC }, t, 1.4); return 1.4; });
+  };
+
+  /* tree（逻辑区「论证地图 + 虚拟论敌」，设计 docs/gaijin/luoji-gaijin-sheji.md P1-1；A22-7）：
+   * {h, top:{tag:'论点', t:'勤奋成就人生', say},
+   *  kids:[{tag:'论据', t:'匡衡凿壁偷光'}, …(1–2 张)], kidSay:'两条论据挂下的旁白',
+   *  foe:{t:'论敌气泡里的问题', at:0, say},                    // 论敌气泡贴在第 at 张论据旁，整棵树晃一晃
+   *  pick:{opts:['补强卡 A','补强卡 B','补强卡 C'], ok:1, ask, say,  // 三张补强卡先摆出来（想一想期间可见）
+   *        hang:{tag:'论证', t:'挂上去的那张卡上写的话'}}}       // 揭晓：选对的卡飞到论点与论据之间挂上，其余变淡，树变稳（✓）
+   * 与 nest 一样：排版构建时算好（textW 估宽，不调用 getBBox），节点是带小标签的卡片，连线是树枝；
+   * 画面只由 t 决定。论点卡从上方落下（①），论据挂下（②），论敌气泡（③），补强卡挂上（④）；口诀另用 end 幕（⑤）。 */
+  function treeCard(c, cx, cy, tag, s, t0, o) {
+    o = o || {}; var maxw = o.maxw || 380, size = o.size || 30;
+    while (size > 20 && textW(s, size) + 40 > maxw) size -= 2;
+    var w = Math.max(160, textW(s, size) + 40), h = size + 30, col = o.color || INK;
+    var g = c.G(function () {
+      c.R('rectangle', [cx - w / 2, cy - h / 2, w, h], { stroke: col, strokeWidth: o.sw || 2.4, fill: '#ffffff', fillStyle: 'solid' }, t0, .5);
+      if (tag) c.T(cx - w / 2 + 6, cy - h / 2 - 8, tag, { size: 20, color: o.tagColor || BLUE, anchor: 'start' }, t0 + .2, .3);
+      c.T(cx, cy + size * .36, s, { size: size, color: col, bold: o.bold }, t0 + .3, .5);
+    });
+    g.w = w; g.h = h; g.cx = cx; g.cy = cy; return g;
+  }
+  TPL.tree = function (c, q, d) {
+    if (d.h) heading(c, q, d.h);
+    var kids = (d.kids || []).slice(0, 2), nk = kids.length;
+    var TY = 165, KY = 390, HY = 278, OY = 500;
+    var KX = nk > 1 ? [W / 2 - 260, W / 2 + 260] : [W / 2];
+    var tree = c.G(), topG = null, kidG = [], foeG = null;
+    q.beat(d.top.say || (d.top.tag + '：' + d.top.t), function (t) {
+      c.into(tree, function () { topG = treeCard(c, W / 2, TY, d.top.tag, d.top.t, t, { bold: 1, size: 32, maxw: 460 }); });
+      c.key(topG, 'transform', t, [0, 0], { d: .6, from: [0, -70], init: [0, -70], ease: 1 });
+      return 1.2;
+    });
+    if (nk) q.beat(d.kidSay || kids.map(function (k) { return k.tag + '：' + k.t; }).join('；'), function (t) {
+      c.into(tree, function () {
+        kids.forEach(function (k, i) {
+          var tk = t + i * .9;
+          c.R('line', [W / 2 + (nk > 1 ? (i ? 60 : -60) : 0), TY + topG.h / 2, KX[i], KY - 46], { stroke: INK, strokeWidth: 2.6, roughness: .8 }, tk, .5);
+          kidG[i] = treeCard(c, KX[i], KY, k.tag, k.t, tk + .4, { maxw: nk > 1 ? 400 : 460 });
+          c.key(kidG[i], 'transform', tk + .4, [0, 0], { d: .5, from: [0, -30], init: [0, -30], ease: 1 });
+        });
+      });
+      return nk * .9 + 1;
+    });
+    if (d.foe) q.beat(d.foe.say || ('论敌问：' + d.foe.t), function (t) {
+      /* 一条论据：气泡在树右侧；两条论据：气泡在右上角（论点卡右边），尾巴指向第 at 张论据 */
+      var at = kidG[d.foe.at || 0] || topG, bw = 380, mw = 300, nl = Math.ceil(textW(d.foe.t, 26) / mw), bh = 52 + 34 * nl;
+      var bx = 960, by = nk > 1 ? 160 + bh / 2 - 30 : 290;
+      foeG = c.G(function () {
+        c.R('ellipse', [bx, by, bw, bh], { stroke: BAD, strokeWidth: 2.6 }, t, .6);
+        c.R('linearPath', [[[bx - bw * .2, by + bh * .4], [at.cx + (at.cx < bx ? at.w / 2 - 20 : -at.w / 2 + 20) * (nk > 1 ? .3 : 1), at.cy - at.h / 2 - 4], [bx - bw * .06, by + bh * .48]]], { stroke: BAD, strokeWidth: 2.4, roughness: .6 }, t + .5, .3);
+        wrap(c, d.foe.t, bx, by + 9 - (nl - 1) * 17, mw, 26, BAD, t + .7);
+      });
+      c.shake(tree, t + .9, 1, 9, 3);
+      return 2;
+    });
+    if (d.pick) {
+      var p = d.pick, opts = p.opts || [], no = opts.length, OX = no === 3 ? [220, 600, 980] : opts.map(function (_, i) { return W / 2 + (i - (no - 1) / 2) * 380; });
+      var og = [];
+      q.beat(p.say || ('挂上：' + (p.hang ? p.hang.t : opts[p.ok])), function (t) {
+        /* 补强卡在「想一想」开始时摆出（t - THINK），揭晓时选对的那张飞上去 */
+        var ts = p.ask ? t - THINK : t;
+        opts.forEach(function (s, i) { og[i] = treeCard(c, OX[i], OY, '', s, ts + i * .3, { size: 26, maxw: 340 }); });
+        var okG = og[p.ok], hx = W / 2, hy = HY;
+        c.key(okG, 'transform', t, [hx - okG.cx, hy - okG.cy], { d: .9, arc: 40, ease: 1, init: [0, 0] });
+        c.key(okG, 'opacity', t + .9, 0, { d: .3, from: 1 });
+        og.forEach(function (g, i) { if (i !== p.ok) c.key(g, 'opacity', t + .3, .3, { d: .5, from: 1 }); });
+        var hang = p.hang || { tag: '', t: opts[p.ok] };
+        var hg = treeCard(c, hx, hy, hang.tag, hang.t, t + 1, { size: 26, maxw: 420, color: OK, sw: 3 });
+        if (foeG) c.key(foeG, 'opacity', t + .4, 0, { d: .5, from: 1 });   /* 补强卡挂上，论敌气泡收起 */
+        c.check(topG.cx + topG.w / 2 + 40, TY, t + 1.8);
+        return 2.6;
+      }, { ask: p.ask || false });
+    }
   };
 
   /* euler（逻辑区「套圈判官」，设计 docs/gaijin/luoji-gaijin-sheji.md (e)-1）：

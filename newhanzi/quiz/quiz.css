@@ -91,6 +91,19 @@ body{background:var(--qz-bg);color:var(--qz-text);
 .qz-tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
 .qz-tagbtn{border:2px solid var(--qz-gold);background:transparent;color:var(--qz-gold);
   border-radius:20px;padding:10px 18px;font-size:15px;cursor:pointer;min-height:48px;}
+/* A22-7 论证地图：论点在顶、论证是连接、论据在下（点位置按钮挂卡） */
+.qz-map{display:flex;flex-direction:column;align-items:center;margin:12px 0 6px;}
+.qz-mslot{width:min(100%,420px);min-height:56px;border:2px dashed var(--qz-gold);border-radius:12px;
+  background:rgba(245,197,24,.05);color:var(--qz-text);padding:6px 12px;cursor:pointer;text-align:center;font-size:15px;}
+.qz-mslot.top{border-style:solid;}
+.qz-mslot.mid{width:min(92%,380px);}
+.qz-mslot.filled{border-style:solid;}
+.qz-mslot-tag{display:block;font-size:12px;color:var(--qz-gold);line-height:1.4;}
+.qz-mhung{display:block;font-size:15px;line-height:1.5;padding:2px 0;}
+.qz-mhung.right{color:var(--qz-green);}
+.qz-mhung.wrong{color:var(--qz-red);}
+.qz-mbranch{width:3px;height:18px;background:var(--qz-line);}
+.qz-mcards .qz-tok{line-height:1.5;text-align:left;}
 .qz-answer{min-height:64px;border:2px dashed var(--qz-line);border-radius:12px;
   padding:8px;margin:10px 0;background:rgba(255,255,255,.02);}
 .qz-answer:empty::after{content:'点下面的词，按顺序拼';color:var(--qz-muted);font-size:14px;}

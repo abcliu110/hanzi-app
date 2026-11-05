@@ -59,8 +59,24 @@ var MODES = {
   blank:   { name: '填空',     icon: '✏️', desc: '选词填进横线里' },
   match:   { name: '连线配对', icon: '🔗', desc: '左右点选配成对' },
   spot:    { name: '找错改错', icon: '🔍', desc: '先找病因，再看改正' },
-  rewrite: { name: '句式改写', icon: '🔄', desc: '换个说法来表达' }
+  rewrite: { name: '句式改写', icon: '🔄', desc: '换个说法来表达' },
+  /* A22-7 论证地图（设计 docs/gaijin/luoji-gaijin-sheji.md P1-1）：tag 题里标签恰为「论点 / 论据 / 论证」的，
+     按树形挂卡渲染（论点在顶、论证是连接、论据在下）。数据仍是 tag 题、错题本仍记在 tag 下，只换显示与交互外观。 */
+  map:     { name: '论证地图', icon: '🌳', desc: '把卡片挂到论证树上' }
 };
+var MAP_TAGS = ['论点', '论证', '论据'];   /* 树上自上而下的顺序 */
+function isMap(q) {
+  if (!q || !Array.isArray(q.tags) || q.tags.length !== 3 || !Array.isArray(q.tokens)) return false;
+  for (var i = 0; i < MAP_TAGS.length; i++) if (q.tags.indexOf(MAP_TAGS[i]) < 0) return false;
+  return q.tokens.every(function (t) { return t && q.tags.indexOf(t.tag) >= 0; });
+}
+/* 模式卡/顶栏显示用：整组 tag 题都是论证题时显示为「论证地图」 */
+function modeMeta(m, q) {
+  if (m === 'tag') {
+    if (q ? isMap(q) : (S.modes.tag && S.modes.tag.length && S.modes.tag.every(isMap))) return MODES.map;
+  }
+  return MODES[m];
+}
 var MODE_ORDER = ['choice', 'judge', 'tag', 'order', 'blank', 'match', 'spot', 'rewrite'];
 var TAB_NAMES = { yuwen: '语法', shici: '古诗词', bushou: '部首', zika: '识字', logic: '逻辑', lab: '实验', guwen: '古文' };
 
@@ -219,7 +235,7 @@ function renderHome() {
     h = '<div class="qz-empty">📦 题库还在准备中，<br>先去看看知识卡吧～</div>';
   } else {
     h = '<div class="qz-modes">' + ms.map(function (m) {
-      var meta = MODES[m];
+      var meta = modeMeta(m);
       return '<button class="qz-mode" data-mode="' + m + '">' +
         '<div class="qz-mode-ic">' + meta.icon + '</div>' +
         '<div class="qz-mode-name">' + meta.name + '</div>' +
@@ -268,7 +284,7 @@ function renderQ() {
   $('qzStreak').textContent = S.streak > 1 ? '🔥 ' + S.streak + ' 连击' : '';
   $('qzModeTag').textContent = S.mode === 'wrong'
     ? '📓 错题'
-    : MODES[item._m].icon + ' ' + MODES[item._m].name;
+    : modeMeta(item._m, item._q).icon + ' ' + modeMeta(item._m, item._q).name;
   $('qbox').innerHTML = Render[item._m](item._v || item._q);
   $('qfb').innerHTML = '';
   $('qfb').hidden = true;
@@ -385,6 +401,7 @@ var Render = {
   },
   /* tag: {prompt, tokens:[{t,tag}], tags:[候选]} */
   tag: function (q) {
+    if (isMap(q)) return Render.map(q);
     return '<div class="qz-q">' + esc(q.prompt) + '</div>' +
       '<div class="qz-sub">先点一个词，再点下面的标签</div>' +
       '<div class="qz-toks">' + q.tokens.map(function (t, i) {
@@ -392,6 +409,22 @@ var Render = {
       }).join('') + '</div>' +
       '<div class="qz-tagrow">' + q.tags.map(function (t, i) {
         return '<button class="qz-tagbtn" data-act="tagb" data-i="' + i + '">' + esc(t) + '</button>';
+      }).join('') + '</div>' +
+      '<div class="qz-rowbtns"><button class="qz-btn ghost" data-act="tagreset">↩ 重来</button></div>';
+  },
+  /* map（A22-7）：同 tag 数据；树上三个位置按钮仍用 data-act="tagb" + 标签下标，判分逻辑与 tag 共用 */
+  map: function (q) {
+    var slot = function (tg, cls) {
+      var i = q.tags.indexOf(tg);
+      return '<button class="qz-mslot ' + cls + '" data-act="tagb" data-i="' + i + '" data-tag="' + esc(tg) + '">' +
+        '<span class="qz-mslot-tag">' + esc(tg) + '</span><span class="qz-mslot-body"></span></button>';
+    };
+    return '<div class="qz-q">' + esc(q.prompt) + '</div>' +
+      '<div class="qz-sub">先点一张卡，再点树上该挂的位置</div>' +
+      '<div class="qz-map">' + slot('论点', 'top') + '<div class="qz-mbranch"></div>' +
+      slot('论证', 'mid') + '<div class="qz-mbranch"></div>' + slot('论据', 'bot') + '</div>' +
+      '<div class="qz-toks qz-mcards">' + shuffle(q.tokens.map(function (t, i) { return i; })).map(function (i) {
+        return '<button class="qz-tok" data-act="tok" data-i="' + i + '">' + esc(q.tokens[i].t) + '</button>';
       }).join('') + '</div>' +
       '<div class="qz-rowbtns"><button class="qz-btn ghost" data-act="tagreset">↩ 重来</button></div>';
   },
@@ -492,6 +525,12 @@ function onTap(el) {
       tokEl.innerHTML = esc(q.tokens[cur.sel].t) +
         '<span class="mini">' + esc(q.tags[i]) + (good ? ' ✓' : ' ✗') + '</span>';
       if (!good) cur.wrong = true;
+      /* 论证地图：卡片文字挂到树上所点的位置 */
+      if (el.classList.contains('qz-mslot')) {
+        var mb = el.querySelector('.qz-mslot-body');
+        if (mb) mb.innerHTML += '<span class="qz-mhung ' + (good ? 'right' : 'wrong') + '">' + esc(q.tokens[cur.sel].t) + (good ? ' ✓' : ' ✗') + '</span>';
+        el.classList.add('filled');
+      }
       cur.sel = -1;
       var ndone = $('qbox').querySelectorAll('.qz-tok.right, .qz-tok.wrong').length;
       if (ndone === q.tokens.length) finishQuestion(!cur.wrong, buildExp(m, q));
@@ -632,7 +671,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 /* node 单测导出（浏览器下 module 未定义，自动跳过） */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    Render: Render, MODES: MODES, MODE_ORDER: MODE_ORDER, TAB_NAMES: TAB_NAMES,
+    Render: Render, MODES: MODES, MODE_ORDER: MODE_ORDER, TAB_NAMES: TAB_NAMES, isMap: isMap,
     shuffle: shuffle, shuffleOpts: shuffleOpts, esc: esc, buildExp: buildExp,
     wbLoad: wbLoad, wbSave: wbSave, wbAdd: wbAdd, wbList: wbList,
     wbRemove: wbRemove, wbCount: wbCount, WB_KEY: WB_KEY

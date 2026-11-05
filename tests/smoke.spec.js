@@ -348,6 +348,54 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic argument map whiteboard (A22-7 tree)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/index.html');
+    await page.locator('#view-home .panel[data-m="logic"]').click();
+    for (const name of ['举例论证', '对比论证']) {
+      await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+      const wb = page.locator('#logiclist .yw-wb[data-lwb="' + name + '"]');
+      await wb.locator('[data-lwb-start]').click();
+      await expect(wb.locator('svg').first()).toBeVisible({ timeout: 10000 });
+    }
+    expect(errors).toEqual([]);
+  });
+
+  test('logic tag questions render as argument map (A22-7)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/quiz/index.html?tab=logic');
+    const card = page.locator('[data-mode="tag"]');
+    await expect(card).toContainText('论证地图', { timeout: 15000 });
+    await card.click();
+    await expect(page.locator('#qzModeTag')).toContainText('论证地图');
+    await expect(page.locator('#qbox .qz-map .qz-mslot')).toHaveCount(3);
+    const prompt = await page.locator('#qbox .qz-q').innerText();
+    const cards = page.locator('#qbox .qz-mcards .qz-tok');
+    const n = await cards.count();
+    expect(n).toBe(3);
+    for (let k = 0; k < n; k++) {
+      const c = cards.nth(k);
+      const txt = (await c.innerText()).trim();
+      const tag = await page.evaluate(([p, t]) => {
+        for (const q of window.NHZ_QUIZ.modes.tag) {
+          if (q.prompt !== p) continue;
+          const tok = q.tokens.find((x) => x.t === t);
+          if (tok) return tok.tag;
+        }
+        return null;
+      }, [prompt, txt]);
+      expect(tag, 'token found in bank').toBeTruthy();
+      await c.click();
+      await page.locator('#qbox .qz-mslot[data-tag="' + tag + '"]').click();
+    }
+    await expect(page.locator('#qbox .qz-mhung.right')).toHaveCount(3);
+    await expect(page.locator('#qbox .qz-mhung.wrong')).toHaveCount(0);
+    await expect(page.locator('#qfb')).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
   test('zika missing char does not mark learned', async ({ page }) => {
     await page.goto('newhanzi/zika.html?zi=%E2%9D%8C');
     await expect(page.locator('.err')).toBeVisible({ timeout: 15000 });

@@ -154,6 +154,7 @@
 <script src="checkin.js"></script>
 <script src="eye-care.js"></script>
 <script src="install.js"></script>
+<script src="wb/index.js"></script>
 <script>
 /* 首页面板导航：主页 / 模块页切换 */
 (function(){
@@ -210,6 +211,8 @@
         '<button data-aid="'+aid+'" data-act="step">单步</button></div></div>';
       logicAnimData[aid] = it['动画'].steps;
     }
+    /* 白板动画（wb/index.js 里登记了本专题名才出，如三段论、论证地图 A22-7）：点播放时才加载引擎与场景 */
+    if((window.NHZ_WB_INDEX||{})[it.name]) b += sh('白板动画')+'<div class="yw-wb" data-lwb="'+escA(it.name)+'"><button type="button" class="back yw-wb-start" data-lwb-start="1">▶ 播放白板动画</button></div>';
     if(it['类比']) b += sh('打个比方')+'<div class="yw-analogy">'+it['类比']+'</div>';
     if(it['图示']) b += sh('看图说话')+'<div class="yw-diagram">'+it['图示']+'</div>';
     if(it['口诀']) b += '<div class="yw-koujue2">🗣️ 口诀：'+esc(it['口诀'])+'</div>';
@@ -362,9 +365,35 @@
       loadWrong: function () { return load(WK, []); },
       loadSrs: function () { return load(SK, {}); } };
   })();
+  /* 逻辑专题白板：按顺序注入 <script>（file:// 可用），已加载的跳过 */
+  var lwbLoaded = {};
+  function lwbLoad(list, cb){
+    var i = 0;
+    (function next(ok){
+      if(!ok) return cb(false);
+      if(i >= list.length) return cb(true);
+      var src = list[i++];
+      if(lwbLoaded[src]) return next(true);
+      var sc = document.createElement('script'); sc.src = src;
+      sc.onload = function(){ lwbLoaded[src] = 1; next(true); };
+      sc.onerror = function(){ next(false); };
+      document.body.appendChild(sc);
+    })(true);
+  }
   document.addEventListener('click', function(e){
     var h = e.target.closest('.yw-head');
     if(h){ h.parentElement.classList.toggle('open'); return; }
+    var wbs = e.target.closest('[data-lwb-start]');
+    if(wbs){
+      e.stopPropagation();
+      var wbox = wbs.closest('[data-lwb]'), wname = wbox.getAttribute('data-lwb');
+      wbs.disabled = true; wbs.textContent = '加载中…';
+      lwbLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[wname] + '.js'], function(ok){
+        if(!ok || !window.NHZWB || !window.NHZWB.has(wname)){ wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
+        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.play();
+      });
+      return;
+    }
     var ab = e.target.closest('[data-aid]');
     if(ab){
       var aid = ab.getAttribute('data-aid');
