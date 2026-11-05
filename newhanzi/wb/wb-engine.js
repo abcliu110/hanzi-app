@@ -34,8 +34,8 @@
    *   层 judge（对错）：ok bad
    *   层 story（叙事）：ink gray acc cmp */
   var PAL = {
-    ink: '#2c3328', gray: '#a3aa9c', acc: '#a8642f', cmp: '#8c6d3a', line: '#d5dfd0',
-    ok: '#0f8c8c', bad: '#8f1d3f',
+    ink: '#2c3328', gray: '#a3aa9c', acc: '#4a7a59', cmp: '#8c6d3a', line: '#d5dfd0',
+    ok: '#0f8c8c', bad: '#b85a52',
     role: '#4f5d7a',
     noun: '#26221c', adj: '#274b8f', pron: '#7b4ba8', verb: '#c22f2f', adv: '#e07b24', prep: '#3d8a4f',
     conj: '#d96a9b', interj: '#c9a227', tagc: '#6b7566'
@@ -516,7 +516,7 @@
       if (i >= 0) {
         var pre = textW(d.bad.slice(0, i), 42), ew = textW(d.err, 42) || 42;
         var cx = g1.x0 + pre + ew / 2;
-        c.ring(cx, y1 - 14, ew + 40, 74, t, BAD);
+        c.ring(cx, y1 - 14, ew + 12, 74, t, BAD);
       }
       c.cross(g1.x1 + 50, y1 - 14, t + .5);
       wrap(c, d.why, W / 2, y1 + 80, W - 160, 28, BAD, t + .8);
@@ -1932,7 +1932,7 @@
     try { if (localStorage.getItem('nhz_wb_mute') === '1') tts.checked = false; } catch (e) {}
     tts.onchange = function () { try { localStorage.setItem('nhz_wb_mute', tts.checked ? '0' : '1'); } catch (e) {} if (!tts.checked) hush(); };
 
-    var S = -1, t = 0, playing = false, last = 0, scene = null, spoken = -1, raf = 0;
+    var S = -1, t = 0, playing = false, last = 0, scene = null, spoken = -1, raf = 0, scrubbed = false;
     var scenes = spec.scenes;
     /* E9 档位：1 浅（lv≤1）2 中（lv≤2，默认）3 深（全部）；title / end 任何档位都显示。S 始终是原始序号 */
     var LVL = 2; try { var sv = parseInt(localStorage.getItem('nhz_wb_lv'), 10); if (sv >= 1 && sv <= 3) LVL = sv; } catch (e) {}
@@ -1944,12 +1944,12 @@
       try { var u = new SpeechSynthesisUtterance(s.replace(/……/g, '')); u.lang = 'zh-CN'; u.rate = .85; hush(); window.speechSynthesis.speak(u); } catch (e) {}
     }
     function load(i) {
-      S = i; while (svg.firstChild) svg.removeChild(svg.firstChild);
+      S = i; scrubbed = false; while (svg.firstChild) svg.removeChild(svg.firstChild);
       scene = buildScene(svg, scenes[i], i); spoken = -1;
       Array.prototype.forEach.call(tabs.children, function (b) { b.classList.toggle('on', +b.getAttribute('data-i') === i); });
     }
     function render() {
-      var tt = reduce && !playing ? scene.dur : t;
+      var tt = reduce && !playing && !scrubbed ? scene.dur : t;
       scene.c.items.forEach(function (f) { f(tt); });
       var k = -1; scene.cues.forEach(function (cu, j) { if (tt >= cu[0]) k = j; });
       cap.textContent = k >= 0 ? scene.cues[k][1] : '';
@@ -1972,7 +1972,7 @@
       playing = true; spoken = -1; pb.textContent = '❚❚ 暂停'; last = performance.now(); raf = requestAnimationFrame(loop);
     }
     pb.onclick = function () { if (playing) stop(); else play(); };
-    bar.oninput = function () { t = bar.value / 1000 * scene.dur; spoken = -1; hush(); render(); };
+    bar.oninput = function () { scrubbed = true; t = bar.value / 1000 * scene.dur; spoken = -1; hush(); render(); };
     svg.addEventListener('click', function () { if (playing) stop(); else play(); });
     function setLv(lv, keep) {
       LVL = lv; vis = visOf(lv);
@@ -1996,18 +1996,19 @@
       if (vis.indexOf(S) < 0) { load(vis[0]); t = 0; } else Array.prototype.forEach.call(tabs.children, function (x) { x.classList.toggle('on', +x.getAttribute('data-i') === S); });
       render();
     });
-    document.addEventListener('visibilitychange', function () { if (document.hidden && playing) stop(); });
+    function onVis() { if (document.hidden && playing) stop(); }
+    document.addEventListener('visibilitychange', onVis);
     setLv(LVL, true);
     load(vis[0]); render();
     var api = {
-      play: play, pause: function () { stop(); },
+      play: play, autoplay: function () { if (!reduce) play(); }, pause: function () { stop(); },
       /* seek / seekRaw / durations 都按原始序号（与档位无关），供验收脚本用 */
       seek: function (i, sec) { if (S !== i) load(i); t = sec; render(); return scene.dur; },
       seekRaw: function (i, sec) { return api.seek(i, sec); },
       visible: function () { return vis.slice(); }, level: function () { return LVL; }, name: name,
       durations: function () { return scenes.map(function (sc, i) { var s = document.createElementNS(NS, 'svg'); return buildScene(s, sc, i).dur; }); },
       scene: function () { return S; }, el: el, svg: svg,
-      destroy: function () { stop(); el.innerHTML = ''; }
+      destroy: function () { stop(); document.removeEventListener('visibilitychange', onVis); el.innerHTML = ''; }
     };
     el._wb = api;
     return api;

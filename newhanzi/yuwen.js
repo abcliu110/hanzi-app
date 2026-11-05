@@ -613,7 +613,7 @@
       loadScripts(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + wfile + '.js'], function (ok) {
         if (!ok || !window.NHZWB || !window.NHZWB.has(wname)) { wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
         var p = window.NHZWB.mount(wbox, wname);
-        if (p) p.play();
+        if (p) p.autoplay();
       });
       return;
     }

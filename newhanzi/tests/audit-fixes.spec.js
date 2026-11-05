@@ -67,17 +67,6 @@ test('8. iOS install hint stays dismissed for the session', async ({ page }) => 
   await expect(page.locator('#pwaIosOk')).toHaveCount(0);
 });
 
-// 9. 路径动画的 dasharray 取真实路径长度（或调用方给的 length），不再固定 500
-test('9. anim-engine path uses measured or explicit length', async ({ page }) => {
-  await page.goto('newhanzi/index.html');
-  await page.addScriptTag({ path: path.join(ROOT, 'anim-engine.js') });
-  const r = await page.evaluate(() => ({
-    measured: AnimEngine.path({ path: 'M0 0 L 800 0' }),
-    explicit: AnimEngine.path({ path: 'M0 0 L 800 0', length: 123 })
-  }));
-  expect(r.measured).toMatch(/stroke-dasharray="800"/);
-  expect(r.explicit).toMatch(/stroke-dasharray="123"/);
-});
 
 // 10. 再次开局前清掉旧计时器：两次 start() 后每秒只减 1 秒
 test('10. dedide-dashu start() does not stack timers', async ({ page }) => {
@@ -101,4 +90,16 @@ test('11. eye-care and install banners stack without overlap', async ({ page }) 
     els.map((e) => { const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; }));
   const [a, b] = boxes;
   expect(a.bottom <= b.top || b.bottom <= a.top, JSON.stringify(boxes)).toBeTruthy();
+});
+
+// 9. 路径动画的 dasharray 取真实路径长度（或调用方给的 length），不再固定 500
+test('9. anim-engine path uses measured or explicit length', async ({ page }) => {
+  await page.goto('newhanzi/index.html');
+  await page.addScriptTag({ path: path.join(ROOT, 'anim-engine.js') });
+  const r = await page.evaluate(() => ({
+    measured: AnimEngine.path({ path: 'M0 0 L 800 0' }),
+    explicit: AnimEngine.path({ path: 'M0 0 L 800 0', length: 123 })
+  }));
+  expect(r.measured).toMatch(/stroke-dasharray="800"/);
+  expect(r.explicit).toMatch(/stroke-dasharray="123"/);
 });

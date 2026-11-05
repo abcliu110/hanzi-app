@@ -239,7 +239,9 @@
           medians: dim['笔顺'].medians
         });
         app._sp = sp;
-        sp.play();
+        var rmReduce = false;
+        try { rmReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+        if (!rmReduce) sp.play();
       }
     } catch (e) {}
 
@@ -274,22 +276,26 @@
     s.onload = function () {
       var rec = window.NHZ_ZIKA;
       if (rec && rec.zi === zi) {
-        // 数据加载成功后再记为已学，避免 404/错字撑大进度
-        try {
-          var k = 'nhz_learned';
-          var raw = localStorage.getItem(k);
-          var map = raw ? JSON.parse(raw) : {};
-          if (Array.isArray(map)) {
-            // 老数组格式没有学习日期，记作 'legacy'，不能盖上今天的日期
-            var m2 = {};
-            map.forEach(function (x) { m2[x] = 'legacy'; });
-            map = m2;
-          }
-          if (!map[zi]) {
-            map[zi] = todayStr();
-            localStorage.setItem(k, JSON.stringify(map));
-          }
-        } catch (e) {}
+                // 停留满 15 秒、页面仍可见时才记为已学：只是打开一下，不算学会
+        var learnTimer = setTimeout(function () {
+          if (document.visibilityState !== 'visible') return;
+          try {
+            var k = 'nhz_learned';
+            var raw = localStorage.getItem(k);
+            var map = raw ? JSON.parse(raw) : {};
+            if (Array.isArray(map)) {
+              // 老数组格式没有学习日期，记作 'legacy'，不能盖上今天的日期
+              var m2 = {};
+              map.forEach(function (x) { m2[x] = 'legacy'; });
+              map = m2;
+            }
+            if (!map[zi]) {
+              map[zi] = todayStr();
+              localStorage.setItem(k, JSON.stringify(map));
+            }
+          } catch (e) {}
+        }, 15000);
+        window.addEventListener('pagehide', function () { clearTimeout(learnTimer); });
         render(rec);
       } else showErr(zi);
     };

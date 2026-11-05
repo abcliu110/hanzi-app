@@ -848,7 +848,7 @@ window.NHZReview = window.NHZReview || (function () {
       wbs.disabled = true; wbs.textContent = '加载中…';
       gwLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[wname] + '.js'], function(ok){
         if(!ok || !window.NHZWB || !window.NHZWB.has(wname)){ wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
-        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.play();
+        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.autoplay();
       });
       return;
     }

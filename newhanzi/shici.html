@@ -35,9 +35,6 @@
 /* 古籍竖排（改进设计 P2-5）：只改诗详情原文区；竖排时轻微飘动，减动效偏好下关闭 */
 .sc-vertical .sc-lines{writing-mode:vertical-rl;text-orientation:upright;height:340px;overflow:auto;margin:0 auto}
 .sc-vertical .sc-lines p{margin:0 12px}
-.sc-vertical.sway .sc-lines{animation:scsway 7s ease-in-out infinite}
-@keyframes scsway{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
-@media (prefers-reduced-motion: reduce){.sc-vertical.sway .sc-lines{animation:none}}
 /* 打拍器 + 平仄格（改进设计 P0-3） */
 .sc-beat{margin:10px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .sc-beat .bk-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
@@ -1385,8 +1382,8 @@ function scReadBar(p){
       if(b.classList.contains('on')){ stopRead(); return; }
       if(!('speechSynthesis' in window)){ b.textContent = '🔇 这台设备不能朗读'; return; }
       stopRead(); b.classList.add('on'); readFrom(0);
-    } else if(a==='vert'){ var wasPy = st.py; if(!detEl.classList.contains('sc-vertical') && wasPy){ st.py = false; scPyOn = false; } detEl.classList.toggle('sc-vertical'); detEl.classList.toggle('sway', detEl.classList.contains('sc-vertical')); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); if(wasPy) redraw(); }
-    else if(a==='py'){ st.py = !st.py; scPyOn = st.py; if(st.py){ detEl.classList.remove('sc-vertical','sway'); var v2 = bar.querySelector('[data-rb=vert]'); if(v2) v2.classList.remove('on'); } redraw(); }
+    } else if(a==='vert'){ var wasPy = st.py; if(!detEl.classList.contains('sc-vertical') && wasPy){ st.py = false; scPyOn = false; } detEl.classList.toggle('sc-vertical'); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); if(wasPy) redraw(); }
+    else if(a==='py'){ st.py = !st.py; scPyOn = st.py; if(st.py){ detEl.classList.remove('sc-vertical'); var v2 = bar.querySelector('[data-rb=vert]'); if(v2) v2.classList.remove('on'); } redraw(); }
     else if(a==='beat'){ st.beat = !st.beat; redraw(); }
     else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
     else if(a==='wb'){ scWb(p, b); }
@@ -1451,7 +1448,7 @@ function scWb(p, btn){
   btn.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
   scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'data/poet_trails.js', 'wb/s/' + window.NHZ_WB_INDEX[name] + '.js'], function(ok){
     if(!ok || !window.NHZWB || !window.NHZWB.has(name)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; btn.classList.remove('on'); return; }
-    box.innerHTML = ''; var pl = window.NHZWB.mount(box, name); if(pl) pl.play();
+    box.innerHTML = ''; var pl = window.NHZWB.mount(box, name); if(pl) pl.autoplay();
   });
 }
 var scAudio = null;
