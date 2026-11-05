@@ -111,4 +111,5 @@ window.NHZ_WB_INDEX = {
   "古文:省略句": "gw_shenglue",
   "古文:是以": "gw_shiyi",
   "古文:然则": "gw_ranze",
+  "古文:无乃…乎": "gw_wunai",
 };
