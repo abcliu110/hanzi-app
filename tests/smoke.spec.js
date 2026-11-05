@@ -348,6 +348,20 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('guwen guyin balance whiteboard all 16 words (A22-1)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    const words = ['妻子','绝境','交通','卑鄙','牺牲','无论','地方','可以','汤','走','去','江','河','涕','臭','颜色'];
+    const missing = await page.evaluate((ws) => ws.filter((w) => !(window.NHZ_WB_INDEX || {})['古文:' + w]), words);
+    expect(missing).toEqual([]);
+    await page.locator('[data-mod="guyin"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '颜色' }).first().click();
+    await page.locator('#gwmdetail [data-gwwb-start]').click();
+    await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
+    expect(errors).toEqual([]);
+  });
+
   test('logic argument map whiteboard (A22-7 tree)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
