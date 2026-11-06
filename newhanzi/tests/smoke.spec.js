@@ -5,6 +5,7 @@ const PAGES = [
   'newhanzi/zika.html?zi=%E5%A4%A9',
   'newhanzi/fuxi.html',
   'newhanzi/yuwen.html',
+  'newhanzi/pinyin.html',
   'newhanzi/bushou.html',
   'newhanzi/shici.html',
   'newhanzi/guwen.html',
@@ -775,4 +776,21 @@ test.describe('yuwen every item renders', () => {
       expect(errs, '页面报错').toEqual([]);
     });
   }
+});
+
+/* 拼音区（负责人 2026-11-06：首页菜单放在识字后面）：首页入口、进二级、面包屑、返回 */
+test('pinyin module: home panel after shizi, detail, crumbs, back', async ({ page }) => {
+  await page.goto('newhanzi/index.html');
+  const ms = await page.locator('#view-home .panels .panel').evaluateAll((els) => els.map((e) => e.getAttribute('data-m')));
+  expect(ms.indexOf('pinyin')).toBe(ms.indexOf('shizi') + 1);
+  await page.click('#view-home .panel[data-m="pinyin"]');
+  const fr = page.frameLocator('#panel-pinyin iframe');
+  await expect(fr.locator('.py-card')).toHaveCount(12);
+  await fr.locator('.py-card[data-id="shengmu"]').click();
+  await expect(fr.locator('#pyDetail .py-chip', { hasText: 'zh' }).first()).toBeVisible();
+  await expect(page.locator('#modTitle')).toContainText('声母');
+  await page.click('#btnBack');
+  await expect(fr.locator('#pyHome')).toBeVisible();
+  await page.click('#btnBack');
+  await expect(page.locator('#view-home')).toBeVisible();
 });

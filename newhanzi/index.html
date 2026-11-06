@@ -33,6 +33,10 @@
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="32" height="36" rx="4"/><path d="M18 18h12M24 14v16M18 26h12"/></svg>
       <b>识字</b><div class="prog"><i id="prog-shizi"></i></div><div class="prog-tx" id="progtx-shizi"></div>
     </button>
+    <button class="panel" type="button" data-m="pinyin">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12h16"/><circle cx="22" cy="30" r="8"/><path d="M30 22v16"/></svg>
+      <b>拼音</b><div class="prog"><i style="width:2%"></i></div><div class="prog-tx">12 个知识点</div>
+    </button>
     <button class="panel" type="button" data-m="yuwen">
       <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8l8 8L20 36l-10 2 2-10z"/><path d="M28 12l8 8"/></svg>
       <b>语法</b><div class="prog"><i style="width:12%"></i></div><div class="prog-tx">135 项</div>
@@ -117,6 +121,10 @@
       </div>
     </div>
 
+    <div id="panel-pinyin" class="panel-frame" style="display:none">
+      <iframe data-src="pinyin.html" title="拼音"></iframe>
+    </div>
+
     <div id="panel-yuwen" class="panel-frame" style="display:none">
       <iframe data-src="yuwen.html" title="语法"></iframe>
     </div>
@@ -163,6 +171,7 @@
   var modTitle = document.getElementById('modTitle');
   var modSub = document.getElementById('modSub');
   var panels = {shizi: document.getElementById('panel-shizi'),
+                pinyin: document.getElementById('panel-pinyin'),
                 yuwen: document.getElementById('panel-yuwen'),
                 yuedu: document.getElementById('panel-yuedu'),
                 logic: document.getElementById('panel-logic'),
@@ -170,7 +179,7 @@
                 bushou: document.getElementById('panel-bushou'),
                 shici: document.getElementById('panel-shici'),
                 guwen: document.getElementById('panel-guwen')};
-  var titles = {shizi:['识字','3500 常用字'], yuwen:['语法','句子 / 修辞 / 病句'],
+  var titles = {shizi:['识字','3500 常用字'], pinyin:['拼音','声母 / 韵母 / 声调 / 拼读'], yuwen:['语法','句子 / 修辞 / 病句'],
     yuedu:['阅读与写作','阅读 / 写作'],
     logic:['逻辑','推理 / 判断'], lab:['实验','动手 / 观察'],
     bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','192 首 / 常识卡'],
