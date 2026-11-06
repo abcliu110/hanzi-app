@@ -95,8 +95,8 @@
 
   grid.innerHTML = MENU.map(function (m) {
     return '<button type="button" class="py-card" data-id="' + esc(m.id) + '">' +
-      '<span class="lv">' + esc(m.lv) + '</span>' +
-      '<span class="no">' + m.no + '</span><b>' + esc(m.name) + '</b>' +
+      '<span class="hd"><span class="no">' + m.no + '</span><b>' + esc(m.name) + '</b>' +
+      '<span class="lv">' + esc(m.lv) + '</span></span>' +
       '<div class="ex">' + esc(m.ex) + '</div>' +
       '<div class="ds">' + esc(m.ds) + '</div></button>';
   }).join('');

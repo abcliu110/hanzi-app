@@ -644,6 +644,15 @@ button.btn.primary { background: var(--accent); border-color: var(--accent); col
   .page-home .home-top-actions .btn-cta { display: none; }
 }
 
+/* 模块视图（#view-module）：不用首页的 hero/board 网格（首页已没有英雄卡，左列永远空 260–280px，模块被挤到右边、
+   iframe 子页进不了平板/桌面档）。改为居中铺满，最大 1200px。2026-11-06 拼音区补厚第 1 路，见 docs/anim/jiaojie/pinyin-07-banshi.md */
+@media (min-width: 768px) {
+  .page-home #view-module .app-main { display: block; max-width: 1200px; margin: 0 auto; padding: 0 24px 32px; }
+}
+@media (min-width: 1200px) {
+  .page-home #view-module .app-main { padding: 0 28px 40px; }
+}
+
 @media (min-width: 1440px) {
   .page-home .listwrap { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
