@@ -258,3 +258,16 @@ test('没有内容文件的知识点：显示简介 + 「还在写」提示', as
   await expect(page.locator('#pyDetail .py-sec').first()).toBeVisible();
   expect(errs).toEqual([]);
 });
+
+test('字卡拼音可点：播真人录音，拆拼链接去拼音区', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('佛'));
+  await expect(page.locator('.bigzi')).toHaveText('佛', { timeout: 20000 });
+  await expect(page.locator('.hero .pinyin .py-play')).toHaveText(['fó', 'fú']);
+  const rq = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-fo2.mp3'));
+  await page.locator('.hero .pinyin .py-play').first().click();
+  await rq;
+  await expect(page.locator('.hero .pinyin .py-split')).toHaveAttribute('href', 'pinyin.html?t=pindu');
+  await expect(page.locator('.hero .pinyin .py-split')).toContainText('f + ó');
+  expect(errs).toEqual([]);
+});

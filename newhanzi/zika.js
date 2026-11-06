@@ -15,6 +15,33 @@
       speechSynthesis.cancel(); speechSynthesis.speak(u);
     } catch (e) { /* 不支持则静默 */ }
   }
+  /* 拼音可点（pinyin-10）：每个读音一个按钮，只播 pinyin/audio 真人录音（NHZPinyinAudio）；没有录音（轻声、叹词）就是普通文字。
+     下面一行小字：声母 + 韵母拆拼，链到拼音区「拼读」。 */
+  function pyButtons(py) {
+    var S = window.NHZPinyinSyllable, A = window.NHZPinyinAudio;
+    var list = String(py).split(/[,，、]\s*/).filter(Boolean);
+    var h = list.map(function (w) {
+      var r = S && S.parse(w);
+      if (r && r.ok && r.audio && A && A.hasSyl(r.written.replace(/ü/g, 'v'), r.tone)) {
+        return '<button type="button" class="py-play" data-syl="' + esc(r.written.replace(/ü/g, 'v')) + '" data-tone="' + r.tone + '" title="听真人读 ' + esc(w) + '">' + esc(w) + '</button>';
+      }
+      return esc(w);
+    }).join('、');
+    return h;
+  }
+  function pySplit(py) {
+    var S = window.NHZPinyinSyllable, h = '';
+    var r0 = S && S.parse(String(py).split(/[,，、]/)[0] || '');
+    if (r0 && r0.ok && r0.legal) {
+      var parts = r0.wholeRead ? '整体认读' : (r0.initial ? r0.initial + ' + ' : '零声母 ') + (S.mark(r0.finalWritten, r0.tone) || r0.finalWritten);
+      h += '<a class="py-split" href="pinyin.html?t=' + (r0.wholeRead ? 'zhengti' : 'pindu') + '" title="去拼音区看怎么拼">' + esc(parts) + ' · 怎么拼 ›</a>';
+    }
+    return h;
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.py-play');
+    if (b && window.NHZPinyinAudio) window.NHZPinyinAudio.playSyl(b.getAttribute('data-syl'), +b.getAttribute('data-tone'));
+  });
   function todayStr() {
     var d = new Date();
     return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
@@ -72,9 +99,9 @@
         var py = (dim['读音'] && dim['读音']['拼音']) || ((window.NHZ_PINYIN||{})[r.zi]) || '';
         /* 罕用读音（古音、专名等）保留但标注，不和常用读音并列 */
         var rare = dim['读音'] && dim['读音']['罕用读音'];
-        return py ? '<div class="pinyin">' + esc(String(py).replace(/,/g, '、')) +
+        return py ? '<div class="pinyin">' + pyButtons(py) +
           (rare ? ' <span class="py-rare" style="font-size:14px;color:var(--muted);font-weight:400;">（古音/罕用：' +
-            esc(String(rare).replace(/,/g, '、')) + '）</span>' : '') + '</div>' : '';
+            esc(String(rare).replace(/,/g, '、')) + '）</span>' : '') + pySplit(py) + '</div>' : '';
       })() +
       '<div class="chips">' + chips + '</div>' +
       // 偏旁部首直达部首库（只显示归属；语义解读在部首详情页，避免对假借字误断）

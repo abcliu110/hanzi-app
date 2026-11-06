@@ -72,6 +72,11 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 .hero .bigzi { font-size: 96px; line-height: 1.15; margin-bottom: 4px; }
 .hero .pinyin { font-size: 22px; color: var(--accent); font-weight: 700; }
+.hero .pinyin .py-play { font: inherit; color: inherit; background: transparent; border: 0; border-bottom: 2px dotted var(--accent); border-radius: 6px; min-height: 44px; padding: 0 6px; cursor: pointer; }
+.hero .pinyin .py-play:hover, .hero .pinyin .py-play:active { background: var(--accent-soft); }
+.hero .pinyin .py-play:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hero .pinyin .py-split { display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 400; color: var(--muted); text-decoration: none; min-height: 44px; }
+.hero .pinyin .py-split:hover { color: var(--accent-deep); text-decoration: underline; }
 .hero .chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
 .chip {
   font-size: 13px; background: var(--accent-soft); color: var(--ink);
