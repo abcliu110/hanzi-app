@@ -21,6 +21,19 @@ function isNoiseConsole(text) {
 
 test.describe.configure({ mode: 'serial' });
 
+// 语法（古文）条目：先进「语法」子面板，再点条目（语法页先显示子面板，不再直接列条目）
+// 语法（古文）子面板：古文 → 语法 → 对应子面板（实词、虚词、一词多义、古今异义、通假、词类活用）
+async function openYufaSub(page, sub) {
+  await page.locator('[data-mod="yufa"]').first().click();
+  await page.locator('[data-ysub="m:' + sub + '"]').first().click();
+}
+
+async function openYufaItem(page, name, group) {
+  await page.locator('[data-mod="yufa"]').first().click();
+  await page.locator('[data-ysub="' + group + '"]').first().click();
+  await page.locator('#gwMItems .yw-head', { hasText: name }).first().click();
+}
+
 test.describe('newhanzi smoke', () => {
   for (const path of PAGES) {
     test(`opens ${path} without page errors`, async ({ page }) => {
@@ -350,8 +363,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '倒装句' }).first().click();
+    await openYufaItem(page, '倒装句', 'g:特殊句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -361,8 +373,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '判断句' }).first().click();
+    await openYufaItem(page, '判断句', 'g:特殊句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -372,8 +383,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '被动句' }).first().click();
+    await openYufaItem(page, '被动句', 'g:特殊句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -383,8 +393,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '省略句' }).first().click();
+    await openYufaItem(page, '省略句', 'g:特殊句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -394,8 +403,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '是以' }).first().click();
+    await openYufaItem(page, '是以', 'g:固定句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -405,8 +413,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '然则' }).first().click();
+    await openYufaItem(page, '然则', 'g:固定句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -416,8 +423,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="yufa"]').first().click();
-    await page.locator('#gwMItems .yw-head', { hasText: '无乃…乎' }).first().click();
+    await openYufaItem(page, '无乃…乎', 'g:固定句式');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     expect(errors).toEqual([]);
@@ -427,7 +433,7 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="guyin"]').first().click();
+    await openYufaSub(page, 'guyin');
     await page.locator('#gwMItems .yw-head', { hasText: '妻子' }).first().click();
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
@@ -441,7 +447,7 @@ test.describe('newhanzi smoke', () => {
     const words = ['妻子','绝境','交通','卑鄙','牺牲','无论','地方','可以','汤','走','去','江','河','涕','臭','颜色'];
     const missing = await page.evaluate((ws) => ws.filter((w) => !(window.NHZ_WB_INDEX || {})['古文:' + w]), words);
     expect(missing).toEqual([]);
-    await page.locator('[data-mod="guyin"]').first().click();
+    await openYufaSub(page, 'guyin');
     await page.locator('#gwMItems .yw-head', { hasText: '颜色' }).first().click();
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
@@ -452,13 +458,13 @@ test.describe('newhanzi smoke', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="duoyi"]').first().click();
+    await openYufaSub(page, 'duoyi');
     await page.locator('#gwMItems .yw-head', { hasText: '去' }).first().click();
     await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:一词多义:去');
     await page.locator('#gwmdetail [data-gwwb-start]').click();
     await expect(page.locator('#gwmdetail [data-gwwb] svg').first()).toBeVisible({ timeout: 10000 });
     await page.goto('newhanzi/guwen.html');
-    await page.locator('[data-mod="guyin"]').first().click();
+    await openYufaSub(page, 'guyin');
     await page.locator('#gwMItems .yw-head', { hasText: '去' }).first().click();
     await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:去');
     expect(errors).toEqual([]);
