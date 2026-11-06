@@ -10,7 +10,7 @@
 </head>
 <body class="page-sub page-zika">
 <header class="topbar nav">
-  <a href="index.html" target="_top" class="back">← 返回</a>
+  <a href="index.html?m=shizi" target="_top" class="back">← 返回</a>
   <span id="navtitle">字卡</span>
 </header>
 <main class="wrap" id="app">
@@ -29,5 +29,6 @@ if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.p
   window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 }
 </script>
+<script src="nav-up.js"></script>
 </body>
 </html>

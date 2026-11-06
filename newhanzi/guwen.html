@@ -63,7 +63,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,
   <span id="navtitle">古文</span>
   <span></span>
 </header>
-<a href="quiz/index.html?tab=guwen" target="_top" style="display:block;text-align:center;margin:12px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
+<a href="quiz/index.html?tab=guwen&from=guwen.html" target="_top" style="display:block;text-align:center;margin:12px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
 <main class="listwrap">
   <div id="gwnav"></div>
   <div id="gwlist" style="display:none"></div>
@@ -405,7 +405,7 @@ window.NHZReview = window.NHZReview || (function () {
       h += '<div class="gw-sec">🕰 人物时间轴</div><div class="gw-wb" data-gwwb="'+esc('古文:时间轴:' + t.author)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放人物时间轴</button></div>';
     /* A22-9 古文产出题型：本篇有逐句 停/对/今 标注时，给断句 / 排今译 / 填今译入口（题目由 quiz/gw_chan.js 自动生成） */
     if((t.句 || []).some(function(s){ return s.停 || (s.对 && s.对.length) || s.今; }))
-      h += '<a class="gw-chanlink" href="quiz/index.html?tab=guwen&text='+encodeURIComponent(t.title)+'" target="_top">✍️ 本篇产出练习：断句 · 排今译 · 填今译 →</a>';
+      h += '<a class="gw-chanlink" href="quiz/index.html?tab=guwen&from=guwen.html&text='+encodeURIComponent(t.title)+'" target="_top">✍️ 本篇产出练习：断句 · 排今译 · 填今译 →</a>';
     h += knowCardHtml(t.title);
     if(t.出处 && t.出处.length) h += '<p class="gw-src">导读、译意、重点字词依据：' + t.出处.map(esc).join('；') + '</p>';
     detEl.innerHTML = h;
@@ -1110,5 +1110,6 @@ window.NHZReview = window.NHZReview || (function () {
   }
 })();
 </script>
+<script src="nav-up.js"></script>
 </body>
 </html>

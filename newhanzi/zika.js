@@ -262,13 +262,13 @@
       catch (e) {
         // 畸形编码（如 ?zi=%E0%A4）会抛 URIError，不能让页面卡在“加载中”
         document.getElementById('app').innerHTML =
-          '<div class="err">链接里的汉字编码不对，打不开这张字卡。<a href="index.html">回首页选字</a></div>';
+          '<div class="err">链接里的汉字编码不对，打不开这张字卡。<a href="index.html?m=shizi">回识字选字</a></div>';
         return;
       }
     }
     if (!zi) {
       document.getElementById('app').innerHTML =
-        '<div class="err">没有指定汉字，<a href="index.html">回首页选字</a></div>';
+        '<div class="err">没有指定汉字，<a href="index.html?m=shizi">回识字选字</a></div>';
       return;
     }
     var s = document.createElement('script');
@@ -304,7 +304,7 @@
   }
   function showErr(zi) {
     document.getElementById('app').innerHTML =
-      '<div class="err">字库里没有"' + esc(zi) + '"，<a href="index.html">回首页</a>换一个字试试</div>';
+      '<div class="err">字库里没有"' + esc(zi) + '"，<a href="index.html?m=shizi">回识字</a>换一个字试试</div>';
   }
   main();
 })();

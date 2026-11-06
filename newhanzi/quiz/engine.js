@@ -826,9 +826,12 @@ function init() {
   var tab = getParam('tab');
   if (!TAB_NAMES[tab]) tab = 'yuwen';
   S.tab = tab;
+  /* 返回 = 界面上一层：做题/结算中先回「选模式」；已在选模式页，回到来源页（from 参数，缺省回首页）。不用浏览器历史。 */
   $('btnBack').addEventListener('click', function () {
-    if (window.history.length > 1) window.history.back();
-    else window.location.href = '../index.html';
+    if (S.view && S.view !== 'home') { renderHome(); return; }
+    var from = getParam('from');
+    var ok = { 'yuwen.html': 1, 'guwen.html': 1, 'shici.html': 1, 'bushou.html': 1, 'grammar_lab.html': 1, 'yuedu-xiezuo.html': 1, 'fuxi.html': 1, 'index.html': 1 };
+    window.location.href = '../' + (ok[from] ? from : 'index.html');
   });
   $('btnNext').addEventListener('click', nextQ);
   $('view-home').addEventListener('click', function (e) {

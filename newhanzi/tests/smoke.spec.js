@@ -53,16 +53,22 @@ test.describe('newhanzi smoke', () => {
     expect(n).toBeGreaterThanOrEqual(6);
   });
 
-  test('zika hides unreliable 小篆 and marks learned only after load', async ({ page }) => {
+  test('zika hides unreliable 小篆 and marks learned only after load and 15s stay', async ({ page }) => {
+    await page.clock.install();
     await page.goto('newhanzi/zika.html?zi=%E5%A4%A9');
     await expect(page.locator('.bigzi')).toHaveText('天', { timeout: 20000 });
     // 演变阶段名可以含「小篆」；不可再渲染不可靠的小篆字形字段
     await expect(page.locator('.kv .k', { hasText: /^小篆$/ })).toHaveCount(0);
-    const learned = await page.evaluate(() => {
+    const read = () => page.evaluate(() => {
       try { return JSON.parse(localStorage.getItem('nhz_learned') || '{}'); }
       catch (e) { return {}; }
     });
-    expect(learned['天']).toBeTruthy();
+    // 只是打开不算学会：停留不足 15 秒不记
+    await page.clock.runFor(5000);
+    expect((await read())['天']).toBeFalsy();
+    // 停留满 15 秒后才记为已学
+    await page.clock.runFor(11000);
+    expect((await read())['天']).toBeTruthy();
   });
 
   test('zika shows 字源讲解 without template text', async ({ page }) => {
@@ -111,7 +117,9 @@ test.describe('newhanzi smoke', () => {
     await page.goto('newhanzi/guwen.html');
     await page.waitForTimeout(500);
     expect(reqs.filter((u) => u.includes('quiz_bank_guwen_')).length).toBe(0);
-    await page.locator('[data-mod="tongjia"]').first().click();
+    // 通假已并入「语法」页：古文菜单 → 语法 → 通假
+    await page.locator('[data-mod="yufa"]').first().click();
+    await page.locator('[data-ysub="m:tongjia"]').first().click();
     await expect(page.locator('#gwMItems .yw-head').first()).toBeVisible({ timeout: 10000 });
     expect(reqs.filter((u) => u.includes('quiz_bank_guwen_')).map((u) => u.split('/').pop())).toEqual(['quiz_bank_guwen_tongjia.js']);
     await page.locator('#gwMItems .yw-head').first().click();
@@ -324,7 +332,8 @@ test.describe('newhanzi smoke', () => {
     const n1 = await page.evaluate(() => window.__said.length);
     await page.waitForTimeout(1200);
     expect(await page.evaluate(() => window.__said.length)).toBe(n1);
-    await page.locator('[data-go="__back"]').click();
+    // 内容里不再放「回××」按钮：用界面层级导航回上一级（离开篇目即停）
+    expect(await page.evaluate(() => window.NHZNav.up())).toBe(true);
     expect(await page.evaluate(() => window.NHZGwSd.playing())).toBe(false);
     // 没有 停 的篇目：按标点分节（过渡版）
     await page.locator('.gw-item', { hasText: '学而时习之' }).first().click();

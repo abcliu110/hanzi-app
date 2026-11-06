@@ -16,7 +16,7 @@
   <div id="ywlist"></div>
   <div id="ywdetail" style="display:none"></div>
   <p class="src-note">实验内容：<a href="proto-yuwen.html">图解课堂原型（蒙特梭利语法符号等）</a>，不在主知识库内，内容以正式版为准。</p>
-  <a href="quiz/index.html?tab=yuwen" target="_top" style="display:block;text-align:center;margin:14px 0 10px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
+  <a href="quiz/index.html?tab=yuwen&from=yuwen.html" target="_top" style="display:block;text-align:center;margin:14px 0 10px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
 <div style="margin:0 0 10px;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--line);">
   <div style="font-weight:bold;margin-bottom:8px;">🎮 语法互动游戏</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -49,5 +49,6 @@ if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.p
   window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 }
 </script>
+<script src="nav-up.js"></script>
 </body>
 </html>

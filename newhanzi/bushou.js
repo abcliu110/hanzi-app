@@ -130,6 +130,8 @@
     document.getElementById('bsDetailBody').appendChild(bodyEl);
     document.getElementById('bsBack').addEventListener('click', hideDetail);
     window.scrollTo(0, 0);
+    var nm = headEl.querySelector('.bs-char');
+    if (window.NHZNavPage) NHZNavPage.set(['部首', (nm ? nm.textContent.trim() : '') || '详情'], [hideDetail, null]);
   }
 
   function hideDetail() {
@@ -143,6 +145,7 @@
     if (controlsEl) controlsEl.style.display = '';
     if (ppsecEl) ppsecEl.style.display = '';
     window.scrollTo(0, 0);
+    if (window.NHZNavPage) NHZNavPage.set(['部首'], []);
   }
 
   /* 列表标题点击 → 进入独立详情页（事件委托，render 后无需重绑） */

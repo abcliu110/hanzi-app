@@ -29,9 +29,16 @@ test('2. legacy array nhz_learned: no today stamp, weekly total matches home', a
   await expect(page.locator('#learnedCount')).toHaveText('已学 3 / 3500');
   await expect(page.locator('#stToday')).toHaveText('0');
 
+  await page.clock.install();
   await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('天'));
   await expect(page.locator('.bigzi')).toHaveText('天', { timeout: 20000 });
-  const learned = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_learned')));
+  /* 只是打开不算学会：停留不足 15 秒时不记为已学 */
+  await page.clock.runFor(5000);
+  let learned = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_learned')));
+  expect(learned['天']).toBeUndefined();
+  /* 停留满 15 秒后才记为已学 */
+  await page.clock.runFor(11000);
+  learned = await page.evaluate(() => JSON.parse(localStorage.getItem('nhz_learned')));
   expect(learned['一']).not.toBe(todayStr());
   expect(learned['二']).not.toBe(todayStr());
   expect(learned['天']).toBe(todayStr());

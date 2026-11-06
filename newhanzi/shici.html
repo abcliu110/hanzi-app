@@ -183,9 +183,22 @@ document.getElementById('scsrc').textContent = '诗文：' + (D.src || '');
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 /* 卡片 d 字段含 <br><b> 排版标签：转义后把允许的标签恢复 */
 function escD(s){return esc(s).replace(/&lt;br&gt;/g,'<br>').replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>');}
-function showList(){ detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0); }
-function showDetail(){ listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0); }
-function setTitle(t){ if(navTitle) navTitle.textContent = t; }
+/* ---- 界面层级导航（不使用浏览器历史）----
+   setTitle 只暂存标题；showList 确认它是「分区」，showDetail 确认它是「条目」。
+   层级：[古诗词] / [古诗词, 分区] / [古诗词, 分区, 条目]；回上一级 = 重新打开上一层视图。 */
+var navSection = '', navDetail = false, navDetailTitle = '', navTitleTmp = '';
+function navReport(){
+  if(!window.NHZNavPage) return;
+  if(!navSection || navSection === '古诗词'){ NHZNavPage.set(['古诗词'], []); return; }
+  if(navDetail){ NHZNavPage.set(['古诗词', navSection, navDetailTitle || '详情'], [function(){ goHome(); }, navSectionGo, null]); return; }
+  NHZNavPage.set(['古诗词', navSection], [function(){ goHome(); }, null]);
+}
+function goHome(){ navDetail = false; vHome(); }
+var NAV_SECTION_FN = { '诗词常识': function(){ vKnow(); }, '朝代长河': function(){ vDyn(); }, '诗人小传': function(){ vPoets(); }, '名句典故': function(){ vFamous(); }, '意象地图': function(){ vImagery(); }, '字→诗句链': function(){ vZilian(); }, '诗库': function(){ vPoems(); } };
+function navSectionGo(){ var f = NAV_SECTION_FN[navSection]; if(f) f(); else goHome(); }
+function showList(){ detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0); navDetail = false; navSection = navTitleTmp; navReport(); }
+function showDetail(){ listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0); navDetail = true; navDetailTitle = navTitleTmp; navReport(); }
+function setTitle(t){ if(navTitle) navTitle.textContent = t; navTitleTmp = t; }
 function poemByOrder(o){ for(var i=0;i<D.poems.length;i++) if(D.poems[i].order===o) return D.poems[i]; return null; }
 function worksOf(name){ return D.poems.filter(function(p){return p.author===name;}); }
 
@@ -203,7 +216,7 @@ function vHome(){
   var h = '<div class="sc-grid">' + SECTIONS.map(function(s){
     return '<div class="sc-card" data-go="'+s.id+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></div>';
   }).join('') + '</div>';
-  h += '<a class="sc-card" href="quiz/index.html?tab=shici" target="_top" style="display:block;text-decoration:none;margin-top:12px;user-select:none;-webkit-user-select:none"><h3>🎮 互动练习</h3><p>7种玩法：选择、判断、排序、填空、配对、找错、改写，把诗词知识玩成闯关</p></a>';
+  h += '<a class="sc-card" href="quiz/index.html?tab=shici&from=shici.html" target="_top" style="display:block;text-decoration:none;margin-top:12px;user-select:none;-webkit-user-select:none"><h3>🎮 互动练习</h3><p>7种玩法：选择、判断、排序、填空、配对、找错、改写，把诗词知识玩成闯关</p></a>';
   h += '<div class="sc-card" style="margin-top:12px"><h3>📚 诗歌基础互动（17 款）</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
     '<a href="games/shici/feihua.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌸 飞花令人机对战</a>' +
     '<a href="games/shici/jichu/duiou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">⚖️ 对偶对仗</a><a href="games/shici/jichu/yayun.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎵 押韵点韵脚</a><a href="games/shici/jichu/pingze.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📏 平仄判断</a><a href="games/shici/jichu/ticaid.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📜 绝句律诗</a><a href="games/shici/jichu/wuyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔢 五言七言</a><a href="games/shici/jichu/guti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📖 古体近体</a><a href="games/shici/jichu/yuefu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎶 乐府知识</a><a href="games/shici/jichu/qicheng.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔄 起承转合</a><a href="games/shici/jichu/jiezou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✂️ 节奏断句</a><a href="games/shici/jichu/silian.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🧩 四联归位</a><a href="games/shici/jichu/lianju.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔗 联句配对</a><a href="games/shici/jichu/shiyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">👁️ 找诗眼</a><a href="games/shici/jichu/yixiang.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌙 意象配对</a><a href="games/shici/jichu/shiti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🏷️ 诗题猜主题</a><a href="games/shici/jichu/langdu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🗣️ 朗读断句</a><a href="games/shici/jichu/beisong.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✍️ 背诵填空</a>' +
@@ -1305,7 +1318,7 @@ function openPoem(order){
     }
   }catch(e){}
   try{ scReadBar(p); }catch(e){}
-  try{ history.replaceState(null,'','#poem-'+order); }catch(e){}
+  
 }
 
 /* ===== 阅读条（docs/gaijin/shici-gaijin-sheji.md P0-2）=====
@@ -1525,7 +1538,6 @@ function scBeatBox(p, on){
 }
 
 function go(v){
-  try{ history.replaceState(null,'',' '); }catch(e){}
   if(v==='home') vHome();
   else if(v==='know') vKnow();
   else if(v==='dyn') vDyn();
@@ -1548,5 +1560,6 @@ function go(v){
 })();
 })();
 </script>
+<script src="nav-up.js"></script>
 </body>
 </html>

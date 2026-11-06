@@ -483,6 +483,7 @@
     fillLazyBanks(bodyEl);
     document.getElementById('ywBack').addEventListener('click', hideDetail);
     window.scrollTo(0, 0);
+    if (window.NHZNavPage) NHZNavPage.set(['语法', it.name || '详情'], [hideDetail, null]);
   }
 
   function hideDetail() {
@@ -497,6 +498,7 @@
     detailEl.innerHTML = '';
     listEl.style.display = '';
     window.scrollTo(0, 0);
+    if (window.NHZNavPage) NHZNavPage.set(['语法'], []);
   }
 
   function render() {

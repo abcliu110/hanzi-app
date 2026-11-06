@@ -303,8 +303,7 @@
   }
   function openModule(m, fromPop){
     if(!panels[m]) return;
-    curMod = m; curDepth = 0; modSub.style.display = '';
-    if(!fromPop) history.pushState({m:m, d:0}, '');
+    curMod = m; curDepth = 0; modSub.style.display = ''; renderCrumbs(null);
     viewHome.style.display='none';
     viewModule.style.display='block';
     modTitle.textContent = titles[m][0];
@@ -313,7 +312,7 @@
     /* 子页 iframe 懒加载：首次打开面板时才把 data-src 赋给 src，首页初始只加载自身 */
     var fr = panels[m].querySelector('iframe[data-src]');
     if(fr && !fr.getAttribute('src')) fr.setAttribute('src', fr.getAttribute('data-src'));
-    else { var nv = modFrameNav(); if(nv){ var nm = nv.crumbs(); if(nm.length > 1 && !fromPop) nv.go(0); } }
+    else { cmdFrame('go', 0); }
     /* 模块视图的返回按钮统一由父页提供；iframe 子页被嵌入时隐藏自家顶栏，避免出现两个 */
     var btnBack = document.getElementById('btnBack');
     if(btnBack) btnBack.style.display = '';
@@ -340,11 +339,7 @@
   document.querySelectorAll('#view-home .panel').forEach(function(p){
     p.addEventListener('click', function(){ openModule(p.getAttribute('data-m')); });
   });
-  /* ---------- 返回 = 回上一级（负责人 2026-11-05/06：不要轻易回首页） ----------
-     模块页（iframe）若提供 window.NHZNav（目前：古文），就把层级交给它：
-     子页每次换页 postMessage 面包屑过来，首页把它显示在顶栏标题处（点哪一级回哪一级），
-     并为每一层压一条浏览器历史，所以顶栏「← 返回」、浏览器/鼠标后退键都是一层一层往回退，
-     只有在模块最外层才回首页。没有 NHZNav 的模块保持原样：返回即回首页。 */
+  /* ---------- 返回 = 回上一级（负责人 2026-11-05/06：不要轻易回首页；只用界面层级，不用浏览器历史） ---------- */
   var curMod = null, curDepth = 0;
   function closeModule(){
     curMod = null; curDepth = 0;
@@ -353,9 +348,13 @@
     modTitle.textContent = '';
     window.scrollTo(0,0);
   }
-  function modFrameNav(){
+  /* 导航全部由界面层级驱动，不使用浏览器历史（pushState/back/go/popstate 一律不用）：
+     子页（iframe）每次换页用 postMessage 报告面包屑；首页只记 curDepth；
+     「← 返回」和面包屑通过 postMessage 命令让子页回到指定层级；已在模块最外层才回首页。 */
+  function cmdFrame(cmd, i){
     var p = curMod && panels[curMod], fr = p && p.querySelector('iframe');
-    try{ return fr && fr.contentWindow && fr.contentWindow.NHZNav ? fr.contentWindow.NHZNav : null; }catch(e){ return null; }
+    if(!fr || !fr.contentWindow) return false;
+    try{ fr.contentWindow.postMessage({nhzCmd:cmd, i:i}, '*'); return true; }catch(e){ return false; }
   }
   function renderCrumbs(names){
     if(!curMod) return;
@@ -370,35 +369,22 @@
     if(!a) return;
     e.preventDefault();
     var i = parseInt(a.getAttribute('data-crumb'), 10);
-    if(i < curDepth) history.go(i - curDepth);
+    if(i < curDepth) cmdFrame('go', i);
   });
   window.addEventListener('message', function(e){
     var d = e.data;
     if(!d || !d.nhzNav || !curMod) return;
     var p = panels[curMod], fr = p && p.querySelector('iframe');
     if(!fr || e.source !== fr.contentWindow) return;
-    var depth = (d.crumbs || []).length - 1;
-    if(depth > curDepth) history.pushState({m:curMod, d:depth}, '');
-    else history.replaceState({m:curMod, d:depth}, '');
-    curDepth = depth;
+    curDepth = Math.max(0, (d.crumbs || []).length - 1);
     renderCrumbs(d.crumbs);
   });
-  window.addEventListener('popstate', function(e){
-    var st = e.state;
-    if(!st || !st.m){ closeModule(); return; }
-    if(st.m !== curMod){ openModule(st.m, true); return; }
-    var nav = modFrameNav();
-    curDepth = st.d;
-    if(nav){
-      var names = nav.crumbs();
-      if(st.d < names.length - 1) nav.go(st.d);
-    }
-  });
   document.getElementById('btnBack').addEventListener('click', function(){
-    if(history.state && history.state.m) history.back();
-    else closeModule();
+    if(curDepth > 0 && cmdFrame('up')) return;
+    closeModule();
   });
-  try{ if(!history.state) history.replaceState({home:1}, ''); }catch(e){}
+  /* 从别的页面返回时用 ?m=模块名 直接打开对应模块（界面层级，不用浏览器历史） */
+  (function(){ var mm = /[?&]m=(\w+)/.exec(location.search); if(mm && panels[mm[1]]) openModule(mm[1]); })();
 
   window.NHZReview = window.NHZReview || (function () {
     var WK = 'nhz_wrong', SK = 'nhz_srs';
