@@ -7,6 +7,22 @@ test('主读音校验（newhanzi/tools/fix_pinyin.py check）', () => {
   execFileSync('python3', [path.resolve(__dirname, '../tools/fix_pinyin.py'), 'check'], { stdio: 'pipe', shell: true });
 });
 
+test('拼音音节校验（newhanzi/tools/check_pinyin_syllables.js）：3500 字读音可解析、标调位置合规', () => {
+  execFileSync(process.execPath, [path.resolve(__dirname, '../tools/check_pinyin_syllables.js')], { stdio: 'pipe' });
+});
+
+test('音节解析器在浏览器里可用（pinyin/syllables.js + syllable.js）', async ({ page }) => {
+  await page.goto('newhanzi/pinyin.html');
+  await page.addScriptTag({ url: 'pinyin/syllables.js' });
+  await page.addScriptTag({ url: 'pinyin/syllable.js' });
+  const r = await page.evaluate(() => {
+    const S = window.NHZPinyinSyllable;
+    const a = S.parse('guì'), b = S.parse('qu4'), c = S.parse('gúi');
+    return [a.initial, a.final, a.tone, b.final, b.audio, c.ok, c.errors[0].code, S.mark('liu', 2), S.LEGAL.length];
+  });
+  expect(r).toEqual(['g', 'uei', 4, 'ü', 'qu4', false, 'tone_position', 'liú', 415]);
+});
+
 test('Q17 拼音开关：逐字注音用 pron 覆盖 + 查表主音，@行号 只对该行生效', async ({ page }) => {
   await page.goto('newhanzi/shici.html#poem-34'); // 春晓（主脚本是 IIFE，openPoem 不挂 window，用 hash 路由进详情）
   await expect(page.locator('.sc-readbar [data-rb=py]')).toBeVisible();
