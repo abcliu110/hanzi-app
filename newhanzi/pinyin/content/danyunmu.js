@@ -120,7 +120,7 @@
 
   ting: [
     {
-      type: 'chips', lv: 1, h: '六个单韵母（点一下听，长按/再点出四声）',
+      type: 'chips', lv: 1, h: '六个单韵母（点一下听，点开出四声）',
       items: [
         { t: 'a', play: 'a1', tones: 'a' },
         { t: 'o', play: 'o1', tones: 'o' },
