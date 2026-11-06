@@ -123,12 +123,10 @@
     var charHtml = headEl.querySelector('.bs-char').innerHTML;
     var infoHtml = headEl.querySelector('.bs-info').innerHTML;
     detailEl.innerHTML =
-      '<div style="margin:6px 0 14px"><button class="yw-back" id="bsBack">← 返回列表</button></div>' +
       '<div class="bs-detail-head"><span class="bs-char">' + charHtml + '</span>' +
       '<div class="bs-info">' + infoHtml + '</div></div>' +
       '<div id="bsDetailBody"></div>';
     document.getElementById('bsDetailBody').appendChild(bodyEl);
-    document.getElementById('bsBack').addEventListener('click', hideDetail);
     window.scrollTo(0, 0);
     var nm = headEl.querySelector('.bs-char');
     if (window.NHZNavPage) NHZNavPage.set(['部首', (nm ? nm.textContent.trim() : '') || '详情'], [hideDetail, null]);

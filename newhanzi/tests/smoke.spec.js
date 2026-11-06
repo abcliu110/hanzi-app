@@ -697,7 +697,8 @@ test.describe('load budget', () => {
     await page.goto('newhanzi/yuwen.html');
     await page.locator('.yw-head:has(.yw-name:text-is("名词"))').click();
     await expect(page.locator('#ywdetail .bank-qs .quiz-q')).toHaveCount(10);
-    await page.click('#ywBack');
+    // 返回上一级：界面层级（不用页内按钮、不用浏览器历史）
+    await page.evaluate(() => window.NHZNav.up());
     await page.locator('.yw-head:has(.yw-name:text-is("把字句"))').click();
     await expect(page.locator('#ywdetail .bank-qs .quiz-q')).toHaveCount(10);
   });
@@ -731,16 +732,18 @@ test('sw.js precache list is up to date', async () => {
   expect(out).toContain('最新');
 });
 
-/* 原型/游戏/练习页都要能一键回首页；原型页不得依赖外部字体等外链 */
-test.describe('home links & no external deps', () => {
+/* 原型/游戏/练习页只有一个返回（回上一级）；原型页不得依赖外部字体等外链 */
+test.describe('single back & no external deps', () => {
   const EXTRA = ALL_PAGES.filter((p) => /\/games\/|proto-yuwen|speedtest|quiz\/index/.test(p));
   for (const path of EXTRA) {
-    test(`home link ${path}`, async ({ page }) => {
+    test(`single back ${path}`, async ({ page }) => {
       const external = [];
       page.on('request', (r) => { if (!r.url().startsWith('http://127.0.0.1')) external.push(r.url()); });
       await page.goto(path, { waitUntil: 'load' });
       const hrefs = await page.locator('a[href]').evaluateAll((as) => as.map((a) => a.href));
-      expect(hrefs.some((h) => /\/newhanzi\/index\.html$/.test(h)), 'link to newhanzi/index.html').toBeTruthy();
+      // 规范（FRONTEND_UI.md 第 7 节）：每个页面只有一个返回，回上一级；不再放首页链接
+      const backs = await page.locator('a,button').filter({ hasText: /^←\s*返回/ }).count();
+      expect(backs, 'exactly one 「← 返回」').toBe(1);
       expect(external, 'external requests').toEqual([]);
     });
   }
@@ -766,7 +769,7 @@ test.describe('yuwen every item renders', () => {
         await expect(page.locator('#ywDetailBody')).toBeVisible();
         const txt = (await page.locator('#ywDetailBody').innerText()).trim();
         if (txt.length < 20) empty.push(name);
-        await page.locator('#ywBack').click();
+        await page.evaluate(() => window.NHZNav.up());
       }
       expect(empty, '正文为空的条目').toEqual([]);
       expect(errs, '页面报错').toEqual([]);

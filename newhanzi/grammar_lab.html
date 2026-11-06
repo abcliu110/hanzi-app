@@ -98,7 +98,6 @@
 </div>
 
 <div id="lab-symbols" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🎩 符号标注大冒险</h2>
   <p style="color:#666">给整句话的每个词戴上正确的符号帽</p>
   <div style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
@@ -118,7 +117,6 @@
 </div>
 
 <div id="lab-baju" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🤏 把字句拼装</h2>
   <p>口诀 <b>S把OVC</b>：按顺序点词块，拼出正确的把字句</p>
   <div class="lab-anim" id="lab-anim-baju"></div>
@@ -130,7 +128,6 @@
 </div>
 
 <div id="lab-le" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>⏱️ 了着过决策树</h2>
   <p>三问决策：完成了吗？经历过吗？持续着吗？</p>
   <div class="lab-anim" id="lab-anim-le"></div>
@@ -138,14 +135,12 @@
 </div>
 
 <div id="lab-dede" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🎯 的地得射击</h2>
   <p>看准位置，一击即中！</p>
   <div class="lab-anim" id="lab-anim-dede"></div>
   <div id="dede-q"></div>
 </div>
 <div id="lab-zibian" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🦴 汉字演变时光机</h2>
   <p>从甲骨文到楷书，看汉字五次大变身。先穿越，再挑战配对！</p>
   <div class="lab-anim" id="lab-anim-zibian"></div>
@@ -161,7 +156,6 @@
 </div>
 
 <div id="lab-pingze" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🎵 平仄标注</h2>
   <p>点每个字切换 <b style="color:#3f8e6b">平</b> / <b style="color:#b85a52">仄</b>，标出整句的平仄</p>
   <div class="lab-anim" id="lab-anim-pingze"></div>
@@ -176,7 +170,6 @@
 </div>
 
 <div id="lab-pinzi" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🧩 部首拼字</h2>
   <p>点偏旁放进格子，拼出目标汉字。点格子可拿回偏旁。</p>
   <div class="lab-anim" id="lab-anim-pinzi"></div>
@@ -192,7 +185,6 @@
 </div>
 
 <div id="lab-xuzi" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>📜 文言虚词断案台</h2>
   <p>之乎者也，一字多义，看准语境再断案</p>
   <div class="lab-anim" id="lab-anim-xuzi"></div>
@@ -201,7 +193,6 @@
 </div>
 
 <div id="lab-xiuci" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>✨ 修辞手法识别</h2>
   <p>读出诗句用的什么修辞手法</p>
   <div class="lab-anim" id="lab-anim-xiuci"></div>
@@ -210,7 +201,6 @@
 </div>
 
 <div id="lab-cuobie" class="lab-page">
-  <a class="back-btn" href="#" data-back>← 返回实验室</a>
   <h2>🩺 错别字诊所</h2>
   <p>点出句子里的错别字，再选出正确的字</p>
   <div class="lab-anim" id="lab-anim-cuobie"></div>
@@ -482,7 +472,13 @@ function svgLabCuobie(){
 }
 
 
-/* 页面切换 */
+/* 页面切换（界面层级：实验 › 某个实验；回上一级 = 回实验首页，不用浏览器历史） */
+function showLabHome(){
+  document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
+  $('lab-home').style.display='block';
+  window.scrollTo(0,0);
+  if(window.NHZNavPage) NHZNavPage.set(['实验'], []);
+}
 document.querySelectorAll('[data-lab]').forEach(function(c){
   c.addEventListener('click', function(){
     $('lab-home').style.display='none';
@@ -490,14 +486,7 @@ document.querySelectorAll('[data-lab]').forEach(function(c){
     $('lab-'+c.getAttribute('data-lab')).classList.add('active');
     initLab(c.getAttribute('data-lab'));
     window.scrollTo(0,0);
-  });
-});
-document.querySelectorAll('[data-back]').forEach(function(b){
-  b.addEventListener('click', function(e){
-    e.preventDefault();
-    document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
-    $('lab-home').style.display='block';
-    window.scrollTo(0,0);
+    if(window.NHZNavPage) NHZNavPage.set(['实验', (c.textContent||'').trim().split('\n')[0]], [showLabHome, null]);
   });
 });
 

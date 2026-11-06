@@ -113,8 +113,6 @@
     listEl.style.display = 'none';
     detailEl.style.display = 'block';
     detailEl.innerHTML =
-      '<div style="display:flex;gap:10px;margin-bottom:16px">' +
-      '<button class="yw-back" id="yxBack">← 返回列表</button></div>' +
       '<div class="yw-detail-head"><span class="yw-ico-lg">' + p.mod.icon + '</span>' +
       '<div><h2>' + esc(p.it.name || '') + '</h2>' +
       (p.it['口诀'] ? '<p class="yw-kj-lg">' + esc(p.it['口诀']) + '</p>' : '') + '</div></div>' +
@@ -126,7 +124,6 @@
       window.scrollTo(0, 0);
       if (window.NHZNavPage) NHZNavPage.set(['阅读与写作'], []);
     }
-    document.getElementById('yxBack').addEventListener('click', backToList);
     window.scrollTo(0, 0);
     if (window.NHZNavPage) NHZNavPage.set(['阅读与写作', p.it.name || '详情'], [backToList, null]);
   }

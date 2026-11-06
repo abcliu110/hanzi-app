@@ -473,15 +473,12 @@
     listEl.style.display = 'none';
     detailEl.style.display = 'block';
     detailEl.innerHTML =
-      '<div style="display:flex;gap:10px;margin-bottom:16px">' +
-      '<button class="yw-back" id="ywBack">← 返回列表</button></div>' +
       '<div class="yw-detail-head"><span class="yw-ico-lg">' + rec.icon + '</span>' +
       '<div><h2>' + esc(it.name || '') + '</h2>' +
       (it['口诀'] ? '<p class="yw-kj-lg">' + esc(it['口诀']) + '</p>' : '') + '</div></div>' +
       '<div class="yw-detail-body" id="ywDetailBody"></div>';
     if (bodyEl) document.getElementById('ywDetailBody').appendChild(bodyEl);
     fillLazyBanks(bodyEl);
-    document.getElementById('ywBack').addEventListener('click', hideDetail);
     window.scrollTo(0, 0);
     if (window.NHZNavPage) NHZNavPage.set(['语法', it.name || '详情'], [hideDetail, null]);
   }

@@ -68,11 +68,10 @@
   }
   function mount() {
     if (inFrame || btn || document.querySelector('[data-nav-up]')) return;
-    var bar = document.querySelector('.topbar');
-    if (bar) {
-      var links = bar.querySelectorAll('a,button');
-      for (var i = 0; i < links.length; i++) { if (/返回|←/.test(links[i].textContent || '')) return; }
-    }
+    // 页面已有自己的「← 返回」（任何顶栏写法）时不再加，保证全站只有一个返回
+    var all = document.querySelectorAll('a,button');
+    for (var i = 0; i < all.length; i++) { if (/^\s*←\s*返回/.test(all[i].textContent || '')) return; }
+    var bar = document.querySelector('.topbar, .top');
     if (!document.getElementById('nav-up-style')) {
       var st = document.createElement('style');
       st.id = 'nav-up-style';

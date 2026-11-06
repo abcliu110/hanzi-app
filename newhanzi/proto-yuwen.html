@@ -199,7 +199,7 @@
       <!-- 列表视图 -->
       <div id="view-list">
         <div class="intro">
-          <a href="yuwen.html" class="back">← 返回语法</a> <a href="index.html" target="_top" class="back home-link">🏠 首页</a>
+          <a href="yuwen.html" class="back">← 返回语法</a> 
           <h1>语法图解课堂</h1>
           <p>基础语法不再背定义。这一版把全球搜集来的创新教法做成可操作的原型：<b>词类变成看得见的符号</b>、<b>句子成分画成骨架图</b>、<b>造句变成拼积木</b>。点任意一条，进入它的图解课堂。</p>
           <div class="method-strip">
@@ -223,8 +223,7 @@
       <!-- 详情视图 -->
       <div id="view-detail" class="hidden">
         <div class="topbar">
-          <button class="back" id="btn-back">← 返回列表</button>
-          <div class="pager">
+                    <div class="pager">
             <button id="btn-prev">← 上一条</button>
             <button id="btn-next">下一条 →</button>
           </div>
@@ -405,10 +404,15 @@ function openItem(id){
   document.getElementById('btn-prev').disabled = idx<=0;
   document.getElementById('btn-next').disabled = idx>=ITEMS.length-1;
 }
-document.getElementById('btn-back').addEventListener('click', function(){
+function closeDetail(){
   document.getElementById('view-detail').classList.add('hidden');
   document.getElementById('view-list').classList.remove('hidden');
   window.scrollTo(0,0);
+}
+// 顶栏「← 返回」：详情打开时先回列表（回上一级），列表中再返回语法页
+var topBack = document.querySelector('.topbar .back');
+if (topBack) topBack.addEventListener('click', function(e){
+  if (!document.getElementById('view-detail').classList.contains('hidden')) { e.preventDefault(); closeDetail(); }
 });
 document.getElementById('btn-prev').addEventListener('click', function(){ stepNav(-1); });
 document.getElementById('btn-next').addEventListener('click', function(){ stepNav(1); });

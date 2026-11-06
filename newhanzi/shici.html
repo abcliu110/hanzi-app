@@ -91,8 +91,6 @@
 .sc-detail-head{text-align:center;padding:20px 16px 6px}
 .sc-detail-head h2{margin:0;font-size:26px}
 .sc-detail-meta{margin-top:8px;font-size:14px;color:var(--muted)}
-.sc-backbtn{display:block;margin:6px 16px 0;padding:13px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent);font-size:17px;font-weight:700;cursor:pointer;width:calc(100% - 32px);color:#fff;text-align:center}
-@media (prefers-color-scheme: dark){.sc-backbtn{color:#14211a}}
 .sc-src{font-size:12px;color:var(--muted);text-align:center;padding:16px}
 .sc-chips{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
 .sc-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
@@ -902,7 +900,7 @@ function knowSVG(g){
 }
 function vKnow(){
   setTitle('诗词常识');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += '<div class="sc-know"><p>诗词常识，配着例子看。🎬 是延伸视频，📊 是图解资料。</p></div>';
   var mods = [];
   KNOW_MODS.forEach(function(mm){
@@ -930,13 +928,12 @@ function vKnowList(midx){
   if(!mm) return;
   D.knowledge.forEach(function(k, i){ if(k.m===midx) idxs.push(i); });
   setTitle(mm[2]);
-  var h = '<button class="sc-backbtn" id="knowlBack">← 返回诗词常识</button>';
+  var h = '';
   h += '<div class="sc-kmod">'+mm[1]+' '+mm[2]+'（'+idxs.length+'）</div>';
   idxs.forEach(function(i){
     h += '<div class="sc-knowtitle" data-idx="'+i+'">'+esc(D.knowledge[i].t)+'</div>';
   });
   listEl.innerHTML = h; showList(); wireBack();
-  document.getElementById('knowlBack').addEventListener('click', vKnow);
   listEl.querySelectorAll('[data-idx]').forEach(function(el){
     el.addEventListener('click', function(){ openKnow(parseInt(el.getAttribute('data-idx'),10)); });
   });
@@ -948,7 +945,7 @@ function openKnow(idx){
   var mm = null;
   KNOW_MODS.forEach(function(x){ if(x[0]===k.m) mm = x; });
   var modName = mm ? mm[2] : '诗词常识';
-  var h = '<button class="sc-backbtn" id="scback">← 返回'+esc(modName)+'</button>';
+  var h = '';
   h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
   /* 学前先看：仅当有真实前置时显示 */
   if(k['前置知识'] && k['前置知识'].length){
@@ -988,12 +985,11 @@ function openKnow(idx){
   if(links) h += '<div style="margin-top:6px">'+links+'</div>';
   h += '</div>';
   detEl.innerHTML = h; showDetail();
-  document.getElementById('scback').addEventListener('click', function(){ vKnowList(k.m); });
-}
+  }
 
 function vDyn(){
   setTitle('朝代长河');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button><div style="padding:14px 0">';
+  var h = '<div style="padding:14px 0">';
   h += D.dynasties.map(function(d){
     return '<div class="sc-dyn"><h3>'+esc(d.name)+'</h3><div class="sc-dyntime">'+esc(d.time)+' · '+esc(d.tag)+'</div><p>'+esc(d.desc)+'</p><p class="sc-why">💡 为什么是这个体裁：'+esc(d.why)+'</p></div>';
   }).join('') + '</div>';
@@ -1009,7 +1005,7 @@ function wireBack(){
 function vPoets(){
   setTitle('诗人小传');
   var names = Object.keys(D.poets).sort();
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += names.map(function(n){
     return '<div class="sc-poet" data-poet="'+esc(n)+'"><div class="sc-pname">'+esc(n)+'</div><div class="sc-pbio">'+esc(D.poets[n]).slice(0,60)+'……</div></div>';
   }).join('');
@@ -1030,9 +1026,7 @@ function openPoet(name){
   h += '<div class="sc-know"><h3>代表作（'+works.length+'）</h3><p>' +
     works.map(function(p){return '<span class="sc-worklink" data-o="'+p.order+'">《'+esc(p.title)+'》</span>';}).join(' · ') +
     '</p></div>';
-  h += '<button class="sc-backbtn" id="scback">← 返回诗人列表</button>';
   detEl.innerHTML = h; showDetail();
-  document.getElementById('scback').addEventListener('click', function(){ vPoets(); });
   detEl.querySelectorAll('.sc-worklink').forEach(function(a){
     a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
   });
@@ -1040,7 +1034,7 @@ function openPoet(name){
 
 function vFamous(){
   setTitle('名句典故');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += D.famous.map(function(f, i){
     return '<div class="sc-knowtitle" data-fidx="'+i+'">'+esc(f.line)+'</div>';
   }).join('');
@@ -1054,10 +1048,9 @@ function openFamous(i){
   var f = D.famous[i]; if(!f) return;
   setTitle('名句典故');
   var link = f.order ? '<div class="sc-flink">📜 出自<span class="sc-worklink" data-o="'+f.order+'">《'+esc(f.title)+'》</span>（'+esc(f.author)+'）</div>' : '<div class="sc-flink">📜 '+esc(f.author)+'《'+esc(f.title)+'》</div>';
-  var h = '<button class="sc-backbtn" id="scback">← 返回名句典故</button>';
+  var h = '';
   h += '<div class="sc-famous"><div class="sc-fline">'+esc(f.line)+'</div><div class="sc-fbai">白话：'+esc(f.baihua)+'</div><div class="sc-fstory">典故：'+esc(f.story)+'</div>'+link+'</div>';
   detEl.innerHTML = h; showDetail();
-  document.getElementById('scback').addEventListener('click', function(){ vFamous(); });
   detEl.querySelectorAll('.sc-worklink').forEach(function(a){
     a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
   });
@@ -1130,7 +1123,7 @@ function vImagery(){
       + '<button type="button" class="sc-imfull" data-full="'+i+'">完整讲解 →</button></div>'
       + '</div></div>';
   }).join('');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += '<div class="sc-know"><p>点卡片翻过来看它代表什么，再点「看诗句」读原句。读过含这个字的诗，卡片就会点亮。</p><p class="sc-imcount">已点亮 <b>'+lit+'</b> / '+D.imagery.length+'</p></div>';
   h += '<div class="sc-imcards">'+cards+'</div>';
   listEl.innerHTML = h; showList(); wireBack();
@@ -1176,9 +1169,7 @@ function openImagery(i){
         ' <span style="font-size:12px;color:var(--xzq-muted,#8a8578)">——<span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span></span></div>';
     }).join('') + '</div>';
   }
-  h += '<button class="sc-backbtn" id="scback">← 返回意象地图</button>';
   detEl.innerHTML = h; showDetail();
-  document.getElementById('scback').addEventListener('click', function(){ vImagery(); });
   detEl.querySelectorAll('.sc-worklink').forEach(function(a){
     a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
   });
@@ -1186,7 +1177,7 @@ function openImagery(i){
 
 function vZilian(preZi){
   setTitle('字→诗句链');
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += '<div class="sc-know"><p>输入一个汉字，找出诗库里含这个字的<b>原句</b>，字会标黄。字卡里的“诗句里的这个字”也是从这里链过来的。</p></div>';
   h += '<div class="sc-zrow"><input id="ziinput" maxlength="1" placeholder="如：月"><button id="zigo">找诗句</button></div>';
   h += '<div class="sc-chips">' + ['月','柳','剑','酒','山','花','风','雪'].map(function(z){
@@ -1235,7 +1226,7 @@ function vPoems(){
   var have = {}; base.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
   var dyns = ['all'].concat(DYN_ORDER.filter(function(d){ return have[d]; }), Object.keys(have).filter(function(d){ return DYN_ORDER.indexOf(d) < 0; }));
   if(poemDyn!=='all' && dyns.indexOf(poemDyn)<0) poemDyn = 'all';
-  var h = '<button class="sc-backbtn" data-go="home">← 返回古诗词</button>';
+  var h = '';
   h += '<div class="searchbox" style="padding:10px 16px 0"><input id="pq" type="text" placeholder="搜诗名 / 诗人 / 诗句" value="'+esc(poemQ)+'" autocomplete="off"></div>';
   h += '<div class="sc-chips">' + ['课内','拓展','all'].map(function(k){
     return '<span class="sc-chip'+(poemKe===k?' active':'')+'" data-ke="'+k+'">'+(k==='all'?'全部':k)+'</span>';
@@ -1297,9 +1288,7 @@ function openPoem(order){
       h += '<div class="sc-card" style="margin-top:8px"><h3>✨ 艺术特色</h3><p>'+esc(sx.ys)+'</p></div>';
     }
   }catch(e){}
-  h += '<button class="sc-backbtn" id="scback">← 返回诗库</button>';
   detEl.innerHTML = h; showDetail();
-  document.getElementById('scback').addEventListener('click', function(){ showList(); });
   /* 逐句锚点点击事件 */
   try{
     var lineEls = detEl.querySelectorAll('.sc-line');
@@ -1410,8 +1399,7 @@ function scReadBar(p){
       setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i, p, st.py); }, 2000);
     });
   });
-  var back = document.getElementById('scback'); if(back) back.addEventListener('click', function(){ stopRead(); scBeatBox(p, false); });
-}
+  }
 
 /* ===== 打拍器 + 平仄格（docs/gaijin/shici-gaijin-sheji.md P0-3）=====
    节拍分组：有逐首校过的 beats 用它；否则纯五言 2/3、纯七言 2/2/3（与「节奏」按钮同规则），别的句式不出打拍器。
