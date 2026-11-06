@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拼音区 · 可点原型（版式 + 内容深度）</title>
+<!-- 原型：只给负责人定版式和内容深度用，不是正式页面。只用 zika.css 的护眼 token；不引外链脚本。
+     音频只播 pinyin/audio 里的真人录音（audio-cmn，Chen Wang，CC BY-SA 3.0），不用 Web Speech。
+     交接说明：docs/anim/jiaojie/pinyin-05-yuanxing.md -->
+<link rel="stylesheet" href="../../zika.css">
+<style>
+:root{
+  /* 声调色：沿用首页 index.js 的 TONE_COLORS（1 红 2 绿 3 青灰 4 橄榄 5 灰），色值取自护眼 token */
+  --t1:var(--red); --t2:var(--green); --t3:var(--blue); --t4:#66734f; --t5:var(--muted);
+  --ok:var(--green); --bad:var(--red);
+  --py:"Noto Sans","Noto Sans CJK SC","PingFang SC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --t1:#d98a82; --t2:#7cc4a0; --t3:#8db8c8; --t4:#b3c094; --ok:#7cc4a0; --bad:#d98a82; }
+}
+body{font-size:17px;line-height:1.7}
+.pp{max-width:1180px;margin:0 auto;padding:16px 24px 48px}
+.pp-head h1{font-size:22px;margin:0;color:var(--accent-deep)}
+.pp-head p{margin:4px 0 0;font-size:14px;color:var(--muted);line-height:1.6}
+.pp-screens{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;margin:8px 0 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.pp-screens button,.seg button,.btn{min-height:48px;padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--accent-deep);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.pp-screens button[aria-selected="true"]{background:var(--accent-deep);border-color:var(--accent-deep);color:var(--card)}
+.btn:hover,.pp-screens button:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+@media (prefers-color-scheme: dark){.btn.pri{color:#14211a}}
+.btn:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.screen{display:none}
+.screen.on{display:block}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 14px}
+.box h3{margin:0 0 6px;font-size:17px;color:var(--accent-deep)}
+.box p{margin:4px 0;font-size:15px;line-height:1.75}
+.note{font-size:13px!important;color:var(--muted);line-height:1.6}
+.src,.blk p.src,.box p.src{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.tag{display:inline-block;font-size:12px;font-weight:700;line-height:1;padding:4px 7px;border-radius:7px;border:1px solid var(--line);color:var(--accent-deep);background:var(--card);vertical-align:middle;white-space:nowrap}
+.tag.self{color:var(--muted)}
+.py{font-family:var(--py)}
+.t1{color:var(--t1)} .t2{color:var(--t2)} .t3{color:var(--t3)} .t4{color:var(--t4)} .t5{color:var(--t5)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:0 5px}
+
+/* ---------- A 菜单版式 ---------- */
+.fixbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--accent-soft)}
+.seg button{border:0;background:transparent;min-width:72px}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 0 var(--line);color:var(--accent-deep)}
+.seg button small{font-weight:400;font-size:12px;margin-left:4px;color:var(--muted)}
+.mock{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg)}
+.mock-top{display:flex;align-items:center;gap:12px;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px}
+.mock-top .mk-back{display:inline-flex;align-items:center;padding:6px 14px;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px}
+@media (prefers-color-scheme: dark){.mock-top .mk-back{color:#14211a}}
+.mock-top b{font-size:18px;letter-spacing:2px}
+.mock-main{padding:12px 24px 20px}
+.mock-main.bug{display:grid;grid-template-columns:260px minmax(0,1fr);column-gap:16px;max-width:1100px}
+.mock-ghost{border:2px dashed var(--line);border-radius:12px;color:var(--muted);font-size:13px;padding:12px;line-height:1.6;align-self:start;min-height:240px}
+.mock-frame{border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:14px 16px;min-width:0;container-type:inline-size}
+.mock-main.fix{max-width:1200px;margin:0 auto}
+.mm-intro{color:var(--muted);font-size:14px;margin:0 0 10px}
+.mm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@container (min-width: 880px){ .mock-main.fix .mm-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+/* 现状：iframe 里的页面按 iframe 视口判断 ≥1200，而 iframe 永远 <1200，所以永远 2 列 */
+.mm-card{width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;min-height:44px;cursor:pointer}
+.mm-card:hover{border-color:var(--accent)}
+.mock-main.fix .mm-card{display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
+.mm-hd{display:flex;align-items:center;gap:8px}
+.mm-no{flex:none;width:28px;height:28px;border-radius:14px;background:var(--accent-soft);color:var(--accent-deep);font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.mm-hd b{font-size:18px;line-height:1.3}
+.mm-hd .tag{margin-left:auto}
+.mm-ex{font-family:var(--py);font-size:16px;color:var(--accent-deep);letter-spacing:.3px}
+.mm-ds{font-size:13px;color:var(--muted);line-height:1.6}
+.mm-st{font-size:12px;color:var(--muted);margin-top:auto;padding-top:4px}
+.mm-st.deep{color:var(--accent-deep);font-weight:700}
+/* 现状复刻：button 默认把内容垂直居中 + L 标签 float，造成右列标题下沉 */
+.mock-main.bug .mm-card{display:block}
+.mock-main.bug .mm-hd{display:block}
+.mock-main.bug .mm-hd .tag{float:right;margin:0}
+.mock-main.bug .mm-no{display:inline-flex;margin-right:6px;vertical-align:middle}
+.mock-main.bug .mm-st{display:none}
+.why{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
+@media (min-width:1200px){.why{grid-template-columns:1fr 1fr}}
+.why pre{white-space:pre-wrap;font-size:12.5px;line-height:1.55;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0;overflow:auto}
+
+/* ---------- 知识点（B1 声调 / B2 声母） ---------- */
+.kp-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 6px}
+.kp-head h2{margin:0;font-size:24px;color:var(--accent-deep)}
+.kp-head .sub{font-size:14px;color:var(--muted)}
+.kp-nav{position:sticky;top:69px;z-index:20;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 0;margin:0 0 12px;background:var(--bg)}
+.kp-nav .jump{min-width:72px}
+.kp-nav .seg{margin-left:auto}
+.stage{margin:0 0 22px;scroll-margin-top:140px}
+.stage>h3{display:flex;align-items:center;gap:10px;font-size:20px;margin:0 0 10px;color:var(--ink)}
+.stage>h3 .sn{width:34px;height:34px;border-radius:17px;background:var(--accent-deep);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.stage>h3 small{font-size:13px;font-weight:400;color:var(--muted)}
+.blk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:0 0 12px}
+.blk-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.blk-h b{font-size:17px;color:var(--accent-deep)}
+.blk p{margin:4px 0;font-size:15.5px;line-height:1.8}
+.blk ul{margin:4px 0;padding-left:22px;font-size:15px;line-height:1.8}
+.lvhide{display:none!important}
+.more{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:0 0 12px}
+
+/* 声调路 */
+.roads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:1200px){.roads{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.road{display:flex;flex-direction:column;align-items:stretch;gap:6px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;cursor:pointer;min-height:44px}
+.road:hover{border-color:var(--accent)}
+.road.playing{border-color:var(--accent-deep);background:var(--accent-soft)}
+.road canvas{width:100%;height:150px;display:block;border-radius:10px;background:var(--surface)}
+.road .rh{display:flex;align-items:baseline;gap:8px}
+.road .rh b{font-size:16px}
+.road .rh .py{font-size:30px;margin-left:auto;line-height:1}
+.road .rd{font-size:13px;color:var(--muted);line-height:1.5}
+.sylpick{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0}
+.sylpick span{font-size:14px;color:var(--muted)}
+.pchip{min-width:56px;min-height:48px;padding:6px 12px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font:inherit;font-family:var(--py);font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.pchip:hover{background:var(--accent-soft)}
+.pchip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-deep);font-weight:700}
+.pchip small{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:13px;color:var(--muted)}
+.pchip.mute,.pchip:disabled{border-style:dashed;color:var(--muted);cursor:default;background:var(--card)}
+.pchip.wait{flex-direction:column;gap:2px;line-height:1.2;min-height:64px;border-style:dashed;color:var(--muted);cursor:default;background:var(--card)}
+.pchip.wait em{font-style:normal;font-size:11px;font-family:system-ui,sans-serif}
+.pchip.flash{background:var(--accent-soft);transform:scale(.97)}
+.prow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.prow .lab{min-width:64px;font-size:14px;color:var(--muted)}
+.rule{border-left:4px solid var(--accent);background:var(--card);border-radius:0 12px 12px 0;padding:8px 14px;margin:8px 0;font-size:16px}
+.five{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:8px 0}
+@media (min-width:1200px){.five{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.five div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.6}
+.five b{font-family:var(--py);font-size:22px;margin-right:6px}
+
+/* 练习 */
+.quiz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.qtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.qscore{margin-left:auto;font-size:14px;color:var(--muted)}
+.qopts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0 6px}
+.qopt{min-height:64px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font:inherit;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px}
+.qopt svg{width:40px;height:28px;flex:none}
+.qopt .py{font-size:26px}
+.qopt.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px}
+.qopt.wrong{border-color:var(--bad);border-width:2px;border-style:dashed}
+.qfb{min-height:30px;font-size:15px;line-height:1.6}
+.qfb .ok{color:var(--ok);font-weight:700}
+.qfb .no{color:var(--bad);font-weight:700}
+.letters{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;margin:12px 0 6px}
+.letter{min-width:56px;min-height:64px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font-family:var(--py);font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 8px}
+.letter:hover{background:var(--accent-soft)}
+.letter.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px}
+.letter.wrong{border-color:var(--bad);border-style:dashed;border-width:2px}
+.target{font-size:15px;color:var(--muted)}
+.target b{font-size:18px}
+
+/* 用：注音读句 */
+.sent{display:flex;flex-wrap:wrap;gap:4px 2px;align-items:flex-end;margin:6px 0 10px}
+.zi{display:inline-flex;flex-direction:column;align-items:center;min-width:52px}
+.zi .pyb{min-height:44px;min-width:52px;padding:2px 6px;border:0;border-bottom:2px solid transparent;background:transparent;font-family:var(--py);font-size:19px;cursor:pointer;border-radius:8px}
+.zi .pyb:hover{background:var(--accent-soft)}
+.zi .pyb.nos{cursor:default;opacity:.8;border-bottom:2px dotted var(--line)}
+.zi a{font-size:28px;line-height:1.3;color:var(--ink);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding:0 4px;border-radius:8px}
+.zi a:hover{background:var(--accent-soft)}
+.zi.punc{min-width:20px}
+.zi.punc .pc{font-size:28px;line-height:1.3;min-height:44px;display:inline-flex;align-items:center}
+body[data-level="1"] .zi .sd{visibility:hidden}
+.zi .sd{font-size:12px;color:var(--muted);font-family:var(--py);min-height:18px}
+.pwords{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:1200px){.pwords{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.word{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 8px}
+
+/* 声母：情境图、镜子、纸条、碰撞 */
+.scenes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:1200px){.scenes{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.scene{font:inherit;color:var(--ink);text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:44px}
+.scene:hover{border-color:var(--accent)}
+.scene svg{width:100%;height:150px;display:block;background:var(--surface);border-radius:10px}
+.scene .sl{font-family:var(--py);font-size:64px;font-weight:700;fill:var(--accent-deep);opacity:0;transition:opacity .4s}
+.scene.show .sl{opacity:.9}
+.scene .obj{transition:opacity .4s}
+.scene .sc{font-size:14px;line-height:1.55}
+.scene .sc b{font-family:var(--py);font-size:20px;color:var(--accent-deep);margin-right:4px}
+.mirror{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.mglyph{width:150px;height:150px;border-radius:16px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--py);font-size:110px;line-height:1;color:var(--accent-deep);perspective:400px}
+.mglyph span{display:inline-block;transition:transform .5s ease}
+.mname{font-family:var(--py);font-size:40px;font-weight:700;min-width:60px;color:var(--ink)}
+.mtips{font-size:14px;color:var(--muted);line-height:1.7}
+.strip-wrap{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.strip-wrap svg{width:200px;height:150px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.strip{transform-origin:100px 26px;transition:transform .2s}
+@keyframes blowS{0%{transform:rotate(0)}25%{transform:rotate(-8deg)}60%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+@keyframes blowP{0%{transform:rotate(0)}20%{transform:rotate(-55deg)}55%{transform:rotate(-30deg)}80%{transform:rotate(-8deg)}100%{transform:rotate(0)}}
+.strip.b{animation:blowS .9s ease-out}
+.strip.p{animation:blowP 1.2s ease-out}
+.bump{display:flex;align-items:center;justify-content:center;min-height:130px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden;position:relative}
+.bk{font-family:var(--py);display:inline-flex;align-items:center;justify-content:center;border-radius:14px;height:88px;transition:transform .18s cubic-bezier(.6,0,1,1),opacity .18s}
+.bk.ini{background:var(--accent-soft);color:var(--accent-deep);font-size:34px;min-width:58px;padding:0 10px;border:1px solid var(--line);border-right:0;border-radius:14px 0 0 14px}
+.bk.fin{background:var(--surface);color:var(--ink);font-size:46px;min-width:96px;padding:0 14px;border:2px solid var(--accent);border-radius:0 14px 14px 0}
+.bk.away{transform:translateX(-220px);opacity:.5}
+.bk.merged{border-radius:14px;min-width:150px;font-size:54px;border:2px solid var(--accent-deep);background:var(--surface);animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.bump .eq{position:absolute;left:12px;top:8px;font-size:14px;color:var(--muted);font-family:var(--py)}
+.grid-tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:10px 0}
+.tile{min-height:72px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);font-family:var(--py);font-size:44px;color:var(--ink);cursor:pointer;line-height:1}
+.tile.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px;color:var(--ok)}
+.tile.wrong{border-color:var(--bad);border-style:dashed;border-width:2px}
+.tbl{border-collapse:separate;border-spacing:6px;margin:6px 0}
+.tbl th{font-family:var(--py);font-size:18px;color:var(--muted);font-weight:400;padding:0 6px}
+.tbl td .pchip{min-width:72px}
+.tonebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:6px 0}
+.tonebar .tb-h{font-size:14px;color:var(--muted)}
+.ptable{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+.ptable th,.ptable td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.6}
+.ptable th{background:var(--card);color:var(--accent-deep)}
+
+/* C 大纲 */
+.ol{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin:0 0 10px}
+.ol summary{min-height:56px;display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;font-size:17px;font-weight:700;color:var(--accent-deep);list-style:none}
+.ol summary::-webkit-details-marker{display:none}
+.ol summary::after{content:"展开";margin-left:auto;font-size:13px;font-weight:400;color:var(--muted)}
+.ol[open] summary::after{content:"收起"}
+.ol summary .mm-ex{font-weight:400;font-size:15px}
+.ol .olb{padding:0 16px 14px}
+.olg{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:1200px){.olg{grid-template-columns:1fr 1fr}}
+.olg>div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.7}
+.olg b{color:var(--accent-deep)}
+.olg ul{margin:2px 0;padding-left:20px}
+@media (prefers-reduced-motion: reduce){ .bk,.mglyph span,.scene .sl,.scene .obj{transition:none} .strip.b,.strip.p,.bk.merged{animation:none} }
+</style>
+</head>
+<body>
+<div class="pp">
+  <header class="pp-head">
+    <h1>拼音区 · 可点原型</h1>
+    <p>给负责人定版式和内容深度用，不是正式页面（正式页 <code>pinyin.html</code> 未改）。A 是菜单版式修正；B1、B2 是两个做到「深」的知识点，每个分「看 / 听读 / 练 / 用」四段，右上角「浅 / 中 / 深」切 L1 / L2 / L3；C 是其余 10 个知识点的深度大纲。声音全部是真人录音。</p>
+  </header>
+  <nav class="pp-screens" role="tablist" aria-label="原型屏幕">
+    <button type="button" role="tab" data-s="menu" aria-selected="true">A 菜单版式</button>
+    <button type="button" role="tab" data-s="tone" aria-selected="false">B1 声调</button>
+    <button type="button" role="tab" data-s="bpmf" aria-selected="false">B2 声母 b p m f</button>
+    <button type="button" role="tab" data-s="outline" aria-selected="false">C 其余 10 个 · 大纲</button>
+  </nav>
+
+  <!-- ================= A 菜单版式 ================= -->
+  <section class="screen on" id="s-menu">
+    <div class="fixbar">
+      <div class="seg" role="group" aria-label="现状或修好">
+        <button type="button" data-mode="fix" aria-pressed="true">修好后</button>
+        <button type="button" data-mode="bug" aria-pressed="false">现状复刻</button>
+      </div>
+      <span class="note" id="modeNote"></span>
+    </div>
+    <div class="mock">
+      <div class="mock-top"><span class="mk-back" aria-hidden="true">← 返回</span><b>拼音</b><span class="note">（示意：首页模块视图的顶栏）</span></div>
+      <div class="mock-main fix" id="mockMain">
+        <div class="mock-ghost" id="mockGhost" hidden>这一列是空的：首页 <code>.app-main</code> 在 ≥768 时是「260px 英雄区 + 内容」两列网格，英雄卡早已不在模块视图里，但网格还在，所以所有模块都被挤到右边。</div>
+        <div class="mock-frame">
+          <p class="mm-intro">按统编一年级上册的顺序学：先声调和单韵母，再声母和拼读，然后复韵母、鼻韵母和整体认读，最后是拼写规则和音变。</p>
+          <div class="mm-grid" id="mmGrid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="why">
+      <div class="box">
+        <h3>为什么偏右（所有模块都这样）</h3>
+        <p>首页 <code>index.html</code> 的模块视图 <code>#view-module .app-main</code> 吃到了 <code>zika.css</code> 里 <code>.page-home .app-main</code> 的网格（2026-11-03 首页重设计 <code>0a0ba775</code> 加的）：≥768 时列为 <b>260px + 1fr</b>，区域「top / mods / hero board」；≥1200 时列为 <b>280px + 1fr</b>，<code>max-width:1200px; margin:0</code>（不居中）。</p>
+        <p>所有模块面板（<code>.panel-frame</code> 七个 iframe 模块，加识字、逻辑）都被放进 <code>grid-area: board</code>，也就是右列。左边的 hero 列本该放英雄卡，但 <code>index.html</code> 里已经没有 <code>.hero-card</code>，于是左边永远空 260–280px。</p>
+        <p>实测（Playwright）：768 宽时面板 x=300、宽 444px；1280 宽时面板 x=324、宽 848px，右边还空 80px。iframe 里的子页按 <b>iframe 自己的宽度</b>判断断点：444px 连平板档（768）都进不去，848px 进不了桌面档（1200），所以 1280 桌面上拼音菜单只有两列。</p>
+      </div>
+      <div class="box">
+        <h3>建议修法（等负责人定，原型已按此演示）</h3>
+        <p>① 首页：模块视图不用那张网格，居中放满：</p>
+<pre>@media (min-width:768px){
+  .page-home #view-module .app-main{
+    display:block; max-width:1200px;
+    margin:0 auto; padding:0 24px 32px;
+  }
+}</pre>
+        <p>修后 iframe 宽度：768 → 720px，1280 → 1152px。仍然小于子页的 768 / 1200 断点，所以只改首页不够。</p>
+        <p>② 子页：菜单列数改用<b>容器宽度</b>判断（<code>container-type:inline-size</code> + <code>@container (min-width:880px)</code> 三列），不再看视口。平板 720 → 2 列；桌面 1152 → 3 列；iPad 横屏 1024 → 3 列。</p>
+        <p>③ 卡片对齐：卡片是 <code>&lt;button&gt;</code>，网格把同一行的卡片拉成一样高，而 button 默认把内容<b>垂直居中</b>，内容短的卡片（右列「单韵母」等）标题就往下沉；L 标签又是 <code>float</code>，和编号徽标不在同一行。改为 <code>display:flex; flex-direction:column; justify-content:flex-start</code>，标题行 flex 对齐，L 标签 <code>margin-left:auto</code>。</p>
+        <p class="note">其他子页（部首、古诗、语法、实验、阅读、古文）同样受①影响；它们里面的断点也是按视口写的，修①之后要逐页看是否也要改成容器查询。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B1 声调 ================= -->
+  <section class="screen kp" id="s-tone" data-kp="tone">
+    <div class="kp-head">
+      <h2>声调</h2><span class="sub py">ā á ǎ à · 轻声</span><span class="tag">统编一上第 1 课起，穿插在 a o e 中</span>
+    </div>
+    <div class="kp-nav">
+      <button class="btn jump" type="button" data-to="tone-kan">看</button>
+      <button class="btn jump" type="button" data-to="tone-ting">听读</button>
+      <button class="btn jump" type="button" data-to="tone-lian">练</button>
+      <button class="btn jump" type="button" data-to="tone-yong">用</button>
+      <div class="seg lvseg" role="group" aria-label="深浅档位">
+        <button type="button" data-lv="1" aria-pressed="false">浅<small>L1</small></button>
+        <button type="button" data-lv="2" aria-pressed="true">中<small>L2</small></button>
+        <button type="button" data-lv="3" aria-pressed="false">深<small>L3</small></button>
+      </div>
+    </div>
+
+    <div class="stage" id="tone-kan">
+      <h3><span class="sn">看</span>声调路 <small>点一段路：小车走一遍，同时听这个声调</small></h3>
+      <div class="blk">
+        <div class="blk-h"><b class="lv-only" data-only="1">小车走四种路</b><b class="lv-only" data-only="2">调号就是路的样子</b><b class="lv-only" data-only="3">五度标记：把声音高低分成 5 度</b><span class="tag lvtag"></span></div>
+        <div class="roads" id="roads"></div>
+        <div class="sylpick" id="toneSyl"><span>换个音节听：</span></div>
+        <div class="prow"><button class="btn pri" type="button" id="toneAll">四段连着走</button><span class="note">只画小车和路，不画人。</span></div>
+      </div>
+      <div class="blk" data-lv="2">
+        <div class="blk-h"><b>轻声</b><span class="tag">L2</span></div>
+        <p>轻声读得又轻又短，书上<b>不标调号</b>。比如「妈妈」<span class="py">māma</span>，第二个「妈」就是轻声。</p>
+        <p class="note">轻声没有单独录音（audio-cmn 不含轻声），要靠词语录音来教，见 C 大纲「变调、轻声、儿化」。</p>
+        <p class="src">依据：《汉语拼音方案》声调符号部分「轻声不标」；GB/T 16159-2012 第 6.5.1 条。</p>
+      </div>
+      <div class="blk" data-lv="3">
+        <div class="blk-h"><b>五度标记法</b><span class="tag">L3</span></div>
+        <div class="five">
+          <div><b class="t1">55</b>阴平：从 5 度到 5 度，高而平。</div>
+          <div><b class="t2">35</b>阳平：从 3 度升到 5 度。</div>
+          <div><b class="t3">214</b>上声：先降到 1 度再升到 4 度，是最长的一个。</div>
+          <div><b class="t4">51</b>去声：从 5 度一路降到 1 度。</div>
+        </div>
+        <p>上声只在单念、或在词语和句子末尾时读完整的 214；在一声、二声、四声和轻声前面，常常只读前半段的低降（半上，约 211 / 21）。两个上声相连，前一个读得像阳平（214 → 35）。</p>
+        <p>轻声没有固定的调值，读多高要看前一个字的声调。轻声是四声的一种音变，不是第五个声调。</p>
+        <p class="src">依据：赵元任五度标记法（普通话调值 55 / 35 / 214 / 51 为通行描写）；上声变调与轻声见普通话水平测试实施纲要（调研报告 A9、A11）。</p>
+      </div>
+    </div>
+
+    <div class="stage" id="tone-ting">
+      <h3><span class="sn">听</span>听读 <small>点哪个读哪个</small></h3>
+      <div class="blk">
+        <div class="blk-h"><b>四声一组，一组一组读</b><span class="tag">L1</span></div>
+        <div id="toneRows"></div>
+      </div>
+      <div class="blk" data-lv="2">
+        <div class="blk-h"><b>对比读：只差声调，意思就变了</b><span class="tag">L2</span><span class="tag self">词对自选</span></div>
+        <div id="tonePairs"></div>
+      </div>
+      <div class="blk" data-lv="3">
+        <div class="blk-h"><b>同一个三声，单念和在词里不一样</b><span class="tag">L3</span></div>
+        <p>先听单念的 <button class="pchip" type="button" data-syl="ma" data-tone="3">mǎ <small>马</small></button>：一路降下去再扬起来（214）。</p>
+        <p>在「马车 mǎchē」里，「马」后面跟着一声，只读前一半的低降，不再扬起来（半上）。词语录音还没有，这里只能用文字说明。</p>
+      </div>
+    </div>
+
+    <div class="stage" id="tone-lian">
+      <h3><span class="sn">练</span>练一练 <small>随机出题，判对错，不扣分</small></h3>
+      <div class="blk">
+        <div class="blk-h"><b>听音选调</b><span class="tag">L1</span></div>
+        <div class="quiz" id="qTone"></div>
+      </div>
+      <div class="blk" data-lv="2">
+        <div class="blk-h"><b>标调练习：调号该落在哪个字母上？</b><span class="tag">L2</span></div>
+        <div class="rule">有 a 不放过，没有 a 找 o e，i u 并列标在后，这样标调不会错。<span class="note">（教育部《汉语拼音的教学特色》所引口诀，和 GB/T 16159-2012 第 6.5.1 条一致）</span></div>
+        <div class="quiz" id="qMark"></div>
+      </div>
+    </div>
+
+    <div class="stage" id="tone-yong">
+      <h3><span class="sn">用</span>读一读 <small>点拼音听音节，点汉字去字卡</small></h3>
+      <div class="blk">
+        <div class="blk-h"><b>词语</b><span class="tag self">自编</span></div>
+        <div class="pwords" id="toneWords"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>短句</b><span class="tag self">自编</span></div>
+        <div id="toneSents"></div>
+        <p class="note">注音按字标原调（GB/T 16159-2012 第 7.1 条：低年级识字读物可按字注音）。轻声音节没有单字录音，下面虚线表示。</p>
+        <p class="note" data-lv="2">「我把」两个三声相连：书上写 <span class="py">wǒ bǎ</span>，读的时候「我」像二声。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B2 声母 b p m f ================= -->
+  <section class="screen kp" id="s-bpmf" data-kp="bpmf">
+    <div class="kp-head">
+      <h2>声母 b p m f</h2><span class="sub">统编一上第 3 课 · 21 个声母的第一组</span><span class="tag">声母共 21 个，y、w 不算声母（统编 2024 修订版）</span>
+    </div>
+    <div class="kp-nav">
+      <button class="btn jump" type="button" data-to="bpmf-kan">看</button>
+      <button class="btn jump" type="button" data-to="bpmf-ting">听读</button>
+      <button class="btn jump" type="button" data-to="bpmf-lian">练</button>
+      <button class="btn jump" type="button" data-to="bpmf-yong">用</button>
+      <div class="seg lvseg" role="group" aria-label="深浅档位">
+        <button type="button" data-lv="1" aria-pressed="false">浅<small>L1</small></button>
+        <button type="button" data-lv="2" aria-pressed="true">中<small>L2</small></button>
+        <button type="button" data-lv="3" aria-pressed="false">深<small>L3</small></button>
+      </div>
+    </div>
+
+    <div class="stage" id="bpmf-kan">
+      <h3><span class="sn">看</span>音形结合 <small>点图：字母出现在右上角，和图对一对形状</small></h3>
+      <div class="blk">
+        <div class="blk-h"><b>一个东西，一个字母</b><span class="tag">L1</span><span class="tag self">情境自编（只画物，不画人）</span></div>
+        <div class="scenes" id="scenes"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>b d p q 照镜子</b><span class="tag">L1</span></div>
+        <div class="mirror">
+          <div class="mglyph" aria-live="polite"><span id="mGlyph">b</span></div>
+          <div>
+            <div class="mname py" id="mName">b</div>
+            <div class="prow">
+              <button class="btn" type="button" id="mLR">左右翻</button>
+              <button class="btn" type="button" id="mUD">上下翻</button>
+              <button class="btn" type="button" id="mReset">回到 b</button>
+            </div>
+            <div class="mtips" id="mTip">b 的肚子在竖线右下边。左右一翻就成了 d，上下一翻就成了 p。</div>
+          </div>
+        </div>
+        <p class="note">翻转只帮助记形状。这一课只学 b、p；d 下一课学，q 在 j q x 那课学。</p>
+        <p class="src">依据：形近字母 b/d/p/q 混淆率 40%–50%（人教社修订研究文章所引二手数据，调研报告 A4）。</p>
+      </div>
+      <div class="blk" data-lv="2">
+        <div class="blk-h"><b>它们在嘴的哪儿发出来</b><span class="tag">L2</span></div>
+        <table class="ptable">
+          <tr><th>声母</th><th>发音部位</th><th>怎么出声</th><th>气流</th></tr>
+          <tr><td class="py">b</td><td>双唇：上下嘴唇合拢</td><td>嘴唇突然张开，「爆」出来</td><td>不送气</td></tr>
+          <tr><td class="py">p</td><td>双唇</td><td>和 b 一样爆开</td><td><b>送气</b>：有一股气冲出来</td></tr>
+          <tr><td class="py">m</td><td>双唇</td><td>嘴唇闭着，声音从鼻子出来</td><td>鼻音</td></tr>
+          <tr><td class="py">f</td><td>唇齿：上牙轻碰下唇</td><td>气从牙和唇的缝里挤出来</td><td>摩擦</td></tr>
+        </table>
+        <p class="src">依据：《汉语拼音方案》声母表；普通话声母按发音部位、发音方法的通行分类。</p>
+      </div>
+      <div class="blk" data-lv="3">
+        <div class="blk-h"><b>一个字母三种读法</b><span class="tag">L3</span></div>
+        <p><b>名称音</b>：字母表里给字母起的名字，b 叫 <span class="py">bê</span>。<b>呼读音</b>：教声母时为了好听清，在后面加个元音，b 读「玻」<span class="py">bo</span>，又轻又短。<b>本音</b>：声母自己的音，只有嘴唇一开的那一下，几乎听不见。</p>
+        <p>拼读时用的是本音。所以拼 <span class="py">bā</span> 不是「玻 + 啊」——要是把 bo 读满再接 a，就拼成「播啊」了。</p>
+        <p>普通话的 b 和 p 都是清音，区别在<b>送不送气</b>，不在声带振不振动（和英语的 b/p 不同）。</p>
+        <p>bo po mo fo 是省写：实际读的时候 b 和 o 之间有一点圆唇的过渡，有学者主张写成 buo，这是学界讨论，不作定论。</p>
+        <p class="src">依据：《汉语拼音方案》字母表（名称音）和声母表（呼读字 玻 坡 摸 佛）；呼读音与本音之分、音节本位的讨论见调研报告 §3.1；单韵母 o 读音见教育部新闻办 2023 年答复（A8）。</p>
+      </div>
+    </div>
+
+    <div class="stage" id="bpmf-ting">
+      <h3><span class="sn">听</span>听读</h3>
+      <div class="blk">
+        <div class="blk-h"><b>呼读音</b><span class="tag">L1</span></div>
+        <div class="prow" id="huduRow"></div>
+        <p class="note">呼读音要负责人自己录（又轻又短，0.2–0.3 秒）。放进 <code>pinyin/audio/hudu/</code> 后这里自动变成可点。没有录音时不拿音节 bō 顶替，因为呼读音必须比音节短。</p>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>一声连读：bā pā mā fā</b><span class="tag">L1</span></div>
+        <div class="prow" id="firstRow"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>拼出来的音节：点格子，再点声调</b><span class="tag">L1</span></div>
+        <div style="overflow-x:auto"><table class="tbl" id="sylTable"></table></div>
+        <div id="sylBar"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>手掌试一试：b 和 p 哪里不一样</b><span class="tag">L1</span></div>
+        <div class="strip-wrap">
+          <svg viewBox="0 0 200 150" aria-label="夹子夹着的一条薄纸条">
+            <rect x="70" y="10" width="60" height="16" rx="4" class="svg-muted"/>
+            <rect x="94" y="22" width="12" height="10" rx="2" class="svg-deep"/>
+            <g class="strip" id="strip"><rect x="94" y="28" width="12" height="104" rx="3" class="svg-panel svg-accent-s" stroke-width="2"/></g>
+          </svg>
+          <div>
+            <p>把手掌（或一条薄纸条）放在嘴前一拳远。先读 b，再读 p。</p>
+            <div class="prow">
+              <button class="pchip" type="button" data-blow="b" data-syl="ba" data-tone="4">b · bà <small>爸</small></button>
+              <button class="pchip" type="button" data-blow="p" data-syl="pa" data-tone="4">p · pà <small>怕</small></button>
+            </div>
+            <p class="note">读 p 时有一股气冲到手心，纸条被吹起来；读 b 几乎没有气。</p>
+          </div>
+        </div>
+        <p class="src">依据：教育部《汉语拼音的教学特色》：送气和不送气，手放在嘴前成对比较（调研报告 A7）。</p>
+      </div>
+      <div class="blk" data-lv="2">
+        <div class="blk-h"><b>送气不送气，一共 6 对</b><span class="tag">L2</span></div>
+        <p>b/p 是第一对。以后还会学到 d/t、g/k、j/q、z/c、zh/ch，都是「左边不送气、右边送气」。</p>
+        <div class="prow" id="aspRow"></div>
+      </div>
+    </div>
+
+    <div class="stage" id="bpmf-lian">
+      <h3><span class="sn">练</span>练一练</h3>
+      <div class="blk">
+        <div class="blk-h"><b>听音选声母</b><span class="tag">L1</span></div>
+        <div class="quiz" id="qIni"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>两拼碰一碰</b><span class="tag">L1</span></div>
+        <div class="prow"><span class="lab">声母</span><span id="bIni"></span></div>
+        <div class="prow"><span class="lab">韵母</span><span id="bFin"></span></div>
+        <div class="prow"><span class="lab">声调</span><span id="bTone"></span></div>
+        <div class="bump" id="bump" aria-live="polite"></div>
+        <div class="prow"><button class="btn pri" type="button" id="bGo">碰！</button><button class="btn" type="button" id="bReset">再来</button><span class="note" id="bMsg"></span></div>
+        <div class="rule lv-only" data-only="1">声母小小的、轻轻的，一出来就撞上韵母，中间不停。</div>
+        <div class="rule" data-lv="2">前音轻短后音重，两音相连猛一碰。<span class="note">（教育部《汉语拼音的教学特色》所引口诀）</span></div>
+        <p class="note" data-lv="2">进阶（支架法）：先把嘴唇合好摆成 b 的样子，不出声，然后直接读出 bā。</p>
+        <p class="note" data-lv="3">为什么不能「玻—啊」：呼读音 bo 已经带了一个 o，再接 a 就是两个元音，拼出来是「播啊」。动画里两个块之间不留空，就是为了让声母只占极短的一下。</p>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>找一找：点出所有的 <span class="py" id="fTarget">b</span></b><span class="tag">L1</span></div>
+        <div class="grid-tiles" id="fTiles"></div>
+        <div class="prow"><span class="qfb" id="fMsg"></span><button class="btn" type="button" id="fNext" style="margin-left:auto">换一盘</button></div>
+      </div>
+    </div>
+
+    <div class="stage" id="bpmf-yong">
+      <h3><span class="sn">用</span>读一读</h3>
+      <div class="blk">
+        <div class="blk-h"><b>词语</b><span class="tag self">自编</span></div>
+        <div class="pwords" id="bpmfWords"></div>
+      </div>
+      <div class="blk">
+        <div class="blk-h"><b>儿歌《小木马》</b><span class="tag self">自编</span></div>
+        <div id="bpmfSong"></div>
+        <p class="note">推 tuī、拉 lā、上 shàng 里的声母还没学，先听，不要求拼。</p>
+        <p class="note" data-lv="2">「不怕」：书上按字标 <span class="py">bù</span>，读的时候在四声前变成 <span class="py">bú</span>（GB/T 16159-2012 第 6.5.2 条：语言教学中可按变调标写）。上面小字就是实际读音。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= C 大纲 ================= -->
+  <section class="screen" id="s-outline">
+    <div class="box">
+      <h3>其余 10 个知识点的深度大纲</h3>
+      <p>每个知识点按 B1、B2 的样子做满「看 / 听读 / 练 / 用」和 L1 / L2 / L3。下面是后续开发清单，顺序按统编一上。例句、儿歌全部另行自编。</p>
+    </div>
+    <div id="olList"></div>
+  </section>
+  <p class="note" style="margin-top:20px">音节录音：Chen Wang（王琛），来自 audio-cmn（Hugo Lopez 整理），许可 CC BY-SA 3.0，未改动。声母呼读音待自录。</p>
+</div>
+
+<script src="../../pinyin/data.js"></script>
+<script src="../../pinyin/syllables.js"></script>
+<script src="../../pinyin/syllable.js"></script>
+<script src="../../pinyin/audio/index.js"></script>
+<script>/* 原型放在 docs/ui-prototypes/ 下，音频地址要往上两级 */ if (window.NHZ_PINYIN_AUDIO) window.NHZ_PINYIN_AUDIO.base = '../../pinyin/audio/';</script>
+<script src="../../pinyin/player.js"></script>
+<script>
+/* 其余 10 个知识点的深度大纲（同一份内容也写进交接文档 pinyin-05-yuanxing.md） */
+window.PP_OUTLINE = [
+  { id: 'danyunmu', name: '单韵母', ex: 'a o e i u ü', src: '统编一上第 1、2 课；教育部新闻办 2023 年就 o 读音的答复',
+    kan: ['每个字母配一个自编情境（只画物和动物，避开课本原图），点图后字母出现在旁边对形状，复用 B2 的情境卡', '嘴形大小、圆不圆的对比：用抽象的开口椭圆示意（不画脸；是否可以见待决问题）'],
+    ting: ['6 个 × 四声：a、o、e 用本音节；i、u、ü 借 yi、wu、yu 的录音并注明「单念和音节 yi 一样」', 'o 按「喔 ō」教；cmn-o1 是否接近「喔」需要人耳确认后再上线'],
+    lian: ['听音选韵母（6 选 1）', '听音选调（复用 B1 题型，范围限单韵母）', 'u / ü 对比听（wu / yu）'],
+    yong: ['自编词语：阿姨 āyí、鱼 yú、乌鸦 wūyā 等，点字去字卡'],
+    l1: '嘴巴张多大、圆不圆', l2: '舌头高低前后、嘴唇圆不圆：i 和 ü 舌位一样，只差圆唇', l3: '元音舌位四边形（抽象图）；《方案》韵母表还有 ê、er、-i；bo po mo fo 实际带圆唇过渡（学界讨论）' },
+  { id: 'yw', name: 'y 和 w', ex: 'yi wu yu · ya wo yue', src: '《汉语拼音方案》韵母表说明 (4)；统编一上第 9 课',
+    kan: ['「请 y、w 来开门」动画（mask 模板）：i→yi、u→wu、ü→yu 时 ü 的两点摘下', 'ia→ya、ie→ye、iao→yao、ua→wa、uo→wo、üe→yue 依次演示'],
+    ting: ['yi wu yu 四声（整体认读）', 'ya ye yao you yan yin yang ying yong / wa wo wai wei wan wen wang weng / yue yuan yun 各四声'],
+    lian: ['还原题：yu → ü，wei → uei', '改写题：i + ang 写成 yang', '判断题：y、w 是不是声母'],
+    yong: ['自编词语和短句，含 yú、wā、yuè 等'],
+    l1: 'y、w 是 i、u、ü 自己出门时请来的开门小帮手', l2: '零声母音节的写法规则全表；yi wu yu 读法同 i u ü', l3: 'y、w 是隔音用的字母，不是声母；2024 新教材声母 21 个，老书说 23 个的来历' },
+  { id: 'pindu', name: '拼读', ex: 'b–ā → bā · g–u–ā → guā', src: '统编一上第 3 课起；教育部口诀；调研报告 §3.1（音节本位讨论）',
+    kan: ['碰撞动画（bump 模板）：两拼 → 三拼（介母块快速滑入）→ 声介合拼 gu–āng → 直呼（三块同时出现）', '复用 B2「两拼碰一碰」的块和节奏，两块之间不留空'],
+    ting: ['每个音节三段：呼读音（短）→ 带调韵母 → 整个音节；三拼加介母', '依赖：21 条呼读音自录'],
+    lian: ['拼读机：声母 × 韵母 × 声调转盘，不存在的组合灰掉，拼出来显示同音字并链接字卡', '找朋友：声母卡配韵母卡', '听音拼字：听音节选声母 + 韵母', '拼音接龙（人教社玩法）'],
+    yong: ['拼出一上生字，读自编词句'],
+    l1: '小声母轻轻一碰大韵母', l2: '三拼口诀「声轻介快韵母响」；支架法；韵母定调法', l3: '呼读音只是名字，拼读用本音；「两个音节拼一个音节」的批评；直呼是目标' },
+  { id: 'fuyunmu', name: '复韵母', ex: 'ai ei ui ao ou iu ie üe er', src: '统编一上第 10–12 课；《方案》韵母表说明 (5)',
+    kan: ['动程图：口形从前一个元音滑向后一个（两个抽象开口之间的滑动箭头）', '省写演示：uei → ui、iou → iu（被省的 e、o 半透明「藏起来」）', 'er 卷舌示意'],
+    ting: ['9 个 × 四声（ui→wei、iu→you、ie→ye、üe→yue 借零声母音节，注明）', '带声母的音节举例'],
+    lian: ['成对辨听：ai/ei、ao/ou、iu/ui、ie/üe', '标调位置（复用 B1 标调题，重点 iu、ui 标后一个）'],
+    yong: ['自编儿歌，含本课韵母'],
+    l1: '滑着读，嘴形会变', l2: 'iu、ui 标调规则；er 不和声母相拼；ye、yue 是整体认读', l3: '前响、后响、中响复韵母；iou、uei 的韵腹在带声母时变弱（所以省写）' },
+  { id: 'biyunmu', name: '鼻韵母', ex: 'an en in un ün · ang eng ing ong', src: '统编一上第 13、14 课；教材 24 韵母 vs 《方案》35 格',
+    kan: ['前鼻 / 后鼻收音对比：舌尖顶上齿龈 vs 舌根抬起（抽象口腔侧剖面，只画器官线条；可否做见待决问题）'],
+    ting: ['9 个 × 四声（in→yin、un→wen、ün→yun、ing→ying 借音；ong 单念没有录音，显示「无录音」）', 'an/ang、en/eng、in/ing 成对对比听'],
+    lian: ['前后鼻对对碰（限时不扣分）', '听音选韵母', 'yuan yin yun ying 认读'],
+    yong: ['自编成对词：金 jīn / 京 jīng 一类，放进短句'],
+    l1: '前鼻收得早、后鼻收得深（听感）', l2: 'un 是 uen 的省写；ün 遇 j q x y 去点；ong 前面一定有声母', l3: '-n、-ng 发音部位；方言区 in/ing、en/eng 混淆；24 韵母和《方案》35 格怎么对应' },
+  { id: 'zhengti', name: '整体认读音节', ex: 'zhi chi shi ri zi ci si yi wu yu …', src: '统编一上第 7、8、9、12、13、14 课',
+    kan: ['「拆开会错」动画：zh + i 拼成错误的音 → 改为整个读', '按课出现的分组卡片'],
+    ting: ['16 个 × 四声，全部有录音'],
+    lian: ['分类题：整体认读还是要拼？（混入 zha、ji、you 等）', '听音选音节', 'zhi / zi 平翘舌辨听'],
+    yong: ['自编词语'],
+    l1: '一口气读，不拆开', l2: '16 个分三类：zhi…si（i 不读 i）；yi wu yu ye yue；yuan yin yun ying', l3: 'zhi…si 的韵母是舌尖元音 -i；「整体认读」是教学分类，不是《方案》术语' },
+  { id: 'pinxie', name: '拼写规则', ex: 'jú · nǚ · Xī\'ān', src: 'GB/T 16159-2012 第 6.5.1、6.6.2 条；《方案》说明 (4)(5)、隔音符号',
+    kan: ['调号找位置动画（tonemark 模板）：a → o → e 依次找；iu、ui 落在后一个；落在 i 上时点淡出', 'ü 摘眼镜：遇 j q x y 摘，遇 n l 不摘', '隔音符号：xiān 和 Xī\'ān 对比'],
+    ting: ['nǚ / nǔ、lǜ / lù 对比听', 'Xī\'ān / xiān 对比听'],
+    lian: ['调号拖放（B1 标调题的拖放版）', '改错题：jü、xīan、标错位置——用音节解析器判对', '补隔音符号'],
+    yong: ['自编词句；大写字母表与音序查字典入门'],
+    l1: '口诀：有 a 不放过…', l2: '6.5.1 全条；省写；隔音符号；大写字母表（课标要求熟记字母表）', l3: '为什么 j q x 后能省点（不和 u 相拼）；移行规则 6.6.2；正词法入门（是否做见待决问题）' },
+  { id: 'yibian', name: '易混音', ex: 'b d p q · n l · zh z · an ang', src: '调研报告 §3.3 常见错误清单',
+    kan: ['镜子（mirror 模板）：b d p q、n m、f t、t l；复用 B2 的翻转', '送气纸条（复用 B2）', '平翘舌、n/l 的部位示意'],
+    ting: ['成对音频：b/p d/t g/k j/q z/c zh/ch；n/l；z/zh c/ch s/sh；前后鼻；f/h'],
+    lian: ['易混对对碰：成对辨听，限时不扣分', '镜子游戏', '错题进复习系统（SRS）'],
+    yong: ['自编绕口短句（不用流行绕口令）'],
+    l1: '听一听、看一看哪里不同', l2: '每组的发音要领', l3: '送气 vs 清浊；平翘舌、n/l 的方言成因' },
+  { id: 'yinbian', name: '变调、轻声、儿化', ex: 'nǐ hǎo · yí gè · huār', src: 'GB/T 16159-2012 第 6.5.2 条；普通话水平测试实施纲要',
+    kan: ['声调路变形：214 + 214 → 35 + 214（复用 B1 的声调路）', '「一」「不」变调路', '轻声：小车只走很短一段'],
+    ting: ['需要词语录音：audio-cmn 没有轻声和变调（edge-tts + 人耳复核，或自录，见待决问题）', '双音节声调组合 20 种（Tone Pairs）'],
+    lian: ['变调侦探：给原调标注，找出实际要变调的字', '声调对对碰'],
+    yong: ['自编句：含「一」「不」和三声连读'],
+    l1: '听着不一样', l2: '上声变调、「一」「不」变调规则；轻声不标调；儿化加 r', l3: '半上 211；三个上声看结构；轻声音高看前字；「啊」的音变' },
+  { id: 'yinjiebiao', name: '音节总表', ex: '声母 × 韵母', src: 'pinyin/syllables.js 合法音节 415 个（+7 叹词）',
+    kan: ['声母 × 韵母大表，按四呼分区；不存在的组合灰掉'],
+    ting: ['点格子出四声条，只显示存在的声调（需从字库反查哪些调有字）'],
+    lian: ['找空格：为什么 f 不拼 i', '在表里找同音字'],
+    yong: ['格子链接到字卡同音字'],
+    l1: '亮的能拼，灰的不能拼', l2: '四呼规律：j q x 只拼齐齿、撮口；g k h 不拼齐齿、撮口', l3: '合法音节表的来源；《方案》35 格 vs 教材分组' }
+];
+</script>
+<script>
+(function () {
+  'use strict';
+  var S = window.NHZPinyinSyllable, A = window.NHZPinyinAudio;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function akey(w) { return String(w).replace(/ü/g, 'v'); }
+  function rnd(n) { return Math.floor(Math.random() * n); }
+  function pick(a) { return a[rnd(a.length)]; }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function has(syl, t) { return !!(A && A.hasSyl(akey(syl), t)); }
+  function play(syl, t) { return A ? A.playSyl(akey(syl), t) : Promise.resolve(false); }
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  /* ---------- 屏幕切换（只用界面状态，不用浏览器历史；?s=tone&lv=3 只在打开时读一次，方便截图和发链接） ---------- */
+  var cur = 'menu';
+  function show(s, olId) {
+    cur = s;
+    $$('.pp-screens button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-s') === s ? 'true' : 'false'); });
+    $$('.screen').forEach(function (x) { x.classList.toggle('on', x.id === 's-' + s); });
+    if (A) A.stop();
+    if (s === 'tone') drawRoads();
+    if (olId) { var d = document.getElementById('ol-' + olId); if (d) { d.open = true; setTimeout(function () { d.scrollIntoView({ block: 'start' }); }, 0); return; } }
+    window.scrollTo(0, 0);
+  }
+  $('.pp-screens').addEventListener('click', function (e) { var b = e.target.closest('button[data-s]'); if (b) show(b.getAttribute('data-s')); });
+
+  /* ---------- 档位（沿用语法白板：浅 / 中 / 深，默认中） ---------- */
+  var LV = 2, LVN = ['浅', '中', '深'];
+  function applyLv() {
+    document.body.setAttribute('data-level', LV);
+    $$('.lvseg button').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-lv') === LV ? 'true' : 'false'); });
+    $$('[data-lv]').forEach(function (el) { if (el.closest('.lvseg')) return; el.classList.toggle('lvhide', +el.getAttribute('data-lv') > LV); });
+    $$('.lv-only').forEach(function (el) { el.classList.toggle('lvhide', +el.getAttribute('data-only') !== LV); });
+    $$('.lvtag').forEach(function (el) { el.textContent = 'L' + LV; });
+    $$('.more').forEach(function (m) { m.parentNode.removeChild(m); });
+    $$('.stage').forEach(function (st) {
+      var hid = $$('.blk[data-lv]', st).filter(function (b) { return +b.getAttribute('data-lv') > LV; }).length;
+      if (hid) st.insertAdjacentHTML('beforeend', '<div class="more">深一点还有 ' + hid + ' 块（选「' + LVN[LV] + '」' + (LV === 1 ? '或「深」' : '') + '可看）</div>');
+    });
+    drawRoads();
+    if (qMark) qMark.lvChanged();
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.lvseg button'); if (b) { LV = +b.getAttribute('data-lv'); applyLv(); }
+    var j = e.target.closest('.jump'); if (j) { var t = document.getElementById(j.getAttribute('data-to')); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+  });
+
+  /* 通用：带 data-syl / data-tone 的按钮点一下就播 */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-syl][data-tone]'); if (!b || b.disabled || b.classList.contains('mute')) return;
+    if (b.closest('.road') || b.classList.contains('noauto')) return;
+    play(b.getAttribute('data-syl'), +b.getAttribute('data-tone'));
+    b.classList.add('flash'); setTimeout(function () { b.classList.remove('flash'); }, 450);
+    var bl = b.getAttribute('data-blow');
+    if (bl) { var s = $('#strip'); s.classList.remove('b', 'p'); void s.getBoundingClientRect(); if (!reduce) s.classList.add(bl); }
+  });
+
+  function pchip(syl, t, small, cls) {
+    var lab = S.mark(syl, t);
+    if (!has(syl, t)) return '<span class="pchip mute" aria-disabled="true" title="没有录音">' + esc(lab) + (small ? '<small>' + esc(small) + '</small>' : '') + '</span>';
+    return '<button type="button" class="pchip ' + (cls || '') + '" data-syl="' + esc(syl) + '" data-tone="' + t + '"><span class="t' + t + '">' + esc(lab) + '</span>' + (small ? '<small>' + esc(small) + '</small>' : '') + '</button>';
+  }
+
+  /* ================= A 菜单 ================= */
+  var MENU = window.NHZ_PINYIN_MENU || [];
+  var DEEP = { shengdiao: 'tone', shengmu: 'bpmf' };
+  $('#mmGrid').innerHTML = MENU.map(function (m) {
+    return '<button type="button" class="mm-card" data-id="' + esc(m.id) + '"><div class="mm-hd"><span class="mm-no">' + m.no + '</span><b>' + esc(m.name) + '</b><span class="tag">' + esc(m.lv) + '</span></div>' +
+      '<div class="mm-ex">' + esc(m.ex) + '</div><div class="mm-ds">' + esc(m.ds) + '</div>' +
+      '<div class="mm-st' + (DEEP[m.id] ? ' deep' : '') + '">' + (DEEP[m.id] ? '原型已做深 · 点开看' : '深度大纲 · 点开看') + '</div></button>';
+  }).join('');
+  $('#mmGrid').addEventListener('click', function (e) {
+    var b = e.target.closest('.mm-card'); if (!b) return;
+    var id = b.getAttribute('data-id');
+    if (DEEP[id]) show(DEEP[id]); else show('outline', id);
+  });
+  function setMode(m) {
+    var main = $('#mockMain');
+    main.className = 'mock-main ' + m;
+    $('#mockGhost').hidden = m !== 'bug';
+    $$('.fixbar .seg button').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mode') === m ? 'true' : 'false'); });
+    $('#modeNote').textContent = m === 'bug'
+      ? '现状：左边空一列；内容框宽度不够，菜单永远两列；右列标题下沉。'
+      : '修好后：模块视图居中铺满；菜单按容器宽度分列（平板 2 列、桌面 3 列）；编号、标题、L 标签在同一行对齐。';
+  }
+  $('.fixbar .seg').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) setMode(b.getAttribute('data-mode')); });
+  setMode('fix');
+
+  /* ================= B1 声调路 ================= */
+  var CONTOUR = { 1: [[0, 5], [1, 5]], 2: [[0, 3], [1, 5]], 3: [[0, 2], [0.42, 1], [1, 4]], 4: [[0, 5], [1, 1]] };
+  var VAL = { 1: '55', 2: '35', 3: '214', 4: '51' };
+  var MARKS = { 1: 'ˉ', 2: 'ˊ', 3: 'ˇ', 4: 'ˋ' };
+  var ROADN = { 1: ['一声', '平路', '高高的，一直平着走'], 2: ['二声', '上坡', '从中间往上爬'], 3: ['三声', '先下坡再上坡', '先往下走，再拐上去'], 4: ['四声', '下坡', '从最高处一路冲下来'] };
+  var TONE_SYL = [['ma', '妈麻马骂'], ['a', ''], ['ba', '八拔把爸'], ['yi', '衣姨椅意'], ['wu', '乌无五雾']];
+  var toneSyl = 'ma', prog = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  function pitch(tone, t) { /* 余弦插值，路面圆滑 */
+    var c = CONTOUR[tone];
+    for (var i = 0; i < c.length - 1; i++) {
+      if (t <= c[i + 1][0] || i === c.length - 2) {
+        var a = c[i], b = c[i + 1], u = Math.max(0, Math.min(1, (t - a[0]) / (b[0] - a[0])));
+        var k = (1 - Math.cos(u * Math.PI)) / 2; return a[1] + (b[1] - a[1]) * k;
+      }
+    }
+    return c[c.length - 1][1];
+  }
+  function drawRoad(cv, tone, p) {
+    var dpr = window.devicePixelRatio || 1, w = cv.clientWidth || 200, h = cv.clientHeight || 150;
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    var L = LV === 3 ? 30 : 22, R = LV === 3 ? 52 : 22, T = LV === 3 ? 18 : 32, B = LV === 3 ? 16 : 12;
+    var X = function (t) { return L + t * (w - L - R); };
+    var Y = function (v) { return T + (5 - v) / 4 * (h - T - B); };
+    var col = css('--t' + tone), ink = css('--ink'), muted = css('--muted'), soft = css('--accent-soft'), line = css('--line');
+    var N = 60, i, t;
+    if (LV === 3) {
+      g.font = '12px system-ui,sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+      for (i = 1; i <= 5; i++) { g.strokeStyle = line; g.setLineDash([4, 4]); g.lineWidth = 1; g.beginPath(); g.moveTo(L, Y(i)); g.lineTo(w - R, Y(i)); g.stroke(); g.fillStyle = muted; g.fillText(String(i), L - 8, Y(i)); }
+      g.setLineDash([]);
+      /* 右侧五度竖标：一根竖线 + 贴着它的小调型 */
+      var bx = w - 12; g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(bx, Y(5)); g.lineTo(bx, Y(1)); g.stroke();
+      g.beginPath(); for (i = 0; i <= N; i++) { t = i / N; var xx = bx - 30 + t * 30, yy = Y(pitch(tone, t)); if (i) g.lineTo(xx, yy); else g.moveTo(xx, yy); } g.stroke();
+    } else {
+      g.fillStyle = soft; g.beginPath(); g.moveTo(X(0), h);
+      for (i = 0; i <= N; i++) { t = i / N; g.lineTo(X(t), Y(pitch(tone, t)) + 4); }
+      g.lineTo(X(1), h); g.closePath(); g.fill();
+    }
+    g.strokeStyle = col; g.lineWidth = LV === 3 ? 4 : 6; g.lineCap = 'round'; g.beginPath();
+    for (i = 0; i <= N; i++) { t = i / N; var x = X(t), y = Y(pitch(tone, t)); if (i) g.lineTo(x, y); else g.moveTo(x, y); }
+    g.stroke();
+    if (LV === 3) {
+      g.fillStyle = col; g.font = '700 22px system-ui,sans-serif'; g.textAlign = 'left'; g.textBaseline = 'top';
+      g.fillText(VAL[tone], L + 4, tone === 4 ? h - B - 26 : (tone === 3 ? T - 4 : h - B - 26));
+    }
+    if (LV === 2) {
+      /* 调号放在离路远的角：一二声右下，三声左上，四声右上 */
+      g.fillStyle = col; g.font = '700 44px "Noto Sans",system-ui,sans-serif'; g.textBaseline = 'top';
+      g.textAlign = tone === 3 ? 'left' : 'right';
+      g.fillText(MARKS[tone], tone === 3 ? L + 4 : w - 14, tone >= 3 ? 2 : h - 62);
+    }
+    /* 小车（L3 换成小球）：沿路走，车身随坡度倾斜 */
+    var px = X(p), py = Y(pitch(tone, p)), d = 0.01;
+    var ang = Math.atan2(Y(pitch(tone, Math.min(1, p + d))) - Y(pitch(tone, Math.max(0, p - d))), X(Math.min(1, p + d)) - X(Math.max(0, p - d)));
+    g.save(); g.translate(px, py); g.rotate(ang); if (LV !== 3) g.translate(0, 3);
+    if (LV === 3) { g.fillStyle = ink; g.beginPath(); g.arc(0, -7, 7, 0, Math.PI * 2); g.fill(); }
+    else {
+      g.fillStyle = col; g.strokeStyle = ink; g.lineWidth = 1.5;
+      g.beginPath(); g.roundRect ? g.roundRect(-16, -18, 32, 11, 4) : g.rect(-16, -18, 32, 11); g.fill(); g.stroke();
+      g.beginPath(); g.roundRect ? g.roundRect(-8, -26, 15, 9, 3) : g.rect(-8, -26, 15, 9); g.fill(); g.stroke();
+      g.fillStyle = ink; g.beginPath(); g.arc(-9, -5, 4.5, 0, Math.PI * 2); g.arc(9, -5, 4.5, 0, Math.PI * 2); g.fill();
+    }
+    g.restore();
+  }
+  function roadCard(t) {
+    var chars = (TONE_SYL.filter(function (x) { return x[0] === toneSyl; })[0] || ['', ''])[1];
+    var desc = LV === 1 ? ROADN[t][2] : (LV === 2 ? '调号 ' + MARKS[t] + ' 和路一个样' : '调值 ' + VAL[t]);
+    return '<button type="button" class="road" data-tone="' + t + '" data-syl="' + toneSyl + '"><div class="rh"><b class="t' + t + '">' + ROADN[t][0] + '</b><span class="rd">' + (LV === 3 ? '' : ROADN[t][1]) + '</span>' +
+      '<span class="py t' + t + '">' + esc(S.mark(toneSyl, t)) + '</span></div><canvas aria-hidden="true"></canvas><div class="rd">' + esc(desc) + (chars ? ' · ' + chars.charAt(t - 1) : '') + '</div></button>';
+  }
+  function drawRoads() {
+    var box = $('#roads'); if (!box) return;
+    box.innerHTML = [1, 2, 3, 4].map(roadCard).join('');
+    $$('.road', box).forEach(function (r) { drawRoad($('canvas', r), +r.getAttribute('data-tone'), prog[+r.getAttribute('data-tone')]); });
+  }
+  var anim = null;
+  function runRoad(t) {
+    var r = $('.road[data-tone="' + t + '"]'); if (!r) return Promise.resolve();
+    $$('.road').forEach(function (x) { x.classList.remove('playing'); }); r.classList.add('playing');
+    play(toneSyl, t);
+    var dur = t === 3 ? 1100 : 800, t0 = performance.now(), cv = $('canvas', r);
+    return new Promise(function (res) {
+      if (anim) cancelAnimationFrame(anim);
+      if (reduce) { prog[t] = 1; drawRoad(cv, t, 1); r.classList.remove('playing'); return res(); }
+      (function step(now) {
+        var p = Math.min(1, (now - t0) / dur); prog[t] = p; drawRoad(cv, t, p);
+        if (p < 1) anim = requestAnimationFrame(step); else { r.classList.remove('playing'); res(); }
+      })(t0);
+    });
+  }
+  $('#roads').addEventListener('click', function (e) { var r = e.target.closest('.road'); if (r) runRoad(+r.getAttribute('data-tone')); });
+  $('#toneAll').addEventListener('click', function () {
+    var b = this; b.disabled = true;
+    [1, 2, 3, 4].reduce(function (p, t) { return p.then(function () { return runRoad(t); }).then(function () { return new Promise(function (r) { setTimeout(r, 350); }); }); }, Promise.resolve())
+      .then(function () { b.disabled = false; });
+  });
+  $('#toneSyl').insertAdjacentHTML('beforeend', TONE_SYL.map(function (x) {
+    return '<button type="button" class="pchip" aria-pressed="' + (x[0] === toneSyl) + '" data-ts="' + x[0] + '">' + x[0] + (x[1] ? '<small>' + x[1] + '</small>' : '') + '</button>';
+  }).join(''));
+  $('#toneSyl').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ts]'); if (!b) return;
+    toneSyl = b.getAttribute('data-ts'); prog = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    $$('[data-ts]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    drawRoads();
+  });
+  window.addEventListener('resize', function () { if (cur === 'tone') drawRoads(); });
+
+  /* 听读 */
+  var ROWS = [['a', ['啊', '', '', '']], ['ma', ['妈', '麻', '马', '骂']], ['ba', ['八', '拔', '把', '爸']], ['yi', ['衣', '姨', '椅', '意']], ['wu', ['乌', '无', '五', '雾']], ['yu', ['迂', '鱼', '雨', '玉']]];
+  $('#toneRows').innerHTML = ROWS.map(function (r) {
+    return '<div class="prow"><span class="lab py">' + r[0] + '</span>' + [1, 2, 3, 4].map(function (t) { return pchip(r[0], t, r[1][t - 1]); }).join('') + '</div>';
+  }).join('');
+  /* 对比词对：自选，避开课本「读一读」原题 */
+  var PAIRS = [[['ma', 3, '马'], ['ma', 4, '骂']], [['ba', 1, '八'], ['ba', 2, '拔']], [['yu', 2, '鱼'], ['yu', 3, '雨']], [['wu', 3, '五'], ['wu', 4, '雾']], [['mi', 3, '米'], ['mi', 4, '蜜']], [['fei', 1, '飞'], ['fei', 2, '肥']]];
+  $('#tonePairs').innerHTML = '<div class="prow">' + PAIRS.map(function (p) {
+    return '<span class="word" style="display:inline-flex;gap:6px;align-items:center">' + pchip(p[0][0], p[0][1], p[0][2]) + '<span class="note">/</span>' + pchip(p[1][0], p[1][1], p[1][2]) + '</span>';
+  }).join('') + '</div>';
+
+  /* ---------- 练：听音选调 ---------- */
+  function roadSvg(t) {
+    var pts = [], i; for (i = 0; i <= 20; i++) { var u = i / 20; pts.push((4 + u * 32).toFixed(1) + ',' + (4 + (5 - pitch(t, u)) / 4 * 20).toFixed(1)); }
+    return '<svg viewBox="0 0 40 28" aria-hidden="true"><polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--t' + t + ')" stroke-width="3.5" stroke-linecap="round"/></svg>';
+  }
+  var TQ_POOL = ['a', 'o', 'e', 'yi', 'wu', 'yu', 'ma', 'ba', 'pa', 'fa', 'mi', 'bo', 'mo', 'bu', 'pu', 'mu', 'fu', 'bi', 'pi', 'da', 'ta', 'na', 'la', 'he', 'ge'];
+  function makeToneQuiz(box) {
+    var q = null, right = 0, total = 0, answered = false;
+    function next() {
+      var syl, t, n = 0; do { syl = pick(TQ_POOL); t = 1 + rnd(4); n++; } while (!has(syl, t) && n < 50);
+      q = { syl: syl, t: t }; answered = false; render(); play(syl, t);
+    }
+    function render() {
+      box.innerHTML = '<div class="qtop"><button type="button" class="btn pri" data-q="again">▶ ' + (q ? '再听一遍' : '开始') + '</button><button type="button" class="btn" data-q="next">下一题</button><span class="qscore">答对 ' + right + ' / ' + total + '</span></div>' +
+        '<div class="qopts">' + [1, 2, 3, 4].map(function (t) { return '<button type="button" class="qopt" data-ans="' + t + '">' + roadSvg(t) + '<span class="py t' + t + '">' + S.mark('a', t) + '</span><span>' + ROADN[t][0] + '</span></button>'; }).join('') + '</div>' +
+        '<div class="qfb" aria-live="polite">' + (q ? '听一听，是哪一种路？' : '点「开始」出题并播放。') + '</div>';
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var k = b.getAttribute('data-q');
+      if (k === 'again') { if (q) play(q.syl, q.t); else next(); return; }
+      if (k === 'next') { next(); return; }
+      if (!q) return;
+      if (b.hasAttribute('data-cmp')) { play(q.syl, +b.getAttribute('data-cmp')); return; }
+      var a = b.getAttribute('data-ans'); if (!a) return;
+      if (answered) { play(q.syl, +a); return; }
+      answered = true; total++; a = +a;
+      var ok = a === q.t; if (ok) right++;
+      $$('.qopt', box).forEach(function (o) { var v = +o.getAttribute('data-ans'); if (v === q.t) o.classList.add('right'); else if (v === a) o.classList.add('wrong'); });
+      $('.qscore', box).textContent = '答对 ' + right + ' / ' + total;
+      $('.qfb', box).innerHTML = ok ? '<span class="ok">对了！</span> 是 <span class="py t' + q.t + '">' + esc(S.mark(q.syl, q.t)) + '</span>，' + ROADN[q.t][0] + '。'
+        : '<span class="no">再听听。</span> 刚才是 <span class="py t' + q.t + '">' + esc(S.mark(q.syl, q.t)) + '</span>（' + ROADN[q.t][0] + '），你选的是' + ROADN[a][0] + '。 ' +
+          '<button type="button" class="pchip" data-cmp="' + q.t + '"><span class="t' + q.t + '">' + esc(S.mark(q.syl, q.t)) + '</span></button> ' +
+          (has(q.syl, a) ? '<button type="button" class="pchip" data-cmp="' + a + '"><span class="t' + a + '">' + esc(S.mark(q.syl, a)) + '</span></button> 对比听' : '');
+    });
+    render();
+  }
+  makeToneQuiz($('#qTone'));
+
+  /* ---------- 练：标调练习 ---------- */
+  var MARK_ITEMS = [['hao', 3, '好'], ['liu', 2, '流'], ['gui', 4, '贵'], ['mei', 3, '美'], ['xue', 2, '学'], ['dou', 4, '豆'], ['jia', 1, '家'], ['shui', 3, '水'], ['nü', 3, '女'], ['bi', 3, '笔'], ['tian', 1, '天'], ['zuo', 4, '坐'], ['niu', 2, '牛'], ['dui', 4, '对'], ['yue', 4, '月'], ['qiu', 2, '球']];
+  function markReason(w, idx) {
+    var p = S.parse(S.mark(w, 1)), ch = w.charAt(idx);
+    if (w.indexOf('a') >= 0) return '有 a 就标在 a 上。';
+    if (/[oe]/.test(w)) return '没有 a，就找 ' + ch + '。';
+    if (/iu|ui/.test(w)) {
+      var s = '没有 a、o、e，i 和 u 并排，标在后一个 ' + ch + ' 上。';
+      if (LV >= 3) s += ' 学理：' + w + ' 是 ' + (p.initial || '') + ' + ' + p.final + ' 的省写，韵腹 ' + p.nucleus + ' 没写出来，所以规定标在后一个字母上。';
+      return s;
+    }
+    return '只有一个元音，就标在它上面' + (ch === 'i' ? '；标在 i 上时，i 的点要去掉。' : '。');
+  }
+  var qMark = (function (box) {
+    var order = shuffle(MARK_ITEMS), k = 0, right = 0, total = 0, done = false, tried = false;
+    function item() { return order[k % order.length]; }
+    function render() {
+      var it = item(), w = it[0];
+      done = false; tried = false;
+      box.innerHTML = '<div class="qtop"><span class="target">给 <b>' + it[2] + '</b> 标上 <b class="t' + it[1] + '">' + ROADN[it[1]][0] + '</b>（' + MARKS[it[1]] + '）：点调号该在的字母</span><span class="qscore">一次答对 ' + right + ' / ' + total + '</span></div>' +
+        '<div class="letters">' + w.split('').map(function (c, i) { return '<button type="button" class="letter" data-i="' + i + '">' + esc(c) + '</button>'; }).join('') + '</div>' +
+        '<div class="qfb" aria-live="polite"></div><div class="prow"><button type="button" class="btn" data-q="next">下一个</button></div>';
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.getAttribute('data-q') === 'next') { k++; render(); return; }
+      if (b.hasAttribute('data-say')) { var it0 = item(); play(it0[0], it0[1]); return; }
+      var i = b.getAttribute('data-i'); if (i == null || done) return;
+      var it = item(), w = it[0], exp = S.expectedToneIndex(w); i = +i;
+      done = i === exp;
+      if (!tried) { tried = true; total++; if (done) right++; }
+      b.classList.add(done ? 'right' : 'wrong');
+      var marked = S.mark(w, it[1]);
+      if (done) {
+        $$('.letter', box).forEach(function (x) { x.disabled = true; });
+        b.textContent = marked.charAt(exp);
+        $('.qfb', box).innerHTML = '<span class="ok">对了！</span> <span class="py t' + it[1] + '" style="font-size:22px">' + esc(marked) + '</span> ' +
+          (has(w, it[1]) ? '<button type="button" class="pchip" data-say="1">▶ 听</button> ' : '') + esc(markReason(w, exp));
+        if (has(w, it[1])) play(w, it[1]);
+      } else {
+        $('.qfb', box).innerHTML = '<span class="no">不在 ' + esc(w.charAt(i)) + ' 上。</span> 想想口诀：有 a 不放过，没有 a 找 o e，i u 并列标在后。';
+      }
+      $('.qscore', box).textContent = '一次答对 ' + right + ' / ' + total;
+    });
+    render();
+    return { lvChanged: function () { /* 理由文字跟档位走；重开当前题 */ } };
+  })($('#qMark'));
+
+  /* ---------- 用：注音字串 ---------- */
+  /* 每个字：[字, 拼音(带调), 实际读音(可空)]；标点：[标点] */
+  function zis(list) {
+    return '<div class="sent">' + list.map(function (z) {
+      if (z.length === 1) return '<span class="zi punc"><span class="pc">' + esc(z[0]) + '</span></span>';
+      var p = S.parse(z[1]), t = p.tone, syl = p.audio ? p.audio.replace(/\d$/, '') : '';
+      var can = t >= 1 && t <= 4 && A && A.hasSyl(syl, t);
+      var py = can ? '<button type="button" class="pyb t' + t + '" data-syl="' + esc(syl) + '" data-tone="' + t + '">' + esc(z[1]) + '</button>'
+        : '<span class="pyb nos t5" title="轻声没有单字录音">' + esc(z[1]) + '</span>';
+      return '<span class="zi"><span class="sd">' + (z[2] ? '读 ' + esc(z[2]) : '') + '</span>' + py + '<a href="../../zika.html?zi=' + encodeURIComponent(z[0]) + '" target="_blank" rel="noopener" title="打开「' + esc(z[0]) + '」字卡">' + esc(z[0]) + '</a></span>';
+    }).join('') + '</div>';
+  }
+  function pwords(list) { return list.map(function (w) { return '<div class="word">' + zis(w) + '</div>'; }).join(''); }
+  /* 自编词语：四个声调各有代表 */
+  $('#toneWords').innerHTML = pwords([
+    [['飞', 'fēi'], ['机', 'jī']], [['爬', 'pá'], ['山', 'shān']], [['小', 'xiǎo', 'xiáo'], ['鸟', 'niǎo']], [['大', 'dà'], ['树', 'shù']],
+    [['妈', 'mā'], ['妈', 'ma']], [['白', 'bái'], ['马', 'mǎ']], [['麻', 'má'], ['花', 'huā']], [['木', 'mù'], ['马', 'mǎ']]
+  ]);
+  /* 小鸟：两个三声相连，实际读 xiáo niǎo，L1 也显示一行小字；变调只显示实际读音，书面仍标原调 */
+  $('#toneSents').innerHTML =
+    zis([['白', 'bái'], ['马', 'mǎ'], ['爬', 'pá'], ['上', 'shàng'], ['坡', 'pō'], ['，'], ['看', 'kàn'], ['见', 'jiàn'], ['大', 'dà'], ['红', 'hóng'], ['花', 'huā'], ['。']]) +
+    zis([['妈', 'mā'], ['妈', 'ma'], ['买', 'mǎi'], ['麻', 'má'], ['花', 'huā'], ['，'], ['我', 'wǒ', 'wó'], ['把', 'bǎ'], ['麻', 'má'], ['花', 'huā'], ['拿', 'ná'], ['回', 'huí'], ['家', 'jiā'], ['。']]);
+
+  /* ================= B2 声母 ================= */
+  /* 情境图：只画物（包、坡上小旗、拱门、发芽），线条风格，颜色走 token class */
+  var SCENES = [
+    { l: 'b', svg: '<g class="obj"><line x1="78" y1="20" x2="78" y2="130" class="svg-deep-s" stroke-width="7" stroke-linecap="round"/><path d="M78 72 C128 62 132 132 78 128" class="svg-accent-s" fill="none" stroke-width="7"/><circle cx="102" cy="100" r="5" class="svg-accent"/><line x1="70" y1="20" x2="86" y2="20" class="svg-deep-s" stroke-width="5" stroke-linecap="round"/></g>',
+      cap: '<b>b</b>竖竖的挂钩挂着一个圆圆的布包。包 <span class="py">bāo</span>，读 b。' },
+    { l: 'p', svg: '<g class="obj"><path d="M10 140 L160 70 L200 70 L200 150 L10 150 Z" class="svg-accent" opacity=".25"/><path d="M10 140 L160 70" class="svg-accent-s" stroke-width="3" fill="none"/><line x1="96" y1="28" x2="96" y2="104" class="svg-deep-s" stroke-width="6" stroke-linecap="round"/><path d="M96 30 C140 30 140 72 96 70 Z" class="svg-red"/></g>',
+      cap: '<b>p</b>山坡上插着一面小旗，旗子挂在杆子右上边。坡 <span class="py">pō</span>，读 p。' },
+    { l: 'm', svg: '<g class="obj"><path d="M40 130 L40 70 C40 40 80 40 80 70 L80 130 M80 70 C80 40 120 40 120 70 L120 130" class="svg-deep-s" fill="none" stroke-width="8" stroke-linejoin="round"/><line x1="24" y1="132" x2="140" y2="132" class="svg-accent-s" stroke-width="4"/><circle cx="22" cy="30" r="12" class="svg-accent" opacity=".5"/></g>',
+      cap: '<b>m</b>两个拱门连在一起，像一座有两个门洞的小门。门 <span class="py">mén</span>，读 m。' },
+    { l: 'f', svg: '<g class="obj"><path d="M50 140 Q100 128 150 140" class="svg-muted-s" fill="none" stroke-width="5"/><path d="M98 138 L98 60 C98 30 128 26 138 44" class="svg-green-s" fill="none" stroke-width="7" stroke-linecap="round"/><path d="M98 84 C82 74 72 80 68 90 C84 96 94 92 98 84 Z" class="svg-green"/><path d="M98 80 C114 70 124 76 128 86 C112 92 102 88 98 80 Z" class="svg-green" opacity=".7"/></g>',
+      cap: '<b>f</b>一棵小芽刚刚冒出来，芽尖弯弯的。发芽 <span class="py">fāyá</span>，读 f。' }
+  ];
+  $('#scenes').innerHTML = SCENES.map(function (s) {
+    return '<button type="button" class="scene" data-l="' + s.l + '"><svg viewBox="0 0 200 150" aria-hidden="true">' + s.svg +
+      '<text class="sl" x="166" y="66" text-anchor="middle">' + s.l + '</text></svg><div class="sc">' + s.cap + '</div></button>';
+  }).join('');
+  $('#scenes').addEventListener('click', function (e) {
+    var b = e.target.closest('.scene'); if (!b) return;
+    b.classList.toggle('show');
+    var l = b.getAttribute('data-l'); if (A && A.hasHudu(l)) A.playHudu(l);
+  });
+
+  /* 镜子：b → 左右翻 d，上下翻 p，两次都翻 q */
+  var mx = 1, my = 1;
+  var MNAME = { '1,1': 'b', '-1,1': 'd', '1,-1': 'p', '-1,-1': 'q' };
+  var MTIP = {
+    b: 'b 的肚子在竖线右下边。左右一翻就成了 d，上下一翻就成了 p。',
+    d: 'd：肚子跑到了竖线左下边（下一课学）。',
+    p: 'p：竖线朝下，肚子在右上边——像坡上的小旗。',
+    q: 'q：竖线朝下，肚子在左上边（j q x 那课学）。'
+  };
+  function mirror() {
+    $('#mGlyph').style.transform = 'scale(' + mx + ',' + my + ')';
+    var n = MNAME[mx + ',' + my]; $('#mName').textContent = n; $('#mTip').textContent = MTIP[n];
+    if (A && A.hasHudu(n)) A.playHudu(n);
+  }
+  $('#mLR').addEventListener('click', function () { mx = -mx; mirror(); });
+  $('#mUD').addEventListener('click', function () { my = -my; mirror(); });
+  $('#mReset').addEventListener('click', function () { mx = 1; my = 1; mirror(); });
+
+  /* 呼读音：有文件才可点，没有就「待录音」 */
+  var HUDU_CH = { b: '玻', p: '坡', m: '摸', f: '佛' };
+  $('#huduRow').innerHTML = ['b', 'p', 'm', 'f'].map(function (i) {
+    if (A && A.hasHudu(i)) return '<button type="button" class="pchip" data-hudu="' + i + '">' + i + '<small>' + HUDU_CH[i] + '</small></button>';
+    return '<span class="pchip wait" aria-disabled="true" title="呼读音待录音">' + i + '<em>待录音 · ' + HUDU_CH[i] + '</em></span>';
+  }).join('');
+  $('#huduRow').addEventListener('click', function (e) { var b = e.target.closest('[data-hudu]'); if (b) A.playHudu(b.getAttribute('data-hudu')); });
+  $('#firstRow').innerHTML = [['ba', '八'], ['pa', '趴'], ['ma', '妈'], ['fa', '发']].map(function (x) { return pchip(x[0], 1, x[1]); }).join('');
+
+  /* 音节格：b p m f × a o i u；点格子出四声条 */
+  var INI = ['b', 'p', 'm', 'f'], FIN = ['a', 'o', 'i', 'u'];
+  $('#sylTable').innerHTML = '<tr><th></th>' + FIN.map(function (f) { return '<th>' + f + '</th>'; }).join('') + '</tr>' + INI.map(function (i) {
+    return '<tr><th>' + i + '</th>' + FIN.map(function (f) {
+      var s = i + f;
+      return '<td>' + (S.isLegal(s) && has(s, 1) ? '<button type="button" class="pchip" data-cell="' + s + '" aria-expanded="false">' + s + '</button>'
+        : '<span class="pchip mute" title="普通话里没有这个音节">' + s + '</span>') + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  $('#sylTable').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cell]'); if (!b) return;
+    var was = b.getAttribute('aria-expanded') === 'true';
+    $$('[data-cell]').forEach(function (x) { x.setAttribute('aria-expanded', 'false'); x.setAttribute('aria-pressed', 'false'); });
+    if (was) { $('#sylBar').innerHTML = ''; return; }
+    var s = b.getAttribute('data-cell'); b.setAttribute('aria-expanded', 'true'); b.setAttribute('aria-pressed', 'true');
+    $('#sylBar').innerHTML = '<div class="tonebar"><span class="tb-h py">' + s + '</span>' + [1, 2, 3, 4].map(function (t) { return pchip(s, t); }).join('') +
+      '</div>';
+  });
+  $('#sylTable').insertAdjacentHTML('afterend', '<p class="note">fi 是灰的：普通话里没有这个音节（f 不和 i 相拼）。</p>');
+  $('#aspRow').innerHTML = [['ba', 'pa'], ['da', 'ta'], ['ge', 'ke'], ['ji', 'qi'], ['zi', 'ci'], ['zhi', 'chi']].map(function (p) {
+    return '<span class="word" style="display:inline-flex;gap:6px;align-items:center">' + pchip(p[0], 1) + '<span class="note">/</span>' + pchip(p[1], 1) + '</span>';
+  }).join('');
+
+  /* ---------- 练：听音选声母 ---------- */
+  (function (box) {
+    var q = null, right = 0, total = 0, answered = false;
+    var POOL = []; INI.forEach(function (i) { FIN.forEach(function (f) { if (S.isLegal(i + f)) POOL.push([i, f]); }); });
+    function next() { var x = pick(POOL), t = 1 + rnd(4); q = { ini: x[0], syl: x[0] + x[1], t: t }; answered = false; render(); play(q.syl, t); }
+    function render() {
+      box.innerHTML = '<div class="qtop"><button type="button" class="btn pri" data-q="again">▶ ' + (q ? '再听一遍' : '开始') + '</button><button type="button" class="btn" data-q="next">下一题</button><span class="qscore">答对 ' + right + ' / ' + total + '</span></div>' +
+        '<div class="qopts">' + INI.map(function (i) { return '<button type="button" class="qopt" data-ans="' + i + '"><span class="py">' + i + '</span></button>'; }).join('') + '</div>' +
+        '<div class="qfb" aria-live="polite">' + (q ? '这个音节的声母是哪一个？' : '点「开始」出题。') + '</div>';
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var k = b.getAttribute('data-q');
+      if (k === 'again') { if (q) play(q.syl, q.t); else next(); return; }
+      if (k === 'next') { next(); return; }
+      var a = b.getAttribute('data-ans'); if (!a || !q || answered) return;
+      answered = true; total++; var ok = a === q.ini; if (ok) right++;
+      $$('.qopt', box).forEach(function (o) { var v = o.getAttribute('data-ans'); if (v === q.ini) o.classList.add('right'); else if (v === a) o.classList.add('wrong'); });
+      $('.qscore', box).textContent = '答对 ' + right + ' / ' + total;
+      var tip = (q.ini === 'b' && a === 'p') || (q.ini === 'p' && a === 'b') ? ' 用手掌试试：p 会吹到手，b 不会。' : '';
+      $('.qfb', box).innerHTML = (ok ? '<span class="ok">对了！</span> ' : '<span class="no">再听听。</span> ') + '是 <span class="py t' + q.t + '">' + esc(S.mark(q.syl, q.t)) + '</span>，声母 <b class="py">' + q.ini + '</b>。' + (ok ? '' : tip);
+    });
+    render();
+  })($('#qIni'));
+
+  /* ---------- 练：两拼碰一碰 ---------- */
+  var bi = 'b', bf = 'a', bt = 1;
+  function btnRow(el, list, curv, key, lab) {
+    el.innerHTML = list.map(function (v) { return '<button type="button" class="pchip" data-' + key + '="' + v + '" aria-pressed="' + (v === curv) + '">' + (lab ? lab(v) : v) + '</button>'; }).join(' ');
+  }
+  var FIN_AS = { a: 'a', o: 'o', i: 'yi', u: 'wu' };
+  function bumpRender() {
+    btnRow($('#bIni'), INI, bi, 'bi');
+    btnRow($('#bFin'), FIN, bf, 'bf');
+    btnRow($('#bTone'), [1, 2, 3, 4], bt, 'bt', function (t) { return '<span class="t' + t + '">' + MARKS[t] + ' ' + ROADN[t][0] + '</span>'; });
+    var s = bi + bf, ok = S.isLegal(s) && has(s, bt);
+    $('#bump').innerHTML = '<span class="eq">' + bi + ' – ' + esc(S.mark(bf, bt)) + ' → ?</span><span class="bk ini away" id="bkI">' + bi + '</span><button type="button" class="bk fin" id="bkF" title="点一下听韵母" data-syl="' + FIN_AS[bf] + '" data-tone="' + bt + '"><span class="t' + bt + '">' + esc(S.mark(bf, bt)) + '</span></button>';
+    $('#bGo').disabled = !ok;
+    $('#bMsg').textContent = ok ? '先点韵母块听一听，再点「碰！」' : (bi + ' 和 ' + bf + ' 不能拼：普通话里没有 ' + s + ' 这个音节。');
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bi],[data-bf],[data-bt]'); if (!b) return;
+    if (b.hasAttribute('data-bi')) bi = b.getAttribute('data-bi');
+    if (b.hasAttribute('data-bf')) bf = b.getAttribute('data-bf');
+    if (b.hasAttribute('data-bt')) bt = +b.getAttribute('data-bt');
+    bumpRender();
+  });
+  $('#bGo').addEventListener('click', function () {
+    var I = $('#bkI'), F = $('#bkF'), s = bi + bf; if (!I || !F) return;
+    if (A && A.hasHudu(bi)) A.playHudu(bi);
+    I.classList.remove('away'); /* 0.18 秒冲过来，两块之间不留空 */
+    setTimeout(function () {
+      play(s, bt);
+      $('#bump').innerHTML = '<span class="eq">' + bi + ' – ' + esc(S.mark(bf, bt)) + ' → ' + esc(S.mark(s, bt)) + '</span><button type="button" class="bk merged" data-syl="' + s + '" data-tone="' + bt + '" title="再听一遍"><span class="t' + bt + '">' + esc(S.mark(s, bt)) + '</span></button>';
+      $('#bMsg').textContent = '碰出来了：' + S.mark(s, bt) + '。点它再听一遍。';
+    }, reduce ? 0 : 200);
+  });
+  $('#bReset').addEventListener('click', bumpRender);
+  bumpRender();
+
+  /* ---------- 练：找一找（形近） ---------- */
+  function findRound() {
+    var target = pick(['b', 'p']), n = 0, tiles = [];
+    for (var i = 0; i < 12; i++) tiles.push(i < 4 ? target : pick(['b', 'd', 'p', 'q'].filter(function (x) { return x !== target; })));
+    tiles = shuffle(tiles);
+    $('#fTarget').textContent = target;
+    $('#fTiles').innerHTML = tiles.map(function (c) { return '<button type="button" class="tile" data-c="' + c + '">' + c + '</button>'; }).join('');
+    $('#fMsg').textContent = '一共 4 个，找到 0 个。';
+    $('#fTiles').onclick = function (e) {
+      var b = e.target.closest('.tile'); if (!b || b.classList.contains('right')) return;
+      if (b.getAttribute('data-c') === target) { b.classList.add('right'); n++; $('#fMsg').textContent = n === 4 ? '全找到了！' : '一共 4 个，找到 ' + n + ' 个。'; }
+      else { b.classList.add('wrong'); $('#fMsg').textContent = '这个是 ' + b.getAttribute('data-c') + '，看看肚子朝哪边。'; setTimeout(function () { b.classList.remove('wrong'); }, 900); }
+    };
+  }
+  $('#fNext').addEventListener('click', findRound); findRound();
+
+  /* ---------- 用 ---------- */
+  $('#bpmfWords').innerHTML = pwords([
+    [['爸', 'bà'], ['爸', 'ba']], [['爬', 'pá'], ['坡', 'pō']], [['木', 'mù'], ['马', 'mǎ']], [['父', 'fù'], ['母', 'mǔ']],
+    [['白', 'bái'], ['布', 'bù']], [['皮', 'pí'], ['包', 'bāo']], [['大', 'dà'], ['门', 'mén']], [['发', 'fā'], ['芽', 'yá']]
+  ]);
+  $('#bpmfSong').innerHTML =
+    zis([['小', 'xiǎo'], ['木', 'mù'], ['马', 'mǎ'], ['，'], ['不', 'bù', 'bú'], ['怕', 'pà'], ['坡', 'pō'], ['。']]) +
+    zis([['爸', 'bà'], ['爸', 'ba'], ['推', 'tuī'], ['，'], ['妈', 'mā'], ['妈', 'ma'], ['拉', 'lā'], ['，']]) +
+    zis([['木', 'mù'], ['马', 'mǎ'], ['爬', 'pá'], ['上', 'shàng'], ['坡', 'pō'], ['。']]);
+
+  /* ================= C 大纲 ================= */
+  $('#olList').innerHTML = (window.PP_OUTLINE || []).map(function (o) {
+    function ul(a) { return '<ul>' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+    return '<details class="ol" id="ol-' + o.id + '"><summary>' + esc(o.name) + ' <span class="mm-ex">' + esc(o.ex) + '</span></summary><div class="olb">' +
+      '<div class="olg"><div><b>看</b>' + ul(o.kan) + '</div><div><b>听读</b>' + ul(o.ting) + '</div><div><b>练</b>' + ul(o.lian) + '</div><div><b>用</b>' + ul(o.yong) + '</div>' +
+      '<div><b>L1 浅</b>：' + esc(o.l1) + '<br><b>L2 中</b>：' + esc(o.l2) + '<br><b>L3 深</b>：' + esc(o.l3) + '</div><div><b>依据</b>：' + esc(o.src) + '</div></div></div></details>';
+  }).join('');
+
+  /* 打开时读一次参数：?s=tone&lv=3&m=bug（不改地址栏，不用浏览器历史） */
+  var qs = {}; location.search.replace(/[?&](\w+)=([^&]*)/g, function (_, k, v) { qs[k] = decodeURIComponent(v); });
+  if (qs.lv) LV = Math.max(1, Math.min(3, +qs.lv || 2));
+  if (qs.m === 'bug') setMode('bug');
+  applyLv();
+  show(qs.s && document.getElementById('s-' + qs.s) ? qs.s : 'menu');
+  if (qs.go) { var tg = document.getElementById(qs.go); if (tg) setTimeout(function () { tg.scrollIntoView({ block: 'start' }); }, 50); }
+})();
+</script>
+</body>
+</html>
