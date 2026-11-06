@@ -51,4 +51,7 @@ catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.m
 /* 拼音音频清单与 pinyin/audio/ 目录一致：tools/gen_pinyin_audio.py --check */
 try { process.stdout.write(execFileSync("python3", [path.join(__dirname, "gen_pinyin_audio.py"), "--check"], { encoding: "utf8" })); }
 catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
+/* 拼音区内容文件（pinyin/content/*.js）：格式、音频键、拼音可解析、数量下限：tools/check_pinyin_content.js */
+try { process.stdout.write(execFileSync(process.execPath, [path.join(__dirname, "check_pinyin_content.js")], { encoding: "utf8" })); }
+catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
 process.exit(bad ? 1 : 0);
