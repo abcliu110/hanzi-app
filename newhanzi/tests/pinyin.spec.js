@@ -23,6 +23,42 @@ test('音节解析器在浏览器里可用（pinyin/syllables.js + syllable.js�
   expect(r).toEqual(['g', 'uei', 4, 'ü', 'qu4', false, 'tone_position', 'liú', 415]);
 });
 
+test('拼音页芯片可听：单韵母四声、声调芯片、声母待录音、无音频芯片不可点、署名', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.addInitScript(() => { window.speechSynthesis && (window.speechSynthesis.speak = () => { window.__usedTTS = true; }); });
+  await page.goto('newhanzi/pinyin.html?t=danyunmu');
+  await expect(page.locator('#pyCredit')).toContainText('CC BY-SA 3.0');
+  await expect(page.locator('.py-chip.is-play')).toHaveCount(6);
+  await page.click('.py-chip[data-show="ü"]');
+  await expect(page.locator('.py-tones .py-tone')).toHaveCount(4);
+  await expect(page.locator('.py-tones .py-tone').nth(2)).toHaveText('ǚ');
+  const req = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-yu3.mp3'));
+  await page.click('.py-tone[data-tone="3"]');
+  await req;
+  await page.click('.py-chip[data-show="ü"]'); // 再点收起
+  await expect(page.locator('.py-tones')).toHaveCount(0);
+  // 声调芯片直接播
+  await page.goto('newhanzi/pinyin.html?t=shengdiao');
+  const r2 = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-a4.mp3'));
+  await page.click('.py-chip[data-kind="tone"][data-tone="4"]');
+  await r2;
+  // 声母：呼读音未录 → 待录音，不可点
+  await page.goto('newhanzi/pinyin.html?t=shengmu');
+  await expect(page.locator('.py-chip.is-wait')).toHaveCount(21);
+  await expect(page.locator('.py-chip.is-wait').first()).toContainText('待录音');
+  await expect(page.locator('.py-chip.is-play')).toHaveCount(0);
+  // 鼻韵母：ong 单念没有音频 → 不可点
+  await page.goto('newhanzi/pinyin.html?t=biyunmu');
+  await expect(page.locator('.py-chip.is-mute')).toHaveText(['ong']);
+  await page.click('.py-chip[data-show="un"]');
+  await expect(page.locator('.py-tones')).toContainText('wen');
+  // 整体认读 16 个都能听
+  await page.goto('newhanzi/pinyin.html?t=zhengti');
+  await expect(page.locator('.py-chip.is-play')).toHaveCount(16);
+  expect(await page.evaluate(() => !!window.__usedTTS)).toBe(false);
+  expect(errs).toEqual([]);
+});
+
 test('Q17 拼音开关：逐字注音用 pron 覆盖 + 查表主音，@行号 只对该行生效', async ({ page }) => {
   await page.goto('newhanzi/shici.html#poem-34'); // 春晓（主脚本是 IIFE，openPoem 不挂 window，用 hash 路由进详情）
   await expect(page.locator('.sc-readbar [data-rb=py]')).toBeVisible();
