@@ -85,7 +85,7 @@
 
   detail.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('.py-chip.is-play, .py-tone[data-tone]') : null;
-    if (!b || !A) return;
+    if (!b || !A || b.closest('.kp')) return; /* 知识点页的芯片由 pinyin/kp.js 处理 */
     var kind = b.getAttribute('data-kind');
     if (kind === 'tones') { openTones(b); return; }
     flash(b);
@@ -102,17 +102,30 @@
   }).join('');
 
   function showHome() {
+    curId = '';
     if (A) A.stop();
+    if (window.NHZPinyinKP) NHZPinyinKP.stop();
     detail.style.display = 'none';
     home.style.display = '';
     window.scrollTo(0, 0);
     if (window.NHZNavPage) NHZNavPage.set(['拼音'], []);
   }
 
-  function showDetail(id) {
-    var m = MENU.filter(function (x) { return x.id === id; })[0];
-    if (!m) return;
-    var h = '';
+  /* 知识点页：有 pinyin/content/<id>.js 就按 SCHEMA 渲染完整页（pinyin/kp.js）；没有就显示 data.js 的简介 + 提示 */
+  var loading = {};
+  function loadContent(id, cb) {
+    var C = window.NHZ_PY_CONTENT || {};
+    if (C[id]) { cb(C[id]); return; }
+    if (loading[id] === 'none') { cb(null); return; }
+    var sc = document.createElement('script');
+    sc.src = 'pinyin/content/' + id + '.js';
+    sc.onload = function () { var C2 = window.NHZ_PY_CONTENT || {}; if (!C2[id]) loading[id] = 'none'; cb(C2[id] || null); };
+    sc.onerror = function () { loading[id] = 'none'; cb(null); };
+    document.head.appendChild(sc);
+  }
+
+  function briefHtml(m) {
+    var h = '<div class="py-brief-h"><h2>' + esc(m.name) + '</h2><span class="ex">' + esc(m.ex) + '</span></div>';
     (m.secs || []).forEach(function (s) {
       h += '<div class="py-sec"><h3>' + esc(s.h) + '</h3>';
       if (s.chips) h += chips(s.chips);
@@ -122,12 +135,31 @@
       h += '</div>';
     });
     if (m.todo) h += '<div class="py-todo">' + esc(m.todo) + '</div>';
+    return h;
+  }
+
+  var curId = '';
+  function showDetail(id, brief) {
+    var m = MENU.filter(function (x) { return x.id === id; })[0];
+    if (!m) return;
+    curId = id;
     if (A) A.stop();
-    detail.innerHTML = h;
+    if (window.NHZPinyinKP) NHZPinyinKP.stop();
     home.style.display = 'none';
     detail.style.display = '';
+    detail.innerHTML = '<p class="py-intro">正在打开「' + esc(m.name) + '」…</p>';
     window.scrollTo(0, 0);
     if (window.NHZNavPage) NHZNavPage.set(['拼音', m.name], [showHome, null]);
+    function fallback() {
+      detail.innerHTML = briefHtml(m) + '<div class="py-todo py-wip">这个知识点的「看 / 听读 / 练 / 用」完整内容还在写，先看上面的简介。</div>';
+    }
+    if (brief || !window.NHZPinyinKP) { detail.innerHTML = briefHtml(m); return; }
+    loadContent(id, function (c) {
+      if (curId !== id || detail.style.display === 'none') return; /* 期间已离开 */
+      if (!c) { fallback(); return; }
+      try { NHZPinyinKP.render(detail, c, m); }
+      catch (e) { if (window.console) console.error(e); fallback(); }
+    });
   }
 
   grid.addEventListener('click', function (e) {
@@ -135,6 +167,7 @@
     if (b) showDetail(b.getAttribute('data-id'));
   });
 
+  /* ?t=<id> 直达知识点（字卡等页面跳转用）；&brief=1 只看 data.js 简介（测试用） */
   var q = /[?&]t=(\w+)/.exec(location.search);
-  if (q) showDetail(q[1]); else showHome();
+  if (q) showDetail(q[1], /[?&]brief=1/.test(location.search)); else showHome();
 })();
