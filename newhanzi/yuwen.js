@@ -378,7 +378,9 @@
         '<div class="game-fb"></div></div>';
     }
     /* 4b. 深讲一点（语法深讲样板：词类） */
-    if (it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
+    if (it['深讲']) body += stepHead('深讲一点') + String(it['深讲']).split(/\n\s*\n/).map(function (para) {
+      return '<p class="yw-exp">' + esc(para.trim()).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
     /* 4d. 辨析（已由对照表派生呈现的不再重复贴原文） */
     if (it['辨析'] && !derivedCompare) body += '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
     /* 4e. 例句解析：程序型标题为全程演示 */
@@ -445,6 +447,20 @@
             return '<button data-qid="' + qid + '" data-oi="' + oi + '">' + esc(op) + '</button>';
           }).join('') + '</div><div class="quiz-fb"></div></div>';
       }).join('') + '</div>';
+    }
+    /* 逻辑扩充 v2：谬误总地图（分区 → 先问什么 → 指向专题）与资料来源 */
+    if (active === 'logic' && it['地图']) {
+      body += stepHead('🗺️ 谬误总地图') + '<div class="yw-map">' + Object.keys(it['地图']).map(function (zone) {
+        var z = it['地图'][zone] || {};
+        return '<div class="yw-map-zone" style="border:1px solid #c9d3c0;border-radius:10px;padding:8px 12px;margin:8px 0;">' +
+          '<b>' + esc(zone) + '</b>' + (z['先问'] ? '<div>先问：' + esc(z['先问']) + '</div>' : '') +
+          '<div>' + (z['专题'] || []).map(function (n) { return '<span class="yw-map-chip" style="display:inline-block;margin:3px 6px 0 0;padding:1px 8px;border-radius:8px;background:#eef3e8;">' + esc(n) + '</span>'; }).join('') + '</div>' +
+          (z['备注'] ? '<div class="yw-exp" style="font-size:13px;">' + esc(z['备注']) + '</div>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    if (active === 'logic' && it['来源'] && it['来源'].length) {
+      body += '<details class="yw-src" style="margin:10px 0;font-size:13px;color:#5a6352;"><summary>📚 资料来源</summary><ul>' +
+        it['来源'].map(function (u) { u = String(u); return '<li>' + (/^https?:\/\//.test(u) ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(u) + '</a>' : esc(u)) + '</li>'; }).join('') + '</ul></details>';
     }
     /* 逻辑 P2-4 讨论卡：只在逻辑区、详情末尾加一块（语法/阅读/写作不受影响） */
     if (active === 'logic' && it['讨论卡']) body += logicTalkHtml(it);

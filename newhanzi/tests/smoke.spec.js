@@ -793,4 +793,22 @@ test('pinyin module: home panel after shizi, detail, crumbs, back', async ({ pag
   await expect(fr.locator('#pyHome')).toBeVisible();
   await page.click('#btnBack');
   await expect(page.locator('#view-home')).toBeVisible();
+
+/* 逻辑扩充 v2（2026-11-06）：首页逻辑区 44 个专题每个都能打开、无页面报错；谬误总地图与资料来源渲染 */
+test('logic every item renders (v2 44 topics)', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e)));
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto('newhanzi/index.html');
+  await page.locator('#view-home .panel[data-m="logic"]').click();
+  await expect(page.locator('#logiclist .yw-head').first()).toBeVisible({ timeout: 20000 });
+  const n = await page.locator('#logiclist .yw-head').count();
+  expect(n).toBeGreaterThanOrEqual(44);
+  for (let i = 0; i < n; i++) {
+    await page.locator('#logiclist .yw-head').nth(i).click();
+  }
+  await expect(page.locator('#logiclist .yw-map-zone')).toHaveCount(4);
+  await expect(page.locator('#logiclist .yw-src').first()).toBeAttached();
+  expect(errs, '页面报错').toEqual([]);
 });
