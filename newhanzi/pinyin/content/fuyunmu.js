@@ -172,7 +172,8 @@
   lian: [
     {
       type: 'quiz-listen', lv: 1, h: '听音选韵母', ask: 'final',
-      pool: ['bai2', 'mai4', 'cai4', 'hei1', 'fei1', 'mei4', 'shui3', 'gui4', 'dui4', 'mao1', 'cao3', 'hao3', 'gou3', 'zou3', 'tou2', 'niu2', 'liu4', 'qiu2', 'xie3', 'tie1', 'jie3', 'xue3', 'jue2', 'que1'],
+      pool: ['bai2', 'mai4', 'cai4', 'hei1', 'fei1', 'mei4', 'shui3', 'gui4', 'dui4', 'mao1', 'cao3', 'hao3', 'gou3', 'zou3', 'tou2', 'niu2', 'liu4', 'qiu2', 'xie3', 'tie1', 'jie3', 'lve4', 'nve4'],
+      note: 'üe 用 lüè（略）、nüè（虐）来听：n、l 后面的 ü 两点不省，看得最清楚。jué、xué 里的 ue 也是 üe，在「带上声母读一读」里听。',
       options: ['ai', 'ei', 'ui', 'ao', 'ou', 'iu', 'ie', 'üe']
     },
     {
