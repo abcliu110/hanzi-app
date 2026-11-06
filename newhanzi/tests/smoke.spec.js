@@ -793,6 +793,7 @@ test('pinyin module: home panel after shizi, detail, crumbs, back', async ({ pag
   await expect(fr.locator('#pyHome')).toBeVisible();
   await page.click('#btnBack');
   await expect(page.locator('#view-home')).toBeVisible();
+});
 
 /* 逻辑扩充 v2（2026-11-06）：首页逻辑区 44 个专题每个都能打开、无页面报错；谬误总地图与资料来源渲染 */
 test('logic every item renders (v2 44 topics)', async ({ page }) => {
