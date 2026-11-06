@@ -45,4 +45,7 @@ catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.m
 /* 语法白板内容稿校验：tools/content/check_yufa_neirong.js */
 try { process.stdout.write(execFileSync(process.execPath, [path.join(__dirname, "content", "check_yufa_neirong.js")], { encoding: "utf8" })); }
 catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
+/* 拼音音频清单与 pinyin/audio/ 目录一致：tools/gen_pinyin_audio.py --check */
+try { process.stdout.write(execFileSync("python3", [path.join(__dirname, "gen_pinyin_audio.py"), "--check"], { encoding: "utf8" })); }
+catch (e) { bad++; console.error(String(e.stdout || "") + String(e.stderr || e.message)); }
 process.exit(bad ? 1 : 0);

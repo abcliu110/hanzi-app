@@ -1,7 +1,7 @@
 /* newhanzi service worker：离线使用
    只在 http(s) 下由各页面注册；file:// 打开时不会注册。
    - 安装时预缓存全部页面及其引用的样式/脚本（清单由 tools/gen_sw_core.py 从页面生成，勿手改）
-     不预缓存 3500 个单字数据文件与语法题库，用到时再缓存
+     不预缓存 3500 个单字数据文件、语法题库和拼音音频，用到时再缓存
    - 所有同源请求：网络优先（拿到就更新缓存），断网或超时才用缓存
      → 改了代码/数据孩子下次打开就是新版，不必手动改 VERSION
    - VERSION 随清单自动变化；新增/删除页面后运行 python3 tools/gen_sw_core.py（测试会检查）。 */
@@ -143,6 +143,12 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
+  /* 拼音音频（pinyin/audio/*.mp3，1660 个，不进 CORE）：文件内容不变，缓存优先；第一次播放时才下载并缓存。
+     只缓存完整的 200 响应（页面用 fetch 取整个文件，不走 Range 请求）。 */
+  if (/\/pinyin\/audio\/.+\.mp3$/.test(url.pathname)) {
+    e.respondWith(caches.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => put(req, res))));
+    return;
+  }
   const isPage = req.mode === "navigate" || req.destination === "document";
   const key = isPage ? new Request(url.pathname) : req;
   const fallback = () => caches.match(req, { ignoreSearch: true })
