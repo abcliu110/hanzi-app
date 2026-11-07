@@ -405,3 +405,64 @@ test('儿化不播（不拿基本音节顶替）；verse.real 可按出现顺序
   await expect(d.locator('.road.mini canvas')).toHaveCount(4);
   expect(errs).toEqual([]);
 });
+
+test('拼读机同音字：次读音也列出并标「多音」，按识字册次排序（pinyin-11 已知/以后 1）', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/pinyin.html?t=pindu');
+  const qb = page.locator('.blk[data-type="quiz-build"]').first();
+  // b + a + 四声 → bà：主读音 bà 的「爸」，次读音 bà 的「把」（bǎ,bà）
+  await qb.locator('[data-row="t"] [data-t="4"]').click();
+  await qb.locator('[data-go]').click();
+  await expect(qb.locator('.hz-l .zi-l').first()).toBeVisible();
+  await expect(qb.locator('.hz-l .zi-l', { hasText: '爸' })).toHaveCount(1);
+  const dy = qb.locator('.hz-multi .hz-m .zi-l.dy');
+  await expect(dy.filter({ hasText: '把' })).toHaveCount(1);
+  await expect(dy.first()).toContainText('多音');
+  await expect(dy.first()).toHaveAttribute('href', /zika\.html\?zi=/);
+  const r = await page.evaluate(() => {
+    const P = window.NHZ_PINYIN, G = window.NHZ_GRADE_MAP, O = ['1上', '1下', '2上', '2下', '3上', '3下', '4上', '4下', '5上', '5下', '6上', '6下'];
+    const zs = Array.from(document.querySelectorAll('.blk[data-type="quiz-build"] .hz-m .zi-l')).map((a) => a.firstChild.textContent);
+    const isMulti = zs.every((z) => { const rs = String(P[z]).split(','); return rs[0] !== 'bà' && rs.indexOf('bà') > 0; });
+    const g = zs.map((z) => (O.indexOf(G[z]) < 0 ? 99 : O.indexOf(G[z])));
+    const sorted = g.every((v, i) => i === 0 || g[i - 1] <= v);
+    const mainOk = Array.from(document.querySelectorAll('.blk[data-type="quiz-build"] .hz-l .zi-l')).every((a) => String(P[a.textContent]).split(',')[0] === 'bà');
+    return { isMulti, sorted, mainOk, n: zs.length };
+  });
+  expect(r.n).toBeGreaterThan(0);
+  expect(r).toEqual({ isMulti: true, sorted: true, mainOk: true, n: r.n });
+  expect(errs).toEqual([]);
+});
+
+test('拆拼直达三拼韵母：拼读页预选拼读机里的韵母并描边，没有的找同介母的三拼机（pinyin-11 已知/以后 2）', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  // 字卡「光」：韵母 uang 链到拼读页
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('光'));
+  await expect(page.locator('.bigzi')).toHaveText('光', { timeout: 20000 });
+  await expect(page.locator('.hero .pinyin .py-split .py-kp').nth(1)).toHaveAttribute('href', 'pinyin.html?t=pindu&k=uang');
+  // uang：u 介母三拼机预选 uang，整台机描边，拼得出来（「碰！」可点）
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=uang');
+  const fb = page.locator('.blk.kp-focus');
+  await expect(fb).toHaveCount(1);
+  await expect(fb).toHaveAttribute('data-type', 'quiz-build');
+  await expect(fb.locator('[data-row="f"] [data-f="uang"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(fb.locator('[data-row="f"] .pchip.kp-focus')).toHaveCount(1);
+  await expect(fb.locator('[data-go]')).toBeEnabled();
+  await expect(fb).toBeInViewport();
+  // ia：i 介母那台（j q x），声母自动换成能拼的
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=ia');
+  await expect(page.locator('.blk.kp-focus [data-row="f"] [data-f="ia"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.blk.kp-focus [data-go]')).toBeEnabled();
+  // uan：拼读机里没有 → 找 u 介母三拼机，加说明，不预选
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=uan');
+  await expect(page.locator('.blk.kp-focus')).toHaveCount(1);
+  await expect(page.locator('.blk.kp-focus [data-row="f"] [data-f="ua"]')).toHaveCount(1);
+  await expect(page.locator('.blk.kp-focus .kp-focus-note')).toContainText('uan');
+  // üan（字卡「卷」juǎn）：找有 j q x 的那台
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=' + encodeURIComponent('üan'));
+  await expect(page.locator('.blk.kp-focus [data-row="i"] [data-i="j"]')).toHaveCount(1);
+  // 不是三拼韵母、页上也没有的 key：照旧停在页首，不描边
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=zz');
+  await expect(page.locator('.kp')).toHaveCount(1);
+  await expect(page.locator('.kp-focus')).toHaveCount(0);
+  expect(errs).toEqual([]);
+});

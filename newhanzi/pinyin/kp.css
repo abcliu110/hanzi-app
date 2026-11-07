@@ -183,8 +183,14 @@
 .nlead{stroke:var(--muted);stroke-width:1;fill:none}
 /* 拼读机：同音字链字卡 */
 .hz{margin-top:8px}.hz-h{font-size:15px;color:var(--muted)}
-.hz-l{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
-.hz-l .zi-l{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
-.hz-l .zi-l:hover{border-color:var(--accent)}
+.hz-l,.hz-m{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.hz-l .zi-l,.hz-m .zi-l{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.hz-l .zi-l:hover,.hz-m .zi-l:hover{border-color:var(--accent)}
+.hz-multi{margin-top:10px}
+.hz-m .zi-l.dy{flex-direction:column;gap:0;border-style:dashed;padding:2px 4px}
+.hz-m .zi-l.dy small{font-size:11px;line-height:1;color:var(--muted)}
+/* 字卡拆拼直达三拼韵母（&k=uang）：拼读机里预选那个韵母并描边整台机 */
+.blk.kp-focus{outline:3px solid var(--accent-deep);outline-offset:4px;border-radius:12px}
+.pchip.kp-focus{outline:3px solid var(--accent-deep);outline-offset:3px}
 .py-chip.kp-focus{outline:3px solid var(--accent-deep);outline-offset:3px}
 .kp .erh{text-decoration:underline dotted var(--muted);text-underline-offset:3px}

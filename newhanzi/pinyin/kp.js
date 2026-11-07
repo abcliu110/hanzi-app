@@ -616,8 +616,10 @@
     });
     if (order.length) next();
   }
-  /* 拼读机拼出音节后：3500 字库里主读音（第一个读音）正好是它的字 → 链字卡（pinyin-content-a 提的）。
-     字表 data/pinyin_lookup.js、年级 data/grade_map.js 按需加载（都在 sw CORE 里）；排序：识字表册次（1上→6下）优先，同册按字库顺序。 */
+  /* 拼读机拼出音节后：3500 字库里读这个音的字 → 链字卡（pinyin-content-a 提的）。
+     先列主读音（第一个读音）正好是它的字；再列「多音」：这个音是它的次读音的字（pinyin-11 已知/以后第 1 条）。
+     读音表 data/pinyin_lookup.js（由 ziku/model-3500.json 经 tools/fix_pinyin.py 生成：只列常用读音、主读音第一；罕用/古音不在内，所以不列），
+     年级 data/grade_map.js；按需加载（都在 sw CORE 里）；排序：识字表册次（1上→6下）优先，同册按字库顺序。 */
   var GRADE_ORDER = ['1上', '1下', '2上', '2下', '3上', '3下', '4上', '4下', '5上', '5下', '6上', '6下'];
   var dictWait = null;
   function loadDict() {
@@ -627,27 +629,40 @@
     return dictWait;
   }
   function homophones(marked) {
-    var P = window.NHZ_PINYIN || {}, G = window.NHZ_GRADE_MAP || {}, out = [], i = 0, want = String(marked).normalize('NFC');
+    var P = window.NHZ_PINYIN || {}, G = window.NHZ_GRADE_MAP || {}, main = [], multi = [], i = 0, want = String(marked).normalize('NFC');
     Object.keys(P).forEach(function (z) {
-      var first = String(P[z]).split(/[,，]/)[0].trim().normalize('NFC');
-      if (first === want) { var g = GRADE_ORDER.indexOf(G[z]); out.push({ z: z, g: g < 0 ? 99 : g, i: i }); }
+      var rs = String(P[z]).split(/[,，]/).map(function (r) { return r.trim().normalize('NFC'); }), g = GRADE_ORDER.indexOf(G[z]);
+      var x = { z: z, g: g < 0 ? 99 : g, i: i, rs: rs };
+      if (rs[0] === want) main.push(x); else if (rs.indexOf(want) > 0) multi.push(x);
       i++;
     });
-    out.sort(function (a, b) { return a.g - b.g || a.i - b.i; });
-    return out;
+    function by(a, b) { return a.g - b.g || a.i - b.i; }
+    main.sort(by); multi.sort(by);
+    return { main: main, multi: multi };
   }
   function showHomophones(el, marked) {
     el.innerHTML = '<span class="note">正在找同音字…</span>';
     loadDict().then(function () {
       if (!el.isConnected) return;
       if (!window.NHZ_PINYIN) { el.innerHTML = ''; return; }
-      var list = homophones(marked), N = 16;
-      if (!list.length) { el.innerHTML = '<span class="note">3500 个常用字里，没有主读音是 <span class="py">' + esc(marked) + '</span> 的字。</span>'; return; }
-      function links(a) { return a.map(function (x) { return '<a class="zi-l" href="zika.html?zi=' + encodeURIComponent(x.z) + '" title="打开「' + esc(x.z) + '」字卡">' + esc(x.z) + '</a>'; }).join(''); }
-      el.innerHTML = '<div class="hz-h">读 <span class="py">' + esc(marked) + '</span> 的字（主读音，3500 字里 ' + list.length + ' 个，识字表先学的排前面）：</div><div class="hz-l">' + links(list.slice(0, N)) + '</div>' +
-        (list.length > N ? '<button type="button" class="kp-btn hz-more">全部 ' + list.length + ' 个</button>' : '');
-      var mb = el.querySelector('.hz-more');
-      if (mb) mb.onclick = function () { el.querySelector('.hz-l').innerHTML = links(list); mb.parentNode.removeChild(mb); };
+      var r = homophones(marked), list = r.main, multi = r.multi, N = 16;
+      function links(a, dy) {
+        return a.map(function (x) {
+          return '<a class="zi-l' + (dy ? ' dy' : '') + '" href="zika.html?zi=' + encodeURIComponent(x.z) + '" title="' + (dy ? '多音字，主读音 ' + esc(x.rs[0]) + '；' : '') + '打开「' + esc(x.z) + '」字卡">' + esc(x.z) + (dy ? '<small>多音</small>' : '') + '</a>';
+        }).join('');
+      }
+      function part(cls, head, a, dy) {
+        return '<div class="' + cls + '"><div class="hz-h">' + head + '</div><div class="' + (dy ? 'hz-m' : 'hz-l') + '">' + links(a.slice(0, N), dy) + '</div>' +
+          (a.length > N ? '<button type="button" class="kp-btn hz-more">全部 ' + a.length + ' 个</button>' : '') + '</div>';
+      }
+      var h = list.length ? part('hz-main', '读 <span class="py">' + esc(marked) + '</span> 的字（主读音，3500 字里 ' + list.length + ' 个，识字表先学的排前面）：', list)
+        : '<span class="note">3500 个常用字里，没有主读音是 <span class="py">' + esc(marked) + '</span> 的字。</span>';
+      if (multi.length) h += part('hz-multi', '还有 ' + multi.length + ' 个<b>多音字</b>，<span class="py">' + esc(marked) + '</span> 是它们的另一个读音（点开字卡看主读音）：', multi, true);
+      el.innerHTML = h;
+      [['.hz-main', list, false], ['.hz-multi', multi, true]].forEach(function (p) {
+        var sec = el.querySelector(p[0]), mb = sec && sec.querySelector('.hz-more');
+        if (mb) mb.onclick = function () { sec.querySelector(p[2] ? '.hz-m' : '.hz-l').innerHTML = links(p[1], p[2]); mb.parentNode.removeChild(mb); };
+      });
     });
   }
   function quizBuild(box, b) {
@@ -683,6 +698,18 @@
       if (e.target.closest('[data-go]') && ctl) { ctl.go(); ctl = null; $('[data-go]', box).disabled = true; return; }
       if (e.target.closest('[data-re]')) render();
     });
+    /* 直达三拼韵母（focusKey）：预选这个韵母；当前声母/声调拼不出来就换成第一个能拼的 */
+    box.nhzPick = function (f) {
+      if (fins.indexOf(f) < 0) return null;
+      st.f = f;
+      if (!legal(st.i, f, st.t)) {
+        var hit = null;
+        tones.some(function (t) { return inis.some(function (i) { if (legal(i, f, t)) { hit = [i, t]; return true; } return false; }); });
+        if (hit) { st.i = hit[0]; st.t = hit[1]; }
+      }
+      render();
+      return $('[data-row="f"] [data-f="' + f + '"]', box);
+    };
     render();
   }
   function markReason(w, idx) {
@@ -846,10 +873,33 @@
     if (!root || !key) return false;
     var want = String(key).normalize('NFC'), hit = null;
     $$('.py-chip').some(function (ch) { if (ch.closest('.lvhide')) return false; if (chipLabel(ch).normalize('NFC') === want) { hit = ch; return true; } return false; });
-    if (!hit) return false;
+    if (!hit) return focusBuild(want);
     hit.classList.add('kp-focus');
     if (hit.getAttribute('data-kind') === 'tones') openTones(hit);
     try { hit.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch (e) { hit.scrollIntoView(); }
+    return true;
+  }
+  /* 三拼韵母（ia uang üan…）在拼读页没有同名芯片（pinyin-11 已知/以后第 2 条）：
+     ① 当前档位可见的拼读机里有这个韵母 → 预选它（声母、声调换成能拼的），描边整台机和那个韵母按钮，滚过去；
+     ② 没有这个韵母（如 uan iong üan）→ 找介母相同的三拼机（u… / i…；ü 开头找有 j q x 的那台），描边、滚过去，加一行说明，不预选。 */
+  function focusBuild(want) {
+    var boxes = $$('.blk[data-type="quiz-build"]').filter(function (b) { return !b.classList.contains('lvhide'); });
+    if (!boxes.length || !/^[iuü]./.test(want)) return false;
+    var blk = null, btn = null;
+    boxes.some(function (b) { var q = $('.quiz', b), f = q && q.nhzPick && $('[data-row="f"] [data-f="' + want + '"]', q); if (f) { blk = b; btn = q.nhzPick(want); return true; } return false; });
+    if (!blk) {
+      var md = want.charAt(0);
+      blk = boxes.filter(function (b) {
+        var fs = $$('[data-row="f"] [data-f]', b).map(function (x) { return x.getAttribute('data-f'); }), is = $$('[data-row="i"] [data-i]', b).map(function (x) { return x.getAttribute('data-i'); });
+        return md === 'ü' ? is.indexOf('j') >= 0 && fs.some(function (f) { return f.length > 1 && /^[iü]/.test(f); }) : fs.some(function (f) { return f.length > 1 && f.charAt(0) === md; });
+      })[0];
+      if (!blk) return false;
+      var q2 = $('.quiz', blk);
+      if (q2) q2.insertAdjacentHTML('beforebegin', '<p class="note kp-focus-note">「<span class="py">' + esc(want) + '</span>」在拼读机里没有现成的按钮；这台三拼机练的是同样带介母 ' + esc(md) + ' 的韵母，拼法一样：声轻介快韵母响。</p>');
+    }
+    blk.classList.add('kp-focus');
+    if (btn) btn.classList.add('kp-focus');
+    try { blk.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch (e) { blk.scrollIntoView(); }
     return true;
   }
   function render(el, c, m, opt) {
