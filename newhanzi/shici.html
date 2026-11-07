@@ -1020,6 +1020,8 @@ function openPoet(name){
   var works = worksOf(name);
   var h = '<div class="sc-detail-head"><h2>'+esc(name)+'</h2></div>';
   h += '<div class="sc-know"><p>'+esc(D.poets[name]||'')+'</p></div>';
+  var routeKey = '诗人足迹:'+name, hasRoute = !!(window.NHZ_WB_INDEX||{})[routeKey];
+  if(hasRoute) h += '<div class="sc-readbar"><button type="button" data-route="1">🗺️ 诗人足迹（按年谱）</button></div><div id="scroute"></div>';
   if(D.stories && D.stories[name]){
     h += '<div class="sc-story"><h4>📖 小故事</h4><p>'+esc(D.stories[name])+'</p></div>';
   }
@@ -1029,6 +1031,17 @@ function openPoet(name){
   detEl.innerHTML = h; showDetail();
   detEl.querySelectorAll('.sc-worklink').forEach(function(a){
     a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+  });
+  var rb = detEl.querySelector('[data-route]');
+  if(rb) rb.addEventListener('click', function(){
+    var box = document.getElementById('scroute'); if(!box) return;
+    if(rb.classList.contains('on')){ rb.classList.remove('on'); box.innerHTML = ''; return; }
+    rb.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
+    scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'data/poet_trails.js', 'wb/s/' + window.NHZ_WB_INDEX[routeKey] + '.js'], function(ok){
+      if(!ok || !window.NHZWB || !window.NHZWB.has(routeKey)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; rb.classList.remove('on'); return; }
+      box.innerHTML = '<p class="sc-memo-tip">点地图上的站点看这里写的诗和依据（年谱）。</p>'; var holder = document.createElement('div'); box.appendChild(holder);
+      var pl = window.NHZWB.mount(holder, routeKey); if(pl) pl.autoplay();
+    });
   });
 }
 

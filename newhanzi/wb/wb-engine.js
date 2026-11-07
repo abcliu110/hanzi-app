@@ -1852,7 +1852,7 @@
     if (!places || !places.length) {
       var TR = window.NHZ_POET_TRAILS || { poets: [] }, found = null;
       TR.poets.forEach(function (p) { if (p.name === d.t) found = p; });
-      places = found ? found.trail.map(function (s) { return { name: s.place, x: s.x, y: s.y, year: s.year, poems: s.poems || [], note: s.note, tag: s.tag }; }) : [];
+      places = found ? found.trail.map(function (s) { return { name: s.place, x: s.x, y: s.y, year: s.year, poems: s.poems || [], note: s.note, tag: s.tag, src: s.src, say: s.say }; }) : [];
     }
     var n = places.length, pts = places.map(function (p) { return routeXY([p.x, p.y]); });
     var yMin = n ? places[0].year : 0, yMax = n ? places[0].year : 0, i, j;
@@ -1885,6 +1885,7 @@
       else lines.push('此地写的诗：诗库未收此地之作');
       if (st.note) lines.push(st.note);
       if (others.length) lines.push('也来过这里：' + others.join('、'));
+      if (st.src) lines.push('依据：' + st.src);
       lines.push('点一下卡片收起');
       var est = 0; lines.forEach(function (ln) { est += Math.max(1, Math.ceil((ln.length * 22) / 260)); });
       var h = 24 + est * 28 + 14, w = 300, px = sp[0] + 26, py = sp[1] - 16;

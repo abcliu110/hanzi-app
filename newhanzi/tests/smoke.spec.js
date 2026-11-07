@@ -282,6 +282,26 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('shici poet trail route whiteboard (A22-13, 年谱出处)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/shici.html');
+    await page.locator('.sc-card[data-go="poets"]').click();
+    await page.locator('.sc-poet[data-poet="李白"]').click();
+    await page.locator('[data-route]').click();
+    await expect(page.locator('#scroute svg').first()).toBeVisible({ timeout: 10000 });
+    const trails = await page.evaluate(() => window.NHZ_POET_TRAILS.poets.map((p) => [p.name, p.trail.every((s) => !!s.src)]));
+    expect(trails.length).toBe(9);
+    expect(trails.every((t) => t[1])).toBe(true);
+    await page.goto('about:blank');
+    // 杜牧未找到可核年谱，不出足迹按钮
+    await page.goto('newhanzi/shici.html');
+    await page.locator('.sc-card[data-go="poets"]').click();
+    await page.locator('.sc-poet[data-poet="杜牧"]').click();
+    await expect(page.locator('[data-route]')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('shici scroll whiteboard mounts', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));

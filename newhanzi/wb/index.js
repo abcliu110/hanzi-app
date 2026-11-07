@@ -148,7 +148,6 @@ window.NHZ_WB_INDEX = {
   "诗人足迹:白居易": "route_baijuyi",
   "诗人足迹:苏轼": "route_sushi",
   "诗人足迹:王昌龄": "route_wangchangling",
-  "诗人足迹:杜牧": "route_dumu",
   "诗人足迹:陆游": "route_luyou",
   "诗人足迹:辛弃疾": "route_xinqiji",
   /* 古文区（docs/gaijin/guwen-gaijin-sheji.md P0-B）：键为「古文:知识点名」 */
