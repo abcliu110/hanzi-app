@@ -54,3 +54,18 @@ test.describe('guwen duiyi (A21)', () => {
     await expect(page.locator('[data-gwdy="toggle"]')).toHaveCount(0);
   });
 });
+
+// GW 2026-11-07：guwen.js 学段字段（tools/content/fix_gw_xueduan.py；供 Q10，不改默认显示）
+test('guwen texts 学段 field: only 小学/初中/高中 with 学段源, default list unchanged', async ({ page }) => {
+  await page.goto('newhanzi/guwen.html');
+  const r = await page.evaluate(() => {
+    const c = {};
+    window.NHZ_GUWEN.texts.forEach((t) => { const k = t['学段'] || '无'; c[k] = (c[k] || 0) + 1; if (t['学段'] && !t['学段源']) c.bad = (c.bad || 0) + 1; });
+    return c;
+  });
+  expect(r.bad).toBeUndefined();
+  expect(Object.keys(r).sort()).toEqual(['初中', '小学', '无', '高中'].sort());
+  expect(r['小学']).toBe(14);
+  await page.locator('[data-mod="pianmu"]').first().click();
+  await expect(page.locator('[data-go="全部"]')).toContainText('59');
+});
