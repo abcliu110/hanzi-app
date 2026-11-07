@@ -1314,17 +1314,19 @@
    *         {line, aside, say}]}                  // 旁注：红字 + 波浪线，不动圈（同三圈模式）
    * 左栏逐行写，右边画圈；只按 rel 排四种拓扑，不做任意坐标。 */
   function eulerPair(c, q, d) {
-    var pr = d.pair, rel = pr.rel, CX = 850, CY = 300, row = 0, POS;
+    var pr = d.pair, rel = pr.rel, CX = 850, CY = 300, row = 0, POS, uDone = 0;
     if (rel === 'eq') POS = { b: { x: CX, y: CY, w: 470, h: 330, ly: CY - 110 }, a: { x: CX, y: CY, w: 440, h: 300, ly: CY + 40 } };
     else if (rel === 'in') POS = { b: { x: CX, y: CY, w: 580, h: 430, ly: CY - 160 }, a: { x: CX, y: CY + 40, w: 260, h: 170, ly: CY + 50 } };
     else if (rel === 'cross') POS = { a: { x: 735, y: CY, w: 400, h: 310, ly: CY + 10, lx: 640 }, b: { x: 965, y: CY, w: 400, h: 310, ly: CY + 10, lx: 1060 } };
+    else if (rel === 'half') POS = { a: { x: 707, y: CY, w: 294, h: 340, ly: CY + 10, box: 1 }, b: { x: 1003, y: CY, w: 294, h: 340, ly: CY + 10, box: 1 } };   /* 矛盾关系：两块填满全集 */
     else if (pr.c) POS = { a: { x: 660, y: CY, w: 175, h: 150, ly: CY + 10 }, b: { x: 850, y: CY, w: 175, h: 150, ly: CY + 10 }, c: { x: 1040, y: CY, w: 175, h: 150, ly: CY + 10 } };
     else POS = { a: { x: 710, y: CY, w: 250, h: 200, ly: CY + 10 }, b: { x: 1000, y: CY, w: 250, h: 200, ly: CY + 10 } };
     var COL = { a: ACC, b: INK, c: BLUE };
     function circle(k, t) {
       var p = POS[k], s = pr[k] || '', col = COL[k];
       return c.G(function () {
-        c.R('ellipse', [p.x, p.y, p.w, p.h], { stroke: col, strokeWidth: 3, strokeLineDash: rel === 'eq' && k === 'a' ? [12, 8] : undefined }, t, .7);
+        if (p.box) c.R('rectangle', [p.x - p.w / 2, p.y - p.h / 2, p.w, p.h], { stroke: col, strokeWidth: 3 }, t, .7);
+        else c.R('ellipse', [p.x, p.y, p.w, p.h], { stroke: col, strokeWidth: 3, strokeLineDash: rel === 'eq' && k === 'a' ? [12, 8] : undefined }, t, .7);
         c.T(p.lx || p.x, p.ly, s, { size: textW(s, 30) > p.w - 30 ? 24 : 30, color: col }, t + .4, .5);
       });
     }
@@ -1335,6 +1337,15 @@
         if (b.aside) {
           if (g) c.R('linearPath', [[[g.x0, g.y + 12], [g.x0 + (g.x1 - g.x0) / 3, g.y + 20], [g.x0 + 2 * (g.x1 - g.x0) / 3, g.y + 12], [g.x1, g.y + 20]]], { stroke: BAD, strokeWidth: 3 }, tt, .5);
           if (b.aside !== true) line(b.aside, tt + .4, BAD);
+          dd += 1.2;
+        }
+        if (pr.u && !uDone && b.draw) {   /* 全集框（pr.u）：第一次画圈时先画外框并在左上角写全集名 */
+          uDone = 1;
+          c.G(function () { c.R('rectangle', [556, 116, 598, 368], { stroke: BLUE, strokeWidth: 2.4 }, tt, .6); c.T(570, 104, pr.u, { size: 24, anchor: 'start', color: BLUE }, tt + .3, .4); });
+          tt += .7; dd += .7;
+        }
+        if (b.gap && pr.gap) {   /* 全集里两圈之外的区域：反对关系“两个都不是”的例子 */
+          c.T(855, 452, pr.gap, { size: 26, color: ACC }, tt, .6); c.ring(855, 443, textW(pr.gap, 26) + 50, 56, tt + .3);
           dd += 1.2;
         }
         if (b.draw && POS[b.draw]) {

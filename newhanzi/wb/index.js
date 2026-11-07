@@ -114,6 +114,8 @@ window.NHZ_WB_INDEX = {
   "言外之意": "lj_yanwai",
   /* 逻辑区 A22-7 剩余：隐含前提（tree 补隐含前提卡 + vs 查一查） */
   "隐含前提": "lj_yinhan",
+  /* 逻辑区 A22-3 遗留：反对关系 / 矛盾关系（euler pair + 全集框） */
+  "非黑即白": "lj_heibai",
   /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
   /* 古诗区 P0-2 其余 11 首 scroll（A19） */

@@ -74,7 +74,7 @@ test.describe('logic daily one-minute (A22-8)', () => {
 });
 
 test.describe('logic whiteboards added 2026-11-07 (luoji-rest)', () => {
-  const cases = [['隐含前提', 4, '查一查']];
+  const cases = [['隐含前提', 4, '查一查'], ['非黑即白', 5, '矛盾关系']];
   for (const [name, n, tab] of cases) {
     test('whiteboard ' + name, async ({ page }) => {
       const errors = [];
