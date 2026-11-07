@@ -55,6 +55,9 @@ body{background:var(--qz-bg);color:var(--qz-text);
 .qz-opts{margin:4px 0;}
 .qz-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
+/* hidden 属性必须真隐藏（.qz-btn 等 display:block 会盖住 UA 的 [hidden]，「下一题」曾在答题前就显示） */
+[hidden]{display:none !important;}
+
 /* 按钮 */
 .qz-btn{display:block;width:100%;text-align:left;background:var(--qz-bg2);
   color:var(--qz-text);border:2px solid var(--qz-line);border-radius:12px;
