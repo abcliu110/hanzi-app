@@ -205,9 +205,9 @@
     {
       type: 'quiz-listen', lv: 1, h: '听音选韵母', ask: 'final',
       pool: ['shan1', 'fan4', 'ban1', 'men2', 'gen1', 'pen2', 'lin2', 'xin1', 'jin1', 'lun2', 'chun1', 'dun1',
-        'tang2', 'fang2', 'bang1', 'deng1', 'feng1', 'peng2', 'xing1', 'ting1', 'jing1', 'hong2', 'dong1', 'zhong1'],
-      options: ['an', 'en', 'in', 'un', 'ang', 'eng', 'ing', 'ong'],
-      note: 'ün 只和 j q x 相拼，写出来是 un（两点省了），所以这里不考 ün；ün 在下面的拼读机和「想一想」里练。'
+        'tang2', 'fang2', 'bang1', 'deng1', 'feng1', 'peng2', 'xing1', 'ting1', 'jing1', 'hong2', 'dong1', 'zhong1', 'jun1', 'qun2', 'xun2'],
+      options: ['an', 'en', 'in', 'un', 'ün', 'ang', 'eng', 'ing', 'ong'],
+      note: 'ün 只和 j q x 相拼，写出来是 un（两点省了）：jūn（军）、qún（裙）、xún（寻）听到的是 ün，答案选 ün；lún（轮）、dūn（蹲）里才是 un。'
     },
     {
       type: 'quiz-listen', lv: 1, h: '前后鼻对对碰：in 还是 ing', ask: 'final',

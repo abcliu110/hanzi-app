@@ -271,3 +271,65 @@ test('字卡拼音可点：播真人录音，拆拼链接去拼音区', async ({
   await expect(page.locator('.hero .pinyin .py-split')).toContainText('f + ó');
   expect(errs).toEqual([]);
 });
+
+/* ---- pinyin-11：剩余项 ---- */
+test('复韵母动程 glide：静态步进示意图（口形 + 舌位），下一步/上一步、听', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/pinyin.html?t=fuyunmu');
+  const g = page.locator('.blk[data-type="anim"]').first();
+  await expect(g.locator('svg.gsvg')).toHaveCount(1);
+  await expect(g.locator('.gnote')).toContainText('第 1 / 3 步');
+  await expect(g.locator('[data-gs="-1"]')).toBeDisabled();
+  await g.locator('[data-gs="1"]').click();
+  await expect(g.locator('.gnote')).toContainText('第 2 / 3 步');
+  await expect(g.locator('svg .garrow')).toHaveCount(1);
+  await g.locator('[data-gi="4"]').click(); // ui：中间藏着 e
+  await g.locator('[data-gs="1"]').click();
+  await expect(g.locator('svg .ghid')).toHaveText('（e）');
+  await expect(g.locator('.gnote')).toContainText('借 wei');
+  const rq = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-wei1.mp3'));
+  await g.locator('[data-gplay]').click(); await rq;
+  await expect(g.locator('details.gfb .fallback')).toHaveCount(1); // 文字说明保留
+  expect(errs).toEqual([]);
+});
+
+test('前后鼻 nasal：口腔侧面两图并排步进，舌尖/舌根接触点，前鼻后鼻各自可听；数组写法也能画', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/pinyin.html?t=biyunmu');
+  const n = page.locator('.blk[data-type="anim"]').first();
+  await expect(n.locator('svg.nsvg')).toHaveCount(2);
+  await expect(n.locator('.nhit')).toHaveCount(0);
+  await n.locator('[data-ns="1"]').click();
+  await expect(n.locator('.nhit')).toHaveCount(2);
+  await expect(n.locator('.ncol').nth(0)).toContainText('舌尖抬起');
+  await expect(n.locator('.ncol').nth(1)).toContainText('舌根抬起');
+  await n.locator('[data-ns="1"]').click();
+  await expect(n.locator('.nair')).toHaveCount(2); // 气流走鼻腔
+  await n.locator('[data-ni="2"]').click();
+  const rq = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-ying1.mp3'));
+  await n.locator('[data-np="back"]').click(); await rq;
+  // 易混音页用数组写法 pairs:[['an','ang'],…]（L2 块）
+  await page.evaluate(() => window.NHZPinyinKP.setLevel(2));
+  await page.goto('newhanzi/pinyin.html?t=yibian');
+  await expect(page.locator('.blk[data-type="anim"] svg.nsvg')).toHaveCount(2);
+  expect(errs).toEqual([]);
+});
+
+test('听音选韵母：j q x 后的 u 还原成 ü，零声母 yu/yue/yun 取韵母本身；jūn 答 ün、jué 答 üe', async ({ page }) => {
+  await page.goto('newhanzi/pinyin.html');
+  const r = await page.evaluate(() => {
+    const out = {};
+    const pools = { jun1: 0, xue2: 0, lun2: 0, yu3: 0, wei1: 0 };
+    Object.keys(pools).forEach((k) => {
+      const box = document.createElement('div'); document.body.appendChild(box);
+      window.NHZPinyinKP.render(box, { id: 'q', name: 'q', lead: '', kan: [], ting: [], yong: [], lian: [{ type: 'quiz-listen', ask: 'final', pool: [k], options: ['un', 'ün', 'üe', 'ue', 'ü', 'u', 'ui', 'uei'] }] }, { name: 'q' });
+      box.querySelector('[data-q="again"]').click();
+      const opts = Array.from(box.querySelectorAll('.qopt')); const want = { jun1: 'ün', xue2: 'üe', lun2: 'un', yu3: 'ü', wei1: 'ui' }[k];
+      const btn = opts.find((b) => b.getAttribute('data-ans') === want); if (btn) btn.click();
+      out[k] = btn && btn.classList.contains('right') ? 'ok' : 'bad';
+      box.remove();
+    });
+    return out;
+  });
+  expect(r).toEqual({ jun1: 'ok', xue2: 'ok', lun2: 'ok', yu3: 'ok', wei1: 'ok' });
+});

@@ -153,3 +153,31 @@
 .road.mini canvas{height:96px}
 .road.mini .rh .py{font-size:24px;margin-left:0}
 .sandhi .kp-btn{align-self:center}
+/* 复韵母动程 / 前后鼻：静态步进示意图（pinyin-11） */
+.gstage,.nstage{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}
+.gsvg{width:100%;max-width:520px;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.ncol{margin:0;flex:1 1 240px;max-width:360px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px}
+.ncol figcaption{font-size:15px;color:var(--ink)}.ncol figcaption .py{font-size:22px}.ncol figcaption small{color:var(--muted)}
+.nsvg{width:100%;height:auto;display:block}
+.gsvg text,.nsvg text{font-family:system-ui,"PingFang SC","Noto Sans CJK SC",sans-serif;fill:var(--muted);text-anchor:middle}
+.gsvg .glab,.nsvg .nlab{font-size:11px}.nsvg .nlab.sm{font-size:9px}
+.gsvg .gcap{font-size:15px;fill:var(--ink);font-family:var(--py)}
+.gsvg .gax{font-size:10px}
+.gsvg .gv{font-size:15px;fill:var(--ink);font-family:var(--py);font-weight:700}
+.gsvg .ghid{font-size:13px;fill:var(--accent-deep)}
+.gmouth{fill:var(--accent-soft);stroke:var(--accent-deep);stroke-width:3}
+.gghost{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}
+.gtrap{fill:none;stroke:var(--line);stroke-width:2}
+.gdot0,.gdot1{fill:var(--card);stroke:var(--muted);stroke-width:1.5}.gdot1.on{stroke:var(--accent-deep)}
+.gball{fill:var(--accent);stroke:var(--accent-deep);stroke-width:2}
+.garrow,.nair{fill:none;stroke:var(--accent-deep);stroke-width:2.5;stroke-linecap:round}
+.nair{stroke-dasharray:6 4}
+.gahd{fill:var(--accent-deep)}
+.nwall{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ntooth{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.nvel{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.ntongue{fill:none;stroke:var(--accent-deep);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.nhit{fill:none;stroke:var(--bad);stroke-width:2.5}
+.gcapt{font-size:16px;line-height:1.7;margin:4px 0}
+.gfb summary{cursor:pointer;color:var(--accent-deep);min-height:44px;display:flex;align-items:center}
+.nlead{stroke:var(--muted);stroke-width:1;fill:none}

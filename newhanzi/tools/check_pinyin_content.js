@@ -6,7 +6,7 @@
  * 2. 音频：chips/groups/pairs 的 play、quiz-listen 的 pool 必须在 pinyin/audio/index.js 里存在（syl + 声调）；
  *    hudu 必须是 21 个声母之一（文件可以还没录，页面显示「待录音」，这里只提示）。
  * 3. 拼音：words/verse/scene 的 py、{py:…} 内联标记、quiz-mark 的 items、verse.real 的值都要能被 NHZPinyinSyllable 解析
- *    且是合法音节；词语/儿歌的音节数要和汉字数对得上（儿化 r 算一个字「儿」）。quiz-build 的声母/韵母要能组成至少一个合法音节。
+ *    且是合法音节（real 可为按出现顺序的数组，'' 表示该处不标）；词语/儿歌的音节数要和汉字数对得上（儿化 r 算一个字「儿」）。quiz-build 的声母/韵母要能组成至少一个合法音节。
  * 4. 数量下限（SCHEMA「规则」）：看 ≥3 块、听读 ≥3 块、练 ≥3 种题型（quiz-*）、用 ≥2 块且词语 ≥8 个 + 至少 1 首儿歌（verse）；
  *    L1/L2/L3 都有块；outline ≤1 块。
  * 退出码：有错误 = 1；只有提示 = 0。 */
@@ -32,7 +32,7 @@ const TYPES = {
   'quiz-mark': ['items'], 'quiz-find': ['target', 'distract'], words: ['items'], verse: ['lines'], outline: ['p']
 };
 const ANIM_KINDS = new Set(['tone-road', 'bump', 'glide', 'nasal']);
-const ANIM_DONE = new Set(['tone-road', 'bump']); /* 框架已实现的 kind；其余必须带 fallback */
+const ANIM_DONE = new Set(['tone-road', 'bump', 'glide', 'nasal']); /* 框架已实现的 kind；其余必须带 fallback（glide/nasal 画不出来时也退回 fallback，建议保留） */
 const ASK = new Set(['initial', 'final', 'tone', 'syllable']);
 const STAGES = ['kan', 'ting', 'lian', 'yong'];
 const STAGE_N = { kan: '看', ting: '听读', lian: '练', yong: '用' };
@@ -42,6 +42,14 @@ let errors = 0, warns = 0;
 const HUDU_MISSING = new Set(); /* 呼读音还没录：只汇总提示一次 */
 function E(where, msg) { errors++; console.error('  ✗ ' + where + '：' + msg); }
 function W(where, msg) { warns++; console.log('  ! ' + where + '：' + msg); }
+
+/* 听音选韵母的标准答案（韵母表里的写法）：j q x 后的 u 还原成 ü（jué → üe、jūn → ün）；
+   y w 开头的零声母音节取韵母本身（yǔ → ü、yún → ün、yuè → üe、wǔ → u、yī → i；iou/uei/uen 用表里的 iu/ui/un） */
+function finalAnswer(r) {
+  if (!r.initial && r.final && /^[yw]/.test(r.written || '')) return ({ iou: 'iu', uei: 'ui', uen: 'un' })[r.final] || r.final;
+  var fw = r.finalWritten || r.written;
+  return /^[jqx]$/.test(r.initial) && /^u/.test(fw) ? 'ü' + fw.slice(1) : fw;
+}
 
 /* 音频键：'ba1' / 'lv4'（ü 写 v） */
 function audioOk(key) {
@@ -158,6 +166,14 @@ function checkBlock(where, b, ctx) {
       if (arr('pool').length < 4) E(where, 'pool 至少 4 个');
       arr('pool').forEach((k) => { if (!audioOk(k)) E(where, 'pool「' + k + '」没有音频'); });
       if (b.options != null && !Array.isArray(b.options)) E(where, 'options 应为数组');
+      /* 判分口径与 kp.js 一致：ask final 时 j q x 后的 u 还原成 ü（jué → üe、jūn → ün）；答案必须在 options 里 */
+      if (Array.isArray(b.options) && (b.ask === 'final' || b.ask === 'initial')) arr('pool').forEach((k) => {
+        const r = S.parse(String(k).replace(/v/g, 'ü'));
+        let a;
+        if (b.ask === 'initial') a = r.initial || '零声母';
+        else a = finalAnswer(r);
+        if (b.options.indexOf(a) < 0) E(where, 'pool「' + k + '」的答案「' + a + '」不在 options 里');
+      });
       break;
     case 'quiz-choose': arr('items').forEach((q, i) => {
       const w = where + '.items[' + i + ']';
@@ -187,9 +203,13 @@ function checkBlock(where, b, ctx) {
     case 'verse': {
       arr('lines').forEach((l, i) => checkPyLine(where + '.lines[' + i + ']', l.w, l.py));
       const all = arr('lines').map((l) => l.w).join('');
+      /* real：'一':'yì'（这首里每个「一」都这样读），或 '一':['yí','']（按出现顺序，'' = 读原调不标） */
       Object.keys(b.real || {}).forEach((z) => {
         if (all.indexOf(z) < 0) E(where, 'real 的「' + z + '」不在句子里');
-        if (!segment(b.real[z])) E(where, 'real「' + z + '」→「' + b.real[z] + '」不能解析');
+        const v = b.real[z], list = Array.isArray(v) ? v : [v];
+        if (Array.isArray(v) && v.length > all.split(z).length - 1) E(where, 'real「' + z + '」给了 ' + v.length + ' 个读音，句子里只出现 ' + (all.split(z).length - 1) + ' 次');
+        list.forEach((x) => { if (x !== '' && !segment(x)) E(where, 'real「' + z + '」→「' + x + '」不能解析'); });
+        if (!list.some((x) => x)) E(where, 'real「' + z + '」至少要有一个读音');
       });
       ctx.verse++; ctx.verseLines += arr('lines').length;
       break;

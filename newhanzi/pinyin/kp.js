@@ -4,7 +4,7 @@
  *   NHZPinyinKP.level() / setLevel(1|2|3)       → 浅 / 中 / 深（默认 2，存 localStorage 'nhz-py-lv'）
  * 只播 pinyin/audio 里的真人录音（NHZPinyinAudio），不用 Web Speech。不做 3D/悬浮特效。
  * 块类型：text chips groups table pairs scene mirror anim(tone-road|bump|glide|nasal) quiz-listen quiz-choose quiz-build
- *         quiz-mark quiz-find words verse outline。glide / nasal 暂用 fallback 静态说明。 */
+ *         quiz-mark quiz-find words verse outline。glide / nasal 是静态步进示意图（点「下一步」），画不出来时退回 fallback。 */
 (function () {
   'use strict';
   var S = window.NHZPinyinSyllable, A = window.NHZPinyinAudio;
@@ -345,10 +345,163 @@
     setup();
   }
 
+  /* ---------------- 复韵母动程（anim glide）、前后鼻（anim nasal）：静态步进示意图 ----------------
+   * 负责人 2026-11-06「不做特效」：只画器官线条和箭头（口形开口、舌位图、口腔侧剖面），不画人脸；点「下一步」看变化。
+   * 舌位为示意（通行描写），不是精确测量值。 */
+  var GSTEP = ['起点', '滑过去', '收住'];
+  function vowelPos(f, ch) { /* 舌位图坐标：x 0=前 1=后，y 0=高 1=低 */
+    if (ch === 'i') return [0.04, 0];
+    if (ch === 'ü') return [0.14, 0];
+    if (ch === 'u') return [1, 0];
+    if (ch === 'o') return f === 'ao' ? [0.96, 0.22] : [1, 0.36];
+    if (ch === 'e') return f === 'ei' ? [0.16, 0.36] : [0.22, 0.62];
+    if (ch === 'a') return f === 'ao' ? [0.9, 1] : [0.12, 1];
+    return [0.5, 0.5];
+  }
+  function isRound(ch) { return ch === 'u' || ch === 'ü' || ch === 'o'; }
+  function lipShape(open, round) { return { rx: round ? 20 : (open <= 1 ? 46 : 38), ry: { 1: 7, 2: 16, 3: 28 }[open] || 12 }; }
+  function trap(p) { var y = 22 + p[1] * 104, xl = 186 + p[1] * 34; return [xl + p[0] * (306 - xl), y]; }
+  function glideSvg(it, step) {
+    var op = it.open || [2, 1], rd = it.round || [isRound(it.from) ? 1 : 0, isRound(it.to) ? 1 : 0];
+    var a = lipShape(op[0], rd[0]), b = lipShape(op[1], rd[1]);
+    var cur = step === 0 ? a : step === 1 ? { rx: (a.rx + b.rx) / 2, ry: (a.ry + b.ry) / 2 } : b;
+    var p0 = trap(vowelPos(it.f, it.from)), p1 = trap(vowelPos(it.f, it.to));
+    var mx = (p0[0] + p1[0]) / 2, my = (p0[1] + p1[1]) / 2;
+    var h = '<svg class="gsvg" viewBox="0 0 320 150" role="img" aria-label="' + esc(it.f + ' 口形和舌位示意：第 ' + (step + 1) + ' 步') + '">';
+    /* 左：口形开口（只画开口线条） */
+    h += '<text x="75" y="14" class="glab">嘴张多大</text>';
+    if (step > 0) h += '<ellipse cx="75" cy="80" rx="' + a.rx + '" ry="' + a.ry + '" class="gghost"/>';
+    h += '<ellipse cx="75" cy="80" rx="' + cur.rx + '" ry="' + cur.ry + '" class="gmouth"/>';
+    h += '<text x="75" y="140" class="gcap">' + esc(step === 0 ? it.from : step === 1 ? it.from + ' → ' + it.to : it.to) + (step === 2 || step === 0 ? (((step ? rd[1] : rd[0]) ? ' 圆' : ' 不圆')) : '') + '</text>';
+    /* 右：舌位图（梯形），小球从 from 滑到 to */
+    h += '<text x="246" y="14" class="glab">舌头在哪儿</text>';
+    h += '<polygon points="186,22 306,22 306,126 220,126" class="gtrap"/>';
+    h += '<text x="186" y="140" class="gax">前</text><text x="306" y="140" class="gax">后</text><text x="176" y="26" class="gax">高</text><text x="208" y="128" class="gax">低</text>';
+    h += '<circle cx="' + p0[0] + '" cy="' + p0[1] + '" r="5" class="gdot0"/><text x="' + (p0[0] + (p0[0] > 280 ? -16 : 16)) + '" y="' + (p0[1] + 5) + '" class="gv">' + esc(it.from) + '</text>';
+    h += '<circle cx="' + p1[0] + '" cy="' + p1[1] + '" r="5" class="gdot1' + (step === 2 ? ' on' : '') + '"/><text x="' + (p1[0] + (p1[0] > 280 ? -16 : 16)) + '" y="' + (p1[1] + 5) + '" class="gv">' + esc(it.to) + '</text>';
+    if (step >= 1) {
+      var ex = step === 1 ? mx : p1[0] - (p1[0] - p0[0]) * 0.12, ey = step === 1 ? my : p1[1] - (p1[1] - p0[1]) * 0.12;
+      h += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) + '" class="garrow" marker-end="url(#gah)"/>';
+      if (it.hidden && step === 1) h += '<text x="' + mx + '" y="' + (my - 8) + '" class="ghid">（' + esc(it.hidden) + '）</text>';
+    }
+    var ball = step === 0 ? p0 : step === 1 ? [mx, my] : p1;
+    h += '<circle cx="' + ball[0] + '" cy="' + ball[1] + '" r="8" class="gball"/>';
+    h += '<defs><marker id="gah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="gahd"/></marker></defs>';
+    return h + '</svg>';
+  }
+  function animGlide(box, b) {
+    var P = b.params || {}, items = (P.items || []).filter(function (x) { return x && x.f && x.from && x.to; });
+    if (!items.length) throw new Error('glide 没有 items');
+    var idx = 0, step = 0;
+    box.innerHTML = '<div class="prow">' + items.map(function (x, i) { return '<button type="button" class="pchip" data-gi="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(x.f) + '</button>'; }).join('') + '</div>' +
+      '<div class="gstage"></div><p class="gcapt" aria-live="polite"></p>' +
+      '<div class="prow"><button type="button" class="kp-btn" data-gs="-1">上一步</button><button type="button" class="kp-btn pri" data-gs="1">下一步</button><button type="button" class="kp-btn" data-gplay="1">▶ 听</button>' +
+      '<span class="note gnote"></span></div>' + (P.hint ? '<p class="note">' + inline(P.hint) + '</p>' : '') +
+      (b.fallback ? '<details class="gfb"><summary>看文字说明</summary><div class="fallback">' + inline(b.fallback) + '</div></details>' : '');
+    function cap(it) {
+      if (step === 0) return '① 先摆好 ' + it.from + ' 的样子' + (isRound(it.from) ? '（嘴唇圆）' : '') + '。';
+      if (step === 1) return '② 一边出声，一边往 ' + it.to + ' 滑，声音不断开' + (it.hidden ? '；中间藏着一个 ' + it.hidden + '（' + it.f + ' 是省写）' : '') + '。';
+      return '③ 滑到 ' + it.to + ' 附近就收住：' + it.f + ' 是一个音，不是两下。' + (LV >= 3 ? ' 收尾往往只滑到靠近 ' + it.to + ' 的地方（通行描写，示意图）。' : '');
+    }
+    function draw() {
+      var it = items[idx];
+      $('.gstage', box).innerHTML = glideSvg(it, step);
+      $('.gcapt', box).textContent = cap(it);
+      $('.gnote', box).textContent = '第 ' + (step + 1) + ' / 3 步 · ' + GSTEP[step] + (it.note ? ' · 录音' + it.note : '');
+      $('[data-gs="-1"]', box).disabled = step === 0;
+      $('[data-gs="1"]', box).disabled = step === 2;
+      var k = keyParts(it.play); $('[data-gplay]', box).disabled = !(k && has(k.syl, k.t));
+    }
+    box.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-gi]');
+      if (c) { idx = +c.getAttribute('data-gi'); step = 0; $$('[data-gi]', box).forEach(function (y) { y.setAttribute('aria-pressed', y === c ? 'true' : 'false'); }); draw(); return; }
+      var s = e.target.closest('[data-gs]'); if (s) { step = Math.max(0, Math.min(2, step + +s.getAttribute('data-gs'))); draw(); return; }
+      if (e.target.closest('[data-gplay]')) {
+        var k = keyParts(items[idx].play); if (k) play(k.syl, k.t);
+        step = 0; draw(); if (!reduce) { later(function () { step = 1; draw(); }, 180); later(function () { step = 2; draw(); }, 420); } else { step = 2; draw(); }
+      }
+    });
+    onLevel.push(draw); draw();
+  }
+
+  /* 前后鼻：口腔侧剖面（嘴在左），只画上颚、牙床、软腭、舌头的线条和气流箭头 */
+  var NAS_TONGUE = {
+    a: 'M36,96 C60,90 108,88 146,102 Q158,116 160,140',
+    e: 'M36,90 C60,80 108,76 144,94 Q158,112 160,140',
+    i: 'M36,82 C50,66 92,60 138,84 Q156,104 160,140',
+    n: 'M46,51 C44,62 62,74 100,77 C128,80 148,98 160,140',
+    ng: 'M36,92 C62,90 96,76 120,58 C132,49 144,56 152,80 Q158,104 160,140'
+  };
+  function nasVowel(f) { var v = String(f).replace(/ng?$/, ''); v = v.charAt(v.length - 1); return v === 'a' ? 'a' : v === 'i' || v === 'ü' ? 'i' : 'e'; }
+  function nasalSvg(f, back, step) {
+    var vel = step === 0 ? 'M126,42 Q150,44 162,56' : 'M126,42 Q140,48 142,70'; /* 软腭：读元音时抬起关住鼻腔，收鼻音时放下 */
+    var tongue = step === 0 ? NAS_TONGUE[nasVowel(f)] : NAS_TONGUE[back ? 'ng' : 'n'];
+    var h = '<svg class="nsvg" viewBox="0 0 200 150" role="img" aria-label="' + esc(f + (back ? ' 后鼻' : ' 前鼻') + '口腔侧面示意：第 ' + (step + 1) + ' 步') + '">';
+    h += '<path d="M12,40 Q18,30 38,28 L150,26 Q174,28 178,52 L180,146" class="nwall"/>'; /* 鼻腔顶、咽后壁 */
+    h += '<text x="100" y="20" class="nlab">鼻腔</text>';
+    h += '<path d="M14,48 Q22,52 24,58 L32,58" class="nwall"/><path d="M32,58 L33,70" class="ntooth"/>'; /* 上唇、上牙 */
+    h += '<path d="M32,58 Q40,48 52,46 Q90,38 126,42" class="nwall"/>'; /* 牙床、硬腭 */
+    h += '<path d="' + vel + '" class="nvel"/>';
+    h += '<path d="M33,84 L32,96" class="ntooth"/><path d="M14,104 Q22,100 24,96 L32,96" class="nwall"/>'; /* 下牙、下唇 */
+    h += '<path d="' + tongue + '" class="ntongue"/>';
+    if (LV >= 2) h += '<path d="M40,14 L44,46" class="nlead"/><text x="38" y="11" class="nlab sm">牙床</text><path d="M168,14 L144,54" class="nlead"/><text x="172" y="11" class="nlab sm">软腭</text>';
+    if (step >= 1) {
+      var pt = back ? [134, 53] : [46, 50];
+      h += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="7" class="nhit"/>';
+      h += '<text x="88" y="142" class="nlab">' + (back ? '舌根抬起，贴住软腭' : '舌尖抬起，顶住牙床') + '</text>';
+    } else h += '<text x="88" y="142" class="nlab">先读 ' + esc(nasVowel(f) === 'i' ? (f.charAt(0) === 'ü' ? 'ü' : 'i') : nasVowel(f)) + '，嘴张开</text>';
+    if (step === 0) h += '<path d="M118,72 Q70,68 6,74" class="nair" marker-end="url(#nah)"/>';
+    if (step === 2) h += '<path d="M164,66 Q168,38 148,35 L16,35" class="nair" marker-end="url(#nah)"/>';
+    h += '<defs><marker id="nah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="gahd"/></marker></defs>';
+    return h + '</svg>';
+  }
+  function animNasal(box, b) {
+    var P = b.params || {};
+    var pairs = (P.pairs || []).map(function (p) {
+      if (Array.isArray(p)) return { front: { f: p[0] }, back: { f: p[1] } };
+      return p && p.front && p.back ? p : null;
+    }).filter(Boolean);
+    pairs.forEach(function (p) { [p.front, p.back].forEach(function (x) { if (!x.play && FINAL_AS[x.f]) x.play = FINAL_AS[x.f] + '1'; }); });
+    if (!pairs.length) throw new Error('nasal 没有 pairs');
+    var idx = 0, step = 0;
+    var CAP = ['① 先读前面的元音：嘴张开，声音从嘴里出来（软腭抬起，关住鼻腔）。', '② 收尾：', '③ 嘴里的路被舌头堵住，软腭放下，声音从鼻子出来。'];
+    box.innerHTML = '<div class="prow">' + pairs.map(function (p, i) { return '<button type="button" class="pchip" data-ni="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(p.front.f + ' / ' + p.back.f) + '</button>'; }).join('') + '</div>' +
+      '<div class="nstage"></div><p class="gcapt" aria-live="polite"></p>' +
+      '<div class="prow"><button type="button" class="kp-btn" data-ns="-1">上一步</button><button type="button" class="kp-btn pri" data-ns="1">下一步</button>' +
+      '<button type="button" class="kp-btn" data-np="front">▶ 听前鼻</button><button type="button" class="kp-btn" data-np="back">▶ 听后鼻</button><span class="note gnote"></span></div>' +
+      (b.fallback ? '<details class="gfb"><summary>看文字说明</summary><div class="fallback">' + inline(b.fallback) + '</div></details>' : '');
+    function draw() {
+      var p = pairs[idx];
+      $('.nstage', box).innerHTML = [['front', '前鼻'], ['back', '后鼻']].map(function (s) {
+        var x = p[s[0]];
+        return '<figure class="ncol"><figcaption><b class="py">' + esc(x.f) + '</b> ' + s[1] + (x.note ? ' <small>录音' + esc(x.note) + '</small>' : '') + '</figcaption>' + nasalSvg(x.f, s[0] === 'back', step) + '</figure>';
+      }).join('');
+      $('.gcapt', box).textContent = step === 1 ? CAP[1] + (P.front ? '前鼻 —— ' + P.front.replace(/^前鼻[^：]*：/, '') + '；后鼻 —— ' + String(P.back || '').replace(/^后鼻[^：]*：/, '') : '前鼻舌尖往上顶住牙床；后鼻舌尖放下，舌根抬起贴住软腭。') : CAP[step];
+      $('.gnote', box).textContent = '第 ' + (step + 1) + ' / 3 步 · 口腔侧面示意图（嘴在左边）';
+      $('[data-ns="-1"]', box).disabled = step === 0;
+      $('[data-ns="1"]', box).disabled = step === 2;
+      ['front', 'back'].forEach(function (s) { var k = keyParts(p[s].play); $('[data-np="' + s + '"]', box).disabled = !(k && has(k.syl, k.t)); $('[data-np="' + s + '"]', box).textContent = '▶ 听 ' + p[s].f; });
+    }
+    box.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-ni]');
+      if (c) { idx = +c.getAttribute('data-ni'); step = 0; $$('[data-ni]', box).forEach(function (y) { y.setAttribute('aria-pressed', y === c ? 'true' : 'false'); }); draw(); return; }
+      var s = e.target.closest('[data-ns]'); if (s) { step = Math.max(0, Math.min(2, step + +s.getAttribute('data-ns'))); draw(); return; }
+      var pl = e.target.closest('[data-np]'); if (pl) { var k = keyParts(pairs[idx][pl.getAttribute('data-np')].play); if (k) play(k.syl, k.t); }
+    });
+    onLevel.push(draw); draw();
+  }
+
   /* ---------------- 练 ---------------- */
   function quizShell(box, startTxt) {
     box.innerHTML = '<div class="qtop"><button type="button" class="kp-btn pri" data-q="again">▶ 开始</button><button type="button" class="kp-btn" data-q="next">下一题</button><span class="qscore">答对 0 / 0</span></div>' +
       '<div class="qq"></div><div class="qopts"></div><div class="qfb" aria-live="polite">' + esc(startTxt) + '</div>';
+  }
+  /* 听音选韵母的标准答案（韵母表里的写法）：j q x 后的 u 还原成 ü（jué → üe、jūn → ün）；
+     y w 开头的零声母音节取韵母本身（yǔ → ü、yún → ün、yuè → üe、wǔ → u、yī → i；iou/uei/uen 用表里的 iu/ui/un） */
+  function finalAnswer(r) {
+    if (!r.initial && r.final && /^[yw]/.test(r.written || '')) return ({ iou: 'iu', uei: 'ui', uen: 'un' })[r.final] || r.final;
+    var fw = r.finalWritten || r.written;
+    return /^[jqx]$/.test(r.initial) && /^u/.test(fw) ? 'ü' + fw.slice(1) : fw;
   }
   function quizListen(box, b) {
     var pool = (b.pool || []).map(keyParts).filter(function (k) { return k && has(k.syl, k.t); });
@@ -357,7 +510,7 @@
       var r = S.parse(k.syl + k.t);
       if (ask === 'tone') return String(k.t);
       if (ask === 'initial') return r.initial || '零声母';
-      if (ask === 'final') { var fw = r.finalWritten || r.written; return /^[jqx]$/.test(r.initial) && /^u/.test(fw) ? 'ü' + fw.slice(1) : fw; } /* j q x 后的 u 还原成 ü */
+      if (ask === 'final') return finalAnswer(r);
       return S.mark(k.syl, k.t);
     }
     var allOpts = b.options || (ask === 'tone' ? ['1', '2', '3', '4'] : pool.map(answerOf).filter(function (v, i, a) { return a.indexOf(v) === i; }));
@@ -568,7 +721,7 @@
       case 'words': body = '<div class="pwords">' + (b.items || []).map(function (it) { return '<div class="word">' + zis(it.w, it.py) + '</div>'; }).join('') + '</div>'; break;
       case 'verse': body = (b.title ? '<div class="verse-t">' + esc(b.title) + '</div>' : '') + (b.lines || []).map(function (l) { return zis(l.w, l.py, b.real); }).join(''); break;
       case 'anim':
-        if (b.kind === 'tone-road' || b.kind === 'bump') { body = '<div class="kp-mount" id="' + id + '"></div>'; LATER.push([id, b]); }
+        if (b.kind === 'tone-road' || b.kind === 'bump' || b.kind === 'glide' || b.kind === 'nasal') { body = '<div class="kp-mount" id="' + id + '"></div>'; LATER.push([id, b]); }
         else body = '<div class="fallback">' + inline(b.fallback || '动画还在做，先看文字说明。') + '</div>';
         break;
       case 'mirror': case 'quiz-listen': case 'quiz-choose': case 'quiz-build': case 'quiz-mark': case 'quiz-find':
@@ -583,13 +736,19 @@
     try {
       if (b.type === 'anim' && b.kind === 'tone-road') animToneRoad(el, b);
       else if (b.type === 'anim' && b.kind === 'bump') animBump(el, b);
+      else if (b.type === 'anim' && b.kind === 'glide') animGlide(el, b);
+      else if (b.type === 'anim' && b.kind === 'nasal') animNasal(el, b);
       else if (b.type === 'mirror') mirror(el, b);
       else if (b.type === 'quiz-listen') quizListen(el, b);
       else if (b.type === 'quiz-choose') quizChoose(el, b);
       else if (b.type === 'quiz-build') quizBuild(el, b);
       else if (b.type === 'quiz-mark') quizMark(el, b);
       else if (b.type === 'quiz-find') quizFind(el, b);
-    } catch (e) { el.innerHTML = '<p class="note">这一块没能显示（' + esc(e.message) + '）</p>'; if (window.console) console.error(e); }
+    } catch (e) {
+      /* 没画出来：有 fallback 就退回静态文字说明 */
+      el.innerHTML = b.fallback ? '<div class="fallback">' + inline(b.fallback) + '</div>' : '<p class="note">这一块没能显示（' + esc(e.message) + '）</p>';
+      if (window.console) console.error(e);
+    }
   }
 
   function applyLevel() {
