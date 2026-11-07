@@ -41,3 +41,20 @@ for (const tab of TABS) {
     await expect(page.locator('.qz-miscon')).toContainText(q['误解标注'][0]['误解'].slice(0, 8));
   });
 }
+
+test('A23C zika blank wrong pick shows misconception (批2)', async ({ page }) => {
+  await page.goto('newhanzi/quiz/index.html?tab=zika');
+  await page.locator('[data-mode="blank"]').first().click({ timeout: 15000 });
+  const qt = await page.locator('#qbox').innerText();
+  const q = await page.evaluate((qt) => {
+    const norm = (s) => String(s).replace(/\s+/g, '').replace(/（[^）]*）/g, '').replace(/_+/g, '');
+    const it = window.NHZ_QUIZ.modes.blank.find((x) => norm(qt).includes(norm(x.s)));
+    return it ? JSON.parse(JSON.stringify(it)) : null;
+  }, qt);
+  expect(q, 'question found in bank').toBeTruthy();
+  const mz = q['误解标注'][0];
+  const btns = page.locator('#qbox button[data-act="pick"]');
+  const texts = (await btns.allInnerTexts()).map((t) => t.trim());
+  await btns.nth(texts.indexOf(mz['选项文本'])).click();
+  await expect(page.locator('.qz-miscon')).toContainText(mz['误解'].slice(0, 8));
+});

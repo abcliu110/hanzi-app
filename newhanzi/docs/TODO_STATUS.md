@@ -284,6 +284,7 @@
 
 ### A23 · A23C（2026-11-07，误解标注与啊哈块）
 - A23C 批1 · 本提交 · 核对清单来源（61/577=六题库 choice，fd705d19 已全量；54 无清单，实际缺口 42 条 A23-2 已补）并补登记；新增自检 tools/content/fix_a23c_check.js 与回归 tests/a23c-miscon.spec.js（六区 choice/judge 答错显示误解，12 过）；修语法判断「我没有他高＝我比他矮」a=true 误标 B→A（fix_a23c_b1_judge.py）。日志 fix-a23c.md
+- A23C 批2 · 本提交 · 选项级反馈扩到带选项的非 choice 题（engine 对 blank/spot/rewrite 同样显示误解）：识字 blank 50 题 + 逻辑 rewrite 5 题，误解句只取自本题解析（fix_a23c_b2_blank_extract.py）
 
 ### A23 · fuxi-loop（2026-11-07，阶段三学习回路闭环）
 - A23-fuxi 每日复习接入 · 见本条提交 · 新文件 review-log.js：NHZReviewLog（键 nhz_review_log，按日记复习道数/记得数，当天另存已复习题 id，旧日只留计数，保留 120 天；是活动日志，不参与三态）+ NHZReviewToday()（有题面的到期 + 错题回炉 − 今天已复习，与 fuxi.js 今日队列同口径；孤儿 srs 记录不再算进首页数字）。首页：统计条「今日复习 N 道」（原「N 待复习」只数 nhz_srs 到期条数，含无题面孤儿，和复习页对不上）、今日任务行改「🔁 今日复习 · 有 N 道待复习（到期 x · 错题回炉 y）· 去复习 →」，当天复习清空后自动勾上。fuxi.html：标题「今日复习」+「本节还剩 / 今天已复习」；有 ≥2 个选项的题直接点选作答（答对=记得、答错=忘了，提取练习），无选项的仍「显示答案→记得/忘了」；答完卡片原地显示答案与下次复习日、不整页重排；今天做过的题（含忘了的）不再回到今日队列——修了原来回炉题点「忘了」后 iv=0 立刻又出现在回炉段、点不完的问题；错题本收进折叠、按来源（src）分组筛选。SRS 写入仍只走 NHZReview.review/record/schedule，三态规格未动。测试：tests/fuxi-loop.spec.js（首页数=队列数、点选/自评回写 nhz_srs、日志、星星、刷新后不回队列、首页自动打勾、错题本按来源筛选）；smoke+audit-fixes+fuxi-loop 203 全过；check_scripts 过；gen_sw_core --check 过。

@@ -16,3 +16,4 @@
 
 ## 批次
 - 批1 · 判断题口径修正 · fix_a23c_b1_judge.py：语法判断「“我没有他高”等于“我比他矮”。」a=true 却标 B/正确（永不显示），改 A/错误，误解句按本题解析改写，正反例沿用 · 1 题 · 复查：fix_a23c_check OK（全站 choice/judge 0 问题）、二次运行 0、npm run check 509 段过、a23c-miscon 12 过
+- 批2 · 机械抽取（只用本题解析） · fix_a23c_b2_blank_extract.py：识字 blank 50 题（解析里单讲某错字的分句 →「把“错”和“对”混了：<原分句>」+ 正反例＝题干填对字√/填错字✗；同句讲对错两字的 3 题按原解析逐字改写），逻辑 rewrite 5 题（解析点名错项的分句）· 55 题 56 条 · 复查：fix_a23c_check OK、二次运行 0、npm run check 510 段过、a23c-miscon 13 过、smoke quiz 9 过
