@@ -30,6 +30,19 @@
 - 审音改读：21 条（1985 改定 8 / 2016 修订稿 13），表 2 块，题 3 块（pick、judge、hear）。
 
 ## 没做 / 待定
-- 古诗文读音 gushidu 卡（另一任务）。
+- ~~古诗文读音 gushidu 卡（另一任务）~~ 2026-11-08 已做，见下节。
 - 易读错的字每条后面的依据标签（「1985 审音表」/「《现汉》第 7 版」）沿用草稿，未逐条对审音表原文复核。
 - 字库主读音顺序（TODO_STATUS Q6）没动。
+
+## 2026-11-08 追加 · gushidu 古诗文读音（no 16）
+- 菜单：`pinyin/data.js` 末尾加 `gushidu`（no 16，group 易错读音），排在审音改读之后；pinyin.js / pinyin.html 没动。
+- 内容 `pinyin/content/gushidu.js`：照 duoyin.js 结构（IIFE + `key()` / `flat()` + 表格包装 + `quiz(kind, lv, h, rows)`，`rv:'古诗文读音'`，听音题 `play: key(拼音)`）。
+  - 数据只来自 `data/shici.js` 的 pron（Q17 逐首校多音字）+ `tools/content/fix_shici_duyin.py` 写明的出处：`DATA` 夹在 `GEN:gushidu` / `GEN:end` 两行之间，由 **`tools/content/gen_py_gushidu.py`** 生成（幂等，`--check` 有待改时退出 1）。改了诗库 pron 后重跑它。
+  - 每条 `{z, py, t, a, ke, g, ce, li, line, fx, rd}`：`li` = 诗库 lines 下标，`fx` = fix_shici_duyin 核过的 7 处的出处（其余空），`rd` = 3500 字库里该字带调读音（选项用）。小池「头」pron 已删、回落主音 tóu，按 fix 脚本出处收进来。
+  - 不收：争议项 `SKIP`（鹿柴「返景」jǐng/yǐng、一剪梅「罗裳」shang、酬乐天「前头」tou，不下结论，只在 L3 说明里一句「课本未注音、各家说法不一，先不收」点到返景）；轻声 pron（两首「燕子」zi）。`/workspace/work/duyin-src/gushi_readings.json` 不存在，未用；鹿柴诗题「柴 zhài」不在 pron 里，未收。
+  - 看：一二年级（L1，9 处）/ 三四年级（L2，15）/ 五六年级（L2，21）课内表；「课本是这样注的」7 处带依据（L2）；拓展诗词按字归并（L3，84 处 31 行）；叶音说明（L3）。听读：chips L1/L2/L3 + pairs（课本注音 vs 另一个读音，3 对）。练：pick L1（8）/ pick L2（34）/ hear L2（41，是/不是）/ wrong L2（41）/ pick L3（81）。用：诗里的词 8 + 课本核过的词 6（每个带 `t` 诗题），整首《春晓》《回乡偶书》（verse 带 `poem`）——「用」取诗库原诗，不是自编。
+  - `C.zidu` = 全部 129 条；另挂 `C.gushi`（= DATA）、`C.gushiSkip`（= SKIP）供校验。
+- `tools/check_pinyin_content.js` 第 6 条：`gushi` 与诗库 pron 逐条对账（诗题 / 行 / 字 / 读音一致；每条带调 pron 都收了或在 gushiSkip；争议项不得出现；pron 已删的须有 fx 且等于查表主音）；「用」里带 `t` 的词语、带 `poem` 的诗句须是原诗原文，诗里注过的字读音一致。已用改坏的副本验证会报错（读音不符 / 漏收 / 原文不符）。
+- 测试：tests/duyin.spec.js `CARDS` 加 gushidu、菜单顺序断言 17 项、gushidu 表里不出现「返景入深林」，新增一例跑 `gen_py_gushidu.py --check` 并核春晓 jué、两处衰 shuāi、小池 tóu、争议不收、rv 统一；smoke 拼音卡数 15→16。
+- 没做：易读错的字依据标签复核（另一任务）；Q6 字库主读音没动；争议三处待负责人定，定了以后改 data/shici.js pron（或 fix_shici_duyin.py），把对应项从 gen_py_gushidu.py 的 `DISPUTE` 去掉再重跑。
+

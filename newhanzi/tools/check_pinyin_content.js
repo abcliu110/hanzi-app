@@ -10,6 +10,8 @@
  * 4. 数量下限（SCHEMA「规则」）：看 ≥3 块、听读 ≥3 块、练 ≥3 种题型（quiz-*）、用 ≥2 块且词语 ≥8 个 + 至少 1 首儿歌（verse）；
  *    L1/L2/L3 都有块；outline ≤1 块。
  * 5. 易错读音卡（duoyin/yicuo/shenyin…）：zidu 里的每个 [字, 拼音] 都要在 ziku/model-3500.json 该字读音中。
+ * 6. 古诗文读音（gushidu）：gushi 与 data/shici.js 的 pron 逐条对账（诗题/行/字/读音一致；每条带调 pron 都收了或在 gushiSkip 争议项里；
+ *    争议项不出现在 gushi；pron 已删、回落主音的条目须写出处 fx 且等于查表主音）；「用」里带 t 的词语、带 poem 的诗句须与诗库原文一致、诗里注过的字读音一致。
  * 退出码：有错误 = 1；只有提示 = 0。 */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -254,6 +256,66 @@ function checkFile(file) {
   if (outline > 1) E(id, 'outline 只许 1 块（现在 ' + outline + '）');
   if (ctx.noAudio.length) W(id, '听音题没有录音，页面跳过这 ' + ctx.noAudio.length + ' 道：' + Array.from(new Set(ctx.noAudio)).join(' '));
   checkZidu(id, c);
+  checkGushi(id, c);
+}
+
+/* 6. 古诗文读音：和诗库 pron 对账 */
+let SHICI = null, LOOKUP = null;
+function checkGushi(id, c) {
+  if (c.gushi == null) return;
+  if (!SHICI) {
+    SHICI = loadWin(path.join(NH, 'data', 'shici.js')).NHZ_SHICI.poems;
+    const lw = loadWin(path.join(NH, 'data', 'pinyin_lookup.js')).NHZ_PINYIN || {};
+    LOOKUP = {}; Object.keys(lw).forEach((z) => { LOOKUP[z] = String(lw[z]).split(',')[0].normalize('NFC'); });
+  }
+  const where = id + '.gushi', byT = new Map(SHICI.map((p) => [p.title, p]));
+  const toned = (py) => /[\u0304\u0301\u030c\u0300]/.test(String(py).normalize('NFD'));
+  const strip = (s) => String(s).replace(PUNCT, '');
+  const skip = new Set((c.gushiSkip || []).map((x) => x[0] + '|' + x[1]));
+  const got = new Set();
+  c.gushi.forEach((r, i) => {
+    const w = where + '[' + i + '] ' + r.t + ' ' + r.z, p = byT.get(r.t);
+    if (!p) { E(w, '诗库里没有这首诗'); return; }
+    if (skip.has(r.t + '|' + r.z)) E(w, '是争议项（gushiSkip），不该收');
+    const line = p.lines[r.li];
+    if (line == null || line.replace(/[，。！？；：、]+$/, '') !== r.line) E(w, '第 ' + r.li + ' 行和诗库不一致：' + line);
+    else if (line.indexOf(r.z) < 0) E(w, '字不在这一行');
+    const pron = p.pron || {}, k = pron[r.z + '@' + r.li] != null ? r.z + '@' + r.li : r.z, py = pron[k];
+    if (py != null) { if (String(py).normalize('NFC') !== r.py) E(w, '读音 ' + r.py + '，诗库 pron 是 ' + py); got.add(r.t + '|' + k); }
+    else if (!r.fx) E(w, '诗库没有这条 pron，也没写出处 fx');
+    else if (LOOKUP[r.z] !== r.py) E(w, 'pron 已删（回落主音），读音应为查表主音 ' + LOOKUP[r.z]);
+    if (!Array.isArray(r.rd) || r.rd.indexOf(r.py) < 0) E(w, 'rd 里没有本读音');
+  });
+  let miss = 0;
+  SHICI.forEach((p) => Object.keys(p.pron || {}).forEach((k) => {
+    const z = k.split('@')[0];
+    if (!toned(p.pron[k]) || skip.has(p.title + '|' + z) || got.has(p.title + '|' + k)) return;
+    miss++; E(where, '诗库 ' + p.title + ' 「' + k + '」' + p.pron[k] + ' 没收（改了诗库后请重跑 tools/content/gen_py_gushidu.py）');
+  }));
+  /* 用：词语 / 诗句和原诗对得上，诗里注过的字读音一致 */
+  const ofPoem = (t) => c.gushi.filter((r) => r.t === t);
+  function sameReading(w, t, text, py) {
+    const zs = String(text).match(/[\u3400-\u9fff]/g) || [], ps = pyTokens(py);
+    if (zs.length !== ps.length) return;
+    ofPoem(t).forEach((r) => zs.forEach((z, j) => { if (z === r.z && ps[j].normalize('NFC') !== r.py) E(w, '「' + z + '」标 ' + ps[j] + '，诗库注 ' + r.py); }));
+  }
+  STAGES.forEach((st) => (c[st] || []).forEach((b, bi) => {
+    const w0 = id + '.' + st + '[' + bi + ']';
+    if (b.type === 'words') (b.items || []).forEach((it, i) => {
+      if (!it.t) return;
+      const p = byT.get(it.t), w = w0 + '.items[' + i + '] ' + it.w;
+      if (!p) { E(w, '诗库里没有《' + it.t + '》'); return; }
+      if (strip(p.lines.join('')).indexOf(it.w) < 0) E(w, '不在《' + it.t + '》原诗里');
+      sameReading(w, it.t, it.w, it.py);
+    });
+    if (b.type === 'verse' && b.poem) {
+      const p = byT.get(b.poem), w = w0 + ' ' + b.poem;
+      if (!p) { E(w, '诗库里没有这首诗'); return; }
+      if (strip(b.lines.map((l) => l.w).join('')) !== strip(p.lines.join(''))) E(w, '诗句和诗库原文不一致');
+      sameReading(w, b.poem, b.lines.map((l) => l.w).join(''), b.lines.map((l) => l.py).join(' '));
+    }
+  }));
+  console.log('  · 古诗读音对账：' + c.gushi.length + ' 条，对上诗库 pron ' + got.size + ' 条' + (miss ? '，漏收 ' + miss : '') + '，争议不收 ' + skip.size + ' 处');
 }
 
 /* 5. 字的读音（易错读音卡）：内容对象的 zidu = [[字, 拼音], …]（页面当作「这个字的读音」展示的每一处），

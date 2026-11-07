@@ -1,24 +1,25 @@
-// 拼音区 · 易错读音（多音字 duoyin / 易读错的字 yicuo / 审音改读 shenyin）
+// 拼音区 · 易错读音（多音字 duoyin / 易读错的字 yicuo / 审音改读 shenyin / 古诗文读音 gushidu）
 // 菜单在 12 个知识点之后成小分组；进页、浅中深、答题判分（答错进错题本）、听音题、返回；768 / 1280 无横向溢出。
 // 截图：设 SHOTS_DIR=/某目录 时把每张卡 768 / 1280 的整页截图存进去（人工看）。
 const { test, expect } = require('@playwright/test');
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-const CARDS = [['duoyin', '多音字'], ['yicuo', '易读错的字'], ['shenyin', '审音改读']];
+const CARDS = [['duoyin', '多音字'], ['yicuo', '易读错的字'], ['shenyin', '审音改读'], ['gushidu', '古诗文读音']];
 const SHOTS = process.env.SHOTS_DIR || '';
 
 test('易错读音内容校验（check_pinyin_content.js：格式 + 读音在 3500 字库里）', () => {
   execFileSync(process.execPath, [path.resolve(__dirname, '../tools/check_pinyin_content.js')], { stdio: 'pipe' });
 });
 
-test('菜单：12 个知识点之后是「易错读音」小分组，三张卡按顺序', async ({ page }) => {
+test('菜单：12 个知识点之后是「易错读音」小分组，四张卡按顺序', async ({ page }) => {
   await page.goto('newhanzi/pinyin.html');
   const seq = await page.locator('#pyGrid > *').evaluateAll((els) => els.map((e) => e.classList.contains('py-grp-h') ? '#' + e.textContent : e.getAttribute('data-id')));
-  expect(seq.length).toBe(16);
+  expect(seq.length).toBe(17);
   expect(seq[11]).toBe('yinjiebiao');
-  expect(seq.slice(12)).toEqual(['#易错读音', 'duoyin', 'yicuo', 'shenyin']);
+  expect(seq.slice(12)).toEqual(['#易错读音', 'duoyin', 'yicuo', 'shenyin', 'gushidu']);
   await expect(page.locator('.py-card[data-id="shenyin"]')).toContainText('审音改读');
+  await expect(page.locator('.py-card[data-id="gushidu"]')).toContainText('古诗文读音');
 });
 
 /* 当前题的答案下标（按题面在内容数据里找；data-i = 原下标） */
@@ -48,6 +49,11 @@ for (const [id, name] of CARDS) {
       await expect(kp).toContainText('1985');
       await expect(kp).toContainText('征求意见稿');
       await expect(kp).toContainText('拟改');
+    }
+    if (id === 'gushidu') {
+      // 课本核过的读音按现状展示；争议项（鹿柴「返景」等）不收进表格
+      await expect(kp).toContainText('不觉晓');
+      await expect(kp.locator('.blk[data-type="table"]', { hasText: '返景入深林' })).toHaveCount(0);
     }
     // 浅中深
     await page.click('.kp-seg button[data-lv="1"]');
@@ -107,3 +113,31 @@ for (const w of [768, 1280]) {
     }
   });
 }
+
+test('古诗文读音：数据与诗库 pron 一致（生成脚本 --check），争议项不收，题目都进「古诗文读音」错题本', async ({ page }) => {
+  execFileSync('python3', [path.resolve(__dirname, '../tools/content/gen_py_gushidu.py'), '--check'], { stdio: 'pipe' });
+  await page.goto('newhanzi/pinyin.html?t=gushidu');
+  await expect(page.locator('.kp[data-kp="gushidu"]')).toBeVisible();
+  const r = await page.evaluate(() => {
+    const C = window.NHZ_PY_CONTENT.gushidu;
+    const skip = C.gushiSkip.map((x) => x.join('|'));
+    return {
+      n: C.gushi.length,
+      skipHit: C.gushi.filter((g) => skip.indexOf(g.t + '|' + g.z) >= 0).length,
+      skipN: skip.length,
+      chunxiao: (C.gushi.find((g) => g.t === '春晓' && g.z === '觉') || {}).py,
+      shuai: C.gushi.filter((g) => g.z === '衰').map((g) => g.py),
+      xiaochi: (C.gushi.find((g) => g.t === '小池' && g.z === '头') || {}).py,
+      hear: C.lian.filter((b) => b.kind === 'hear').reduce((a, b) => a + b.items.length, 0),
+      rv: Array.from(new Set(C.lian.map((b) => b.rv)))
+    };
+  });
+  expect(r.n).toBeGreaterThan(100);
+  expect(r.skipN).toBe(3);
+  expect(r.skipHit).toBe(0);
+  expect(r.chunxiao).toBe('jué');
+  expect(r.shuai).toEqual(['shuāi', 'shuāi']);
+  expect(r.xiaochi).toBe('tóu');
+  expect(r.hear).toBeGreaterThan(10);
+  expect(r.rv).toEqual(['古诗文读音']);
+});
