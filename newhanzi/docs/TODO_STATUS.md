@@ -90,6 +90,8 @@
 
 **领取 2026-11-08 GD（00:30 JST，古诗文读音 gushidu 卡，按 docs/anim/jiaojie/duyin-01-caidan.md 接入拼音菜单「易错读音」分组）：** 新建 pinyin/content/gushidu.js + 生成脚本 tools/content/gen_py_gushidu.py（只用 data/shici.js pron 及 fix_shici_duyin.py 写明的出处），改 pinyin/data.js、tools/check_pinyin_content.js、tests/duyin.spec.js、smoke 拼音卡数。鹿柴「返景」、一剪梅「罗裳」、酬乐天「前头」不下结论；不做依据标签复核、不动 Q6。副本 /workspace/work/hz-gd，端口 4213。
 
+**领取 2026-11-08 GT（01:00 JST，A21 遗留「古文停顿」；负责人 2026-11-08 00:55 拍板「古文停顿只补统编课内篇目」）：** fix-guwen.md 所列缺停顿 38 篇中 学段 已标（统编课内）的篇目 + 小学 2 篇缺句，逐句补 句[].停/停源（统编教材/教参朗读节奏、人教教案，来源出入大的句子不标），脚本 tools/content/fix_gw_tingdun.py（幂等，--check）；只动 data/guwen.js 的 停/停源、该脚本、fix-guwen.md、本表。非统编篇目（寓言/成语故事等）不做。副本 /workspace/work/hz-gt，端口 4219。
+
 ## 二、待确认（需产品负责人拍板，本轮不做）
 
 | ID | 来源 | 事项 |
