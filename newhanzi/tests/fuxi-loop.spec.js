@@ -228,3 +228,37 @@ test.describe('fuxi option-level feedback (A23 选项级反馈)', () => {
     await pickWrong('choice');
   });
 });
+
+// A23 weekly 周报复习数据（FUXI）：读 nhz_review_log（NHZReviewLog），只读不写
+test('weekly report shows review data from nhz_review_log', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('newhanzi/weekly.html');
+  const exp = await page.evaluate(() => {
+    const pad = (n) => ('0' + n).slice(-2);
+    const fmt = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    const now = new Date(), t = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const back = (k) => { const d = new Date(t); d.setDate(d.getDate() - k); return fmt(d); };
+    const mon = new Date(t); mon.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+    const days = {};
+    days[back(0)] = { n: 5, ok: 4 };
+    days[back(1)] = { n: 3, ok: 3 };
+    days[back(2)] = { n: 2, ok: 1 };
+    days[back(10)] = { n: 7, ok: 7 };     // 上周或更早，不计本周
+    localStorage.clear();
+    localStorage.setItem('nhz_review_log', JSON.stringify({ days }));
+    let wkN = 0, wkD = 0;
+    Object.keys(days).forEach((d) => { if (d >= fmt(mon) && d <= back(0)) { wkN += days[d].n; wkD++; } });
+    const before = localStorage.getItem('nhz_review_log');
+    return { wkN, wkD, before };
+  });
+  await page.reload();
+  await expect(page.locator('#wkReview')).toBeVisible();
+  await expect(page.locator('#wkRvN')).toHaveText(String(exp.wkN));
+  await expect(page.locator('#wkRvDays')).toHaveText(exp.wkD + ' / 7');
+  await expect(page.locator('#wkRvStreak')).toHaveText('3');
+  await expect(page.locator('.wk-bar')).toHaveCount(7);
+  // 周报只读：不改复习日志
+  expect(await page.evaluate(() => localStorage.getItem('nhz_review_log'))).toBe(exp.before);
+  expect(errors).toEqual([]);
+});

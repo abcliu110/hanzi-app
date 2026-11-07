@@ -17,6 +17,12 @@
 .wk-weak{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:4px 14px}
 .wk-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
 .wk-row:last-child{border-bottom:none}
+.wk-bars{display:flex;gap:6px;align-items:flex-end;margin:12px 0 4px;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.wk-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:104px}
+.wk-bar i{display:block;width:60%;max-width:28px;background:var(--accent);border-radius:6px 6px 0 0}
+.wk-bar em{font-style:normal;font-size:13px;color:var(--ink);margin-bottom:2px}
+.wk-bar span{font-size:13px;color:var(--ink);opacity:.8;margin-top:4px}
+.wk-bar.future{opacity:.4}
 .wk-note{font-size:13px;color:var(--ink);opacity:.7;margin-top:16px}
 </style>
 </head>
@@ -28,6 +34,7 @@
 <main class="wrap" id="app">
   <div class="loading">周报生成中…</div>
 </main>
+<script src="review-log.js"></script>
 <script src="weekly.js"></script>
 <script src="nav-up.js"></script>
 </body>
