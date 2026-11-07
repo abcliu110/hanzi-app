@@ -236,11 +236,14 @@ window.NHZReview = window.NHZReview || (function () {
   var routeEl = document.getElementById('gwroute'); /* P2-B 进阶路线容器 */
   var routeBack = false; /* P2-B：从路线图进详情时，详情的“回篇目”只回上一层（回路线图） */
   var curMod = null, curFilter = '', curJr = false, curGroup = null;
-  /* 学段筛选（Q10-guwen）：数据实测 level 只有两种——"小学"19卡、"初高中拓展"287卡，
-     没有单独的初中/高中拆分，故筛选项为 全部/小学/初高中（初中+高中合一档，不虚构拆分）。
-     知识点按 it.level 判；篇目无 level 字段，按有无 ce（小学课内册次）判：有 ce=小学14篇，无 ce=初高中45篇。
-     默认"全部"，不默认隐藏任何内容；筛选状态全局保持，切换子模块/篇目分类不重置。 */
-  var curLevel = '全部';
+  /* 学段筛选（Q10-guwen）：
+     · 知识点：数据 level 只有两种——"小学"、"初高中拓展"，没有初中/高中拆分，故知识点筛选仍为 全部/小学/初高中（不虚构拆分）。
+     · 篇目：2026-11-08 负责人拍板 Q10「拆初中/高中两档，未标归其他」——按 data/guwen.js 学段 字段
+       （8a2c4d6a，统编可核才标：小学 14 / 初中 21 / 高中 7），筛选为 全部/小学/初中/高中/其他，未标学段的 17 篇归「其他」。
+     默认"全部"，不默认隐藏任何内容；两套筛选状态各自全局保持，切换子模块/篇目分类不重置。 */
+  var curLevel = '全部';   /* 知识点学段 */
+  var curTLevel = '全部';  /* 篇目学段 */
+  var TEXT_LEVELS = ['全部', '小学', '初中', '高中', '其他'];
   var curListCat = null; /* listEl 当前显示：null=篇目分类页，否则为篇目分类名/全部 */
   function levelOf(it){ return (it && it.level) ? it.level : '初高中拓展'; }
   function levelMatch(it){
@@ -248,10 +251,11 @@ window.NHZReview = window.NHZReview || (function () {
     if(curLevel === '小学') return levelOf(it) === '小学';
     return levelOf(it) === '初高中拓展'; /* 初高中档 */
   }
-  function textLevel(t){ return t.ce ? '小学' : '初高中'; }
-  function textMatch(t){ return curLevel === '全部' || textLevel(t) === curLevel; }
-  function levelCounts(items, fn){
-    var c = {'全部': 0, '小学': 0, '初高中': 0};
+  function textLevel(t){ var x = t && t['学段']; return (x === '小学' || x === '初中' || x === '高中') ? x : '其他'; }
+  function textMatch(t){ return curTLevel === '全部' || textLevel(t) === curTLevel; }
+  function levelCounts(items, fn, levels){
+    var c = {};
+    (levels || ['全部', '小学', '初高中']).forEach(function(lv){ c[lv] = 0; });
     (items || []).forEach(function(x){ c['全部']++; c[fn(x)]++; });
     return c;
   }
@@ -259,6 +263,14 @@ window.NHZReview = window.NHZReview || (function () {
     return '<div style="margin:8px 0"><span style="font-size:15px;font-weight:bold;margin-right:6px">学段：</span>' +
       ['全部', '小学', '初高中'].map(function(lv){
         return '<button class="gw-filterbtn' + (curLevel === lv ? ' on' : '') + '" data-level="' + lv + '">' + lv + '（' + counts[lv] + '）</button>';
+      }).join('') + '</div>';
+  }
+  function textLevelFilterHtml(items){
+    var counts = levelCounts(items, textLevel, TEXT_LEVELS);
+    return '<div style="margin:8px 0"><span style="font-size:15px;font-weight:bold;margin-right:6px">学段：</span>' +
+      TEXT_LEVELS.map(function(lv){
+        return '<button class="gw-filterbtn' + (curTLevel === lv ? ' on' : '') + '" data-tlevel="' + lv + '"' +
+          (lv === '其他' ? ' title="统编教材未收或未能核对学段的篇目"' : '') + '>' + lv + '（' + counts[lv] + '）</button>';
       }).join('') + '</div>';
   }
   var lastTextList = '全部'; /* 篇目详情返回用：记住从哪个篇目列表进来（全部或分类） */
@@ -295,7 +307,7 @@ window.NHZReview = window.NHZReview || (function () {
     curListCat = null;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var h = '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→学段→分类排）</button>'; /* P2-B */
-    h += levelFilterHtml(levelCounts(D.texts, textLevel));
+    h += textLevelFilterHtml(D.texts);
     h += '<div class="gw-grid">' + SECTIONS.map(function(s){
       var n = D.texts.filter(function(t){ return t.cat === s.id && textMatch(t); }).length;
       return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+n+' 篇 · '+esc(s.d)+'</p></div>';
@@ -309,9 +321,9 @@ window.NHZReview = window.NHZReview || (function () {
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
     var base = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
     var items = base.filter(textMatch);
-    var h = levelFilterHtml(levelCounts(base, textLevel));
+    var h = textLevelFilterHtml(base);
     if(!items.length){
-      h += '<p class="gw-p">本分类下没有「'+esc(curLevel)+'」篇目，切换学段或回分类看看。</p>';
+      h += '<p class="gw-p">本分类下没有「'+esc(curTLevel)+'」篇目，切换学段或回分类看看。</p>';
     }
     h += items.map(function(t){
       var idx = D.texts.indexOf(t);
@@ -903,6 +915,12 @@ window.NHZReview = window.NHZReview || (function () {
       return;
     }
     /* 学段筛选：切换后按当前所在视图重渲染（知识点列表 keepFilter 保留搜索/初中优先；篇目列表按分类重渲染） */
+    var tlb = e.target.closest('[data-tlevel]');
+    if(tlb){
+      curTLevel = tlb.getAttribute('data-tlevel');
+      if(curListCat) showList(curListCat); else showSections();
+      return;
+    }
     var lvb = e.target.closest('[data-level]');
     if(lvb){
       curLevel = lvb.getAttribute('data-level');

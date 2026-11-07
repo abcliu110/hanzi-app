@@ -83,3 +83,32 @@ test('guwen route groups no-ce texts by 学段 (P2-B)', async ({ page }) => {
   await expect(page.locator('.gw-route-sec').last()).toContainText('未标学段');
   expect(errors).toEqual([]);
 });
+
+// Q10（2026-11-08 负责人拍板）：篇目学段筛选按 学段 字段拆 小学/初中/高中/其他，未标归其他；知识点仍 小学/初高中；默认全部
+test('guwen 篇目学段筛选 小学/初中/高中/其他 (Q10)', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('newhanzi/guwen.html');
+  await page.locator('[data-mod="pianmu"]').first().click();
+  const btn = (lv) => page.locator('#gwlist [data-tlevel="' + lv + '"]');
+  await expect(btn('全部')).toHaveClass(/on/);
+  await expect(btn('全部')).toContainText('59');
+  await expect(btn('小学')).toContainText('14');
+  await expect(btn('初中')).toContainText('21');
+  await expect(btn('高中')).toContainText('7');
+  await expect(btn('其他')).toContainText('17');
+  await expect(page.locator('#gwlist [data-level="初高中"]')).toHaveCount(0);
+  await btn('高中').click();
+  await expect(page.locator('[data-go="全部"]')).toContainText('共7篇');
+  await page.locator('[data-go="全部"]').click();
+  await expect(page.locator('#gwlist .gw-item')).toHaveCount(7);
+  await btn('其他').click();
+  await expect(page.locator('#gwlist .gw-item')).toHaveCount(17);
+  await expect(page.locator('#gwlist .gw-item', { hasText: '刻舟求剑' })).toHaveCount(1);
+  // 知识点列表不受篇目筛选影响，仍是 小学/初高中
+  await page.goto('newhanzi/guwen.html');
+  await page.locator('[data-mod="wenhua"]').first().click();
+  await expect(page.locator('#gwmlist [data-level="初高中"]')).toHaveCount(1);
+  await expect(page.locator('#gwmlist [data-tlevel]')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
