@@ -108,3 +108,4 @@
 ### SC1（2026-11-07，接手 shici-rest：A22-12 / A22-14 / A19）
 - A22-12 画中有诗核对：已做 441ebddb/3384bb59 补登记；修终帧泄题（圈字环、注释）+ 加载提示不收；tests/shici-rest.spec.js 新增 1 例；npm run check 过、smoke「shici」73/73 过、check_wb 诗:绝句 过（700/1100）、lint 2 错误为既有 R5 引擎色板项（本线未动）、基线重拍诗:绝句 6 幕。
 - A22-14 回流深链+飞花令核对：已做 db6a2a4d/511a3424/a82271b3 补登记；修位置令跨分句、错例、AI 重复、首数写死，乐府知识接深链；tests/shici-rest.spec.js +2 例；npm run check 过、gen_sw_core --check 最新、shici-rest 3/3 过。
+- 2026-11-08 PZ（A22-17 遗留）：tools/content/fix_shici_pz5.py（幂等、--check，出处搜韵网《平水韵》20170714 版）改 data/shici.js pz 5 字：悯农其一「颗」平→仄（哿韵上）、凉州词「场」仄→平（阳韵平）、己亥杂诗「究」平→仄（宥韵去）、过故人庄「场」仄→平、春夜喜雨「俱」仄→平（虞韵平）；只改 pz、未动 pron。复查：gen_sc2_pingshui.py --check 冲突 0 字 0 首（两读 332 不变）、fix_shici_duyin.py --check OK、二次运行 0 改动；格律小作坊 91 首全部开放（覆盖卡无冲突时改写为「全部开放」），tests/shici-p2.spec.js P2-2 用例同步；npm run check 过，shici 相关 Playwright 83 例过。

@@ -31,12 +31,12 @@ test.describe('shici P2 (A22-17)', () => {
   test('P2-2 格律小作坊：只开放 pz 与平水韵无冲突的诗，两读字标◐', async ({ page }) => {
     await page.goto('newhanzi/games/shici/gelu.html');
     const st = await page.evaluate(() => window.__gelu);
-    expect(st.open).toBeGreaterThanOrEqual(80);
-    // 平水韵单读字冲突的 5 首不开放（颗/场/究/场/俱）
-    expect(st.blocked.sort((a, b) => a - b)).toEqual([19, 37, 138, 158, 169]);
+    expect(st.open).toBeGreaterThanOrEqual(91);
+    // 原平水韵单读字冲突 5 首（颗/场/究/场/俱）2026-11-08 已按字表改 pz（fix_shici_pz5.py），现全部开放
+    expect(st.blocked).toEqual([]);
     await expect(page.locator('#poemSel option')).toHaveCount(st.open);
-    await expect(page.locator('#poemSel option[value="138"]')).toHaveCount(0);
-    await expect(page.locator('#todoText')).toContainText('暂不开放');
+    for (const o of [19, 37, 138, 158, 169]) await expect(page.locator('#poemSel option[value="' + o + '"]')).toHaveCount(1);
+    await expect(page.locator('#todoText')).toContainText('全部开放');
     // 登鹳雀楼默认局：韵部取自字表
     await expect(page.locator('#poemTip')).toContainText('尤韵');
     // 望庐山瀑布「遥看」的看是两读

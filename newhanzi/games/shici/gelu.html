@@ -72,6 +72,7 @@ var D = window.NHZ_SHICI || {poems:[]};
 var PZ = window.NHZ_PZ;
 /* 2026-11-07 SC2：pz 逐字对照平水韵字表（data/pingshui_pz.js，搜韵网《平水韵》，tools/content/gen_sc2_pingshui.py 生成）。
    平水韵只有一个声调的字：pz 与字表一致才算可核；与字表冲突的诗本页不开放（不替数据改平仄）。
+   2026-11-08 PZ：原冲突 5 处（颗/场/究/场/俱）已按字表改 data/shici.js（tools/content/fix_shici_pz5.py），现 91 首全部开放；本页判定逻辑保留。
    平仄两读的字（看/教/过/思…）字表不能单独判定，格子下标「◐两读」，不替孩子定平仄。 */
 var PS = (window.NHZ_PINGSHUI && window.NHZ_PINGSHUI.chars) || {};
 function psTone(c){
@@ -105,9 +106,10 @@ D.poems.forEach(function(p){
 var withPz = pzPoems.length + pzBlocked.length;
 document.getElementById('todoText').textContent =
   '实测：data/shici.js ' + D.poems.length + ' 首诗中带 pz（平仄谱）的有 ' + withPz + ' 首；按 ticai 标为近体诗（五绝/七绝/五律/七律）的共 ' + jinti +
-  ' 首。逐字对照平水韵字表：' + pzPoems.length + ' 首与字表无冲突，本页开放；' + pzBlocked.length + ' 首有字与平水韵冲突，暂不开放（' +
-  pzBlocked.map(function(b){ return '《' + b.p.title + '》' + b.bad.join(''); }).join('、') +
-  '）。没有 pz 的诗不出题，古体诗与词只做节奏，不做平仄。平仄两读的字在格子下标「◐两读」。';
+  ' 首。逐字对照平水韵字表：' + (pzBlocked.length ? pzPoems.length + ' 首与字表无冲突，本页开放；' + pzBlocked.length + ' 首有字与平水韵冲突，暂不开放（' +
+  pzBlocked.map(function(b){ return '《' + b.p.title + '》' + b.bad.join(''); }).join('、') + '）' :
+  pzPoems.length + ' 首与字表全部无冲突，本页全部开放') +
+  '。没有 pz 的诗不出题，古体诗与词只做节奏，不做平仄。平仄两读的字在格子下标「◐两读」。';
 var sel = document.getElementById('poemSel');
 sel.innerHTML = pzPoems.map(function(p){
   return '<option value="' + p.order + '"' + (p.order === 38 ? ' selected' : '') + '>' +
