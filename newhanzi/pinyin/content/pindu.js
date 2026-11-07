@@ -168,15 +168,16 @@
     {
       type: 'quiz-build', lv: 2, h: '三拼机：声母 + 介母开头的韵母',
       initials: ['g', 'k', 'h', 'zh', 'sh'],
-      finals: ['ua', 'uo', 'uai', 'uang'],
+      finals: ['ua', 'uo', 'uai', 'uan', 'uang'],
       tones: [1, 2, 3, 4],
       note: '口诀：声轻介快韵母响。'
     },
     {
-      type: 'quiz-build', lv: 2, h: '三拼机：j q x 和 i 开头的韵母',
+      type: 'quiz-build', lv: 2, h: '三拼机：j q x 和 i、ü 开头的韵母',
       initials: ['j', 'q', 'x', 'l', 'n'],
-      finals: ['ia', 'ie', 'iao', 'ian', 'iang'],
-      tones: [1, 2, 3, 4]
+      finals: ['ia', 'ie', 'iao', 'ian', 'iang', 'iong', 'üan'],
+      tones: [1, 2, 3, 4],
+      note: 'j q x 碰 üan，ü 上两点省去，写成 uan：j–üān→juān。'
     },
     {
       type: 'quiz-listen', lv: 1, h: '听音选声母',

@@ -452,14 +452,39 @@ test('拆拼直达三拼韵母：拼读页预选拼读机里的韵母并描边�
   await page.goto('newhanzi/pinyin.html?t=pindu&k=ia');
   await expect(page.locator('.blk.kp-focus [data-row="f"] [data-f="ia"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.blk.kp-focus [data-go]')).toBeEnabled();
-  // uan：拼读机里没有 → 找 u 介母三拼机，加说明，不预选
-  await page.goto('newhanzi/pinyin.html?t=pindu&k=uan');
+  // uan / iong / üan（2026-11-08 三拼机补齐）：拼读机里有了 → 预选，拼得出来，不再出「没有现成按钮」说明
+  for (const [k, ini] of [['uan', 'g'], ['iong', 'j'], ['üan', 'j']]) {
+    await page.goto('newhanzi/pinyin.html?t=pindu&k=' + encodeURIComponent(k));
+    const fk = page.locator('.blk.kp-focus');
+    await expect(fk).toHaveCount(1);
+    await expect(fk.locator('[data-row="f"] [data-f="' + k + '"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(fk.locator('[data-row="i"] [data-i="' + ini + '"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(fk.locator('[data-go]')).toBeEnabled();
+    await expect(fk.locator('.kp-focus-note')).toHaveCount(0);
+  }
+  // üan 在 j q x 机上拼出 juān（ü 写成 u），iong 拼出 xióng
+  const jm = page.locator('.blk.kp-focus');
+  await jm.locator('[data-t="1"]').click();
+  await jm.locator('[data-go]').click();
+  await expect(jm.locator('.bk.merged')).toHaveText('juān');
+  await jm.locator('[data-i="x"]').click();
+  await jm.locator('[data-f="iong"]').click();
+  await jm.locator('[data-t="2"]').click();
+  await jm.locator('[data-go]').click();
+  await expect(jm.locator('.bk.merged')).toHaveText('xióng');
+  // l n 不和 üan/iong 相拼：灰掉
+  await jm.locator('[data-i="l"]').click();
+  await expect(jm.locator('[data-row="f"] [data-f="üan"]')).toHaveClass(/mute/);
+  await expect(jm.locator('[data-row="f"] [data-f="iong"]')).toHaveClass(/mute/);
+  // 字卡「卷」「熊」的拆拼链接指向这两个韵母
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('熊'));
+  await expect(page.locator('.bigzi')).toHaveText('熊', { timeout: 20000 });
+  await expect(page.locator('.hero .pinyin .py-split .py-kp').nth(1)).toHaveAttribute('href', 'pinyin.html?t=pindu&k=iong');
+  // 仍没有按钮的三拼韵母（üe，字卡「学」）：找有 j q x 的那台，加说明，不预选
+  await page.goto('newhanzi/pinyin.html?t=pindu&k=' + encodeURIComponent('üe'));
   await expect(page.locator('.blk.kp-focus')).toHaveCount(1);
-  await expect(page.locator('.blk.kp-focus [data-row="f"] [data-f="ua"]')).toHaveCount(1);
-  await expect(page.locator('.blk.kp-focus .kp-focus-note')).toContainText('uan');
-  // üan（字卡「卷」juǎn）：找有 j q x 的那台
-  await page.goto('newhanzi/pinyin.html?t=pindu&k=' + encodeURIComponent('üan'));
   await expect(page.locator('.blk.kp-focus [data-row="i"] [data-i="j"]')).toHaveCount(1);
+  await expect(page.locator('.blk.kp-focus .kp-focus-note')).toContainText('üe');
   // 不是三拼韵母、页上也没有的 key：照旧停在页首，不描边
   await page.goto('newhanzi/pinyin.html?t=pindu&k=zz');
   await expect(page.locator('.kp')).toHaveCount(1);

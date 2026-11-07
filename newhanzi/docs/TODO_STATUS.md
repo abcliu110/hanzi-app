@@ -338,3 +338,4 @@
 
 ### D1（2026-11-08 01:00 JST 起，负责人 00:55「全部按照你的建议来」后的小项；副本 hz-d1，端口 4214）
 - 醉花阴正文（拍板：按古诗文网改「销魂…人比」）· 见本条提交 · tools/content/fix_shici_zuihuayin.py（幂等 --check）：data/shici.js 末行改「莫道不销魂，帘卷西风，人比黄花瘦。」，同文件知识卡引文 3 处统一；shiju 索引重算 销/比。pron/pz 不动；duyin/pz5/gushidu --check 均 OK，gushidu 无需重生成；npm run check、smoke shici 73 例过。未改（他人文件）：shangxi.js 逐句讲、data_feihua.js、字卡 瘦/魂 等同句，见 fix-shici.md。
+- 三拼机补 uan / iong / üan（拍板：三拼机补齐）· 见本条提交 · pinyin/content/pindu.js：介母 u 机（g k h zh sh）韵母加 uan；j q x 机加 iong、üan，标题改「j q x 和 i、ü 开头的韵母」，加一行说明（j q x 碰 üan 省两点写 uan）。字卡 `&k=uan/iong/üan` 现走 pinyin-tail（fa91d19b）的预选分支：预选韵母、声母换成能拼的、可直接「碰！」，不再出「没有现成按钮」说明；l n 与 iong/üan 灰掉。tests/pinyin.spec.js 三拼直达用例改写（三韵母预选、juān/xióng 拼出、l 灰掉、字卡「熊」链 k=iong、üe 仍走同介母说明分支）；pinyin.spec+duyin.spec 30/30 过；check_pinyin_content 16 文件过；768/1280 无横向溢出。kp.js 注释「如 uan iong üan」已过时，未改（pinyin-tail 文件）。
