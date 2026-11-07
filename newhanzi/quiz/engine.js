@@ -279,7 +279,7 @@ function renderHome() {
         '<div class="qz-mode-ic">' + meta.icon + '</div>' +
         '<div class="qz-mode-name">' + meta.name + '</div>' +
         '<div class="qz-mode-desc">' + meta.desc + '</div>' +
-        '<div class="qz-mode-n">' + S.modes[m].length + ' 题</div></button>';
+        '<div class="qz-mode-n">' + S.modes[m].length + ' 题' + (S.modes[m].length > ROUND_MAX ? ' · 每轮 ' + ROUND_MAX : '') + '</div></button>';
     }).join('') + '</div>';
   }
   if (S.point) h += '<a class="qz-wrong" href="index.html?tab=' + encodeURIComponent(S.tab) + '" style="display:block;text-align:center;text-decoration:none">看全部题目 →</a>';
@@ -293,6 +293,24 @@ function renderHome() {
 }
 
 /* ---------- 开局 ---------- */
+/* 每轮题数上限（2026-11-08 负责人拍板「题量大的题库每轮上限 20 题」）：
+   一轮候选超过 ROUND_MAX 时只抽 ROUND_MAX 道——先放本卷错题本（nhz_quiz_wrong）里还在的题，再从其余题随机补足；
+   ≤ ROUND_MAX 时原样（仍整体洗牌）。引擎没有「做过/没做过」记录，不另建。URL 无题数参数，不新增。
+   wrongKeys：错题的 JSON 串集合（与 wbAdd/wbRemove 同一比对口径）；不传则纯随机。 */
+var ROUND_MAX = 20;
+function pickRound(arr, max, wrongKeys) {
+  var a = shuffle(arr || []);
+  if (!(max > 0) || a.length <= max) return a;
+  if (!wrongKeys) return a.slice(0, max);
+  var pri = [], rest = [], i;
+  for (i = 0; i < a.length; i++) (wrongKeys[JSON.stringify(a[i])] ? pri : rest).push(a[i]);
+  return shuffle(pri.concat(rest).slice(0, max));
+}
+function wrongKeySet(tab, mode) {
+  var ks = {};
+  wbList(tab, mode).forEach(function (q) { ks[JSON.stringify(q)] = 1; });
+  return ks;
+}
 function startMode(mode) {
   var list;
   if (mode === 'wrong') {
@@ -300,9 +318,9 @@ function startMode(mode) {
     availModes().forEach(function (m) {
       wbList(S.tab, m).forEach(function (q) { list.push({ _m: m, _q: q, _v: shuffleOpts(m, q) }); });
     });
-    list = shuffle(list);
+    list = pickRound(list, ROUND_MAX);
   } else {
-    list = shuffle(S.modes[mode]).map(function (q) { return { _m: mode, _q: q, _v: shuffleOpts(mode, q) }; });
+    list = pickRound(S.modes[mode], ROUND_MAX, wrongKeySet(S.tab, mode)).map(function (q) { return { _m: mode, _q: q, _v: shuffleOpts(mode, q) }; });
   }
   if (!list.length) return;
   S.mode = mode; S.list = list; S.idx = 0;
@@ -899,6 +917,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     Render: Render, MODES: MODES, MODE_ORDER: MODE_ORDER, TAB_NAMES: TAB_NAMES, isMap: isMap,
     shuffle: shuffle, shuffleOpts: shuffleOpts, esc: esc, buildExp: buildExp,
+    pickRound: pickRound, ROUND_MAX: ROUND_MAX,
     normalizeShort: normalizeShort, shortOk: shortOk, shortAnswers: shortAnswers,
     wbLoad: wbLoad, wbSave: wbSave, wbAdd: wbAdd, wbList: wbList,
     wbRemove: wbRemove, wbCount: wbCount, WB_KEY: WB_KEY

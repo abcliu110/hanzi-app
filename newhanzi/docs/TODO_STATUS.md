@@ -109,7 +109,7 @@
 | Q7 | docs/xiufu/infra.md 1 | yuwen/grammar|logic|reading|writing.json 旧版：删除还是由 data.js 反写 |
 | Q8 | docs/xiufu/infra.md 2 | sync-to-source.yml 会 force push 覆盖本仓库，-jpg 仓库是否弃用、是否删该 workflow |
 | Q9 | docs/xiufu/infra.md 3 | 是否加自动发布 gh-pages 的 workflow |
-| Q10 | docs/xiufu/content.md | shici.html 是否按 ke 隐藏拓展诗、是否加年级筛选；guwen.html 是否按 level 隐藏初高中内容（数据已备，GW 2026-11-07：guwen.js 篇目 学段/学段源 字段 小学 14 · 初中 21 · 高中 7 · 未标 17，见执行日志；页面筛选仍按 ce 分「小学/初高中」，是否改用 学段 拆初中/高中待定）。**2026-11-08 负责人拍板（按建议）：guwen 篇目筛选拆初中/高中、未标归「其他」✅ D2 本提交（见执行日志）**；shici 年级筛选、知识点 level 拆分不在此次范围 |
+| Q10 | docs/xiufu/content.md | shici.html 是否按 ke 隐藏拓展诗、是否加年级筛选；guwen.html 是否按 level 隐藏初高中内容（数据已备，GW 2026-11-07：guwen.js 篇目 学段/学段源 字段 小学 14 · 初中 21 · 高中 7 · 未标 17，见执行日志；页面筛选仍按 ce 分「小学/初高中」，是否改用 学段 拆初中/高中待定）。**2026-11-08 负责人拍板（按建议）：guwen 篇目筛选拆初中/高中、未标归「其他」✅ D2 85552e6a（见执行日志）**；shici 年级筛选、知识点 level 拆分不在此次范围 |
 | Q11 | docs/xiufu/content.md | 毛泽东诗词、蒙学篇目、少年中国说是否入古诗库；伯牙鼓琴改《吕氏春秋》版 |
 | Q12 | docs/anim/jiaojie/yufa-p2-03e-bijiao.md | Q24 比较句「没有」正文疑点签字 |
 | Q13 | docs/anim/jiaojie/yufa-neirong-01…07 | 新增 54 项语法内容稿（句式/补语/词与短语/深层/修辞/文言/标点）待负责人审稿后才能上白板 |
@@ -256,7 +256,8 @@
 - MAIN 收尾 · 旧副本未提交改动搬入 · 本提交 · hz-main：A22-2 执行日志与 gaijin/README 行（表格状态 d4792fc6 早已登记，只补日志/README）＋首页入口；hz-y 批 10 WIP（fix_yuwen_kb.py + yscan/b10_unk.txt 202 句）经核已被 1a0eed00（MAIN2 批 10，fix_yuwen_b10_qita.py）及 2026-11-06 题库重写取代，不搬，见 fix-yuwen.md 批 10 行后注。
 
 - GW · guwen.js 学段字段 · 本提交 · 新工具 tools/content/fix_gw_xueduan.py（幂等，--check）：59 篇加 学段/学段源，只标统编篇目可核的——小学 14（已有 ce，依据沿用 ceBasis；伯牙鼓琴照 ceBasis 注明课本为《吕氏春秋》版）、初中 21、高中 7（依据：古诗文网「初中文言文」「高中文言文」统编目录，高中只算必修/选择性必修；再把本应用原文逐句〔≥3 字，不计标点〕到该篇原文核对，命中句数写进 学段源，最低 7/8 出师表节选、11/13 劝学节选）。篇名不同照实写：逍遥游（节选）=八下《北冥有鱼》、燕雀安知鸿鹄之志=《陈涉世家》、己所不欲勿施于人（卫灵公 15.24）=高中选必上《论语十二章》（不在七上十二章）。未标 17：刻舟求剑 掩耳盗铃 郑人买履 狐假虎威 画蛇添足 亡羊补牢 揠苗助长 南辕北辙 买椟还珠 卧薪尝胆 破釜沉舟 完璧归赵 负荆请罪 小时了了 管宁割席 伤仲永（人教旧版七下，统编无）始得西山宴游记（统编必修/选必无）。页面不改（Q10 待定，默认显示不变）。检查：二次运行 0 改动；fix_gw_a21_duiyi --check 过；tests/guwen-rest.spec.js 新增学段用例（全部有 学段源、小学 14、篇目总数 59 不变）过。
-- D2 · Q10 古文篇目学段筛选 · 本提交 · 负责人 2026-11-08 00:55 拍板「拆初中/高中两档，未标归其他」：guwen.html 篇目分类页与篇目列表的学段筛选由 ce 判「小学/初高中」改为按 data/guwen.js 学段 字段（8a2c4d6a）判「全部/小学/初中/高中/其他」，计数 59 / 14 / 21 / 7 / 17，未标学段 17 篇归「其他」（按钮 title 写明）；默认仍「全部」，不隐藏内容。知识点列表（虚词、文化常识等）数据 level 只有 小学/初高中拓展、无初中/高中拆分，筛选保持 全部/小学/初高中 不变，篇目与知识点两套筛选状态分开（data-tlevel / data-level）。复查：npm run check 通过（520 段）；tests/guwen-rest.spec.js 6 例过（新增 Q10 用例）；smoke -g guwen 19 例过；sw.js --check 最新。
+- D2 · Q10 古文篇目学段筛选 · 85552e6a · 负责人 2026-11-08 00:55 拍板「拆初中/高中两档，未标归其他」：guwen.html 篇目分类页与篇目列表的学段筛选由 ce 判「小学/初高中」改为按 data/guwen.js 学段 字段（8a2c4d6a）判「全部/小学/初中/高中/其他」，计数 59 / 14 / 21 / 7 / 17，未标学段 17 篇归「其他」（按钮 title 写明）；默认仍「全部」，不隐藏内容。知识点列表（虚词、文化常识等）数据 level 只有 小学/初高中拓展、无初中/高中拆分，筛选保持 全部/小学/初高中 不变，篇目与知识点两套筛选状态分开（data-tlevel / data-level）。复查：npm run check 通过（520 段）；tests/guwen-rest.spec.js 6 例过（新增 Q10 用例）；smoke -g guwen 19 例过；sw.js --check 最新。
+- D2 · quiz 一轮题数上限 20 · 本提交 · 负责人 2026-11-08 00:55 拍板「题量大的题库每轮上限 20 题」：quiz/engine.js 加 ROUND_MAX=20 与 pickRound()，startMode 普通模式与错题重练都过它——候选 >20 时先放本卷错题本 nhz_quiz_wrong 里的题（同 wbAdd 的 JSON 比对口径），再随机补足到 20 并整体洗牌；≤20 原样全量。引擎无「做过/没做过」记录、URL 无题数参数，均不新增。模式卡题数后加「· 每轮 20」（仅 >20 时）。受影响：古文选择 1993、古文填空 712（gw_chan 生成）、逻辑选择 268 / 判断 178 等；实验室 order/blank/spot/rewrite 各 20 题不变。新用例 tests/quiz-round.spec.js 4 例（pickRound 单测：抽 20 不重复、≤20 全量、错题优先、错题 >20 也只出 20；古文选择 1/20；实验室 order 20 题不变；字卡错题本 3 题必进本轮）。复查：npm run check 通过（521 段）；quiz-round 4 例、smoke -g quiz 10 例、a23c-miscon+leftover 16 例、fuxi-loop 7 例过。
 
 ## 五、全 app 内容质量审查（2026-11-05，基线 5545da64）
 
