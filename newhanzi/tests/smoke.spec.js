@@ -817,7 +817,7 @@ test('pinyin module: home panel after shizi, detail, crumbs, back', async ({ pag
   expect(ms.indexOf('pinyin')).toBe(ms.indexOf('shizi') + 1);
   await page.click('#view-home .panel[data-m="pinyin"]');
   const fr = page.frameLocator('#panel-pinyin iframe');
-  await expect(fr.locator('.py-card')).toHaveCount(12);
+  await expect(fr.locator('.py-card')).toHaveCount(15);
   await fr.locator('.py-card[data-id="shengmu"]').click();
   await expect(fr.locator('#pyDetail .py-chip', { hasText: 'zh' }).first()).toBeVisible();
   await expect(page.locator('#modTitle')).toContainText('声母');

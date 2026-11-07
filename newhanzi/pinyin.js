@@ -93,8 +93,9 @@
     else A.playSyl(b.getAttribute('data-syl'), +b.getAttribute('data-tone'));
   });
 
-  grid.innerHTML = MENU.map(function (m) {
-    return '<button type="button" class="py-card" data-id="' + esc(m.id) + '">' +
+  grid.innerHTML = MENU.map(function (m, i) {
+    var gh = m.group && (i === 0 || MENU[i - 1].group !== m.group) ? '<h3 class="py-grp-h">' + esc(m.group) + '</h3>' : '';
+    return gh + '<button type="button" class="py-card" data-id="' + esc(m.id) + '">' +
       '<span class="hd"><span class="no">' + m.no + '</span><b>' + esc(m.name) + '</b>' +
       '<span class="lv">' + esc(m.lv) + '</span></span>' +
       '<div class="ex">' + esc(m.ex) + '</div>' +

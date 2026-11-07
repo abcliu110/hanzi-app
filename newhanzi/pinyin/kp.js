@@ -4,7 +4,8 @@
  *   NHZPinyinKP.level() / setLevel(1|2|3)       → 浅 / 中 / 深（默认 2，存 localStorage 'nhz-py-lv'）
  * 只播 pinyin/audio 里的真人录音（NHZPinyinAudio），不用 Web Speech。不做 3D/悬浮特效。
  * 块类型：text chips groups table pairs scene mirror anim(tone-road|bump|glide|nasal) quiz-listen quiz-choose quiz-build
- *         quiz-mark quiz-find words verse outline。glide / nasal 是静态步进示意图（点「下一步」），画不出来时退回 fallback。 */
+ *         quiz-mark quiz-find words verse outline。quiz-choose 可带 item.play（听音题）、b.rv（错题进错题本），易错读音卡用。
+ *        glide / nasal 是静态步进示意图（点「下一步」），画不出来时退回 fallback。 */
 (function () {
   'use strict';
   var S = window.NHZPinyinSyllable, A = window.NHZPinyinAudio;
@@ -566,21 +567,42 @@
       $('.qfb', box).innerHTML = fb;
     });
   }
+  /* 错题打通（易错读音卡）：块带 rv（知识点名）时，答错进统一错题本、答对推进复习间隔；口径同 fuxi.js / yuwen.js 的 NHZReview.record。
+     拼音页不加载 fuxi.js，所以这里留一份同格式的最小实现（键 nhz_wrong / nhz_srs，id = hash(q + options + answer)）。 */
+  var REVIEW = window.NHZReview || (function () {
+    var IV = [1, 2, 4, 7, 15, 30];
+    function load(k, fb) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; } catch (e) { return fb; } }
+    function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 忽略 */ } }
+    function idOf(it) { var s = it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer, h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'q' + (h < 0 ? -h : h); }
+    return { record: function (it, correct) {
+      if (!it || !it.q) return;
+      var id = idOf(it), wrong = load('nhz_wrong', []), srs = load('nhz_srs', {}), now = Date.now();
+      if (correct) { if (srs[id]) { var iv = Math.min(srs[id].iv + 1, IV.length - 1); srs[id] = { iv: iv, next: now + IV[iv] * 86400000 }; save('nhz_srs', srs); } return; }
+      var rec = { id: id, q: it.q, options: it.options || [], answer: it.answer, 解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now };
+      var i = 0; for (; i < wrong.length; i++) if (wrong[i].id === id) { rec.addedAt = wrong[i].addedAt || now; wrong[i] = rec; break; }
+      if (i === wrong.length) wrong.push(rec);
+      save('nhz_wrong', wrong); srs[id] = { iv: 0, next: now + IV[0] * 86400000 }; save('nhz_srs', srs);
+    } };
+  })();
+  function plainText(s) { return String(s == null ? '' : s).replace(/\{(?:py|zi):([^}]*)\}/g, '$1'); }
+  /* quiz-choose：item.play = 音频键（听音题，出「▶ 听」按钮，没有录音的题不出）；b.rv = 错题本里的知识点名 */
   function quizChoose(box, b) {
-    var order = shuffle(b.items || []), k = -1, right = 0, total = 0, answered = false;
+    var order = shuffle((b.items || []).filter(function (it) { var kk = it.play && keyParts(it.play); return !it.play || (kk && has(kk.syl, kk.t)); })), k = -1, right = 0, total = 0, answered = false;
     box.innerHTML = '<div class="qtop"><span class="target"></span><span class="qscore">答对 0 / 0</span></div><div class="qq"></div><div class="qopts"></div><div class="qfb" aria-live="polite"></div>' +
       '<div class="prow"><button type="button" class="kp-btn" data-q="next">下一题</button></div>';
-    function next() {
+    function next(auto) {
       k = (k + 1) % order.length; answered = false;
       var it = order[k], idx = shuffle(it.options.map(function (_, i) { return i; }));
       $('.target', box).textContent = '第 ' + (k + 1) + ' / ' + order.length + ' 题';
-      $('.qq', box).innerHTML = inline(it.q);
+      $('.qq', box).innerHTML = inline(it.q) + (it.play ? ' <button type="button" class="kp-btn pri" data-q="hear">▶ 听</button>' : '');
+      if (it.play && auto) { var kk = keyParts(it.play); play(kk.syl, kk.t); }
       $('.qopts', box).innerHTML = idx.map(function (i) { return '<button type="button" class="qopt" data-i="' + i + '">' + inline(it.options[i], true) + '</button>'; }).join('');
       $('.qfb', box).innerHTML = '';
     }
     box.addEventListener('click', function (e) {
       var btn = e.target.closest('button'); if (!btn) return;
-      if (btn.getAttribute('data-q') === 'next') { next(); return; }
+      if (btn.getAttribute('data-q') === 'next') { next(true); return; }
+      if (btn.getAttribute('data-q') === 'hear') { var kh = keyParts(order[k].play); if (kh) play(kh.syl, kh.t); return; }
       var i = btn.getAttribute('data-i');
       if (i == null || btn.classList.contains('pyi')) return;
       if (answered) return;
@@ -589,6 +611,8 @@
       $$('.qopt', box).forEach(function (o) { var v = +o.getAttribute('data-i'); if (v === it.answer) o.classList.add('right'); else if (v === +i) o.classList.add('wrong'); });
       $('.qscore', box).textContent = '答对 ' + right + ' / ' + total;
       $('.qfb', box).innerHTML = (ok ? '<span class="ok">对了！</span> ' : '<span class="no">再想想。</span> 答案是「' + inline(it.options[it.answer]) + '」。 ') + (it.why ? inline(it.why) : '');
+      if (b.rv) REVIEW.record({ q: plainText(it.q) + (it.play ? '（听音题：' + it.play + '）' : ''), options: it.options.map(plainText), answer: plainText(it.options[it.answer]),
+        解析: plainText(it.why || ''), src: '拼音', point: b.rv }, ok);
     });
     if (order.length) next();
   }

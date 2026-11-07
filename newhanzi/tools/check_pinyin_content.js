@@ -9,6 +9,7 @@
  *    且是合法音节（real 可为按出现顺序的数组，'' 表示该处不标）；词语/儿歌的音节数要和汉字数对得上（儿化 r 算一个字「儿」）。quiz-build 的声母/韵母要能组成至少一个合法音节。
  * 4. 数量下限（SCHEMA「规则」）：看 ≥3 块、听读 ≥3 块、练 ≥3 种题型（quiz-*）、用 ≥2 块且词语 ≥8 个 + 至少 1 首儿歌（verse）；
  *    L1/L2/L3 都有块；outline ≤1 块。
+ * 5. 易错读音卡（duoyin/yicuo/shenyin…）：zidu 里的每个 [字, 拼音] 都要在 ziku/model-3500.json 该字读音中。
  * 退出码：有错误 = 1；只有提示 = 0。 */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -181,6 +182,7 @@ function checkBlock(where, b, ctx) {
       if (!Array.isArray(q.options) || q.options.length < 2) E(w, 'options 至少 2 个');
       else if (!(q.answer >= 0 && q.answer < q.options.length)) E(w, 'answer 越界');
       checkInline(w + '.q', q.q); checkInline(w + '.why', q.why);
+      if (q.play != null && !audioOk(q.play)) ctx.noAudio.push(q.play); /* 听音题没录音：页面不出这道题，这里只汇总提示 */
       (q.options || []).forEach((o, j) => checkInline(w + '.options[' + j + ']', o));
     }); break;
     case 'quiz-build': {
@@ -232,7 +234,7 @@ function checkFile(file) {
   if (!c.lead) E(id, '缺 lead');
   else checkInline(id + '.lead', c.lead);
   if (!Array.isArray(c.src) || !c.src.length) E(id, 'src 应为非空数组（依据）');
-  const ctx = { lv: {}, words: 0, verse: 0, verseLines: 0 };
+  const ctx = { lv: {}, words: 0, verse: 0, verseLines: 0, noAudio: [] };
   let outline = 0;
   STAGES.forEach((st) => {
     if (!Array.isArray(c[st])) { E(id, '缺 ' + st + '（' + STAGE_N[st] + '）数组'); c[st] = []; }
@@ -241,7 +243,8 @@ function checkFile(file) {
   const cnt = (st) => c[st].filter((b) => b && b.type !== 'outline').length;
   if (cnt('kan') < 3) E(id, '看 只有 ' + cnt('kan') + ' 块（≥3）');
   if (cnt('ting') < 3) E(id, '听读 只有 ' + cnt('ting') + ' 块（≥3）');
-  const qt = new Set(c.lian.filter((b) => b && /^quiz-/.test(b.type)).map((b) => b.type));
+  /* 易错读音卡的题都是 quiz-choose，按 kind（pick/sent/hear/wrong/judge）算不同题型 */
+  const qt = new Set(c.lian.filter((b) => b && /^quiz-/.test(b.type)).map((b) => b.type + (b.kind ? ':' + b.kind : '')));
   if (qt.size < 3) E(id, '练 只有 ' + qt.size + ' 种题型（≥3）：' + Array.from(qt).join(' '));
   if (cnt('yong') < 2) E(id, '用 只有 ' + cnt('yong') + ' 块（≥2）');
   if (ctx.words < 8) E(id, '词语只有 ' + ctx.words + ' 个（≥8）');
@@ -249,6 +252,43 @@ function checkFile(file) {
   else if (ctx.verseLines < 2) E(id, '儿歌/短句只有 ' + ctx.verseLines + ' 行（≥2）');
   [1, 2, 3].forEach((l) => { if (!ctx.lv[l]) E(id, '没有 L' + l + ' 的块'); });
   if (outline > 1) E(id, 'outline 只许 1 块（现在 ' + outline + '）');
+  if (ctx.noAudio.length) W(id, '听音题没有录音，页面跳过这 ' + ctx.noAudio.length + ' 道：' + Array.from(new Set(ctx.noAudio)).join(' '));
+  checkZidu(id, c);
+}
+
+/* 5. 字的读音（易错读音卡）：内容对象的 zidu = [[字, 拼音], …]（页面当作「这个字的读音」展示的每一处），
+ *    字必须在 ziku/model-3500.json 里，拼音必须是该字「读音.拼音」之一（逗号分隔，NFC 比较）。不改字库主读音（TODO_STATUS Q6）。 */
+let ZIKU = null;
+function zikuReadings() {
+  if (ZIKU) return ZIKU;
+  ZIKU = new Map();
+  const f = path.join(NH, 'ziku', 'model-3500.json');
+  if (!fs.existsSync(f)) return ZIKU;
+  JSON.parse(fs.readFileSync(f, 'utf8')).forEach((x) => {
+    const r = ((x.dim || {})['读音'] || {})['拼音'] || '';
+    ZIKU.set(x.zi, String(r).split(/[,，\s]+/).filter(Boolean).map((t) => t.normalize('NFC')));
+  });
+  return ZIKU;
+}
+function checkZidu(id, c) {
+  if (c.zidu == null) return;
+  if (!Array.isArray(c.zidu)) { E(id, 'zidu 应为 [[字, 拼音], …]'); return; }
+  const R = zikuReadings();
+  if (!R.size) { W(id, '找不到 ziku/model-3500.json，跳过读音核对'); return; }
+  /* 「用」里的词语也逐字核对（轻声 / 无调音节跳过） */
+  const all = c.zidu.slice();
+  STAGES.forEach((st) => (c[st] || []).forEach((b) => { if (b && b.type === 'words') (b.items || []).forEach((it) => {
+    const zs = String(it.w).match(/[\u3400-\u9fff]/g) || [], ps = pyTokens(it.py);
+    if (zs.length === ps.length) zs.forEach((z, i) => { if (S.parse(ps[i]).tone !== 5 && R.has(z)) all.push([z, ps[i]]); /* 词里不在字库的字不核 */ });
+  }); }));
+  let n = 0;
+  all.forEach((p) => {
+    const z = p && p[0], py = String((p && p[1]) || '').normalize('NFC');
+    if (!R.has(z)) { E(id + '.zidu', '「' + z + '」不在 3500 字库里'); return; }
+    if (R.get(z).indexOf(py) < 0) { E(id + '.zidu', '「' + z + '」读 ' + py + '，字库只有 ' + R.get(z).join('/')); return; }
+    n++;
+  });
+  console.log('  · 读音核对：' + n + ' / ' + all.length + ' 处在 3500 字库里（含「用」里的词语）');
 }
 
 function flushHudu(id) {
