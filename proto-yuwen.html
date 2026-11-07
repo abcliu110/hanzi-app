@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>语法图解课堂原型</title>
+    <!-- 不依赖 Google Fonts（国内/离线会失败），只用系统字体 -->
+    <style>
+      :root{
+        --bg:#e4eedf; --bg2:#dce8d7; --card:#f2f6ee; --ink:#2c3328; --ink2:#6b7566; --line:#d5dfd0;
+        --red:#b85a52; --red-soft:#f3e4e2; --gold:#4a7a59; --ok:#3f8e6b; --ok-soft:#d3e5d6; --bad:#b85a52; --bad-soft:#f3e4e2;
+        --accent-soft:#d3e5d6; --shadow:0 2px 10px rgba(60,90,50,.08);
+        /* 蒙特梭利标准色（两源交叉版） */
+        --m-noun:#26221c; --m-adj:#274b8f; --m-pron:#7b4ba8; --m-verb:#c22f2f; --m-adv:#e07b24;
+        --m-prep:#3d8a4f; --m-conj:#d96a9b; --m-interj:#c9a227; --m-det:#7fb3d9;
+        --de1:#2563eb; --de2:#e07b24; --de3:#7b4ba8;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#1a211c; --bg2:#1f2923; --card:#243028; --ink:#e6eee4; --ink2:#9aab9c; --line:#354339;
+          --red:#d08a84; --red-soft:#3a2826; --gold:#6fa87d; --ok:#6fa87d; --ok-soft:#2a3a30; --bad:#d08a84; --bad-soft:#3a2826;
+          --accent-soft:#2a3a30; --shadow:0 2px 10px rgba(0,0,0,.35);
+          --m-noun:#d8d2c4; --m-adj:#7ba3e8; --m-pron:#b48fe0; --m-verb:#ef7a6a; --m-adv:#f0a35e;
+          --m-prep:#6fc286; --m-conj:#ef9ec0; --m-interj:#e3c566; --m-det:#a9cfee;
+          --de1:#7ba3e8; --de2:#f0a35e; --de3:#b48fe0;
+        }
+      }
+      *{box-sizing:border-box}
+      html{-webkit-text-size-adjust:100%}
+      body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;line-height:1.65}
+      .wrap{max-width:880px;margin:0 auto;padding:20px 16px 64px}
+      h1,h2,h3{font-family:"Songti SC","STSong","Noto Serif CJK SC","SimSun",serif;line-height:1.3}
+      button{font-family:inherit;cursor:pointer}
+      .hidden{display:none!important}
+
+      /* ---------- 列表页 ---------- */
+      .intro{padding:26px 4px 6px}
+      .intro h1{font-size:30px;margin:0 0 8px;font-weight:900}
+      .intro p{margin:0;color:var(--ink2);font-size:15px;max-width:640px}
+      .intro p b{color:var(--ink)}
+      .method-strip{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 4px}
+      .method-chip{font-size:12.5px;font-weight:700;background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink)}
+      .legend{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+      .legend h3{margin:0 0 4px;font-size:15px}
+      .legend .sub{font-size:12.5px;color:var(--ink2);margin:0 0 10px}
+      .legend-grid{display:flex;flex-wrap:wrap;gap:6px 16px}
+      .legend-item{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500}
+      .sym{display:inline-flex;align-items:center;justify-content:center;flex:none}
+      .sym svg{display:block}
+      .cat{margin-top:30px}
+      .cat-head{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:12px}
+      .cat-head h2{font-size:20px;margin:0;font-weight:900}
+      .cat-head .from{font-size:12.5px;color:var(--ink2)}
+      .row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);color:var(--ink);transition:transform .15s ease,border-color .15s ease}
+      .row:hover{transform:translateY(-1px);border-color:var(--red)}
+      .row .sym{width:40px;height:40px}
+      .row .tt{flex:1;min-width:0}
+      .row .t{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .row .hook{font-size:13.5px;color:var(--ink2);margin-top:1px}
+      .badge{font-size:11px;font-weight:700;color:var(--red);background:var(--red-soft);border-radius:999px;padding:2px 8px;white-space:nowrap}
+      .badge.game{color:var(--ok);background:var(--ok-soft)}
+      .row .arrow{color:var(--ink2);font-size:18px;flex:none}
+      .foot-note{margin-top:34px;font-size:12.5px;color:var(--ink2);border-top:1px solid var(--line);padding-top:12px}
+      .foot-note a{color:var(--red)}
+
+      /* ---------- 详情页 ---------- */
+      .topbar{display:flex;align-items:center;gap:14px;padding:8px 0 4px;flex-wrap:wrap}
+      .back{background:var(--red-soft);border:2px solid var(--red);color:var(--red);font-size:17px;font-weight:700;padding:8px 16px;border-radius:10px;cursor:pointer}
+      .pager{margin-left:auto;display:flex;gap:8px}
+      .pager button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:13.5px;color:var(--ink)}
+      .pager button:disabled{opacity:.35;cursor:default}
+      .detail-head{display:flex;gap:16px;align-items:center;margin:10px 0 4px}
+      .detail-head .sym{width:64px;height:64px}
+      .detail-head h1{font-size:27px;margin:0;font-weight:900}
+      .detail-head .hook{color:var(--ink2);font-size:14.5px;margin-top:2px}
+      .step{margin-top:26px}
+      .step-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+      .step-no{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
+      .step-head h2{font-size:18px;margin:0;font-weight:900}
+      .step-head .src{margin-left:auto;font-size:12px;color:var(--ink2);text-align:right}
+      .analogy{background:#fdf3d3;border-left:4px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;font-size:15.5px}
+      @media (prefers-color-scheme: dark){.analogy{background:#38301c}}
+      .analogy b{color:var(--red)}
+      .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--shadow)}
+      .rule{background:var(--ink);color:var(--bg);border-radius:12px;padding:14px 18px;font-size:16.5px;font-weight:700;text-align:center}
+      .rule .formula{font-size:20px;letter-spacing:.06em}
+      .trap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      @media (max-width:560px){.trap-grid{grid-template-columns:1fr}}
+      .trap{border-radius:10px;padding:12px 14px;font-size:14.5px}
+      .trap.bad{background:var(--bad-soft)}
+      .trap.good{background:var(--ok-soft)}
+      .trap .mark{font-weight:900;margin-right:6px}
+      .trap.bad .mark{color:var(--bad)} .trap.good .mark{color:var(--ok)}
+      .trap .why{display:block;font-size:13px;color:var(--ink2);margin-top:4px}
+      .srcbox{margin-top:30px;font-size:12.5px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:12px}
+      .srcbox a{color:var(--red);word-break:break-all}
+
+      /* 例句符号标注 */
+      .symline{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:flex-end;justify-content:center;padding:10px 0 4px}
+      .tok{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:34px}
+      .tok .sym{height:30px}
+      .tok .w{font-size:21px;font-weight:700}
+      .tok .cls{font-size:11px;color:var(--ink2)}
+      .tok.plain .w{color:var(--ink2);font-weight:500;font-size:18px;padding-top:30px}
+      .caption{text-align:center;color:var(--ink2);font-size:13px;margin-top:8px}
+
+      /* 通用按钮与反馈 */
+      .btn{background:var(--red);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-size:15px;font-weight:700}
+      .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+      .btn:disabled{opacity:.4;cursor:default}
+      .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+      .feedback{font-size:14.5px;font-weight:700;min-height:24px}
+      .feedback.ok{color:var(--ok)} .feedback.no{color:var(--bad)}
+      @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+      .shake{animation:shake .4s ease}
+      @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+      .pop{animation:pop .35s ease}
+
+      /* 小测 */
+      .quiz-q{font-size:16px;font-weight:700;margin-bottom:10px}
+      .quiz-opts{display:grid;gap:8px}
+      .quiz-opt{text-align:left;background:var(--bg2);border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:15px;color:var(--ink)}
+      .quiz-opt.right{border-color:var(--ok);background:var(--ok-soft)}
+      .quiz-opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+      .quiz-why{font-size:13.5px;color:var(--ink2);margin-top:8px;min-height:20px}
+
+      /* Symbolize 游戏 */
+      .palette{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+      .pal-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg2);border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12px;color:var(--ink);min-width:56px}
+      .pal-btn.sel{border-color:var(--red);background:var(--red-soft)}
+      .game-toks{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;padding:16px 6px 8px}
+      .gtok{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:4px 6px;border-radius:10px;color:var(--ink)}
+      .gtok .slot{height:32px;display:flex;align-items:center}
+      .gtok .w{font-size:23px;font-weight:700;padding:2px 8px;border-radius:8px;border-bottom:3px solid var(--line)}
+      .gtok.sel .w{border-bottom-color:var(--red);background:var(--red-soft)}
+      .gtok .empty{width:30px;height:30px;border:1.5px dashed var(--line);border-radius:8px}
+
+      /* 黎氏图解 */
+      .diagram-box svg{width:100%;height:auto;display:block}
+      .fadeable{transition:opacity .5s ease}
+      #diag-panel.shrunk #dg-branch{opacity:.07!important}
+
+      /* 四素句 / 拼句 */
+      .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+      @media (max-width:560px){.slots{grid-template-columns:repeat(2,1fr)}}
+      .slot{border:2px dashed var(--line);border-radius:12px;min-height:74px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--bg)}
+      .slot .lab{font-size:12px;font-weight:900;letter-spacing:.1em}
+      .slot.filled{border-style:solid}
+      .slot .val{font-size:17px;font-weight:700}
+      .slot button{background:none;border:none;color:var(--ink2);font-size:12px;padding:0}
+      .tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+      .tile{background:var(--card);border:1.5px solid var(--ink2);border-bottom-width:3.5px;border-radius:10px;padding:9px 15px;font-size:16.5px;font-weight:700;color:var(--ink)}
+      .tile:active{transform:translateY(1px)}
+      .tile.used{opacity:.25;pointer-events:none}
+      .answer-strip{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;border:2px dashed var(--line);border-radius:12px;padding:8px;align-items:center;justify-content:center;background:var(--bg);margin-bottom:12px}
+      .answer-strip .tile{border-color:var(--red)}
+      .built-sentence{text-align:center;font-size:19px;font-weight:700;margin-top:12px;min-height:30px}
+
+      /* 把字句动画舞台 */
+      .stage{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:26px 10px 20px;overflow:hidden}
+      .stage-row{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;position:relative;z-index:2}
+      .blk{background:var(--card);border:1.5px solid var(--ink2);border-radius:9px;padding:8px 14px;font-size:18px;font-weight:700;transition:transform .8s cubic-bezier(.5,0,.2,1)}
+      .blk.flag{background:var(--red);color:#fff;border-color:var(--red)}
+      .blk.obj{border-color:var(--red);color:var(--red)}
+      .stage .role{display:flex;gap:8px;justify-content:center;margin-top:10px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+      .formula-bar{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+      .formula-bar span{background:var(--ink);color:var(--bg);border-radius:8px;padding:6px 14px;font-weight:900;font-size:16px}
+      .formula-bar span.hot{background:var(--red);color:#fff}
+      .steps-flow{display:grid;gap:8px}
+      .flow-step{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:15px;opacity:.38;transition:opacity .3s}
+      .flow-step.on{opacity:1;border-color:var(--red)}
+      .flow-step .n{background:var(--red);color:#fff;width:22px;height:22px;border-radius:50%;font-size:12.5px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px}
+
+      /* 决策树 */
+      .tree-q{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+      .tree-q .q{font-size:16px;font-weight:700}
+      .tree-q .yn{display:flex;gap:8px;margin-top:10px}
+      .tree-q .yn button{border-radius:8px;padding:7px 18px;font-size:14.5px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+      .tree-q .yn button.picked-yes{border-color:var(--ok);background:var(--ok-soft)}
+      .tree-q .yn button.picked-no{border-color:var(--ink2);background:var(--bg2)}
+      .tree-result{border-radius:12px;padding:16px;text-align:center;font-size:16px}
+      .tree-result .big{font-size:34px;font-weight:900;font-family:"Songti SC","STSong","Noto Serif CJK SC","SimSun",serif}
+
+      /* 的地得 */
+      .de-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:9px;font-size:17.5px}
+      .de-blank{min-width:40px;text-align:center;font-weight:900;border-bottom:3px solid var(--ink2);padding:0 4px}
+      .de-choices{margin-left:auto;display:flex;gap:6px}
+      .de-choices button{width:40px;height:40px;border-radius:9px;font-size:18px;font-weight:900;border:1.5px solid var(--line);background:var(--card)}
+      .de-choices button.c1{color:var(--de1)} .de-choices button.c2{color:var(--de2)} .de-choices button.c3{color:var(--de3)}
+      .de-choices button.right{border-color:var(--ok);background:var(--ok-soft)}
+      .de-choices button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+      .de-tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- 列表视图 -->
+      <div id="view-list">
+        <div class="intro">
+          <a href="yuwen.html" class="back">← 返回语法</a> 
+          <h1>语法图解课堂</h1>
+          <p>基础语法不再背定义。这一版把全球搜集来的创新教法做成可操作的原型：<b>词类变成看得见的符号</b>、<b>句子成分画成骨架图</b>、<b>造句变成拼积木</b>。点任意一条，进入它的图解课堂。</p>
+          <div class="method-strip">
+            <span class="method-chip">蒙特梭利语法符号</span>
+            <span class="method-chip">黎锦熙图解法</span>
+            <span class="method-chip">香港四素句</span>
+            <span class="method-chip">台湾 Top10 句型</span>
+            <span class="method-chip">Duolingo 词块拼句</span>
+            <span class="method-chip">视频·博文精华原话</span>
+          </div>
+          <div class="legend">
+            <h3>全课统一图例：蒙特梭利语法符号</h3>
+            <p class="sub">本课用到的每个词类，一个形状＋一种颜色，全课通用。三角系＝名词家族（稳稳立着），圆系＝动词家族（滚得动）。先记住这张表，后面每一课都在用它。注：蒙氏原系统还有「冠词」（浅蓝小三角），汉语没有冠词这一类，本课不用；数词、量词、助词的符号在完整版补齐。</p>
+            <div class="legend-grid" id="legend-grid"></div>
+          </div>
+        </div>
+        <div id="list-body"></div>
+        <p class="foot-note">方法出处：蒙特梭利语法符号（xihamontessori.com / montessorivivo-europe.com 交叉版）、黎锦熙「图解法」、香港「四素句」、台湾国家教育研究院句型语料库分析、Duolingo 词块组句；讲解原话出处见各课页末。</p>
+      </div>
+
+      <!-- 详情视图 -->
+      <div id="view-detail" class="hidden">
+        <div class="topbar">
+                    <div class="pager">
+            <button id="btn-prev">← 上一条</button>
+            <button id="btn-next">下一条 →</button>
+          </div>
+        </div>
+        <div id="detail-body"></div>
+      </div>
+    </div>
+
+<script>
+/* ================= 符号系统（蒙特梭利标准，形状＋颜色双编码） ================= */
+var SYM = {
+  noun:  {name:'名词',   color:'var(--m-noun)',  shape:'tri'},
+  adj:   {name:'形容词', color:'var(--m-adj)',   shape:'tri'},
+  pron:  {name:'代词',   color:'var(--m-pron)',  shape:'tri'},
+  verb:  {name:'动词',   color:'var(--m-verb)',  shape:'circle'},
+  adv:   {name:'副词',   color:'var(--m-adv)',   shape:'circle-sm'},
+  prep:  {name:'介词',   color:'var(--m-prep)',  shape:'crescent'},
+  conj:  {name:'连词',   color:'var(--m-conj)',  shape:'bar'},
+  interj:{name:'感叹词', color:'var(--m-interj)',shape:'excl'},
+  det:   {name:'冠词',   color:'var(--m-det)',   shape:'tri-sm'}
+};
+function symSVG(key, size){
+  var s = SYM[key], c = s.color, h = '';
+  size = size || 30;
+  if(s.shape==='tri')       h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><path d="M15 3 L28 26 L2 26 Z" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='tri-sm') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><path d="M15 10 L24 26 L6 26 Z" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='circle') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='circle-sm') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><circle cx="15" cy="17" r="8" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='crescent') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><path d="M4 26 A11.5 13.5 0 0 1 26 26 L20.5 26 A6.8 8 0 0 0 9.5 26 Z" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='bar') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><rect x="3" y="9" width="24" height="12" rx="3" style="fill:'+c+'"/></svg>';
+  else if(s.shape==='excl') h = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 30 30"><path d="M13.4 3 h3.2 l-1 13 h-1.2 Z" style="fill:'+c+'"/><circle cx="15" cy="23.5" r="2.4" style="fill:'+c+'"/></svg>';
+  return '<span class="sym">'+h+'</span>';
+}
+
+/* ================= 课程数据 ================= */
+/* 词类课：analogy 类比 / sentence 例句逐词符号 / rule 规则 / traps 易错 / quiz 小测 */
+var WORD_CLASSES = [
+ {key:'noun', hook:'人事物的名字，稳稳立着的「金字塔」',
+  analogy:'名词的符号是一座<b>黑色大三角，像金字塔</b>——金字塔几千年立在那里不动，人、事、物的名字也一样稳。看到三角，就想到「这是个东西的名字」。',
+  sentence:[['我','pron'],['家',null],['的',null],['小猫','noun'],['在','prep'],['窗台','noun'],['上',null],['睡觉','verb']],
+  rule:'名词＝人、事、物、时间、地点的名称。问「什么东西 / 谁」，答得出来的就是它。',
+  traps:[['✗','把「睡觉」当名词','「睡觉」是动作，不是东西的名字——它是动词。','bad'],['✓','「窗台」是名词','窗台是看得见、摸得着的物，三角稳稳立住。','good']],
+  quiz:{q:'哪个词该戴黑色大三角（名词）？',opts:['跑步','美丽','桌子','慢慢'],a:2,why:'桌子是「物」的名字；跑步是动词，美丽是形容词，慢慢是副词。'}},
+ {key:'verb', hook:'动作和变化，能滚动的「红球」',
+  analogy:'动词的符号是一个<b>红色大圆，像一颗能滚动的球</b>——球停不住，动作也停不住：跑、跳、想、变，全在动。看到红圆，就想到「有动作」。',
+  sentence:[['妹妹','noun'],['高兴', 'adj'],['地',null],['唱','verb'],['着',null],['歌','noun']],
+  rule:'动词＝动作、行为、心理活动、变化的词。问「做什么」，答得出来的就是它。',
+  traps:[['✗','「高兴」是动词','「高兴」是形容词（性质状态）；这句里真正的动作是「唱」。','bad'],['✓','「想 / 是 / 有」也是动词','它们不「动」，但表示心理和判断，词类身份仍是动词。','good']],
+  quiz:{q:'哪个词该戴红色大圆（动词）？',opts:['书包','飞快地','飞','红色'],a:2,why:'「飞」是动作；书包是名词，飞快地是副词，红色是形容词。'}},
+ {key:'adj', hook:'给名词化妆的「深蓝三角」',
+  analogy:'形容词和名词是<b>一家人，都是三角</b>——只是形容词的三角小一号、换成深蓝：它总是贴在名词身边，给名词「化妆」：红的花、高的山、伟大的时代。',
+  sentence:[['伟大','adj'],['的',null],['人民','noun'],['创造','verb'],['伟大','adj'],['的',null],['时代','noun']],
+  rule:'形容词＝形状、性质、状态的词，专门描写名词。问「什么样的」，答得出来的就是它。',
+  traps:[['✗','「很」是形容词','「很」只表示程度，是副词（小橙圆），它自己不描写样子。','bad'],['✓','形容词常和「的」手拉手','「美丽的花」——形容词＋的＋名词，是最常见的搭配。','good']],
+  quiz:{q:'哪个词该戴深蓝三角（形容词）？',opts:['勇敢','勇气','和','哇'],a:0,why:'「勇敢」描写性质，是形容词；勇气是名词，和是连词，哇是感叹词。'}},
+ {key:'adv', hook:'动词的小跟班「小橙圆」',
+  analogy:'副词的符号是<b>一颗小橙圆，紧挨着动词的大红圆</b>——小圆是大圆的跟班，专门给动作加说明：怎么跑（飞快地跑）、多深（很爱）、什么时候（已经走了）。',
+  sentence:[['他','pron'],['已经','adv'],['飞快','adv'],['地',null],['跑','verb'],['出','verb'],['教室','noun']],
+  rule:'副词＝修饰动词、形容词的词，表示程度、范围、时间、语气。总是站在被修饰的词前面。',
+  traps:[['✗','副词跑到动词后面','✗「跑飞快地」→ ✓「飞快地跑」。副词在前，这是铁律。','bad'],['✓','「不 / 没 / 很 / 都 / 已经」都是副词','它们个头小、位置活，是句子里最高频的副词。','good']],
+  quiz:{q:'哪个词该戴小橙圆（副词）？',opts:['苹果','非常','跳舞','因为'],a:1,why:'「非常」表示程度，修饰形容词或动词，是副词。'}},
+ {key:'pron', hook:'名词的替身演员「紫三角」',
+  analogy:'代词也是三角家族，换上<b>紫色</b>——它是名词的<b>替身演员</b>：名字太长或刚说过，就派替身上场：我、你、他、这、那、谁。',
+  sentence:[['小明','noun'],['把','prep'],['书','noun'],['给','verb'],['我','pron'],['他','pron'],['自己','pron'],['留','verb'],['着',null]],
+  rule:'代词＝代替名词（或问名词）的词：人称代词（我/你/他）、指示代词（这/那）、疑问代词（谁/什么）。',
+  traps:[['✗','代词指谁说不清','「他告诉他妈妈他赢了」——三个「他」可以是三个人，写作时要避免指代不明。','bad'],['✓','疑问代词不代替谁，专门提问','「谁来了？」里的「谁」是疑问代词。','good']],
+  quiz:{q:'哪个词该戴紫色三角（代词）？',opts:['老师','认真地','他们','教室'],a:2,why:'「他们」是人称代词，代替一群人的名字。'}},
+ {key:'prep', hook:'引出时间地点的「绿色小拱门」',
+  analogy:'介词的符号是一座<b>绿色小拱门（新月）</b>——拱门自己不是主角，它负责「带路」：把时间、地点、对象领进句子：在教室里、从明天起、对大家说。',
+  sentence:[['同学们','noun'],['在','prep'],['操场','noun'],['上',null],['为','prep'],['运动员','noun'],['加油','verb']],
+  rule:'介词＝不能单独当谓语，总是领着一个名词组成「介词短语」，交代时间、地点、对象、方式。',
+  traps:[['✗','「在」有时是动词','「他在家」里「在」是谓语动词；「他在家看书」里「在」才是介词。看它后面还有没有真动词。','bad'],['✓','介词短语不能当主角','它只能给主句做状语，所以句子里一定还有别的动词当谓语。','good']],
+  quiz:{q:'哪个词该戴绿色新月（介词）？',opts:['唱歌','从','学校','大声'],a:1,why:'「从」领着地点或时间进句子（从北京来），是介词。'}},
+ {key:'conj', hook:'把词句手拉手的「粉色连接条」',
+  analogy:'连词的符号是一根<b>粉色长条，像一座小桥 / 一根连接带</b>——它的工作只有一个：把词与词、句与句手拉手接起来：和、因为…所以…、虽然…但是…。',
+  sentence:[['因为','conj'],['下雨','verb'],['所以','conj'],['我们','pron'],['留在','verb'],['家里','noun']],
+  rule:'连词＝连接词、短语、分句的词。成对出现的（因为…所以…）要成对用，不要只用一半。',
+  traps:[['✗','「因为…所以…」里主语一前一后乱放','两个分句主语相同时，关联词放主语后；不同时放主语前。','bad'],['✓','连词接的两边要「门当户对」','「苹果和香蕉」两边都是名词；连词不连接身份悬殊的两边。','good']],
+  quiz:{q:'哪个词该戴粉色连接条（连词）？',opts:['但是','开心','操场','慢慢地'],a:0,why:'「但是」连接前后两个分句，表示转折，是连词。'}},
+ {key:'interj', hook:'情绪的烟花「金色感叹号」',
+  analogy:'感叹词的符号干脆就是一个<b>金色感叹号</b>——它不进句子结构，独立在句外，像烟花一样「啪」地炸出情绪：哇！唉……喂？',
+  sentence:[['哇','interj'],['这',null],['烟花','noun'],['太','adv'],['美','adj'],['了',null]],
+  rule:'感叹词＝表示感叹、呼唤、应答的词，独立于句子成分之外，后面常跟感叹号或逗号。',
+  traps:[['✗','把感叹词算进句子成分','它不做主谓宾定状补任何成分，划句子成分时直接跳过。','bad'],['✓','「嗯 / 哦 / 唉」都是感叹词','应答声、叹息声也算。','good']],
+  quiz:{q:'哪个词该戴金色感叹号（感叹词）？',opts:['漂亮','唉','我们','在'],a:1,why:'「唉」独立表达叹息情绪，是感叹词。'}}
+];
+
+/* ================= 列表结构 ================= */
+var CATS = [
+ {id:'wc', title:'词类家族 · 蒙特梭利符号', from:'方法：蒙特梭利语法符号系统（形状＋颜色双编码）'},
+ {id:'comp', title:'句子成分 · 画出骨架', from:'方法：黎锦熙图解法 + 中文成分符号标注法'},
+ {id:'build', title:'句型拼搭 · 积木组句', from:'方法：香港四素句 / 台湾 Top10 句型 / Duolingo 词块'},
+ {id:'xu', title:'虚词小站 · 精华照搬', from:'方法：视频与博文精华（三问决策树 / 三色定位 / 旗帜说）'}
+];
+var ITEMS = [];
+WORD_CLASSES.forEach(function(w){ ITEMS.push({id:'wc-'+w.key, cat:'wc', type:'word', key:w.key, title:SYM[w.key].name, hook:w.hook, badge:'图解课'}); });
+ITEMS.push(
+ {id:'sym-game', cat:'wc', type:'symbolize', title:'符号标注大冒险', hook:'给整句话的每个词戴上正确的符号帽', badge:'动手游戏'},
+ {id:'comp-diagram', cat:'comp', type:'diagram', title:'句子成分：黎氏图解', hook:'主谓宾是骨架站在横线上，定状补是枝叶挂在线下', badge:'图解课'},
+ {id:'comp-frag', cat:'comp', type:'fragment', title:'完整句 vs 片段', hook:'主谓二分快问：少了主语或谓语，句子就站不住', badge:'动手游戏'},
+ {id:'sisu', cat:'build', type:'sisu', title:'四素句拼搭', hook:'时＋地＋人＋事，四块积木拼出一个完整的句子', badge:'动手游戏'},
+ {id:'tiles', cat:'build', type:'tiles', title:'词块拼句 S+V+O', hook:'台湾 Top10 句型第 1 名，覆盖课文里最多的句子', badge:'动手游戏'},
+ {id:'ba', cat:'build', type:'ba', title:'把字句：「抓」字诀', hook:'「把是旗帜不是动词」——把宾语抓到动词前面去', badge:'图解课'},
+ {id:'aspect', cat:'xu', type:'aspect', title:'了 / 着 / 过：三问决策树', hook:'不用背定义，回答三个问题就知道用哪个', badge:'图解课'},
+ {id:'de', cat:'xu', type:'de', title:'的 / 地 / 得：三色定位', hook:'的跟名词、地跟动词、得带补语——看位置选字', badge:'动手游戏'}
+);
+var byId = {}; ITEMS.forEach(function(it){ byId[it.id]=it; });
+var wcByKey = {}; WORD_CLASSES.forEach(function(w){ wcByKey[w.key]=w; });
+
+/* ================= 通用小件 ================= */
+function esc(s){ return s; }
+function stepHead(no, title, src){
+  return '<div class="step-head"><span class="step-no">'+no+'</span><h2>'+title+'</h2>'+(src?'<span class="src">'+src+'</span>':'')+'</div>';
+}
+function symlineHTML(tokens){
+  var h = '<div class="symline">';
+  tokens.forEach(function(t){
+    if(t[1]) h += '<span class="tok"><span class="sym">'+symSVG(t[1],28).replace('<span class="sym">','').replace(/<\/span>$/,'')+'</span><span class="w">'+t[0]+'</span><span class="cls">'+SYM[t[1]].name+'</span></span>';
+    else h += '<span class="tok plain"><span class="w">'+t[0]+'</span></span>';
+  });
+  return h+'</div>';
+}
+function trapsHTML(traps){
+  var h = '<div class="trap-grid">';
+  traps.forEach(function(t){
+    h += '<div class="trap '+(t[3]==='bad'?'bad':'good')+'"><span class="mark">'+t[0]+'</span>'+t[1]+'<span class="why">'+t[2]+'</span></div>';
+  });
+  return h+'</div>';
+}
+function quizHTML(qz, uid){
+  var h = '<div class="panel"><div class="quiz-q">'+qz.q+'</div><div class="quiz-opts">';
+  qz.opts.forEach(function(o,i){ h += '<button class="quiz-opt" data-quiz="'+uid+'" data-i="'+i+'">'+o+'</button>'; });
+  return h+'</div><div class="quiz-why" id="why-'+uid+'"></div></div>';
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-quiz]'); if(!b) return;
+  var uid = b.getAttribute('data-quiz'), item = QUIZREG[uid]; if(!item) return;
+  var i = +b.getAttribute('data-i'), box = b.parentElement;
+  if(box.dataset.done) return;
+  box.querySelectorAll('.quiz-opt').forEach(function(o){ o.disabled = true; });
+  var why = document.getElementById('why-'+uid);
+  if(i === item.a){ b.classList.add('right'); why.innerHTML = '✓ 答对了。'+item.why; why.style.color = 'var(--ok)'; }
+  else { b.classList.add('wrong'); box.children[item.a].classList.add('right'); why.innerHTML = '✗ 再想想。'+item.why; why.style.color = 'var(--bad)'; }
+  box.dataset.done = '1';
+});
+var QUIZREG = {};
+
+/* ================= 列表渲染 ================= */
+function renderLegend(){
+  document.getElementById('legend-grid').innerHTML =
+    Object.keys(SYM).filter(function(k){ return k!=='det'; }).map(function(k){ return '<span class="legend-item">'+symSVG(k,24)+SYM[k].name+'</span>'; }).join('');
+}
+function renderList(){
+  var h = '';
+  CATS.forEach(function(c){
+    h += '<section class="cat"><div class="cat-head"><h2>'+c.title+'</h2><span class="from">'+c.from+'</span></div>';
+    ITEMS.filter(function(it){ return it.cat===c.id; }).forEach(function(it){
+      var icon = it.type==='word' ? symSVG(it.key,36) : '<span class="sym" style="font-size:26px">'+({symbolize:'🎩',diagram:'🦴',fragment:'✂️',sisu:'🧩',tiles:'🧱',ba:'🚩',aspect:'🌳',de:'🎯'})[it.type]+'</span>';
+      h += '<button class="row" data-open="'+it.id+'"><span class="sym" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center">'+icon+'</span><span class="tt"><span class="t">'+it.title+'<span class="badge'+(it.badge==='动手游戏'?' game':'')+'">'+it.badge+'</span></span><span class="hook">'+it.hook+'</span></span><span class="arrow">›</span></button>';
+    });
+    h += '</section>';
+  });
+  document.getElementById('list-body').innerHTML = h;
+}
+document.addEventListener('click', function(e){
+  var r = e.target.closest('[data-open]'); if(r) openItem(r.getAttribute('data-open'));
+});
+
+/* ================= 详情导航 ================= */
+var currentId = null;
+function openItem(id){
+  currentId = id;
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-detail').classList.remove('hidden');
+  renderDetail(id);
+  window.scrollTo(0,0);
+  var idx = ITEMS.findIndex(function(x){ return x.id===id; });
+  document.getElementById('btn-prev').disabled = idx<=0;
+  document.getElementById('btn-next').disabled = idx>=ITEMS.length-1;
+}
+function closeDetail(){
+  document.getElementById('view-detail').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+// 顶栏「← 返回」：详情打开时先回列表（回上一级），列表中再返回语法页
+var topBack = document.querySelector('.topbar .back');
+if (topBack) topBack.addEventListener('click', function(e){
+  if (!document.getElementById('view-detail').classList.contains('hidden')) { e.preventDefault(); closeDetail(); }
+});
+document.getElementById('btn-prev').addEventListener('click', function(){ stepNav(-1); });
+document.getElementById('btn-next').addEventListener('click', function(){ stepNav(1); });
+function stepNav(d){
+  var idx = ITEMS.findIndex(function(x){ return x.id===currentId; });
+  var n = idx + d; if(n<0 || n>=ITEMS.length) return;
+  openItem(ITEMS[n].id);
+}
+function detailHead(it, iconHTML){
+  return '<div class="detail-head"><span class="sym" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center">'+iconHTML+'</span><div><h1>'+it.title+'</h1><div class="hook">'+it.hook+'</div></div></div>';
+}
+
+/* ================= 词类详情（六步） ================= */
+function renderWord(it){
+  var w = wcByKey[it.key];
+  QUIZREG[it.id] = w.quiz;
+  var h = detailHead(it, symSVG(it.key,56));
+  h += '<section class="step">'+stepHead(1,'打个比方','蒙特梭利语法符号')+'<div class="analogy">'+w.analogy+'</div></section>';
+  h += '<section class="step">'+stepHead(2,'看图说话','符号标注 Symbolizing')+'<div class="panel">'+symlineHTML(w.sentence)+'<p class="caption">每个实词头上戴着自己的符号帽——不用查定义，看形状颜色就知道它的身份。</p></div></section>';
+  h += '<section class="step">'+stepHead(3,'动手试试','去玩「符号标注大冒险」')+'<div class="panel"><p style="margin:0 0 10px">记住这个符号的样子了吗？去给整句话的每个词戴符号帽，戴错会被弹回来。</p><button class="btn" data-open="sym-game">开始标注 →</button></div></section>';
+  h += '<section class="step">'+stepHead(4,'规则一句话')+'<div class="rule">'+w.rule+'</div></section>';
+  h += '<section class="step">'+stepHead(5,'易错诊所','反例卡 · 先划界再记规则')+trapsHTML(w.traps)+'</section>';
+  h += '<section class="step">'+stepHead(6,'小测一下')+quizHTML(w.quiz, it.id)+'</section>';
+  h += '<div class="srcbox">方法出处：蒙特梭利语法符号系统（Grammar Symbols / Grammar Boxes），符号颜色取 xihamontessori 与 montessorivivo 两源交叉版；不同教具商颜色有细微差异（如形容词棕/深蓝），本课统一用上表。</div>';
+  return h;
+}
+
+/* ================= Symbolize 游戏 ================= */
+var SYM_ROUNDS = [
+ {tokens:[['小狗','noun'],['在','prep'],['院子里','noun'],['追','verb'],['皮球','noun']], tip:'院子里：地点也是「物」，戴名词三角。'},
+ {tokens:[['美丽的','adj'],['花儿','noun'],['在','prep'],['微风中','noun'],['轻轻','adv'],['摇晃','verb']], tip:'轻轻：修饰「摇晃」的程度样子，戴副词小橙圆。'},
+ {tokens:[['哇','interj'],['妹妹','noun'],['和','conj'],['我','pron'],['一起','adv'],['笑','verb'],['了',null]], tip:'「了」是助词，不在本课符号表里，跳过它。'}
+];
+var symState = null;
+function renderSymbolize(it){
+  symState = {round:0, placed:{}, selectedWord:null, selectedSym:null, done:false};
+  var h = detailHead(it, '<span style="font-size:34px">🎩</span>');
+  h += '<section class="step">'+stepHead(1,'先想一想','蒙特梭利 Symbolizing')+'<div class="analogy">蒙特梭利教室里，孩子把<b>符号实物摆在每个词的上方</b>，这叫 Symbolizing，被称为「早期形式的句子图示」。先点一个词，再点它的符号帽——戴对了留下，戴错了弹回来。</div></section>';
+  h += '<section class="step">'+stepHead(2,'动手试试','点词 → 点符号')+'<div class="panel"><div id="sym-round-lab" style="font-weight:700"></div><div class="game-toks" id="sym-toks"></div><div class="palette" id="sym-pal"></div><div class="btnrow"><button class="btn" id="sym-check">检查</button><button class="btn ghost" id="sym-next">下一句</button><span class="feedback" id="sym-fb"></span></div><p class="caption" id="sym-tip"></p></div></section>';
+  h += '<section class="step">'+stepHead(3,'规则一句话')+'<div class="rule">身份（词性）决定它能担任哪些职位（成分）——先认身份，再谈职位。</div></section>';
+  h += '<div class="srcbox">比喻出处：「身份（词性）决定职位（成分）」——韩群锋博客《英语句法学习笔记》<a href="https://blog.hanqunfeng.com/2026/08/27/english-syntax/" target="_blank" rel="noopener">blog.hanqunfeng.com/2026/08/27/english-syntax/</a>；游戏法出处：蒙特梭利 Grammar Boxes 与 Symbolizing（berkshiremontessori.org）。</div>';
+  setTimeout(initSymRound, 0);
+  return h;
+}
+function initSymRound(){
+  var r = SYM_ROUNDS[symState.round];
+  document.getElementById('sym-round-lab').textContent = '第 '+(symState.round+1)+' 句 / 共 '+SYM_ROUNDS.length+' 句';
+  document.getElementById('sym-tip').textContent = r.tip;
+  document.getElementById('sym-fb').textContent = '';
+  symState.placed = {}; symState.selectedWord = null; symState.selectedSym = null; symState.done = false;
+  var pal = document.getElementById('sym-pal');
+  pal.innerHTML = Object.keys(SYM).filter(function(k){return k!=='det';}).map(function(k){
+    return '<button class="pal-btn" data-sym="'+k+'">'+symSVG(k,26)+SYM[k].name+'</button>';
+  }).join('');
+  pal.querySelectorAll('[data-sym]').forEach(function(b){
+    b.addEventListener('click', function(){
+      symState.selectedSym = b.getAttribute('data-sym');
+      pal.querySelectorAll('.pal-btn').forEach(function(x){ x.classList.toggle('sel', x===b); });
+      tryPlace();
+    });
+  });
+  drawSymToks();
+  document.getElementById('sym-check').onclick = checkSymRound;
+  document.getElementById('sym-next').onclick = function(){
+    symState.round = (symState.round+1) % SYM_ROUNDS.length; initSymRound();
+  };
+}
+function drawSymToks(){
+  var r = SYM_ROUNDS[symState.round], box = document.getElementById('sym-toks');
+  box.innerHTML = r.tokens.map(function(t,i){
+    if(!t[1]) return '<span class="gtok"><span class="slot"></span><span class="w" style="color:var(--ink2)">'+t[0]+'</span></span>';
+    var placed = symState.placed[i];
+    return '<button class="gtok'+(symState.selectedWord===i?' sel':'')+'" data-wi="'+i+'"><span class="slot">'+(placed?symSVG(placed,28):'<span class="empty"></span>')+'</span><span class="w">'+t[0]+'</span></button>';
+  }).join('');
+  box.querySelectorAll('[data-wi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      symState.selectedWord = +b.getAttribute('data-wi');
+      drawSymToks(); tryPlace();
+    });
+  });
+}
+function tryPlace(){
+  if(symState.selectedWord===null || !symState.selectedSym || symState.done) return;
+  symState.placed[symState.selectedWord] = symState.selectedSym;
+  symState.selectedWord = null; symState.selectedSym = null;
+  document.querySelectorAll('#sym-pal .pal-btn').forEach(function(x){ x.classList.remove('sel'); });
+  drawSymToks();
+}
+function checkSymRound(){
+  var r = SYM_ROUNDS[symState.round], fb = document.getElementById('sym-fb'), wrong = [];
+  r.tokens.forEach(function(t,i){ if(t[1] && symState.placed[i] !== t[1]) wrong.push(i); });
+  if(wrong.length===0){
+    symState.done = true; fb.textContent = '🎉 全对！每个词都戴对了符号帽。'; fb.className = 'feedback ok';
+  } else {
+    fb.textContent = '有 '+wrong.length+' 个戴错了，已经弹回去，再试试。'; fb.className = 'feedback no';
+    wrong.forEach(function(i){ delete symState.placed[i]; });
+    var box = document.getElementById('sym-toks'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    drawSymToks();
+  }
+}
+
+/* ================= 黎氏图解 ================= */
+function renderDiagram(it){
+  var h = detailHead(it, '<span style="font-size:34px">🦴</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','黎锦熙「图解法」')+'<div class="analogy">一句话就像一棵树：<b>主语、谓语、宾语是树干</b>，站在横线上方；<b>定语、状语、补语是枝叶</b>，挂在横线下方。缩句＝剪掉枝叶，扩句＝长出枝叶——先找到树干，句子就不会看错。</div></section>';
+  h += '<section class="step">'+stepHead(2,'看图说话','主干在上 · 枝叶在下')+'<div class="panel diagram-box" id="diag-panel">'
+    + diagramSVG()
+    + '<div class="btnrow"><button class="btn" id="diag-play">▶ 播放两步划分</button><button class="btn ghost" id="diag-shrink">✂️ 缩句：只留树干</button><span class="feedback" id="diag-fb"></span></div>'
+    + '<p class="caption" id="diag-cap">例：伟大的人民一定创造出伟大的时代。点「播放」，看 ‖ 先分开主谓，再逐个挂上枝叶。</p></div></section>';
+  h += '<section class="step">'+stepHead(3,'规则一句话')+'<div class="rule">先 ‖ 划分主谓，再标枝叶：（）定语 ·［］状语 ·＜＞补语 · ～ 宾语 · • 中心语</div></section>';
+  h += '<section class="step">'+stepHead(4,'易错诊所')+trapsHTML([
+      ['✗','把状语当成主语的一部分','「一定创造」里「一定」是状语（枝叶），谓语中心语只有「创造」。','bad'],
+      ['✓','缩句后检查：谁（什么）＋干什么，还通顺就是树干','「人民创造时代」——枝叶全剪掉，意思骨架还在。','good']])+'</section>';
+  QUIZREG[it.id] = {q:'「（伟大的）人民‖［一定］创造＜出＞（伟大的）时代」——哪个是这句的树干（缩句结果）？',opts:['伟大的人民创造伟大的时代','人民创造时代','人民一定创造出时代','伟大的时代'],a:1,why:'缩句只留主干：主语「人民」＋谓语「创造」＋宾语「时代」，定状补全部剪掉。'};
+  h += '<section class="step">'+stepHead(5,'小测一下')+quizHTML(QUIZREG[it.id], it.id)+'</section>';
+  h += '<div class="srcbox">方法出处：黎锦熙句本位「图解法」（主、谓、宾置于长横线上方，定、状、补附于下方，复杂句用支架顶起），与 Reed-Kellogg 句子图示法（1877）高度同构；行内符号为大陆语文教学通用的成分符号标注法。开放问题：未找到把 Reed-Kellogg 树形图直接用于中文教学的正式出版教材，中文路线以黎氏图解与符号标注为准。</div>';
+  setTimeout(initDiagram, 0);
+  return h;
+}
+function diagramSVG(){
+  /* 坐标：横线 y=118；主干词在上方 y≈78；枝叶在下方 y≈150 */
+  function box(x,y,w,txt,cls,extra){ return '<g class="fadeable '+(cls||'')+'" '+(extra||'')+'><rect x="'+x+'" y="'+y+'" width="'+w+'" height="34" rx="8" style="fill:var(--card);stroke:var(--ink2)" stroke-width="1.4"/><text x="'+(x+w/2)+'" y="'+(y+22)+'" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--ink)">'+txt+'</text></g>'; }
+  function lab(x,y,txt,color){ return '<text class="fadeable lab-g" x="'+x+'" y="'+y+'" text-anchor="middle" font-size="12.5" font-weight="900" style="fill:'+color+'">'+txt+'</text>'; }
+  var s = '<svg viewBox="0 0 640 210" role="img" aria-label="黎氏图解：伟大的人民一定创造出伟大的时代">';
+  s += '<line class="fadeable" id="dg-line" x1="18" y1="118" x2="622" y2="118" style="stroke:var(--ink)" stroke-width="2.5"/>';
+  s += '<line class="fadeable" id="dg-split" x1="238" y1="100" x2="238" y2="136" style="stroke:var(--red)" stroke-width="3"/>';
+  /* 主干 */
+  s += '<g id="dg-trunk">'+box(140,66,110,'人民','trunk')+box(268,66,110,'创造','trunk')+box(440,66,110,'时代','trunk')
+     + lab(195,56,'主语','var(--m-adj)')+lab(323,56,'谓语','var(--m-verb)')+lab(495,56,'宾语','var(--m-noun)')+'</g>';
+  /* 枝叶 */
+  s += '<g id="dg-branch">'
+     + '<line x1="168" y1="118" x2="120" y2="140" style="stroke:var(--ink2)" stroke-width="1.4"/>'+box(58,140,116,'伟大的','branch')+lab(116,192,'定语','var(--m-adj)')
+     + '<line x1="292" y1="118" x2="262" y2="140" style="stroke:var(--ink2)" stroke-width="1.4"/>'+box(216,140,86,'一定','branch')+lab(259,192,'状语','var(--m-adv)')
+     + '<line x1="352" y1="118" x2="382" y2="140" style="stroke:var(--ink2)" stroke-width="1.4"/>'+box(352,140,66,'出','branch')+lab(385,192,'补语','var(--m-prep)')
+     + '<line x1="472" y1="118" x2="520" y2="140" style="stroke:var(--ink2)" stroke-width="1.4"/>'+box(462,140,116,'伟大的','branch')+lab(520,192,'定语','var(--m-adj)')
+     + '</g>';
+  return s+'</svg>';
+}
+function initDiagram(){
+  var panel = document.getElementById('diag-panel');
+  var trunk = document.getElementById('dg-trunk'), branch = document.getElementById('dg-branch'),
+      split = document.getElementById('dg-split'), cap = document.getElementById('diag-cap'),
+      fb = document.getElementById('diag-fb');
+  function setStage(n){
+    split.style.opacity = n>=1 ? 1 : 0;
+    trunk.style.opacity = n>=1 ? 1 : .12;
+    branch.style.opacity = n>=2 ? 1 : .12;
+  }
+  setStage(0);
+  document.getElementById('diag-play').onclick = function(){
+    panel.classList.remove('shrunk'); setStage(0); fb.textContent='';
+    cap.textContent = '第一步：找谓语「创造」，用 ‖ 把句子分成主语部分和谓语部分……';
+    setTimeout(function(){ setStage(1);
+      setTimeout(function(){ setStage(2); cap.textContent = '第二步：再逐个挂枝叶——（伟大的）修饰人民和时代是定语，［一定］修饰创造是状语，＜出＞补充创造是补语。'; }, 1100);
+    }, 900);
+  };
+  document.getElementById('diag-shrink').onclick = function(){
+    setStage(2); panel.classList.toggle('shrunk');
+    var on = panel.classList.contains('shrunk');
+    fb.textContent = on ? '缩句结果：人民创造时代。' : '';
+    fb.className = 'feedback ok';
+    cap.textContent = on ? '枝叶（定语·状语·补语）全部剪掉，只剩树干：主语＋谓语＋宾语。病句诊断也从这里下手——先看树干对不对。' : '例：伟大的人民一定创造出伟大的时代。';
+  };
+}
+
+/* ================= 完整句 vs 片段 ================= */
+var FRAGS = [
+ {s:'跑过操场。', ok:false, why:'只有动作，没有「谁」——缺主语，是片段。'},
+ {s:'妹妹笑了。', ok:true, why:'谁（妹妹）＋怎么样（笑了），主谓齐全。'},
+ {s:'美丽的校园。', ok:false, why:'只有「什么地方」，没有谓语说它怎么样——是短语，不是句子。'},
+ {s:'下雨了。', ok:true, why:'「下雨」自成一个完整的陈述（陈述天气变化），这类句子是完整句。'},
+ {s:'在教室里读书的同学。', ok:false, why:'再长也是「谁」的展开，缺谓语收尾，是片段。'}
+];
+var fragState = null;
+function renderFragment(it){
+  fragState = {i:0, score:0, locked:false};
+  var h = detailHead(it, '<span style="font-size:34px">✂️</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','主谓二分快问')+'<div class="analogy">句子像一辆<b>自行车：主语是前轮，谓语是后轮</b>——少一个轮子就骑不走。看到一句话，先只问一句：谁（什么）？＋怎么样（做什么）？两问都有答案，就是完整句。</div></section>';
+  h += '<section class="step">'+stepHead(2,'动手试试','10 秒判断 · 即时解释')+'<div class="panel"><div id="frag-q" style="font-size:21px;font-weight:700;text-align:center;padding:10px 0"></div><div class="btnrow" style="justify-content:center"><button class="btn" id="frag-yes">✓ 完整句</button><button class="btn ghost" id="frag-no">✗ 片段</button></div><div class="feedback" id="frag-fb" style="text-align:center"></div><div class="btnrow" style="justify-content:center"><button class="btn ghost hidden" id="frag-next">下一题</button></div><p class="caption" id="frag-score"></p></div></section>';
+  h += '<section class="step">'+stepHead(3,'规则一句话')+'<div class="rule">完整句 ＝ 主语部分 ＋ 谓语部分（无主句等特殊句型除外）</div></section>';
+  h += '<div class="srcbox">方法出处：Sentence Builder Quest 的「完整句 vs 片段」主谓二分快问（onlinemathlearning.com），每题即时指出缺主语还是缺谓语。</div>';
+  setTimeout(initFrag, 0);
+  return h;
+}
+function initFrag(){
+  var q = document.getElementById('frag-q'), fb = document.getElementById('frag-fb'),
+      sc = document.getElementById('frag-score'), nx = document.getElementById('frag-next');
+  function draw(){
+    var f = FRAGS[fragState.i];
+    q.textContent = '「'+f.s+'」'; fb.textContent=''; nx.classList.add('hidden'); fragState.locked = false;
+    sc.textContent = '第 '+(fragState.i+1)+' / '+FRAGS.length+' 题 · 已答对 '+fragState.score+' 题';
+  }
+  function judge(guess){
+    if(fragState.locked) return; fragState.locked = true;
+    var f = FRAGS[fragState.i], right = guess === f.ok;
+    if(right) fragState.score++;
+    fb.textContent = (right ? '✓ 答对了。' : '✗ 不对。') + f.why;
+    fb.className = 'feedback ' + (right ? 'ok' : 'no');
+    nx.textContent = fragState.i >= FRAGS.length-1 ? '再来一轮' : '下一题';
+    nx.classList.remove('hidden');
+  }
+  document.getElementById('frag-yes').onclick = function(){ judge(true); };
+  document.getElementById('frag-no').onclick = function(){ judge(false); };
+  nx.onclick = function(){ fragState.i = (fragState.i+1) % FRAGS.length; if(fragState.i===0) fragState.score = 0; draw(); };
+  draw();
+}
+</script>
+
+<script>
+/* ================= 四素句拼搭 ================= */
+var SISU_SLOTS = [
+ {key:'time', lab:'时 · 什么时候', color:'#b8860b'},
+ {key:'place', lab:'地 · 在哪里', color:'#3d8a4f'},
+ {key:'person', lab:'人 · 谁', color:'#274b8f'},
+ {key:'event', lab:'事 · 做什么', color:'#c22f2f'}
+];
+var SISU_TILES = [
+ {t:'早上', cat:'time'}, {t:'在公园里', cat:'place'}, {t:'爷爷', cat:'person'}, {t:'打太极', cat:'event'},
+ {t:'放学后', cat:'time'}, {t:'在图书馆', cat:'place'}, {t:'同学们', cat:'person'}, {t:'借书', cat:'event'}
+];
+var sisuState = null;
+function renderSisu(it){
+  sisuState = {placed:{}};
+  var h = detailHead(it, '<span style="font-size:34px">🧩</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','香港「四素句」')+'<div class="analogy">香港小学教造句有个笨办法，特别管用：一个完整的句子就是四块积木——<b>时（什么时候）＋地（在哪里）＋人（谁）＋事（做什么）</b>。幼儿园先拼「人＋事」二素句，小学再加上时、地，升级成四素句。缺哪块，一眼就看出来。</div></section>';
+  h += '<section class="step">'+stepHead(2,'动手试试','点积木，填空格')+'<div class="panel"><div class="slots" id="sisu-slots"></div><div class="tiles" id="sisu-tiles"></div><div class="built-sentence" id="sisu-out"></div><div class="btnrow" style="justify-content:center"><button class="btn" id="sisu-check">拼好了，检查</button><button class="btn ghost" id="sisu-clear">清空</button><span class="feedback" id="sisu-fb"></span></div></div></section>';
+  h += '<section class="step">'+stepHead(3,'规则一句话')+'<div class="rule">完整句四要素：时 ＋ 地 ＋ 人 ＋ 事（顺序可以换，四样不能缺）</div></section>';
+  h += '<section class="step">'+stepHead(4,'易错诊所')+trapsHTML([
+      ['✗','只有「人＋事」就交卷','「爷爷打太极」——没说何时何地，句子是光秃秃的，描写文里要补上时、地。','bad'],
+      ['✓','四素齐了还能再升级','在「事」前面加样子（慢慢地）、在「人」前面加描写（头发花白的），句子就丰满了。','good']])+'</section>';
+  h += '<div class="srcbox">方法出处：香港小学中文「四素句」框架（时＋地＋人＋事＝完整句子；幼儿园二素句→小学四素句阶梯），经 ppparentsclub.plgroup.hk 等香港教育资料介绍；图卡组句做法另见台北补救教材。</div>';
+  setTimeout(initSisu, 0);
+  return h;
+}
+function initSisu(){
+  drawSisu();
+  document.getElementById('sisu-clear').onclick = function(){ sisuState.placed = {}; drawSisu(); };
+  document.getElementById('sisu-check').onclick = function(){
+    var fb = document.getElementById('sisu-fb');
+    var missing = SISU_SLOTS.filter(function(s){ return !sisuState.placed[s.key]; });
+    if(missing.length){ fb.textContent = '还缺：'+missing.map(function(s){ return s.lab.split(' ')[0]; }).join('、'); fb.className='feedback no'; return; }
+    fb.textContent = '🎉 四素齐全，一个完整的句子拼好了！'; fb.className='feedback ok';
+  };
+}
+function drawSisu(){
+  var slots = document.getElementById('sisu-slots'), tiles = document.getElementById('sisu-tiles'), out = document.getElementById('sisu-out');
+  slots.innerHTML = SISU_SLOTS.map(function(s){
+    var v = sisuState.placed[s.key];
+    return '<div class="slot'+(v?' filled':'')+'" style="'+(v?('border-color:'+s.color):'')+'"><span class="lab" style="color:'+s.color+'">'+s.lab+'</span>'
+      + (v ? '<span class="val">'+v+'</span><button data-unfill="'+s.key+'">✕ 取下</button>' : '<span style="color:var(--ink2);font-size:13px">（空）</span>') + '</div>';
+  }).join('');
+  tiles.innerHTML = SISU_TILES.map(function(t,i){
+    var used = Object.keys(sisuState.placed).some(function(k){ return sisuState.placed[k]===t.t; });
+    return '<button class="tile'+(used?' used':'')+'" data-tile="'+i+'">'+t.t+'</button>';
+  }).join('');
+  out.textContent = SISU_SLOTS.map(function(s){ return sisuState.placed[s.key] || '＿＿'; }).join(' ') + (SISU_SLOTS.every(function(s){return sisuState.placed[s.key];}) ? '。' : '');
+  document.getElementById('sisu-fb').textContent = '';
+  slots.querySelectorAll('[data-unfill]').forEach(function(b){ b.addEventListener('click', function(){ delete sisuState.placed[b.getAttribute('data-unfill')]; drawSisu(); }); });
+  tiles.querySelectorAll('[data-tile]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = SISU_TILES[+b.getAttribute('data-tile')];
+      if(sisuState.placed[t.cat]){ var fb=document.getElementById('sisu-fb'); fb.textContent='「'+SISU_SLOTS.find(function(s){return s.key===t.cat;}).lab+'」已经有积木了，先取下再换。'; fb.className='feedback no'; return; }
+      sisuState.placed[t.cat] = t.t; drawSisu();
+    });
+  });
+}
+
+/* ================= 词块拼句 ================= */
+var TILE_ROUNDS = [
+ {parts:['我','买了','五盒','口罩'], roles:['主语 S','谓语 V','数量','宾语 O'], pattern:'S + V + O', note:'台湾语料库统计：课文里出现最多的句型就是它。'},
+ {parts:['冬天','来了'], roles:['主语 S','谓语 V'], pattern:'S + V', note:'没有宾语也完整——动词后面跟不跟东西，看动词本身。'},
+ {parts:['桌上','有','一只','大蟑螂'], roles:['处所 T','谓语 V','数量','宾语 O'], pattern:'存现句', note:'先说地方、再说有什么——华语爱把「场景」放句首。'}
+];
+var tileState = null;
+function renderTiles(it){
+  tileState = {round:0, order:[], pool:[]};
+  var h = detailHead(it, '<span style="font-size:34px">🧱</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','Duolingo 词块组句')+'<div class="analogy">Duolingo 教语法几乎不讲规则：给你一堆<b>词块，自己排成句子</b>，排对了就过关。排得多了，语序就长在手上——这叫「在做中学」。台湾研究者数过 18,340 个课文句子：<b>Top10 句型覆盖约 80% 的句子</b>，先拼熟这 10 个，就够用了。</div></section>';
+  h += '<section class="step">'+stepHead(2,'动手试试','点词块排句子')+'<div class="panel"><div style="font-weight:700;margin-bottom:8px" id="tile-pattern"></div><div class="answer-strip" id="tile-answer"></div><div class="tiles" id="tile-pool"></div><div class="btnrow"><button class="btn" id="tile-check">检查</button><button class="btn ghost" id="tile-next">换一句</button><span class="feedback" id="tile-fb"></span></div><p class="caption" id="tile-note"></p></div></section>';
+  h += '<section class="step">'+stepHead(3,'规则一句话')+'<div class="rule">中文语序的骨架：谁（主）＋ 做（谓）＋ 什么（宾）——先排骨架，再添枝叶</div></section>';
+  h += '<div class="srcbox">方法出处：Duolingo 词块（word tiles）组句与隐性语法观（blog.duolingo.com）；句型数据：台湾国家教育研究院对康轩/南一/翰林三版教科书 18,340 个单句的语料库分析，归纳三大类 42 句型，Top10 覆盖课文约 80% 句子。</div>';
+  setTimeout(initTiles, 0);
+  return h;
+}
+function initTiles(){
+  var r = TILE_ROUNDS[tileState.round];
+  tileState.order = [];
+  tileState.pool = r.parts.map(function(_,i){ return i; });
+  /* 打乱（保证不等于原序） */
+  for(var k=0;k<10;k++){ tileState.pool.sort(function(){ return Math.random()-.5; }); if(tileState.pool.join()!==r.parts.map(function(_,i){return i;}).join()) break; }
+  document.getElementById('tile-pattern').textContent = '句型：'+r.pattern;
+  document.getElementById('tile-note').textContent = r.note;
+  document.getElementById('tile-fb').textContent = '';
+  drawTiles();
+  document.getElementById('tile-check').onclick = function(){
+    var fb = document.getElementById('tile-fb'), rr = TILE_ROUNDS[tileState.round];
+    if(tileState.order.length < rr.parts.length){ fb.textContent='还没排完。'; fb.className='feedback no'; return; }
+    var ok = tileState.order.every(function(v,i){ return v===i; });
+    if(ok){ fb.textContent = '🎉 排对了！这句的骨架是：'+rr.parts.map(function(p,i){ return p+'（'+rr.roles[i]+'）'; }).join(' '); fb.className='feedback ok'; }
+    else { fb.textContent = '语序不对，点答案里的词块可以退回重排。'; fb.className='feedback no'; var a=document.getElementById('tile-answer'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake'); }
+  };
+  document.getElementById('tile-next').onclick = function(){ tileState.round = (tileState.round+1)%TILE_ROUNDS.length; initTiles(); };
+}
+function drawTiles(){
+  var r = TILE_ROUNDS[tileState.round];
+  var ans = document.getElementById('tile-answer'), pool = document.getElementById('tile-pool');
+  ans.innerHTML = tileState.order.length ? tileState.order.map(function(pi,pos){ return '<button class="tile" data-ret="'+pos+'">'+r.parts[pi]+'</button>'; }).join('') : '<span style="color:var(--ink2);font-size:14px">点下面的词块，把句子排出来</span>';
+  pool.innerHTML = tileState.pool.map(function(pi){ return '<button class="tile" data-pick="'+pi+'">'+r.parts[pi]+'</button>'; }).join('');
+  ans.querySelectorAll('[data-ret]').forEach(function(b){ b.addEventListener('click', function(){
+    var pos = +b.getAttribute('data-ret'); tileState.pool.push(tileState.order[pos]); tileState.order.splice(pos,1); drawTiles();
+  }); });
+  pool.querySelectorAll('[data-pick]').forEach(function(b){ b.addEventListener('click', function(){
+    var pi = +b.getAttribute('data-pick'); tileState.pool = tileState.pool.filter(function(x){ return x!==pi; }); tileState.order.push(pi); drawTiles();
+  }); });
+}
+
+/* ================= 把字句 ================= */
+function renderBa(it){
+  var h = detailHead(it, '<span style="font-size:34px">🚩</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','博文精华 · 照抄')+'<div class="analogy">英文讲解站 Fluentide 有句名言：<b>「把 is a flag, not a verb」——把是旗帜，不是动词。</b>它竖起一面旗，宣告：「我要对这个东西（通常是特定的那个），做一件有结果的事。」而「把」的小篆字形本义是<b>「拿、抓」</b>：把字句，就是先把宾语「抓」到动词前面来。</div></section>';
+  h += '<section class="step">'+stepHead(2,'看图说话','「抓」的动画')+'<div class="panel"><div class="formula-bar"><span>S</span><span class="hot">把</span><span>O</span><span>V</span><span>C</span></div><p class="caption" style="margin:0 0 12px">口诀：<b>S 把 O V C</b>（主语＋把＋宾语＋动词＋补语/结果）</p>'
+    + '<div class="stage"><div class="stage-row" id="ba-row">'
+    + '<span class="blk" id="ba-s">我</span><span class="blk obj" id="ba-o">书</span><span class="blk" id="ba-v">放在</span><span class="blk" id="ba-c">桌子上</span>'
+    + '</div><div class="role"><span>主语 S</span><span style="color:var(--red);font-weight:700">宾语 O</span><span>动词 V</span><span>结果 C</span></div></div>'
+    + '<div class="btnrow"><button class="btn" id="ba-play">▶ 播放：把「书」抓过去</button><button class="btn ghost" id="ba-reset">还原</button><span class="feedback" id="ba-fb"></span></div></div></section>';
+  h += '<section class="step">'+stepHead(3,'两个要点','Fluentide · 提交前自检')+trapsHTML([
+      ['要点一','宾语通常是「知道的那一个」','我把这本书看完了（自然）／我把一本书看完了（单说不太自然，放进语境能说，如“这个寒假我总算把一本书看完了”）。无定把字句是受限格式、不是病句。','good'],
+      ['要点二','动词不能「光杆」','✗ 我把书看 → ✓ 我把书看完了。动词后面必须带结果：补语、了、趋向，至少一样。','good']])+'</section>';
+  h += '<section class="step">'+stepHead(4,'把 ↔ 被 互换四步','韩群锋博客 · 句子技巧')+'<div class="panel"><div class="steps-flow" id="ba-flow">'
+    + ['① 找出主动者（猫）和被动者（鱼）','② 把 / 被 对调：猫把鱼吃掉了 → 鱼被猫吃掉了','③ 主、被换位：主动者去「被」后面，被动者站句首','④ 动作不变：动词和补语（吃掉了）原样保留']
+    .map(function(s,i){ return '<div class="flow-step" data-fs="'+i+'"><span class="n">'+(i+1)+'</span><span>'+s+'</span></div>'; }).join('')
+    + '</div><div class="btnrow"><button class="btn" id="ba-step">下一步</button><span class="feedback" id="ba-step-fb"></span></div></div></section>';
+  QUIZREG[it.id] = {q:'哪句把字句是对的？',opts:['我把作业写。','我把那本作业写完了。','我把一本新书写。','把书我看完了。'],a:1,why:'宾语「那本作业」是双方都知道的那本，动词带了结果「完」，两条都过关；「我把一本新书写」错在动词光杆。'};
+  h += '<section class="step">'+stepHead(5,'小测一下')+quizHTML(QUIZREG[it.id], it.id)+'</section>';
+  h += '<div class="srcbox">出处：「把 is a flag, not a verb」与两个要点——Fluentide《Chinese Grammar: 把字句》<a href="https://fluentide.com/chinese/grammar/ba" target="_blank" rel="noopener">fluentide.com/chinese/grammar/ba</a>；口诀 S把OVC 与「把」本义导入——卡尔加里大学《初级"把"字句的"教"与"学"》；把/被互换四步——韩群锋博客《小学语文常考句子技巧与练习》<a href="https://blog.hanqunfeng.com/2026/09/03/chinese-sentence-skills/" target="_blank" rel="noopener">blog.hanqunfeng.com</a>；三步变形引入法（书放在桌子上→加上「我」→用「把」连接）——豆瓣《"把字句"怎么教？》<a href="https://www.douban.com/note/663090305/" target="_blank" rel="noopener">douban.com/note/663090305</a>。</div>';
+  setTimeout(initBa, 0);
+  return h;
+}
+var baStep = 0;
+function initBa(){
+  var o = document.getElementById('ba-o'), row = document.getElementById('ba-row'), fb = document.getElementById('ba-fb');
+  var flag = null, moved = false;
+  document.getElementById('ba-play').onclick = function(){
+    if(moved) return;
+    var oRect = o.getBoundingClientRect(), vRect = document.getElementById('ba-v').getBoundingClientRect();
+    var dx = vRect.left - oRect.left - 8;
+    o.style.transform = 'translateX('+dx+'px) translateY(-16px)';
+    fb.textContent = '「把」竖起旗，伸手把宾语「书」抓到动词前面……'; fb.className = 'feedback';
+    setTimeout(function(){
+      flag = document.createElement('span'); flag.className = 'blk flag pop'; flag.textContent = '把';
+      row.insertBefore(flag, o); row.insertBefore(o, document.getElementById('ba-v'));
+      o.style.transform = '';
+      moved = true;
+      fb.textContent = '我 把 书 放在 桌子上 —— S 把 O V C，成型！'; fb.className = 'feedback ok';
+    }, 850);
+  };
+  document.getElementById('ba-reset').onclick = function(){
+    if(flag) flag.remove();
+    row.insertBefore(o, document.getElementById('ba-v')); /* 顺序回到 S O V C */
+    row.insertBefore(document.getElementById('ba-s'), o);
+    moved = false; fb.textContent = '';
+  };
+  var steps = document.querySelectorAll('#ba-flow .flow-step'); baStep = 0;
+  steps.forEach(function(s){ s.classList.remove('on'); });
+  document.getElementById('ba-step').onclick = function(){
+    if(baStep < steps.length){ steps[baStep].classList.add('on'); baStep++; }
+    if(baStep >= steps.length) document.getElementById('ba-step-fb').textContent = '四步走完：猫把鱼吃掉了 ↔ 鱼被猫吃掉了。';
+  };
+}
+
+/* ================= 了/着/过 决策树 ================= */
+var TREE = [
+ {q:'① 动作或事情「完成 / 实现了」吗？', yes:{leaf:'了₁', ex:'我吃<b>了</b>饭。', why:'了₁跟在动词后面，表示动作完成。'}, next:'q2'},
+ {q:'② 这件事是「人生经历过一次」，现在已经不延续了吗？', yes:{leaf:'过', ex:'我去<b>过</b>北京。', why:'过＝往人生履历上添一笔：经历过，现在提起来是「履历」。'}, next:'q3'},
+ {q:'③ 状态正在「持续着」，没有结束点？', yes:{leaf:'着', ex:'门开<b>着</b>呢。', why:'着＝状态的录像一直开着：门开着、他笑着。'}, no:{leaf:'了₂', ex:'下雨<b>了</b>！', why:'三个都不是？多半是情况发生了变化——句尾的了₂，报告「新情况」。'}}
+];
+var treeState = null;
+function renderAspect(it){
+  treeState = {stage:0, result:null};
+  var h = detailHead(it, '<span style="font-size:34px">🌳</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','视频精华 · 照抄')+'<div class="analogy">「了」像<b>拍照</b>——咔嚓，事情成了一张定格的照片（完成 / 新情况）；「着」像<b>录像</b>——镜头开着，状态一直持续；「过」像<b>人生履历</b>——做过一次，就在履历上添一笔（经历）。B 站名师还有一招：按<b>位置</b>拆「了」——动词后的是了₁（完成），句尾的是了₂（新情况），一刀切开最大的混淆点。</div></section>';
+  h += '<section class="step">'+stepHead(2,'看图说话','时间轴上一字排开')+'<div class="panel">'+aspectSVG()+'<p class="caption">同一根时间轴，三种看法：了₁盯住「完成点」，着盯住「持续段」，过回望「经历过」，了₂报告「刚刚变了」。</p></div></section>';
+  h += '<section class="step">'+stepHead(3,'动手试试','三问决策树 · 点着往下走')+'<div class="panel"><div id="tree-box"></div><div class="btnrow"><button class="btn ghost" id="tree-reset">重新开始</button></div></div></section>';
+  h += '<section class="step">'+stepHead(4,'易错诊所')+trapsHTML([
+      ['✗','用「过」说现在还在持续的事','✗ 他生病过三天了（还在病）→ ✓ 他病了三天了。「过」只管已经翻篇的经历。','bad'],
+      ['✓','「着」后面常有「呢」撑腰','门开着呢 / 他笑着呢——「着…呢」是持续状态的黄金搭档。','good']])+'</section>';
+  QUIZREG[it.id] = {q:'「我＿＿过长城，去年爬的。」该填哪个？',opts:['了','着','过','得'],a:2,why:'爬长城是已经翻篇的人生经历——决策树第二问，答案「过」。'};
+  h += '<section class="step">'+stepHead(5,'小测一下')+quizHTML(QUIZREG[it.id], it.id)+'</section>';
+  h += '<div class="srcbox">出处：三问决策树——hanzistroke 对比页（动作完成了吗→了 / 人生经历过吗→过 / 状态持续着吗→着）<a href="https://www.hanzistroke.com/compare/%E4%BA%86-%E8%BF%87-%E7%9D%80" target="_blank" rel="noopener">hanzistroke.com/compare/了-过-着</a>；「过＝人生履历」与「按所要强调的选，不按英语时态选」——GraphChinese <a href="https://graphchinese.com/le-guo-zhe-aspect-particles" target="_blank" rel="noopener">graphchinese.com/le-guo-zhe-aspect-particles</a>；「了」按位置拆分——Bilibili 内米kalong「对外汉语初级语法教学」系列（如动态助词「过」<a href="https://www.bilibili.com/video/BV1ER4y1g7vn/" target="_blank" rel="noopener">BV1ER4y1g7vn</a>）。</div>';
+  setTimeout(initTree, 0);
+  return h;
+}
+function aspectSVG(){
+  var s = '<svg viewBox="0 0 640 190" role="img" aria-label="了着过时间轴">';
+  s += '<line x1="30" y1="150" x2="610" y2="150" style="stroke:var(--ink2)" stroke-width="2"/><path d="M610 150 l-12 -5 v10 Z" style="fill:var(--ink2)"/><text x="596" y="172" font-size="12" style="fill:var(--ink2)">时间</text>';
+  s += '<circle cx="150" cy="150" r="7" style="fill:var(--m-verb)"/><text x="150" y="122" text-anchor="middle" font-size="17" font-weight="900" style="fill:var(--m-verb)">了₁</text><text x="150" y="100" text-anchor="middle" font-size="12.5" style="fill:var(--ink2)">动作完成 ●</text>';
+  s += '<rect x="255" y="145" width="110" height="10" rx="5" style="fill:var(--m-adv)"/><text x="310" y="122" text-anchor="middle" font-size="17" font-weight="900" style="fill:var(--m-adv)">着</text><text x="310" y="100" text-anchor="middle" font-size="12.5" style="fill:var(--ink2)">状态持续 ▬</text>';
+  s += '<circle cx="455" cy="150" r="7" fill="none" style="stroke:var(--m-pron)" stroke-width="2.5"/><text x="455" y="122" text-anchor="middle" font-size="17" font-weight="900" style="fill:var(--m-pron)">过</text><text x="455" y="100" text-anchor="middle" font-size="12.5" style="fill:var(--ink2)">曾经经历 ○</text>';
+  s += '<path d="M545 150 v-34 m0 0 l-6 10 m6 -10 l6 10" style="stroke:var(--de1)" stroke-width="2.5" fill="none"/><text x="545" y="100" text-anchor="middle" font-size="17" font-weight="900" style="fill:var(--de1)">了₂</text><text x="545" y="82" text-anchor="middle" font-size="12.5" style="fill:var(--ink2)">新情况 ↑</text>';
+  return s+'</svg>';
+}
+function initTree(){
+  drawTree();
+  document.getElementById('tree-reset').onclick = function(){ treeState = {stage:0, result:null}; drawTree(); };
+}
+function drawTree(){
+  var box = document.getElementById('tree-box'), h = '';
+  for(var i=0;i<treeState.stage;i++){
+    h += '<div class="tree-q" style="opacity:.55"><div class="q">'+TREE[i].q+'</div><div style="font-size:13.5px;color:var(--ink2);margin-top:4px">已回答，继续 ↓</div></div>';
+  }
+  if(treeState.result){
+    var r = treeState.result;
+    h += '<div class="tree-result" style="background:var(--ok-soft)"><div class="big">'+r.leaf+'</div><div style="margin:6px 0">'+r.ex+'</div><div style="font-size:14px;color:var(--ink2)">'+r.why+'</div></div>';
+  } else {
+    var node = TREE[treeState.stage];
+    h += '<div class="tree-q pop"><div class="q">'+node.q+'</div><div class="yn"><button data-yn="1">是 ✓</button><button data-yn="0">不是 ✗</button></div></div>';
+  }
+  box.innerHTML = h;
+  var yn = box.querySelectorAll('[data-yn]');
+  yn.forEach(function(b){ b.addEventListener('click', function(){
+    var yes = b.getAttribute('data-yn')==='1', node = TREE[treeState.stage];
+    if(yes){ treeState.result = node.yes; }
+    else if(node.next){ treeState.stage++; }
+    else { treeState.result = node.no; }
+    drawTree();
+  }); });
+}
+
+/* ================= 的/地/得 三色定位 ================= */
+var DE_ITEMS = [
+ {pre:'红红', post:'苹果', ans:'的', tag:'的＋名词', color:'var(--de1)'},
+ {pre:'高兴', post:'跳起来', ans:'地', tag:'地＋动词', color:'var(--de2)'},
+ {pre:'跑', post:'飞快', ans:'得', tag:'动词＋得＋补语', color:'var(--de3)'},
+ {pre:'美丽', post:'花儿', ans:'的', tag:'的＋名词', color:'var(--de1)'},
+ {pre:'慢慢', post:'走', ans:'地', tag:'地＋动词', color:'var(--de2)'},
+ {pre:'笑', post:'合不拢嘴', ans:'得', tag:'动词＋得＋补语', color:'var(--de3)'}
+];
+function renderDe(it){
+  var h = detailHead(it, '<span style="font-size:34px">🎯</span>');
+  h += '<section class="step">'+stepHead(1,'打个比方','香港 notesity 病句讲义')+'<div class="analogy">三个「de」长得一样，站的位置完全不同——<b>记住位置就记住字</b>：<span style="color:var(--de1);font-weight:900">的</span>站在名词前面（定语），<span style="color:var(--de2);font-weight:900">地</span>站在动词前面（状语），<span style="color:var(--de3);font-weight:900">得</span>跟在动词后面带补语（怎么样）。</div></section>';
+  h += '<section class="step">'+stepHead(2,'看图说话','三色定位图')+'<div class="panel" style="text-align:center;font-size:17px;line-height:2.2">'
+    + '<span class="de-tag" style="background:var(--ok-soft);color:var(--de1)">蓝色 的</span> ［形容词］<b style="color:var(--de1)">的</b>＋名词<br>'
+    + '<span class="de-tag" style="background:var(--ok-soft);color:var(--de2)">橙色 地</span> ［样子］<b style="color:var(--de2)">地</b>＋动词<br>'
+    + '<span class="de-tag" style="background:var(--ok-soft);color:var(--de3)">紫色 得</span> 动词＋<b style="color:var(--de3)">得</b>＋［补语：怎么样］</div></section>';
+  h += '<section class="step">'+stepHead(3,'动手试试','看位置，选对字')+'<div class="panel"><div id="de-list"></div><div class="feedback" id="de-fb" style="text-align:center"></div></div></section>';
+  h += '<section class="step">'+stepHead(4,'规则一句话')+'<div class="rule">的 → 名词前 · 地 → 动词前 · 得 → 动词后</div></section>';
+  h += '<div class="srcbox">出处：状语＝动词「前面」（标志字「地」）、补语＝动词「后面」（标志字「得」）的定位讲法——香港 notesity《写作技巧——病句》<a href="https://www.notesity.hk/blog/posts/chinese-grammatical-mistakes" target="_blank" rel="noopener">notesity.hk/blog/posts/chinese-grammatical-mistakes</a>。</div>';
+  setTimeout(initDe, 0);
+  return h;
+}
+function initDe(){
+  var list = document.getElementById('de-list'), done = 0;
+  list.innerHTML = DE_ITEMS.map(function(d,i){
+    return '<div class="de-item"><span>'+d.pre+'</span><span class="de-blank" id="de-blank-'+i+'">？</span><span>'+d.post+'</span>'
+      + '<span class="de-choices"><button class="c1" data-de="'+i+'" data-v="的">的</button><button class="c2" data-de="'+i+'" data-v="地">地</button><button class="c3" data-de="'+i+'" data-v="得">得</button></span></div>';
+  }).join('');
+  list.querySelectorAll('[data-de]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = +b.getAttribute('data-de'), d = DE_ITEMS[i], row = b.closest('.de-item');
+      if(row.dataset.done) return;
+      if(b.getAttribute('data-v') === d.ans){
+        row.dataset.done = '1'; b.classList.add('right');
+        var blank = document.getElementById('de-blank-'+i);
+        blank.textContent = d.ans; blank.style.color = d.color; blank.style.borderBottomColor = d.color;
+        row.insertAdjacentHTML('beforeend', '<span class="de-tag" style="background:var(--ok-soft);color:'+d.color+'">'+d.tag+'</span>');
+        done++;
+        var fb = document.getElementById('de-fb');
+        fb.textContent = done >= DE_ITEMS.length ? '🎉 六句全对！秘诀就是看位置。' : '✓ 对了（'+done+' / '+DE_ITEMS.length+'）';
+        fb.className = 'feedback ok';
+      } else {
+        b.classList.add('wrong'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+        setTimeout(function(){ b.classList.remove('wrong'); }, 600);
+      }
+    });
+  });
+}
+
+/* ================= 详情分发 ================= */
+function renderDetail(id){
+  var it = byId[id], h = '';
+  if(it.type==='word') h = renderWord(it);
+  else if(it.type==='symbolize') h = renderSymbolize(it);
+  else if(it.type==='diagram') h = renderDiagram(it);
+  else if(it.type==='fragment') h = renderFragment(it);
+  else if(it.type==='sisu') h = renderSisu(it);
+  else if(it.type==='tiles') h = renderTiles(it);
+  else if(it.type==='ba') h = renderBa(it);
+  else if(it.type==='aspect') h = renderAspect(it);
+  else if(it.type==='de') h = renderDe(it);
+  document.getElementById('detail-body').innerHTML = h;
+}
+
+renderLegend();
+renderList();
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

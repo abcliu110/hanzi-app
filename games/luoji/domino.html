@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多米诺 · 真因果 vs 强加因果</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top .home{background:var(--accent-soft);border:2px solid var(--accent-deep);color:var(--accent-deep)}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.prem{font-size:19px;margin:4px 0}
+.prem b{color:var(--accent-deep)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"Kaiti SC","STKaiti","KaiTi",serif;pointer-events:none}
+#sdot{pointer-events:none}
+.hot{cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+
+.dm{position:relative;display:flex;align-items:flex-end;gap:14px;min-height:190px;padding:20px 16px 14px;margin:10px 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.dm::after{content:"";position:absolute;left:10px;right:10px;bottom:12px;height:3px;background:var(--line);border-radius:2px}
+.tile{position:relative;z-index:1;flex:0 0 auto;width:86px;height:150px;border-radius:10px;border:2px solid var(--accent-deep);background:var(--card);color:var(--ink);font-size:16px;font-weight:700;line-height:1.35;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;transform-origin:100% 100%;transition:transform .35s ease-in,opacity .3s,margin .4s;cursor:default}
+.tile.fall{transform:rotate(72deg)}
+.tile.gone{opacity:.15;border-style:dashed}
+.tile.pick{cursor:pointer}
+.tile.pick:hover{border-color:var(--orange)}
+.tile.far{margin-left:190px}
+.tile.bad{border-color:var(--red);color:var(--red)}
+.gapnote{position:absolute;z-index:2;top:6px;font-size:15px;color:var(--red);font-weight:700;white-space:nowrap}
+.kj{font-size:18px;font-weight:700;color:var(--accent-deep);margin:6px 0}
+.why{font-size:15px;color:var(--muted)}
+h2{font-size:18px;margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🔗 多米诺：真因果 vs 强加因果</h1></div>
+  <div class="card" id="demo"></div>
+  <div class="card" id="box"></div>
+  <div class="rule">真因果：前一块倒下，真能推倒后一块，一环扣一环。强加因果：两块根本没挨着，前面倒了，后面纹丝不动。<br>口诀：因果链条环环扣，五个为什么问到底；没有因果别硬凑，先问一句推得出。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 内容只取 newhanzi/yuwen/data.js 逻辑区「因果链：多米诺」「强加因果」两条的 例子 / 例句解析 / 口诀（括号里的说明原样作讲解），
+     玩法按 docs/gaijin/luoji-gaijin-sheji.md P1-2：排出一排 → 推倒连锁 → 抽掉一块看连锁中断 → 混进强加块，推了不倒。 */
+  var KJ1 = '因果链条环环扣，五个为什么问到底', KJ2 = '没有因果别硬凑，先问一句推得出';
+  var DEMO = ['少一颗铁钉', '掉一只马掌', '折一匹战马', '伤一位将军', '败一场战争', '亡一个帝国'];
+  var DEMO_WHY = '起点只是一颗铁钉，终点却是一个帝国——每一环都比前一环大，这就是多米诺的“放大”。';
+  /* ok: 一路倒下；不 ok 时 cut = 第几块和下一块没挨着（从 0 数） */
+  var QS = [
+    { t: ['熬夜', '上课犯困', '听不懂', '成绩下滑', '考不上高中'], ok: true, why: '每环都经得起问为什么：为什么犯困？因为熬夜。为什么听不懂？因为犯困。一环扣一环，链条才牢。', p: '因果链：多米诺' },
+    { t: ['他穿了红衣服', '比赛赢了'], ok: false, cut: 0, why: '迷信式因果：“穿红衣服”和“比赛赢了”只是碰巧，红衣服不会让人跑得更快。', p: '强加因果' },
+    { t: ['多读书', '词汇量大', '作文好', '语文高分'], ok: true, why: '链条完整：读书→词汇→作文→高分，每环都经得起问为什么。', p: '因果链：多米诺' },
+    { t: ['早上没吃早饭', '考试失利'], ok: false, cut: 0, why: '中间缺环节，链条不牢：没吃早饭和考试失利之间缺了好几环（饿→没精神→没发挥好），直接跳过去就是断链。', p: '因果链：多米诺' },
+    { t: ['昨晚熬夜刷题', '今天上课精神不振'], ok: true, why: '真实因果：熬夜少睡→白天没精神，是身体的真实规律，换谁熬夜都一样。', p: '强加因果' },
+    { t: ['他是北方人', '思想守旧'], ok: false, cut: 0, why: '地域推不出思想：“北方人”是出生地，“思想守旧”是个人想法，两件事没有因果链，硬凑就是强加。', p: '强加因果' },
+    { t: ['多运动', '身体壮', '不容易生病', '少请假', '功课不掉队'], ok: true, why: '链条完整。', p: '因果链：多米诺' },
+    { t: ['多喝水', '成绩变好'], ok: false, cut: 0, why: '中间缺环节：喝水和成绩没有链条，缺了环节直接跳，就是断链。', p: '因果链：多米诺' },
+    { t: ['今天是星期三', '要下雨'], ok: false, cut: 0, why: '星期推不出天气。', p: '强加因果' },
+    { t: ['每天练字半小时', '字越写越好看'], ok: true, why: '练习带来进步，这是真实因果。', p: '强加因果' },
+    { t: ['他个子高', '数学一定好'], ok: false, cut: 0, why: '身高推不出数学。', p: '强加因果' },
+    { t: ['上课走神', '笔记没记全', '复习没材料', '考试丢分'], ok: true, why: '每环都问为什么。', p: '因果链：多米诺' }
+  ];
+  var CHOICES = ['会一路倒下（真因果）', '推不倒（强加 / 断链）'];
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function row(id, tiles, opt){
+    opt = opt || {};
+    return '<div class="dm" id="' + id + '">' + tiles.map(function(t, i){
+      return '<div class="tile' + (opt.pick ? ' pick' : '') + '" data-i="' + i + '">' + esc(t) + '</div>';
+    }).join('') + '</div>';
+  }
+  /* 依次倒下：从 0 推起，遇到 gone（抽掉）或 cut（没挨着）就停 */
+  function topple(el, stopAt, done){
+    var tiles = el.querySelectorAll('.tile'), i = 0;
+    (function step(){
+      if (i >= tiles.length) { done && done(i); return; }
+      if (tiles[i].classList.contains('gone')) { done && done(i); return; }
+      tiles[i].classList.add('fall');
+      if (stopAt != null && i === stopAt) { done && done(i + 1); return; }
+      i++; setTimeout(step, 260);
+    })();
+  }
+  /* ---------- 演示：推倒 → 抽一块再推 ---------- */
+  var demo = document.getElementById('demo'), dstage = 0;
+  function renderDemo(msg){
+    var h = '<h2>先玩一玩</h2><div class="prem">完整链：' + esc(DEMO.join('→')) + '</div>';
+    h += row('drow', DEMO, { pick: dstage === 1 });
+    h += '<div class="btns">';
+    if (dstage === 0) h += '<button class="btn main" id="dpush">① 推第一块</button>';
+    if (dstage === 1) h += '<span class="ask">② 点一块牌把它抽掉，再推</span>';
+    if (dstage === 2) h += '<button class="btn main" id="dpush2">推第一块</button>';
+    if (dstage === 3) h += '<button class="btn" id="dreset">重新摆好</button>';
+    h += '</div><div class="fb" id="dfb">' + (msg || '') + '</div>';
+    demo.innerHTML = h;
+  }
+  demo.addEventListener('click', function(e){
+    var el = document.getElementById('drow');
+    if (e.target.id === 'dpush') {
+      e.target.disabled = true;
+      topple(el, null, function(){ dstage = 1; setTimeout(function(){ renderDemo('<span class="ok">一块推一块，全倒了。' + esc(DEMO_WHY) + '</span>'); }, 400); });
+      return;
+    }
+    var t = e.target.closest('.tile.pick');
+    if (t && dstage === 1) {
+      if (t.getAttribute('data-i') === '0') { document.getElementById('dfb').textContent = '抽第一块就没得推了，换中间的一块。'; return; }
+      dstage = 2;
+      var idx = t.getAttribute('data-i');
+      renderDemo('抽掉了「' + DEMO[idx] + '」，再推推看。');
+      document.querySelector('#drow .tile[data-i="' + idx + '"]').classList.add('gone');
+      return;
+    }
+    if (e.target.id === 'dpush2') {
+      e.target.disabled = true;
+      topple(el, null, function(n){
+        dstage = 3;
+        var gone = el.querySelector('.tile.gone'), gi = +gone.getAttribute('data-i');
+        var fb = document.getElementById('dfb');
+        fb.className = 'fb bad';
+        fb.textContent = '少了「' + DEMO[gi] + '」这一环，后面的牌一块也推不倒——每一环都要真的在。';
+        var b = el.parentNode.querySelector('.btns'); b.innerHTML = '<button class="btn" id="dreset">重新摆好</button>';
+      });
+      return;
+    }
+    if (e.target.id === 'dreset') { dstage = 0; renderDemo(); }
+  });
+  renderDemo();
+  /* ---------- 判一判：推得倒吗？ ---------- */
+  var box = document.getElementById('box'), qi = 0, score = 0, answered = false;
+  function render(){
+    var q = QS[qi];
+    var h = '<div class="prog">判一判 · 第 ' + (qi + 1) + ' / ' + QS.length + ' 排</div>';
+    h += '<div class="ask">推倒第一块，这一排会一路倒下吗？</div>';
+    h += row('qrow', q.t);
+    h += '<div class="btns" id="qbtns">' + CHOICES.map(function(c, i){ return '<button class="btn" data-a="' + i + '">' + esc(c) + '</button>'; }).join('') + '</div>';
+    h += '<div class="fb" id="fb"></div>';
+    box.innerHTML = h;
+    answered = false;
+  }
+  function finish(){
+    box.innerHTML = '<div class="ask">判完了：' + QS.length + ' 排判对 ' + score + ' 排。</div><div class="kj">' + KJ1 + '</div><div class="kj">' + KJ2 + '</div><div class="btns"><button class="btn main" id="again">再来一轮</button></div>';
+  }
+  box.addEventListener('click', function(e){
+    if (e.target.id === 'again') { qi = 0; score = 0; render(); return; }
+    if (e.target.id === 'next') { qi++; if (qi >= QS.length) finish(); else render(); return; }
+    var b = e.target.closest('[data-a]');
+    if (!b || answered) return;
+    answered = true;
+    var q = QS[qi], pick = +b.getAttribute('data-a'), right = (pick === 0) === q.ok;
+    if (right) score++;
+    var btns = box.querySelectorAll('[data-a]');
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+    NHZReview.record({ q: '多米诺：「' + q.t.join('→') + '」推倒第一块，会一路倒下吗？', options: CHOICES.slice(),
+      answer: CHOICES[q.ok ? 0 : 1], 解析: q.why, src: '逻辑', point: q.p }, right);
+    var el = document.getElementById('qrow');
+    if (!q.ok) {
+      var nx = el.querySelector('.tile[data-i="' + (q.cut + 1) + '"]');
+      if (nx) { nx.classList.add('far'); nx.classList.add('bad'); }
+    }
+    topple(el, q.ok ? null : q.cut, function(){
+      if (!q.ok) {
+        var nx = el.querySelector('.tile[data-i="' + (q.cut + 1) + '"]');
+        var note = document.createElement('div');
+        note.className = 'gapnote'; note.textContent = '这两块根本没挨着';
+        note.style.left = Math.max(8, nx.offsetLeft - 150) + 'px';
+        el.appendChild(note);
+      }
+      var fb = document.getElementById('fb');
+      fb.className = 'fb ' + (right ? 'ok' : 'bad');
+      fb.innerHTML = (right ? '✓ 判对了。' : '✗ 再看看。') + (q.ok ? '一路倒下了。' : '推了不倒。') + '<div class="why">' + esc(q.why) + '</div><div class="kj">' + (q.p === '强加因果' && !q.ok ? KJ2 : KJ1) + '</div>';
+      document.getElementById('qbtns').innerHTML = '<button class="btn main" id="next">' + (qi + 1 < QS.length ? '下一排 →' : '看结果') + '</button>';
+    });
+  });
+  render();
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

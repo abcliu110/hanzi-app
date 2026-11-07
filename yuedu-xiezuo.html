@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读与写作 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="page-sub page-yuwen">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">阅读与写作</span>
+</header>
+<div class="controls" id="yxcontrols">
+  <div class="searchbox">
+    <input id="yq" type="text" placeholder="搜知识点，如：审题 / 三遍阅读法" autocomplete="off">
+  </div>
+</div>
+
+<main class="listwrap">
+  <div id="yxlist"></div>
+  <div id="yxdetail" style="display:none"></div>
+</main>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="yuwen/data.js"></script>
+<script src="yuedu-xiezuo.js"></script>
+<script src="nav-up.js"></script>
+</body>
+</html>

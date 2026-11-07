@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>套圈判官 · 三段论</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top .home{background:var(--accent-soft);border:2px solid var(--accent-deep);color:var(--accent-deep)}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.prog{font-size:14px;color:var(--muted)}
+.prem{font-size:19px;margin:4px 0}
+.prem b{color:var(--accent-deep)}
+.ask{font-size:18px;font-weight:700;margin:8px 0}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"Kaiti SC","STKaiti","KaiTi",serif;pointer-events:none}
+#sdot{pointer-events:none}
+.hot{cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.fb{font-size:16px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>⭕ 套圈判官 · 三段论</h1></div>
+  <div class="card" id="box"></div>
+  <div class="rule">判官三问：①谁是中间那个圈？②小圈被逼进去了吗？③能摆出反例吗？——能摆出“前提都对、结论却错”的摆法，推理就不成立。</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  /* 题目：例句取自 yuwen/data.js「三段论」例子，鸭嘴兽一题取自 docs/gaijin/luoji-gaijin-sheji.md (e)-1。
+     P 大圈、M 中间那个圈、S 小圈；p1 = 所有 M 都是 P；p2 = S 在 M 里（allow:['m']）或 S 在 P 里（allow:['m','p']）；
+     concl 检查 S 是否在 'P' 或 'M' 里。判分只看拓扑：能不能摆出前提都成立、结论却不成立的位置。 */
+  var QS = [
+    {P:'导电的东西', M:'金属', S:'铜', p1:'所有金属都导电', p2:'铜是金属', allow:['m'], concl:'铜导电', check:'P'},
+    {P:'会下蛋的', M:'鸡', S:'鸭嘴兽', p1:'所有鸡都会下蛋', p2:'鸭嘴兽会下蛋', allow:['m','p'], concl:'鸭嘴兽是鸡', check:'M'},
+    {P:'用肺呼吸的', M:'鸟类', S:'鸽子', p1:'鸟类都用肺呼吸', p2:'鸽子是鸟类', allow:['m'], concl:'鸽子用肺呼吸', check:'P'},
+    {P:'动物', M:'狗', S:'人', p1:'狗是动物', p2:'人是动物', allow:['m','p'], concl:'人是狗', check:'M'}
+  ];
+  var POS = { m:{x:260,y:250}, p:{x:500,y:175}, o:{x:575,y:42} };
+  var box = document.getElementById('box');
+  var qi = 0, score = 0, stage = 0, sAt = null, recorded = false;
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function holds(q, r){ return q.check === 'P' ? (r === 'm' || r === 'p') : r === 'm'; }
+  function valid(q){ return q.allow.every(function(r){ return holds(q, r); }); }
+  function where(q, r){ return r === 'm' ? '「' + q.M + '」圈里' : r === 'p' ? '「' + q.P + '」圈里、「' + q.M + '」圈外' : '两个圈外面'; }
+  function svg(q){
+    var h = '<svg id="pic" viewBox="0 0 640 400" role="img" aria-label="欧拉圈">';
+    h += '<rect class="hot" data-r="o" x="0" y="0" width="640" height="400" fill="transparent"/>';
+    h += '<ellipse class="hot" data-r="p" cx="320" cy="210" rx="290" ry="175" fill="none" pointer-events="all" stroke="var(--blue)" stroke-width="3"/>';
+    h += '<text x="320" y="72" text-anchor="middle" font-size="24" fill="var(--blue)">' + esc(q.P) + '</text>';
+    if (stage >= 1) {
+      h += '<ellipse class="hot" data-r="m" cx="260" cy="230" rx="130" ry="95" fill="none" pointer-events="all" stroke="var(--ink)" stroke-width="2.6"/>';
+      h += '<text x="260" y="170" text-anchor="middle" font-size="22" fill="var(--ink)">' + esc(q.M) + '</text>';
+    }
+    if (sAt) {
+      var p = POS[sAt];
+      h += '<g id="sdot"><ellipse cx="'+p.x+'" cy="'+p.y+'" rx="48" ry="30" fill="var(--surface)" stroke="var(--orange)" stroke-width="2.6"/>' +
+        '<text x="'+p.x+'" y="'+(p.y+7)+'" text-anchor="middle" font-size="20" fill="var(--orange)">' + esc(q.S) + '</text></g>';
+    }
+    return h + '</svg>';
+  }
+  function render(fb, cls, extra){
+    var q = QS[qi];
+    var h = '<div class="prog">第 ' + (qi+1) + ' / ' + QS.length + ' 题 · 答对 ' + score + '</div>';
+    h += '<div class="prem"><b>大前提</b>：' + esc(q.p1) + '</div>';
+    if (stage >= 1) h += '<div class="prem"><b>小前提</b>：' + esc(q.p2) + '</div>';
+    if (stage >= 2) h += '<div class="prem"><b>结论</b>：所以' + esc(q.concl) + '？</div>';
+    h += svg(q);
+    if (stage === 0) h += '<div class="ask">「' + esc(q.p1) + '」：「' + esc(q.M) + '」圈该放在哪儿？</div><div class="btns">' +
+      '<button class="btn" data-a="in">整个放进「' + esc(q.P) + '」圈里</button><button class="btn" data-a="out">放在「' + esc(q.P) + '」圈外面</button><button class="btn" data-a="cross">和「' + esc(q.P) + '」圈交叉一半</button></div>';
+    if (stage === 1) h += '<div class="ask">「' + esc(q.p2) + '」：「' + esc(q.S) + '」放在哪儿？点图上的位置。</div>';
+    if (stage === 2) h += '<div class="ask">结论「' + esc(q.concl) + '」一定成立吗？</div><div class="btns">' +
+      '<button class="btn" data-c="1">一定成立</button><button class="btn" data-c="0">不一定（能摆出反例）</button></div>';
+    h += '<div class="fb ' + (cls || '') + '" id="fb">' + (fb || '') + '</div>' + (extra || '');
+    box.innerHTML = h;
+  }
+  function finish(){
+    box.innerHTML = '<div class="ask">判完了：' + QS.length + ' 题答对 ' + score + ' 题。</div>' +
+      '<p>记住：结论被圈子“逼”进去，推理才成立；只要能摆出反例，就不成立。</p>' +
+      '<div class="btns"><button class="btn main" id="again">再判一轮</button><a class="btn" href="../../quiz/index.html?tab=logic&point=' + encodeURIComponent('三段论') + '" target="_top" style="text-decoration:none">练三段论的题 →</a></div>';
+  }
+  box.addEventListener('click', function(e){
+    var q = QS[qi];
+    if (e.target.id === 'again') { qi = 0; score = 0; stage = 0; sAt = null; recorded = false; render(); return; }
+    if (e.target.id === 'next') { qi++; stage = 0; sAt = null; recorded = false; if (qi >= QS.length) finish(); else render(); return; }
+    var a = e.target.closest('[data-a]');
+    if (a && stage === 0) {
+      var ok = a.getAttribute('data-a') === 'in';
+      stage = 1;
+      render(ok ? '✓ 对：「所有' + q.M + '」说的是每一个都在里面，所以整个放进去。' :
+        '✗ 「' + q.p1 + '」说的是每一个' + q.M + '都在「' + q.P + '」里，所以要整个放进去，已经帮你摆好。', ok ? 'ok' : 'bad');
+      return;
+    }
+    var r = e.target.closest('[data-r]');
+    if (r && stage === 1) {
+      var reg = r.getAttribute('data-r');
+      if (q.allow.indexOf(reg) < 0) { document.getElementById('fb').className = 'fb bad'; document.getElementById('fb').textContent = '✗ 放在' + where(q, reg) + '，「' + q.p2 + '」就不成立了，换个位置。'; return; }
+      sAt = reg; stage = 2;
+      render('「' + q.S + '」放在' + where(q, reg) + '，两个前提都成立。', 'ok');
+      return;
+    }
+    var c = e.target.closest('[data-c]');
+    if (c && stage === 2) {
+      var say = c.getAttribute('data-c') === '1', v = valid(q), right = say === v;
+      if (right) score++;
+      if (!recorded) {
+        recorded = true;
+        NHZReview.record({ q: '套圈判官：' + q.p1 + '；' + q.p2 + '；所以' + q.concl + '。结论一定成立吗？',
+          options: ['一定成立', '不一定（能摆出反例）'], answer: v ? '一定成立' : '不一定（能摆出反例）',
+          解析: v ? '「' + q.S + '」只能放进「' + q.M + '」圈，结论被逼出来。' : '「' + q.S + '」可以放在「' + q.P + '」圈里、「' + q.M + '」圈外：前提都对，结论却错。',
+          src: '逻辑', point: '三段论' }, right);
+      }
+      stage = 3;
+      var msg;
+      if (v) {
+        msg = (right ? '✓ ' : '✗ ') + '「' + q.S + '」只能放在' + where(q, q.allow[0]) + '，它被逼进了「' + (q.check === 'P' ? q.P : q.M) + '」圈：结论一定成立。';
+      } else {
+        var bad = q.allow.filter(function(x){ return !holds(q, x); })[0];
+        sAt = bad;
+        msg = (right ? '✓ ' : '✗ ') + '反例：把「' + q.S + '」放在' + where(q, bad) + '，两个前提照样成立，结论「' + q.concl + '」却错了——推理不成立。';
+      }
+      render(msg, right ? 'ok' : 'bad', '<div class="btns"><button class="btn main" id="next">' + (qi + 1 < QS.length ? '下一题 →' : '看结果') + '</button></div>');
+      return;
+    }
+  });
+  render();
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

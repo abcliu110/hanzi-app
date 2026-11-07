@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>逻辑一分钟：每日一句</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --red:#b85a52;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.date{font-size:15px;color:var(--muted)}
+.sent{font-size:22px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.ask{font-size:18px;font-weight:700;margin:10px 0 6px}
+.btns{display:flex;flex-direction:column;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:left}
+.btn:disabled{cursor:default}
+.btn.ok{border-color:var(--green);background:rgba(63,142,107,.12)}
+.btn.bad{border-color:var(--red);background:rgba(184,90,82,.10)}
+.fb{font-size:17px;margin:8px 0;min-height:1.7em}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.expl{display:none;background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:10px}
+.expl.show{display:block}
+.src{font-size:14px;color:var(--muted);margin-top:10px}
+.foot{font-size:14px;color:var(--muted);text-align:center;margin-top:16px}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.links a{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid var(--accent-deep);color:var(--accent-deep);text-decoration:none;font-size:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>⏱️ 逻辑一分钟：每日一句</h1></div>
+  <div class="card">
+    <div class="date" id="dateline"></div>
+    <div class="sent" id="sent"></div>
+    <div class="ask" id="ask"></div>
+    <div class="btns" id="btns"></div>
+    <div class="fb" id="fb"></div>
+    <div class="expl" id="expl"></div>
+    <div class="src" id="src"></div>
+  </div>
+  <div class="links">
+    <a id="more" href="../../quiz/index.html?tab=logic">🎮 逻辑大闯关 →</a>
+    <a href="../../quiz/index.html?tab=logic">🎮 逻辑大闯关 →</a>
+    <a href="../../fuxi.html">📖 去错题本复习 →</a>
+  </div>
+  <div class="foot">句子来源：逻辑区各专题「例句解析」原句，按日期轮换 · 明天再来换新的一句</div>
+</div>
+<script>
+/* 复习/错题统一记录（与 fuxi.js、games/luoji/miuwu.html 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本（nhz_wrong）并安排明天复习（nhz_srs）；答对不进错题本。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  return { record: record,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+</script>
+<script src="daily_data.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* 每日一句（A22-8，docs/gaijin/luoji-gaijin-sheji.md P1-5）。
+     题池 games/luoji/daily_data.js 由 tools/content/build_logic_daily.js 从 yuwen/data.js 逻辑区「例句解析」逐字生成（勿手改）。
+     轮换：按本地日期算“第几天”（dayNum），idx = dayNum % 题数，连续 N 天不重样、第 N+1 天从头轮；
+     选项顺序也用 dayNum 打乱，同一天反复打开是同一题、同一顺序。
+     当天作答记在 localStorage nhz_logic_daily（{ 'YYYY-MM-DD': { i, ok, pick } }，只留最近 31 天），首页卡片读它显示“今天做过没”。
+     答错 -> NHZReview.record 进错题本（选项按固定顺序记，保证同一句在错题本只有一条）。 */
+  var POOL = (window.NHZ_LOGIC_DAILY && window.NHZ_LOGIC_DAILY.items) || [];
+  var KEY = 'nhz_logic_daily';
+  function pad(n) { return ('0' + n).slice(-2); }
+  var now = new Date();
+  var ds = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  var dayNum = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  var sentEl = document.getElementById('sent');
+  if (!POOL.length) { sentEl.textContent = '题池没加载上，请稍后再试。'; return; }
+  var idx = dayNum % POOL.length;
+  var it = POOL[idx];
+  var rng = dayNum * 31 + idx + 1;
+  function rnd() { rng = (rng * 1103515245 + 12345) & 0x7fffffff; return rng / 0x80000000; }
+  var opts = it.opts.slice();
+  for (var i = opts.length - 1; i > 0; i--) {
+    var j = Math.floor(rnd() * (i + 1));
+    var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+  }
+  function loadLog() {
+    try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && typeof v === 'object' ? v : {}; }
+    catch (e) { return {}; }
+  }
+  function saveLog(rec) {
+    var all = loadLog(), cut = new Date(now.getTime());
+    cut.setDate(cut.getDate() - 31);
+    var cs = cut.getFullYear() + '-' + pad(cut.getMonth() + 1) + '-' + pad(cut.getDate());
+    Object.keys(all).forEach(function (d) { if (d < cs) delete all[d]; });
+    all[ds] = rec;
+    try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  document.getElementById('dateline').textContent =
+    '📅 今天是 ' + now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 · 第 ' + (idx + 1) + ' / ' + POOL.length + ' 句';
+  sentEl.textContent = it.s;
+  document.getElementById('ask').textContent = it.q;
+  document.getElementById('src').textContent = '出处：逻辑区「' + it.src + '」专题 · 例句解析';
+  var more = document.getElementById('more');
+  more.href = '../../quiz/index.html?tab=logic&point=' + encodeURIComponent(it.point);
+  more.textContent = '🎯 练「' + it.point + '」专题的题 →';
+  var btns = document.getElementById('btns');
+  var fb = document.getElementById('fb');
+  var expl = document.getElementById('expl');
+  var done = false;
+  function reveal(pick, fresh) {
+    done = true;
+    var ok = (pick === it.a);
+    var all = btns.querySelectorAll('.btn');
+    for (var k = 0; k < all.length; k++) {
+      all[k].disabled = true;
+      if (all[k].textContent === it.a) all[k].className = 'btn ok';
+      else if (all[k].textContent === pick) all[k].className = 'btn bad';
+    }
+    if (ok) { fb.className = 'fb ok'; fb.textContent = fresh ? '✅ 答对了！' : '✅ 今天这句已经答对了，明天再来换新的一句。'; }
+    else { fb.className = 'fb bad'; fb.textContent = fresh ? '❌ 答错了，已进错题本，复习时会再见到它。' : '❌ 今天这句答错了，已在错题本里，明天再来换新的一句。'; }
+    expl.textContent = '💡 一句话解析：' + it.ex;
+    expl.className = 'expl show';
+  }
+  opts.forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'btn';
+    b.type = 'button';
+    b.textContent = o;
+    b.addEventListener('click', function () {
+      if (done) return;
+      var ok = (o === it.a);
+      saveLog({ i: idx, ok: ok, pick: o });
+      if (!ok) {
+        try {
+          window.NHZReview.record({
+            q: '逻辑一分钟：' + it.s + '（' + it.q + '）',
+            options: it.opts.slice(), answer: it.a, 解析: it.ex, src: '逻辑', point: it.point
+          }, false);
+        } catch (e) {}
+      }
+      reveal(o, true);
+    });
+    btns.appendChild(b);
+  });
+  var prev = loadLog()[ds];
+  if (prev && prev.i === idx && prev.pick) reveal(prev.pick, false);
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

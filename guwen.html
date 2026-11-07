@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古文 · 识字星球</title>
+<link rel="stylesheet" href="zika.css">
+<style>
+.gw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.gw-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);cursor:pointer;align-self:start}
+.gw-card h3{margin:0 0 6px;font-size:18px}
+.gw-card p{margin:0;color:var(--muted);font-size:14px}
+.gw-item{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
+.gw-item:active{background:var(--accent-soft)}
+.gw-ititle{font-size:18px;font-weight:bold}
+.gw-imeta{margin-top:4px;font-size:13px;color:var(--muted)}
+/* P2-B 古文进阶路线（只新增样式，不改原有类） */
+.gw-route-sec{margin:20px 0 6px;font-size:17px;font-weight:bold}
+.gw-route-group{margin:14px 0 4px;font-size:15px;font-weight:bold;color:var(--accent-deep)}
+.gw-route-note{font-size:14px;line-height:1.8;color:var(--muted);padding:0 4px}
+.gw-route-num{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;border-radius:13px;background:var(--accent-soft);color:var(--accent-deep);font-size:14px;font-weight:bold;margin-right:8px}
+.gw-route-badge{float:right;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:1px 8px}
+.gw-route-badge.warn{color:#b8860b;border-color:#f5c518;background:rgba(245,197,24,.12)}
+.gw-backbtn{display:block;width:100%;text-align:center;padding:13px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent);font-size:17px;font-weight:700;cursor:pointer;margin:12px 0;color:#fff}
+@media (prefers-color-scheme: dark){.gw-backbtn{color:#14211a}}
+.gw-chanlink{display:block;text-align:center;margin:14px 0;padding:12px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#b8860b;font-size:16px;font-weight:bold;text-decoration:none}
+.gw-head{text-align:center;padding:20px 16px 6px}
+.gw-head h2{margin:0;font-size:26px}
+.gw-meta{margin-top:8px;font-size:14px;color:var(--muted)}
+.gw-sec{margin:20px 0 6px;font-size:17px;font-weight:bold}
+.gw-yuanwen{font-family:Georgia,"Songti SC","SimSun",serif;font-size:19px;line-height:1.9;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.gw-p{font-size:16px;line-height:1.8;padding:0 4px}
+.gw-eg{font-family:Georgia,"Songti SC","SimSun",serif;font-size:17px;line-height:1.9;padding:0 4px;margin:8px 0}
+.gw-words{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.gw-word{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);font-size:15px}
+.gw-word b{color:var(--accent-deep)}
+.gw-tag{display:inline-block;background:var(--accent-soft);color:var(--accent-deep);font-size:12px;border-radius:8px;padding:1px 7px;margin-left:6px}
+.gw-input{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-size:16px;margin:8px 0}
+.gw-filterbtn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:15px;cursor:pointer;margin:0 8px 8px 0}
+.gw-filterbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.gw-chips{padding:10px 0;display:flex;flex-wrap:wrap;gap:8px}
+.gw-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
+.gw-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.gw-linkbtn{display:block;text-align:center;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;margin:8px 0;color:var(--accent-deep);text-decoration:none}
+.gw-kc-sum{font-size:15px;color:var(--muted);padding:0 4px;margin:4px 0 8px}
+.gw-kc{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--surface);color:var(--ink);font-size:15px;cursor:pointer}
+.gw-kc b{color:var(--accent-deep)}
+.gw-kc .gw-kc-ex{display:block;margin-top:4px;font-family:Georgia,"Songti SC","SimSun",serif;font-size:16px;color:var(--muted)}
+.gw-from{display:inline-block;padding:6px 12px;border-radius:16px;border:1px solid var(--accent-deep);background:var(--surface);color:var(--accent-deep);font-size:14px;cursor:pointer;margin:4px 6px 4px 0}
+.gw-yw .zd{border-bottom:3px solid #c46a2b;cursor:pointer;border-radius:3px}
+.gw-yw .zd.on{background:#fff3c4}
+.gw-yw .pu{cursor:pointer;color:var(--accent-deep)}
+.gw-yw .sen.reading{background:#fff3c4;border-radius:6px}
+/* A21 逐句对译（guwen/duiyi.js） */
+.gw-dy{margin:8px 0}
+.gw-dy-tip{font-size:14px;color:var(--muted,#6b7566);margin:6px 0}
+.gw-dy-row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--surface)}
+.gw-dy-row.reading{background:#fff8dc}
+.gw-dy-yuan{font-size:22px;line-height:2.6;font-family:"Songti SC","STSong","SimSun",serif}
+.gw-dy-yuan .dy-w{display:inline-flex;flex-direction:column;align-items:center;vertical-align:top;line-height:1.3;margin:0 2px;cursor:pointer;border-bottom:3px solid #c46a2b;border-radius:3px;padding:0 2px}
+.gw-dy-yuan .dy-w .dy-g{font-size:12px;color:#6b7566;font-family:inherit;max-width:9em;white-space:normal;text-align:center;line-height:1.25}
+.gw-dy-yuan .dy-w.on{background:#fff3c4}
+.gw-dy-yuan .dy-t{color:#b9b2a3;margin:0 1px}
+.gw-dy-say{border:none;background:none;font-size:18px;cursor:pointer;vertical-align:middle;margin-left:6px}
+.gw-dy-jin{font-size:16px;color:var(--ink);margin-top:4px}
+.gw-dy-jin .dy-m{background:none;color:inherit;border-bottom:2px dotted #c46a2b}
+.gw-dy-jin .dy-m.on{background:#fff3c4}
+.gw-dy-shi{margin-top:6px}
+.gw-dy-xi{display:block;font-size:13px;color:#6b7566;margin:2px 0 4px}
+.gw-gloss{margin:8px 0;padding:10px 12px;border:1px solid #c46a2b;border-radius:12px;background:var(--surface);font-size:16px;min-height:1.6em}
+.gw-gloss b{font-size:20px;color:var(--accent-deep);font-family:Georgia,"Songti SC","SimSun",serif}
+.gw-src{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+a:focus-visible,button:focus-visible,input:focus-visible,.gw-card:focus-visible,.gw-item:focus-visible,.yw-head:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body class="page-sub page-guwen">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">古文</span>
+  <span></span>
+</header>
+<a href="quiz/index.html?tab=guwen&from=guwen.html" target="_top" style="display:block;text-align:center;margin:12px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
+<main class="listwrap">
+  <div id="gwnav"></div>
+  <div id="gwlist" style="display:none"></div>
+  <div id="gwroute" style="display:none"></div>
+  <div id="gwdetail" style="display:none"></div>
+  <div id="gwmlist" style="display:none"></div>
+  <div id="gwmdetail" style="display:none"></div>
+  <p class="gw-src" id="gwsrc">原文为公有领域古代文献；导读、译意、重点字词为本应用原创讲解。</p>
+</main>
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="data/guwen.js"></script>
+<script src="data/guwen_knowledge.js"></script>
+<script src="data/guwen_links.js"></script>
+<script src="wb/index.js"></script>
+<script src="guwen/songdu.js"></script>
+<script src="guwen/duiyi.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
+<script>
+(function(){
+  'use strict';
+  var D = window.NHZ_GUWEN || {texts: []};
+  /* 篇目 ↔ 知识点双向链接：tools/content/build_guwen_links.py 离线生成（例句逐字命中原文），缺文件时两处区块都不显示 */
+  var LINKS = window.NHZ_GUWEN_LINKS || {byText: {}, byPoint: {}};
+  /* 知识数据：语法模块式结构 {categories:[{id,name,icon,intro,items:[点]}]}。
+     点字段与语法模块一致：讲解、口诀、例子、分类、深讲、怎么认、辨析、例句解析、易错、动手练（练习）、小测。
+     题库 key 用“子模块:点名”（如 xuci:而），不用裸点名：裸名在子模块间会撞（安在实词与一词多义、
+     见/去/何/若/乃跨多个子模块），命名空间 key 才能保证题库挂到正确的点上。 */
+  var K = window.NHZ_GUWEN_KNOWLEDGE || {categories: []};
+  /* 题库：每子模块一个 bank 脚本（guwen/quiz_bank_guwen_<子模块>.js），进入该子模块时才 <script> 加载
+     （file:// 下也能用；合并式写入，不覆盖）。bankData 与 window.NHZ_GUWEN_BANK 是同一个对象。 */
+  var bankData = window.NHZ_GUWEN_BANK = window.NHZ_GUWEN_BANK || {};
+  var bankLoaded = {};
+  function loadBank(mid, cb){
+    if(bankLoaded[mid] === true){ cb(); return; }
+    if(bankLoaded[mid]){ bankLoaded[mid].push(cb); return; }
+    bankLoaded[mid] = [cb];
+    var sc = document.createElement('script');
+    sc.src = 'guwen/quiz_bank_guwen_' + mid + '.js';
+    function fin(){ var q = bankLoaded[mid]; bankLoaded[mid] = true; (q || []).forEach(function(f){ f(); }); }
+    sc.onload = fin; sc.onerror = fin;
+    document.head.appendChild(sc);
+  }
+  var bankState = {};
+  var bankQuizData = {};
+/* 复习/错题统一记录（与 fuxi.js 同款 helper，保持一致，勿单改一处）：
+   答错 -> 进错题本并安排明天复习；答对复习项 -> 推进间隔。静默失败，不影响答题反馈。 */
+window.NHZReview = window.NHZReview || (function () {
+  var WK = 'nhz_wrong', SK = 'nhz_srs';
+  var IV = [1, 2, 4, 7, 15, 30];
+  function load(k, fb) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+    catch (e) { return fb; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function hash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 'q' + (h < 0 ? -h : h);
+  }
+  function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+  function record(it, correct) {
+    if (!it || !it.q) return;
+    var id = idOf(it);
+    var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+    if (correct) {
+      if (srs[id]) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+        save(SK, srs);
+      }
+    } else {
+      var found = false;
+      for (var i = 0; i < wrong.length; i++) {
+        if (wrong[i].id === id) {
+          wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+            解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+          found = true; break;
+        }
+      }
+      if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+        解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+      save(WK, wrong);
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      save(SK, srs);
+    }
+  }
+  function review(id, remembered) {
+    var srs = load(SK, {}), now = Date.now();
+    if (!srs[id]) return false;
+    if (remembered) {
+      var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+      srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+    } else {
+      srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+    }
+    save(SK, srs);
+    return true;
+  }
+  function clearWrong(id) {
+    var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+    for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+    save(WK, nw);
+    if (srs[id]) { delete srs[id]; save(SK, srs); }
+  }
+  return { record: record, review: review, clearWrong: clearWrong,
+    loadWrong: function () { return load(WK, []); },
+    loadSrs: function () { return load(SK, {}); } };
+})();
+  var quizData = {};
+  var quizRecorded = {}; /* 动手练/小测只记首次作答（反馈仍可重答，不改反馈） */
+  var currentItems = {};
+  var MODS = [
+    /* 首页顺序按学习路径：读篇目 → 诵读 → 字词与语法 → 高频字 → 翻译 → 背景知识（文学、文化、历史）→ 总表 */
+    {id:'pianmu', icon:'📜', t:'古文篇目', d:'论语、寓言、史记、世说、唐宋八大家、小学课文'},
+    {id:'songdu', icon:'🔊', t:'诵读', d:'篇目积累、断句、语感'},
+    {id:'yufa', icon:'🧩', t:'语法', d:'实词、一词多义、古今异义、通假、词类活用、虚词、句式'},
+    /* 以下属于语法（parent:'yufa'），首页不出现，从语法页的子面板进入；顺序见 YUFA_ORDER */
+    {id:'shici', icon:'📝', t:'实词', d:'含55个初中优先', parent:'yufa'},
+    {id:'duoyi', icon:'🌿', t:'一词多义', d:'一字多义看语境', parent:'yufa'},
+    {id:'guyin', icon:'⚖️', t:'古今异义', d:'古今意思大不同', parent:'yufa'},
+    {id:'tongjia', icon:'🔁', t:'通假', d:'通假字读本字', parent:'yufa'},
+    {id:'huoyong', icon:'🔄', t:'词类活用', d:'换词性换意思', parent:'yufa'},
+    {id:'xuci', icon:'🔤', t:'虚词', d:'用法、例句、辨析、题库', parent:'yufa'},
+    {id:'gaopinci', icon:'⭐', t:'篇目高频字', d:'小学14篇与初中篇目重点字'},
+    {id:'fanyi', icon:'🔍', t:'翻译方法', d:'直译为主、留换删补调'},
+    {id:'wenxue', icon:'✒️', t:'文学常识', d:'作家作品、文体'},
+    {id:'wenhua', icon:'🏺', t:'文化常识', d:'器物、度量衡、历法、节日、地理'},
+    {id:'lishi', icon:'🏯', t:'历史', d:'朝代、史事人典、制度'},
+    {id:'zongbiao', icon:'📊', t:'汇总总表', d:'按分类的字表总汇'}
+  ];
+  var SECTIONS = [
+    {id:'论语选读', icon:'📖', t:'论语选读', d:'孔子的话，学与思'},
+    {id:'寓言故事', icon:'🦊', t:'寓言故事', d:'小故事，大道理'},
+    {id:'名家短篇', icon:'🏯', t:'名家短篇', d:'陋室铭、爱莲说、桃花源记'},
+    {id:'史记选读', icon:'📚', t:'史记选读', d:'鸿门宴、完璧归赵、破釜沉舟'},
+    {id:'世说新语', icon:'💬', t:'世说新语', d:'咏雪、陈太丘、杨氏之子'},
+    {id:'唐宋八大家', icon:'🖋️', t:'唐宋八大家', d:'师说、小石潭记、书戴嵩画牛'},
+    {id:'先秦散文', icon:'🏛️', t:'先秦散文', d:'孟子庄子荀子、左传战国策'},
+    {id:'魏晋散文', icon:'🎋', t:'魏晋散文', d:'出师表、陈情表、兰亭集序'},
+    {id:'小学课文', icon:'🎒', t:'小学课文', d:'司马光、精卫填海、囊萤夜读、曹冲称象等课本小古文'}
+  ];
+  var navEl = document.getElementById('gwnav');
+  var listEl = document.getElementById('gwlist');
+  var detEl = document.getElementById('gwdetail');
+  var mlistEl = document.getElementById('gwmlist');
+  var mdetEl = document.getElementById('gwmdetail');
+  var routeEl = document.getElementById('gwroute'); /* P2-B 进阶路线容器 */
+  var routeBack = false; /* P2-B：从路线图进详情时，详情的“回篇目”只回上一层（回路线图） */
+  var curMod = null, curFilter = '', curJr = false, curGroup = null;
+  /* 学段筛选（Q10-guwen）：数据实测 level 只有两种——"小学"19卡、"初高中拓展"287卡，
+     没有单独的初中/高中拆分，故筛选项为 全部/小学/初高中（初中+高中合一档，不虚构拆分）。
+     知识点按 it.level 判；篇目无 level 字段，按有无 ce（小学课内册次）判：有 ce=小学14篇，无 ce=初高中45篇。
+     默认"全部"，不默认隐藏任何内容；筛选状态全局保持，切换子模块/篇目分类不重置。 */
+  var curLevel = '全部';
+  var curListCat = null; /* listEl 当前显示：null=篇目分类页，否则为篇目分类名/全部 */
+  function levelOf(it){ return (it && it.level) ? it.level : '初高中拓展'; }
+  function levelMatch(it){
+    if(curLevel === '全部') return true;
+    if(curLevel === '小学') return levelOf(it) === '小学';
+    return levelOf(it) === '初高中拓展'; /* 初高中档 */
+  }
+  function textLevel(t){ return t.ce ? '小学' : '初高中'; }
+  function textMatch(t){ return curLevel === '全部' || textLevel(t) === curLevel; }
+  function levelCounts(items, fn){
+    var c = {'全部': 0, '小学': 0, '初高中': 0};
+    (items || []).forEach(function(x){ c['全部']++; c[fn(x)]++; });
+    return c;
+  }
+  function levelFilterHtml(counts){
+    return '<div style="margin:8px 0"><span style="font-size:15px;font-weight:bold;margin-right:6px">学段：</span>' +
+      ['全部', '小学', '初高中'].map(function(lv){
+        return '<button class="gw-filterbtn' + (curLevel === lv ? ' on' : '') + '" data-level="' + lv + '">' + lv + '（' + counts[lv] + '）</button>';
+      }).join('') + '</div>';
+  }
+  var lastTextList = '全部'; /* 篇目详情返回用：记住从哪个篇目列表进来（全部或分类） */
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function catById(id){
+    for(var i=0;i<K.categories.length;i++) if(K.categories[i].id===id) return K.categories[i];
+    return null;
+  }
+  function modMeta(id){
+    for(var i=0;i<MODS.length;i++) if(MODS[i].id===id) return MODS[i];
+    return {id:id, icon:'📖', t:id, d:''};
+  }
+  function hideAll(){
+    if(window.NHZGwSd) NHZGwSd.stop();
+    navEl.style.display='none'; listEl.style.display='none'; detEl.style.display='none';
+    mlistEl.style.display='none'; mdetEl.style.display='none';
+    if(routeEl) routeEl.style.display='none'; /* P2-B */
+  }
+  /* ---------- 子模块列表（语法模块式 panel 网格） ---------- */
+  function showNav(){
+    hideAll(); navEl.style.display='block'; window.scrollTo(0,0);
+    /* 属于语法的子模块（parent:'yufa'）首页不与语法并列，从语法页的子面板进入 */
+    var h = '<div class="yw-grid">' + MODS.filter(function(m){ return !m.parent; }).map(function(m){
+      var n = m.id==='pianmu' ? D.texts.length : (catById(m.id) ? catById(m.id).items.length : 0);
+      /* 语法卡的点数 = 语法条目 + 其下各子面板条目 */
+      if(m.id==='yufa') MODS.forEach(function(c){ if(c.parent==='yufa' && catById(c.id)) n += catById(c.id).items.length; });
+      var unit = m.id==='pianmu' ? '篇' : '点';
+      return '<button class="yw-head" data-mod="'+esc(m.id)+'"><span class="yw-ico">'+m.icon+'</span><span class="yw-name">'+esc(m.t)+'</span><span class="yw-sub">'+n+unit+' · '+esc(m.d)+'</span><span class="yw-arrow">▾</span></button>';
+    }).join('') + '</div>';
+    navEl.innerHTML = h;
+  }
+  /* ---------- 篇目流（原有分类→列表→明细，原样不动） ---------- */
+  function showSections(){
+    curListCat = null;
+    hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→分类排）</button>'; /* P2-B */
+    h += levelFilterHtml(levelCounts(D.texts, textLevel));
+    h += '<div class="gw-grid">' + SECTIONS.map(function(s){
+      var n = D.texts.filter(function(t){ return t.cat === s.id && textMatch(t); }).length;
+      return '<div class="gw-card" data-go="'+esc(s.id)+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+n+' 篇 · '+esc(s.d)+'</p></div>';
+    }).join('') + '</div>';
+    h += '<button class="gw-backbtn" data-go="全部">📜 全部篇目（共'+D.texts.filter(textMatch).length+'篇）</button>';
+    listEl.innerHTML = h;
+  }
+  function showList(cat){
+    lastTextList = cat;
+    curListCat = cat;
+    hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
+    var base = cat==='全部' ? D.texts : D.texts.filter(function(t){return t.cat===cat;});
+    var items = base.filter(textMatch);
+    var h = levelFilterHtml(levelCounts(base, textLevel));
+    if(!items.length){
+      h += '<p class="gw-p">本分类下没有「'+esc(curLevel)+'」篇目，切换学段或回分类看看。</p>';
+    }
+    h += items.map(function(t){
+      var idx = D.texts.indexOf(t);
+      return '<div class="gw-item" data-idx="'+idx+'"><div class="gw-ititle">'+esc(t.title)+'</div><div class="gw-imeta">'+esc(t.author)+' · '+esc(t.source)+' · '+esc(t.cat)+'</div></div>';
+    }).join('');
+    listEl.innerHTML = h;
+  }
+  /* ---------- P2-B 古文进阶路线（独立区块，不动 showDetail 篇目详情主体） ----------
+     路线排序依据（实测 data/guwen.js，59 篇；不要编造难度等级）：
+     · 有 ce（册次）字段的只有 14 篇：3上1、3下1、4上2、4下2、5上1、5下2、6上4、6下1。
+       第一段按册次排：3上→3下→4上→4下→5上→5下→6上→6下；同册次内保持数据原顺序。
+       注意设计文档写的是“3下→6上→7上…”，实测并无 7上及以上册次，路线只排真实存在的册次。
+     · 无 ce 的 45 篇没有 level 字段（全篇 level 均为 undefined），不编难度。
+       第二段按 cat 分组排，组序：论语选读→寓言故事→先秦散文→史记选读→唐宋八大家→
+       世说新语→魏晋散文→名家短篇→小学课文；组内保持数据原顺序。
+       其中小学课文 6 篇全有 ce，故第二段无小学课文组（空组不显示）。
+       第二段组名下明确标注“未标册次 · 按分类排，不是难度等级”。
+     掌握度计算方式（只读现有账本，不实现新模型、不改账本格式）：
+     · nhz_wrong（NHZReview.loadWrong()）：错题数组，每条 {q, options, answer, 解析, src, point, addedAt}。
+       只有互动练习的填今译/断句题把篇名写进题干（《篇名》），才能无歧义归属到篇；
+       古文页内题库/知识点题只记 point（知识点名，跨模块重名，如“说”），按 point 归属会误算，
+       故不按 point 归属。单篇可归属错题数 = 题干含《该篇篇名》的 nhz_wrong 条数。
+     · nhz_srs：键是题干哈希（q+options+answer），值只有 {iv, next}，无法反推属于哪篇，
+       故不用于单篇掌握度（设计文档“读 nhz_srs”只能读到全站复习项，落不到篇）。
+     · 点读（原文点字看释义、点句末标点朗读）没有任何落盘账本，故无点读覆盖率——不硬造。
+     · 答对首答不落盘（record 只在答错时建项、答对复习项时推进间隔），所以“无错题”≠“已掌握”。
+     结论：单篇只有两态——无可归属错题 →「未开始」（仅表示账本里没有这篇的错题，
+     不是“没学过”）；有可归属错题 →「有错题待复习（N 条）」。不给百分比、不给“已掌握”。
+     点击路线图中的篇目进 showDetail；详情的“回篇目”只回上一层（回路线图，见 routeBack）。 */
+  var CE_ORDER = ['3上','3下','4上','4下','5上','5下','6上','6下'];
+  var CAT_ORDER = ['论语选读','寓言故事','先秦散文','史记选读','唐宋八大家','世说新语','魏晋散文','名家短篇','小学课文'];
+  function routeMastery(){
+    var wrong = [];
+    try { wrong = (window.NHZReview && window.NHZReview.loadWrong()) || []; } catch(e) { wrong = []; }
+    var map = {};
+    wrong.forEach(function(w){
+      var m = String((w && w.q) || '').match(/《([^》]+)》/);
+      if(m) map[m[1]] = (map[m[1]] || 0) + 1;
+    });
+    return map;
+  }
+  function routeGroups(){
+    var withCe = [], noCe = [];
+    D.texts.forEach(function(t, i){ (t.ce ? withCe : noCe).push({t: t, idx: i}); });
+    withCe.sort(function(a, b){
+      var d = CE_ORDER.indexOf(a.t.ce) - CE_ORDER.indexOf(b.t.ce);
+      return d !== 0 ? d : a.idx - b.idx;
+    });
+    var groups = [];
+    CAT_ORDER.forEach(function(cat){
+      var items = noCe.filter(function(x){ return x.t.cat === cat; });
+      if(items.length) groups.push({cat: cat, items: items});
+    });
+    noCe.forEach(function(x){ /* cat 不在 CAT_ORDER 时兜底：按原顺序追加成组，不丢篇 */
+      if(CAT_ORDER.indexOf(x.t.cat) < 0 && !groups.some(function(g){ return g.cat === x.t.cat; }))
+        groups.push({cat: x.t.cat, items: noCe.filter(function(y){ return y.t.cat === x.t.cat; })});
+    });
+    return {withCe: withCe, groups: groups};
+  }
+  function showRoute(){
+    hideAll(); routeEl.style.display='block'; window.scrollTo(0,0);
+    var g = routeGroups(), mastery = routeMastery(), n = 0;
+    function itemHtml(x){
+      n++;
+      var c = mastery[x.t.title] || 0;
+      var badge = c ? '<span class="gw-route-badge warn">有错题待复习（'+c+' 条）</span>'
+                    : '<span class="gw-route-badge">未开始</span>';
+      return '<div class="gw-item" data-route-idx="'+x.idx+'"><span class="gw-route-num">'+n+'</span>' +
+        '<span class="gw-ititle">'+esc(x.t.title)+'</span>' + badge +
+        '<div class="gw-imeta">'+esc(x.t.author)+' · '+esc(x.t.source)+' · '+esc(x.t.cat) +
+        (x.t.ce ? ' · ' + esc(x.t.ce) : '') + '</div></div>';
+    }
+    var h = '<div class="gw-head"><h2>🗺️ 古文进阶路线</h2><div class="gw-meta">共 '+D.texts.length+' 篇 · 点击篇目进详情</div></div>';
+    h += '<div class="gw-route-sec">第一段 · 有册次（'+g.withCe.length+' 篇，按册次 3上→6下）</div>';
+    h += g.withCe.map(itemHtml).join('');
+    h += '<div class="gw-route-sec">第二段 · 未标册次（'+g.groups.reduce(function(s, gr){ return s + gr.items.length; }, 0)+' 篇，按分类排）</div>';
+    h += '<p class="gw-route-note">第二段的篇目在数据里没有册次、也没有难度字段，'
+      + '这里只按分类分组排先后，不是难度等级，不要按组序理解为由易到难。</p>';
+    g.groups.forEach(function(gr){
+      h += '<div class="gw-route-group">'+esc(gr.cat)+'（'+gr.items.length+' 篇 · 未标册次）</div>';
+      h += gr.items.map(itemHtml).join('');
+    });
+    h += '<p class="gw-route-note">掌握度说明：只认本地错题本（nhz_wrong）里题干带《篇名》的错题；'
+      + '“未开始”只表示账本里没有这篇的错题，不是没学过。点读没有记录，所以不算点读覆盖率；'
+      + '错题本按题记不按篇记，所以这里不给百分比、不标“已掌握”。</p>';
+    routeEl.innerHTML = h;
+  }
+  var curText = -1;
+  if(window.NHZGwSd) NHZGwSd.cur = function(){ return detEl.style.display !== 'none' ? D.texts[curText] : null; };
+  if(window.NHZGwDy) NHZGwDy.cur = function(){ return detEl.style.display !== 'none' ? D.texts[curText] : null; };
+  function showDetail(idx){
+    var t = D.texts[idx]; if(!t) return;
+    curText = idx; try{ speechSynthesis.cancel(); }catch(e){}
+    hideAll(); detEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<div class="gw-head"><h2>'+esc(t.title)+'</h2><div class="gw-meta">'+esc(t.author)+' · '+esc(t.source)+'</div></div>';
+    /* 古文区 P2-A 论语语境卡：只给 cat='论语选读' 的篇目加播放按钮，点了才加载引擎和场景（复用知识点详情的白板按钮写法与点击处理） */
+    if(t.cat==='论语选读' && window.NHZ_WB_INDEX && window.NHZ_WB_INDEX['古文:语境:'+t.title])
+      h += '<div class="gw-sec">🎬 语境卡</div><div class="gw-wb" data-gwwb="'+esc('古文:语境:'+t.title)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放语境卡</button></div>';
+    h += '<div class="gw-sec">📖 原文 <span class="gw-tag">点读</span></div><div class="gw-yuanwen gw-yw">'+yuanwenHtml(t)+'</div>';
+    if(window.NHZGwSd) h += NHZGwSd.barHtml(t); /* P1-D 诵读跟读（guwen/songdu.js） */
+    if(window.NHZGwDy) h += NHZGwDy.html(t); /* A21 逐句对译点读（guwen/duiyi.js；默认收起） */
+    h += '<div class="gw-gloss" id="gwGloss">点带橙线的字看意思；点句末标点听这一句。</div>';
+    h += '<div class="gw-sec">💡 导读</div><p class="gw-p">'+esc(t.导读)+'</p>';
+    h += '<div class="gw-sec">🔍 译意</div><p class="gw-p">'+esc(t.译意)+'</p>';
+    h += '<div class="gw-sec">📝 重点字词</div><div class="gw-words">'+t.重点.map(function(w){
+      return '<div class="gw-word"><b>'+esc(w[0])+'</b>：'+esc(w[1])+'</div>';
+    }).join('')+'</div>';
+    /* 古文区 P2-D 历史人物时间轴：只给史记选读 / 唐宋八大家篇目加按钮（点了才加载，仿知识点详情的白板按钮写法）；其他分类不动 */
+    if((t.cat === '史记选读' || t.cat === '唐宋八大家') && window.NHZ_WB_INDEX && window.NHZ_WB_INDEX['古文:时间轴:' + t.author])
+      h += '<div class="gw-sec">🕰 人物时间轴</div><div class="gw-wb" data-gwwb="'+esc('古文:时间轴:' + t.author)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放人物时间轴</button></div>';
+    /* A22-9 古文产出题型：本篇有逐句 停/对/今 标注时，给断句 / 排今译 / 填今译入口（题目由 quiz/gw_chan.js 自动生成） */
+    if((t.句 || []).some(function(s){ return s.停 || (s.对 && s.对.length) || s.今; }))
+      h += '<a class="gw-chanlink" href="quiz/index.html?tab=guwen&from=guwen.html&text='+encodeURIComponent(t.title)+'" target="_top">✍️ 本篇产出练习：断句 · 排今译 · 填今译 →</a>';
+    h += knowCardHtml(t.title);
+    if(t.出处 && t.出处.length) h += '<p class="gw-src">导读、译意、重点字词依据：' + t.出处.map(esc).join('；') + '</p>';
+    detEl.innerHTML = h;
+    detEl.dataset.back = lastTextList || t.cat;
+  }
+  /* 原文点读（gaijin/guwen P0-A 的先行版）：用篇目已有的「重点」字词，在原文里给每个重点字词的第一次出现画橙线，
+     点开看释义和本篇相关知识点；点句末标点（。！？）朗读这一句。逐句今译、注字、停顿、句式见下方「逐句对译」（guwen/duiyi.js，数据 句[]）。 */
+  function yuanwenHtml(t){
+    var src = String(t.原文 || ''), keys = (t.重点 || []).map(function(w){ return w[0]; }).filter(Boolean);
+    keys.sort(function(a, b){ return b.length - a.length; });
+    var used = {}, out = '', i = 0, sen = 0, buf = '';
+    function flush(endPu){
+      out += '<span class="sen" data-sen="'+sen+'">' + buf + (endPu ? '<span class="pu" data-pu="'+sen+'">'+esc(endPu)+'</span>' : '') + '</span>';
+      buf = ''; sen++;
+    }
+    while(i < src.length){
+      var hit = null;
+      for(var k = 0; k < keys.length; k++){ if(!used[keys[k]] && src.substr(i, keys[k].length) === keys[k]){ hit = keys[k]; break; } }
+      if(hit){ used[hit] = 1; buf += '<span class="zd" data-zd="'+esc(hit)+'">'+esc(hit)+'</span>'; i += hit.length; continue; }
+      var ch = src.charAt(i++);
+      if(/[。！？]/.test(ch)){ while(i < src.length && /[”’」]/.test(src.charAt(i))){ ch += src.charAt(i++); } flush(ch); }
+      else buf += esc(ch);
+    }
+    if(buf) flush('');
+    return out;
+  }
+  var gwJs = {};
+  function gwLoad(list, cb){
+    var i = 0;
+    (function next(ok){
+      if(!ok) return cb(false);
+      if(i >= list.length) return cb(true);
+      var src = list[i++]; if(gwJs[src]) return next(true);
+      var sc = document.createElement('script'); sc.src = src;
+      sc.onload = function(){ gwJs[src] = 1; next(true); }; sc.onerror = function(){ next(false); };
+      document.body.appendChild(sc);
+    })(true);
+  }
+  function glossFor(t, key){
+    var w = (t.重点 || []).filter(function(x){ return x[0] === key; })[0];
+    var rows = ((LINKS.byText || {})[t.title] || []).filter(function(r){ return r.name === key || r.name.indexOf(key) === 0; });
+    return '<b>'+esc(key)+'</b>：'+esc(w ? w[1] : '') + (rows.length ? '<div style="margin-top:6px">' + rows.map(function(r){ var m = modMeta(r.mid); return '<button class="gw-from" data-gwpoint="'+esc(r.mid)+':'+r.i+'">'+m.icon+' '+esc(m.t)+'·'+esc(r.name)+' →</button>'; }).join('') + '</div>' : '');
+  }
+  function speakSen(el){
+    detEl.querySelectorAll('.sen.reading').forEach(function(x){ x.classList.remove('reading'); });
+    if(!('speechSynthesis' in window)){ var g = document.getElementById('gwGloss'); if(g) g.textContent = '这台设备不能朗读。'; return; }
+    try{ speechSynthesis.cancel(); }catch(e){}
+    el.classList.add('reading');
+    var u = new SpeechSynthesisUtterance(el.textContent.replace(/[，。！？、；：“”‘’]/g, ' '));
+    u.lang = 'zh-CN'; u.rate = 0.8; u.onend = function(){ el.classList.remove('reading'); };
+    speechSynthesis.speak(u);
+  }
+  /* 本篇文言知识卡：按子模块顺序汇总「虚词 3 · 通假 1 …」，每条点开跳到该知识点 */
+  function knowCardHtml(title){
+    var rows = (LINKS.byText || {})[title];
+    if(!rows || !rows.length) return '';
+    var order = MODS.map(function(m){ return m.id; });
+    rows = rows.slice().sort(function(a, b){ return order.indexOf(a.mid) - order.indexOf(b.mid) || a.i - b.i; });
+    var cnt = {}, seq = [];
+    rows.forEach(function(r){ if(!cnt[r.mid]){ cnt[r.mid] = 0; seq.push(r.mid); } cnt[r.mid]++; });
+    var h = '<div class="gw-sec" id="gwKnowCard">🗂 本篇文言知识卡</div>';
+    h += '<p class="gw-kc-sum">本篇：' + seq.map(function(mid){ return esc(modMeta(mid).t) + ' ' + cnt[mid]; }).join(' · ') + '</p>';
+    h += rows.map(function(r){
+      var m = modMeta(r.mid);
+      return '<button class="gw-kc" data-gwpoint="'+esc(r.mid)+':'+r.i+'">'+m.icon+' '+esc(m.t)+' · <b>'+esc(r.name)+'</b> →' +
+        '<span class="gw-kc-ex">'+esc(r.ex)+'</span></button>';
+    }).join('');
+    h += '<p class="gw-src">知识卡按知识库例句与本篇原文逐字对上自动列出，没对上的知识点不硬凑。</p>';
+    return h;
+  }
+  /* 知识点 → 出自哪些篇目（知识点详情底部） */
+  function fromTextsHtml(modId, idx){
+    var key = String(idx).replace(/_(\d+)$/, ':$1');
+    var rows = (LINKS.byPoint || {})[key];
+    if(!rows || !rows.length) return '';
+    var seen = {};
+    rows = rows.filter(function(r){ if(seen[r.t]) return false; seen[r.t] = 1; return textIdx(r.t) >= 0; });
+    if(!rows.length) return '';
+    return '<div class="gw-sec">📜 例句出自本库篇目</div><div>' + rows.map(function(r){
+      return '<button class="gw-from" data-gwtext="'+esc(r.t)+'" title="'+esc(r.ex)+'">出自《'+esc(r.t)+'》→</button>';
+    }).join('') + '</div>';
+  }
+  function textIdx(title){
+    for(var i=0;i<D.texts.length;i++) if(D.texts[i].title===title) return i;
+    return -1;
+  }
+  function openPoint(mid, i){
+    var yc = mid==='yufa' ? catById('yufa') : null;
+    showMList(mid, false, yc && yc.items[i] ? yufaGroupOf(yc.items[i]) : undefined);
+    loadBank(mid, function(){
+      if(curMod !== mid) return;
+      var key = mid + '_' + i;
+      if(!currentItems[key]) renderMItems();
+      if(currentItems[key]) showMDetail(key);
+    });
+  }
+  /* ---------- 题库（语法模块 bank 机制，key 为点 key） ---------- */
+  function bankFiltered(bid){
+    var st = bankState[bid];
+    var qs = bankData[st.key].questions;
+    if(!st.filter || st.filter==='全部') return qs;
+    return qs.filter(function(q){ return q['类']===st.filter; });
+  }
+  function bankHeadHtml(bid){
+    var st = bankState[bid];
+    var qs = bankFiltered(bid);
+    var end = Math.min(st.offset+10, qs.length);
+    var label = (st.filter && st.filter!=='全部') ? '（'+st.filter+'）' : '';
+    return '第 '+(st.offset+1)+'–'+end+' 道 / 共 '+qs.length+' 道'+label+' · 本轮答对 '+st.score+' / 已答 '+st.answered;
+  }
+  function bankBatchHtml(bid){
+    var st = bankState[bid];
+    var qs = bankFiltered(bid);
+    var batch = qs.slice(st.offset, st.offset+10);
+    return batch.map(function(q, qi){
+      var qid = 'bk'+bid+'_'+qi+'_'+Math.floor(Math.random()*100000);
+      bankQuizData[qid] = q;
+      return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+(st.offset+qi+1)+'. '+esc(q.q)+'</div>'+
+        '<div class="quiz-opts">'+q.options.map(function(op, oi){
+          return '<button data-bqid="'+qid+'" data-boi="'+oi+'">'+esc(op)+'</button>';
+        }).join('')+'</div><div class="quiz-fb"></div></div>';
+    }).join('');
+  }
+  function renderBank(bid){
+    var box = document.getElementById(bid);
+    if(!box) return;
+    var st = bankState[bid];
+    box.querySelector('.bank-head').textContent = bankHeadHtml(bid);
+    box.querySelector('.bank-qs').innerHTML = bankBatchHtml(bid);
+    var btns = box.querySelectorAll('[data-bank-filter]');
+    for(var i=0;i<btns.length;i++){
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-bank-filter').split('|')[1]===st.filter);
+    }
+  }
+  /* 内容分型：8型（CONTENT_PATTERNS.md v2.0），按子模块id映射 */
+  function itemType(modId){
+    var m = modId || '';
+    if(m==='xuci' || m==='guyin') return '辨析';
+    if(m==='shici' || m==='duoyi' || m==='gaopinci') return '词条';
+    if(m==='yufa' || m==='huoyong') return '规律';
+    if(m==='songdu' || m==='fanyi') return '程序';
+    if(m==='lishi') return '故事';
+    if(m==='tongjia' || m==='wenxue' || m==='wenhua' || m==='meiti' || m==='zongbiao') return '清单';
+    return '规律';
+  }
+  var TYPE_LABEL = { '规律':'规律型', '辨析':'辨析型', '程序':'程序型', '词条':'词条型', '故事':'故事型', '清单':'清单型', '材料':'材料型' };
+  var TYPE_COLOR = { '规律':'#3d5a40', '辨析':'#5a4a7a', '程序':'#7a5a3a', '词条':'#4a7a59', '故事':'#8a5a44', '清单':'#5a6a7a', '材料':'#7a6a3d' };
+  function typeTag(tp){
+    return '<div class="yw-typetag" style="--tc:' + TYPE_COLOR[tp] + '">' + TYPE_LABEL[tp] + '</div>';
+  }
+  /* ---------- 点渲染（语法模块渲染顺序 + 按型节标题） ---------- */
+  function itemHtml(it, idx, icon, modId){
+    var body = '';
+    var hasVisual = it['类比'] || it['图示'] || it['动画'] || it['小测'];
+    var step = 0;
+    var tp = itemType(modId);
+    /* 学前先看：仅当有真实前置时显示 */
+    if(it['前置知识'] && it['前置知识'].length){
+      body += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div>' +
+        '<p class="yw-exp">先复习：' + it['前置知识'].map(function(q){ return esc(q); }).join('、') + '</p></div>';
+    }
+    /* 型标签 */
+    function stepHead(title){
+      step++;
+      return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+title+'</span></div>';
+    }
+    /* 按型定的节标题（内容零删减，只换标题） */
+    var T = {
+      '规律': { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' },
+      '辨析': { analogy:'💡 啊哈现象', rule:'辨析对照', ex:'分水岭例句', bad:'天坑病例' },
+      '词条': { analogy:'💡 啊哈现象', rule:'释义精讲', ex:'例组', bad:'易错诊所' },
+      '程序': { analogy:'💡 啊哈现象', rule:'一句话', ex:'全程演示', bad:'易错诊所' },
+      '故事': { analogy:'💡 啊哈现象', rule:'时间轴', ex:'关键节点', bad:'易错诊所' },
+      '清单': { analogy:'💡 啊哈现象', rule:'一览', ex:'例组', bad:'易错诊所' }
+    }[tp] || { analogy:'💡 啊哈现象', rule:'一句话', ex:'例组', bad:'病例' };
+    /* 白板（gaijin/guwen P0-B 句式拆装，键「古文:知识点名」）：点了才加载引擎和场景 */
+    /* 先查「古文:分类名:名」（一词多义「去」与古今异义「去」同名，A22-5），再查「古文:名」 */
+    var wbI = window.NHZ_WB_INDEX || {}, wbCat = catById(modId), wbK = wbCat && wbI['古文:' + wbCat.name + ':' + it.name] ? '古文:' + wbCat.name + ':' + it.name : '古文:' + it.name;
+    /* 回落到「古文:名」时，古今异义白板（gw_gy_*）只给古今异义分类：实词「去 汤 涕 走」等同名条目不再出古今异义白板（LEFTOVER A-09） */
+    if(wbK === '古文:' + it.name && /^gw_gy_/.test(wbI[wbK] || '') && !(wbCat && wbCat.id === 'guyin')) wbK = '';
+    if(wbK && wbI[wbK]){
+      body += '<div class="yw-step"><span class="yw-stepnum">🎬</span><span class="yw-steptitle">白板动画</span></div><div class="gw-wb" data-gwwb="'+esc(wbK)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放白板动画</button></div>';
+    }
+    /* 规则一句话 */
+    if(it['讲解'] || it['口诀'] || (it['例子'] && it['例子'].length)){
+      body += stepHead(T.rule);
+      if(it['讲解']) body += '<p class="yw-exp">' + esc(it['讲解']) + '</p>';
+      if(it['口诀']) body += '<div class="yw-koujue2">🗣️ 口诀：' + esc(it['口诀']) + '</div>';
+      if(it['例子'] && it['例子'].length){
+        body += '<div class="words">' + it['例子'].map(function(w){
+          return '<span>' + esc(w) + '</span>';
+        }).join('') + '</div>';
+      }
+    }
+    /* Q15 四型模板：对照表（结构化字段）+ 图式（分类 → 中心 + 成员阵列） */
+    var PT = window.NHZPatterns || null;
+    if (PT) {
+      if (it['对照表']) body += PT.renderCompare(it['对照表']);
+      if (PT.schemaFromItem(it)) body += PT.renderSchema(PT.schemaFromItem(it));
+    }
+    /* 分类：每类独立块 */
+    if(it['分类'] && it['分类'].length){
+      var flColors = ['#4a7a59', '#7a6a3d', '#8a5a44', '#5a6a7a', '#6a7a4a', '#7a5a5a'];
+      body += stepHead('分类 · ' + it['分类'].length + '类');
+      body += it['分类'].map(function(c, ci){
+        return '<div class="yw-fenlei" style="--fl:' + flColors[ci % flColors.length] + '">' +
+          '<div class="yw-fl-head"><span class="yw-fl-name">' + esc(c['类']) + '</span>' +
+          '<span class="yw-fl-rep">' + esc(c['代表'] || '') + '</span></div>' +
+          '<p class="yw-exp">' + esc(c['说明'] || '') + '</p>' +
+          (c['例子'] ? c['例子'].map(function(e){
+            return '<p class="yw-exp">📝 ' + esc(e) + '</p>';
+          }).join('') : '') + '</div>';
+      }).join('');
+    }
+    /* 怎么认：程序型重排为步骤卡形态 */
+    if(it['怎么认'] && it['怎么认'].length){
+      if(tp === '程序'){
+        body += stepHead('🃏 步骤卡') + '<div class="yw-stepcards">' +
+          it['怎么认'].map(function(s, si){
+            return '<div class="yw-stepcard"><span class="yw-stepcard-n">' + (si+1) + '</span><span>' + esc(s) + '</span></div>';
+          }).join('') + '</div>';
+      } else {
+        body += stepHead('怎么认') +
+          it['怎么认'].map(function(s, si){
+            return '<p class="yw-exp">' + (si+1) + '. ' + esc(s) + '</p>';
+          }).join('');
+      }
+    }
+    /* Q15 四型模板：决策树（字段优先；程序型无字段时用「怎么认」排成判断流程）+ 时间轴（故事型：讲解里的 → 链） */
+    if (PT) {
+      if (it['决策树']) body += PT.renderDecision(it['决策树']);
+      else if (tp === '程序' && it['怎么认'] && it['怎么认'].length) {
+        body += PT.renderDecisionNodes(PT.decisionFromSteps(it['怎么认']), '判断流程（按「怎么认」）');
+      }
+      if (tp === '故事' && PT.timelineFromItem(it)) body += PT.renderTimeline(PT.timelineFromItem(it));
+    }
+    if(it['类比']) body += stepHead(T.analogy) + '<div class="yw-analogy">' + it['类比'] + '</div>';
+    if(it['图示']) body += stepHead('看图说话') + '<div class="yw-diagram">' + it['图示'] + '</div>';
+    if(it['深讲']) body += stepHead('深讲一点') + '<p class="yw-exp">' + esc(it['深讲']) + '</p>';
+    /* 辨析：guyin模块的"古义是X，今义是Y"解析为对照表，其余保持原文 */
+    if(it['辨析']){
+      var bxHtml = '<div class="warn">🔍 辨析：' + esc(it['辨析']) + '</div>';
+      if(modId === 'guyin'){
+        var bxm = String(it['辨析']).match(/^古义是(.+?)，今义是(.+?)[，。]/);
+        if(bxm){
+          bxHtml = '<div class="sec-t" style="font-size:15px;font-weight:bold;color:#3d5a40;margin:16px 0 8px">对照表</div>' +
+            '<table style="width:100%;border-collapse:collapse;font-size:14px;margin:8px 0">' +
+            '<tr><th style="border:1px solid #d5dfd0;padding:8px 10px;background:#f8faf5;text-align:left">古义</th>' +
+            '<th style="border:1px solid #d5dfd0;padding:8px 10px;background:#f8faf5;text-align:left">今义</th></tr>' +
+            '<tr><td style="border:1px solid #d5dfd0;padding:8px 10px">' + esc(bxm[1]) + '</td>' +
+            '<td style="border:1px solid #d5dfd0;padding:8px 10px">' + esc(bxm[2]) + '</td></tr></table>';
+        }
+      }
+      body += bxHtml;
+    }
+    /* 例句解析：程序型标题为全程演示 */
+    if(it['例句解析'] && it['例句解析'].length) body += stepHead(tp === '程序' ? '🎬 全程演示' : '例句解析') +
+      it['例句解析'].map(function(e){
+        return '<p class="yw-exp">📝 ' + esc(e['句'] || '') + '<br>↳ ' + esc(e['析'] || '') + '</p>';
+      }).join('');
+    if(it['易错']) body += '<div class="warn">⚠️ ' + esc(it['易错']) + '</div>';
+    /* 题库动手练：有点库的点用题库（每轮 10 道），不再重复显示样板 3 道 */
+    var bk = it.key ? bankData[it.key] : null;
+    if(bk && bk.questions && bk.questions.length){
+      var bid = 'bank'+idx+'_'+Math.floor(Math.random()*100000);
+      bankState[bid] = {key: it.key, offset: 0, score: 0, answered: 0, filter: '全部'};
+      var bclasses = ['全部'];
+      bk.questions.forEach(function(q){
+        if(q['类'] && bclasses.indexOf(q['类']) < 0) bclasses.push(q['类']);
+      });
+      body += '<div class="yw-quiz yw-bank" id="' + bid + '">' +
+        '<div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练 · 题库</span></div>' +
+        '<div class="bank-filters">' + bclasses.map(function(c){
+          return '<button class="' + (c==='全部' ? 'on' : '') + '" data-bank-filter="' + bid + '|' + c + '">按类练：' + esc(c) + '</button>';
+        }).join('') + '</div>' +
+        '<p class="yw-exp bank-head">' + esc(bankHeadHtml(bid)) + '</p>' +
+        '<div class="bank-qs">' + bankBatchHtml(bid) + '</div>' +
+        '<button class="bank-next" data-bank-next="' + bid + '">再来 10 道 →</button></div>';
+    }
+    /* 动手练（每点 3 道带解析的选择题，按类分组） */
+    if(it['练习'] && it['练习'].length && !bk){
+      var groups = [];
+      it['练习'].forEach(function(q){
+        var gname = q['类'] || '综合';
+        var g = null;
+        for(var gi=0; gi<groups.length; gi++) if(groups[gi].name===gname) g = groups[gi];
+        if(!g){ g = {name: gname, qs: []}; groups.push(g); }
+        g.qs.push(q);
+      });
+      var qi = 0;
+      body += '<div class="yw-quiz"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">动手练</span></div>' + groups.map(function(g){
+        return '<div class="yw-lx-group"><div class="yw-lx-grouphead">按类练：' + esc(g.name) + '</div>' + g.qs.map(function(q){
+          var qid = 'lx'+idx+'_'+(qi++)+'_'+Math.floor(Math.random()*100000);
+          quizData[qid] = q;
+          return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+esc(q.q)+'</div>'+
+            '<div class="quiz-opts">'+q.options.map(function(op, oi){
+              return '<button data-qid="'+qid+'" data-oi="'+oi+'">'+esc(op)+'</button>';
+            }).join('')+'</div><div class="quiz-fb"></div></div>';
+        }).join('') + '</div>';
+      }).join('') + '</div>';
+    }
+    /* 小测（有则保留；古文点目前无小测） */
+    if(it['小测'] && it['小测'].length){
+      body += '<div class="yw-quiz">' + it['小测'].map(function(q, qi){
+        var qid = 'q'+idx+'_'+qi+'_'+Math.floor(Math.random()*100000);
+        quizData[qid] = q;
+        return '<div class="quiz-q" id="'+qid+'"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div>'+
+          '<div class="quiz-opts">'+q.options.map(function(op, oi){
+            return '<button data-qid="'+qid+'" data-oi="'+oi+'">'+esc(op)+'</button>';
+          }).join('')+'</div><div class="quiz-fb"></div></div>';
+      }).join('') + '</div>';
+    }
+    /* 古文原有内容：外链与备注，放在最后保留 */
+    if(it.links && it.links.length){
+      body += '<div class="gw-sec">链接</div>' + it.links.map(function(l){
+        return '<a class="gw-linkbtn" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t)+'</a><p class="gw-p">'+esc(l.note || '')+'</p>';
+      }).join('');
+    }
+    if(it.note) body += '<p class="gw-src">'+esc(it.note)+'</p>';
+    body += fromTextsHtml(modId, idx);
+    currentItems[idx] = {it: it, body: body, icon: icon};
+    var bank = bk;
+    return '<div class="yw-item">' +
+      '<button class="yw-head" data-idx="'+idx+'"><span class="yw-ico">'+icon+'</span><span class="yw-name">'+esc(it.name || '')+'</span>' +
+      (it['口诀'] ? '<span class="yw-kj">'+esc(it['口诀'])+'</span>' : '') +
+      (it['subtitle'] ? '<span class="yw-sub">'+esc(it['subtitle'])+'</span>' : '') +
+      '<span class="yw-badges">' +
+      (levelOf(it) === '小学' ? '<span class="yw-badge">🎒小学</span>' : '') +
+      (hasVisual ? '<span class="yw-badge">✨图解</span>' : '') +
+      (bank ? '<span class="yw-badge">📝'+bank.total+'道</span>' :
+        (it['练习'] ? '<span class="yw-badge">📝动手练</span>' : '')) +
+      '</span>' +
+      '<span class="yw-arrow">▾</span></button>' +
+      '<div class="yw-body" data-idx="'+idx+'">' + body + '</div></div>';
+  }
+  /* ---------- 点列表（语法模块式 panel 网格 + 搜索） ---------- */
+  function renderMItems(){
+    var cat = catById(curMod); if(!cat) return;
+    var box = document.getElementById('gwMItems'); if(!box) return;
+    var meta = modMeta(curMod);
+    var q = curFilter.trim();
+    var list = (cat.items || []).filter(function(it){
+      if(curMod==='yufa' && curGroup && yufaGroupOf(it) !== curGroup) return false;
+      if(!levelMatch(it)) return false;
+      if(curMod==='shici' && curJr && !it.jr) return false;
+      if(!q) return true;
+      return (it.name || '').indexOf(q) >= 0 ||
+        (it['讲解'] || '').indexOf(q) >= 0 ||
+        (it['深讲'] || '').indexOf(q) >= 0 ||
+        (it['辨析'] || '').indexOf(q) >= 0 ||
+        (it['口诀'] || '').indexOf(q) >= 0;
+    });
+    if(!list.length){ box.innerHTML = '<p class="gw-p">没有符合条件的知识点' + (curLevel !== '全部' ? '（学段：' + esc(curLevel) + '）' : '') + '，换个词或学段试试。</p>'; return; }
+    box.innerHTML = '<div class="yw-grid">' + list.map(function(it){
+      var idx = (cat.items || []).indexOf(it);
+      return itemHtml(it, curMod+'_'+idx, meta.icon, curMod);
+    }).join('') + '</div>';
+  }
+  /* 语法页 = 子面板：句子成分、特殊句式、固定句式（yufa 条目按 subtitle 分组）+ parent:'yufa' 的子模块（实词、虚词、词类活用、通假、古今异义、一词多义）+ 总说 */
+  var YUFA_GROUPS = [
+    {g:'句子成分', icon:'🧱', d:'主谓宾定状补，古今不同处'},
+    {g:'特殊句式', icon:'🔀', d:'判断、被动、倒装、省略'},
+    {g:'固定句式', icon:'🧷', d:'者…也、为…所…、何…之等'},
+    {g:'总说', icon:'🧭', d:'读句三步：主干、虚词、活用'}
+  ];
+  function yufaGroupOf(it){ return String(it.subtitle || '').split(' · ')[0]; }
+  function yufaGroupItems(g){
+    var cat = catById('yufa'); if(!cat) return [];
+    return cat.items.filter(function(it){ return yufaGroupOf(it) === g; });
+  }
+  function showYufaHub(){
+    curMod = 'yufa'; curGroup = null;
+    var cat = catById('yufa'), meta = modMeta('yufa');
+    hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
+    var h = '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(meta.d)+'</div></div>';
+    if(cat && cat.intro) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
+    /* 语法子面板顺序：总说（入门）→ 字词（实词、一词多义、古今异义、通假、词类活用、虚词）→ 句子（句子成分、特殊句式、固定句式） */
+    var YUFA_ORDER = ['g:总说','m:shici','m:duoyi','m:guyin','m:tongjia','m:huoyong','m:xuci','g:句子成分','g:特殊句式','g:固定句式'];
+    var panels = YUFA_ORDER.map(function(k){
+      if(k.indexOf('g:')===0){
+        var x = YUFA_GROUPS.filter(function(y){ return 'g:'+y.g===k; })[0];
+        return {key:k, icon:x.icon, t:x.g, n:yufaGroupItems(x.g).length, d:x.d};
+      }
+      var m = modMeta(k.slice(2)), c = catById(m.id);
+      return {key:k, icon:m.icon, t:m.t, n:c ? c.items.length : 0, d:m.d};
+    });
+    h += '<div class="yw-grid">' + panels.filter(function(p){ return p.n > 0; }).map(function(p){
+      return '<button class="yw-head" data-ysub="'+esc(p.key)+'"><span class="yw-ico">'+p.icon+'</span><span class="yw-name">'+esc(p.t)+'</span><span class="yw-sub">'+p.n+'点 · '+esc(p.d)+'</span><span class="yw-arrow">▾</span></button>';
+    }).join('') + '</div>';
+    mlistEl.innerHTML = h;
+  }
+  function showMList(id, keepFilter, group){
+    if(id==='yufa' && !group){ showYufaHub(); return; }
+    curMod = id; curGroup = id==='yufa' ? group : null;
+    if(!keepFilter){ curFilter = ''; curJr = false; }
+    var cat = catById(id);
+    var meta = modMeta(id);
+    if(curGroup){
+      var gm = YUFA_GROUPS.filter(function(x){ return x.g===curGroup; })[0] || {icon:'🧩', d:''};
+      meta = {id:'yufa', icon:gm.icon, t:curGroup, d:gm.d, parent:'yufa'};
+    }
+    var items = cat ? (curGroup ? yufaGroupItems(curGroup) : cat.items) : [];
+    hideAll(); mlistEl.style.display='block'; window.scrollTo(0,0);
+    var h = '';
+    /* 标题只出现一次：点数并入副标题，不再另起「名称 + N点」的列表头 */
+    var cntTxt = items.length + '点' + (curLevel !== '全部' ? ' · ' + curLevel + ' ' + levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; })[curLevel] + '点' : '');
+    h += '<div class="gw-head"><h2>'+meta.icon+' '+esc(meta.t)+'</h2><div class="gw-meta">'+esc(cat ? cntTxt + ' · ' + String(meta.d).replace(/^\d+个点 · /, '') : meta.d)+'</div></div>';
+    if(!cat){ h += '<p class="gw-p">这里还没有内容。</p>'; mlistEl.innerHTML = h; return; }
+    h += levelFilterHtml(levelCounts(items, function(it){ return levelOf(it) === '小学' ? '小学' : '初高中'; }));
+    if(cat.intro && !curGroup) h += '<p class="gw-p">'+esc(cat.intro)+'</p>';
+    h += '<input class="gw-input" id="gwSearch" placeholder="'+(id==='shici' ? '搜索实词或义项…' : '搜索知识点…')+'" value="'+esc(curFilter)+'">';
+    if(id==='shici'){
+      h += '<button class="gw-filterbtn'+(curJr ? ' on' : '')+'" id="gwJrBtn">只看初中优先</button>';
+    }
+    h += '<div id="gwMItems"></div>';
+    mlistEl.innerHTML = h;
+    var inp = document.getElementById('gwSearch');
+    if(inp) inp.addEventListener('input', function(){ curFilter = inp.value; renderMItems(); });
+    var jb = document.getElementById('gwJrBtn');
+    if(jb) jb.addEventListener('click', function(){ curJr = !curJr; jb.className = curJr ? 'gw-filterbtn on' : 'gw-filterbtn'; renderMItems(); });
+    if(bankLoaded[id] === true) renderMItems();
+    else {
+      document.getElementById('gwMItems').innerHTML = '<p class="gw-p">加载中…</p>';
+      loadBank(id, function(){ if(curMod === id && document.getElementById('gwMItems')) renderMItems(); });
+    }
+  }
+  /* ---------- 点详情（移动节点，非复制） ---------- */
+  function showMDetail(idx){
+    var rec = currentItems[idx]; if(!rec) return;
+    var it = rec.it;
+    var headEl = mlistEl.querySelector('.yw-head[data-idx="'+idx+'"]');
+    var itemEl = headEl ? headEl.closest('.yw-item') : null;
+    var bodyEl = itemEl ? itemEl.querySelector('.yw-body') : null;
+    hideAll(); mdetEl.style.display='block'; window.scrollTo(0,0);
+    mdetEl.innerHTML =
+      '<div class="yw-detail-head"><span class="yw-ico-lg">'+rec.icon+'</span>' +
+      '<div><h2>'+esc(it.name || '')+'</h2>' +
+      (it['口诀'] ? '<p class="yw-kj-lg">'+esc(it['口诀'])+'</p>' : '') + '</div></div>' +
+      '<div class="yw-detail-body" id="gwDetailBody"></div>';
+    if(bodyEl) document.getElementById('gwDetailBody').appendChild(bodyEl);
+  }
+  function hideMDetail(){
+    var bodyEl = document.querySelector('#gwDetailBody .yw-body');
+    if(bodyEl){
+      var idx = bodyEl.getAttribute('data-idx');
+      var headEl = mlistEl.querySelector('.yw-head[data-idx="'+idx+'"]');
+      if(headEl) headEl.closest('.yw-item').appendChild(bodyEl);
+    }
+    mdetEl.style.display='none'; mdetEl.innerHTML = '';
+    mlistEl.style.display='block'; window.scrollTo(0,0);
+  }
+  document.addEventListener('click', function(e){
+    var ys = e.target.closest('[data-ysub]');
+    if(ys){
+      var yk = ys.getAttribute('data-ysub');
+      if(yk.indexOf('g:')===0) showMList('yufa', false, yk.slice(2)); else showMList(yk.slice(2));
+      return;
+    }
+    var card = e.target.closest('[data-mod]');
+    if(card){
+      var mid = card.getAttribute('data-mod');
+      if(mid==='pianmu') showSections(); else showMList(mid);
+      return;
+    }
+    /* 学段筛选：切换后按当前所在视图重渲染（知识点列表 keepFilter 保留搜索/初中优先；篇目列表按分类重渲染） */
+    var lvb = e.target.closest('[data-level]');
+    if(lvb){
+      curLevel = lvb.getAttribute('data-level');
+      if(mlistEl.style.display !== 'none' && curMod && !(curMod==='yufa' && !curGroup)) showMList(curMod, true, curGroup || undefined);
+      else if(listEl.style.display !== 'none'){
+        if(curListCat) showList(curListCat); else showSections();
+      }
+      return;
+    }
+    var wbs = e.target.closest('[data-gwwb-start]');
+    if(wbs){
+      e.stopPropagation();
+      var wbox = wbs.closest('[data-gwwb]'), wname = wbox.getAttribute('data-gwwb');
+      wbs.disabled = true; wbs.textContent = '加载中…';
+      gwLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[wname] + '.js'], function(ok){
+        if(!ok || !window.NHZWB || !window.NHZWB.has(wname)){ wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
+        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.autoplay();
+      });
+      return;
+    }
+    var zd = e.target.closest('[data-zd]');
+    if(zd && detEl.style.display !== 'none'){
+      var ct = D.texts[curText]; detEl.querySelectorAll('.zd.on').forEach(function(x){ x.classList.remove('on'); }); zd.classList.add('on');
+      var gl = document.getElementById('gwGloss'); if(gl && ct) gl.innerHTML = glossFor(ct, zd.getAttribute('data-zd'));
+      return;
+    }
+    var pu = e.target.closest('[data-pu]');
+    if(pu){ speakSen(pu.closest('.sen')); return; }
+    var gp = e.target.closest('[data-gwpoint]');
+    if(gp){
+      var pp = gp.getAttribute('data-gwpoint').split(':');
+      navPendingCross = navCrumbs(); /* 跨链接：返回回到点进来的那一页 */
+      openPoint(pp[0], parseInt(pp[1], 10));
+      return;
+    }
+    var gt = e.target.closest('[data-gwtext]');
+    if(gt){
+      var ti = textIdx(gt.getAttribute('data-gwtext'));
+      if(ti >= 0){ navPendingCross = navCrumbs(); lastTextList = '全部'; showDetail(ti); }
+      return;
+    }
+    var go = e.target.closest('[data-go]');
+    if(go){
+      var g = go.getAttribute('data-go');
+      if(g==='__nav') showNav();
+      else if(g==='__sections') showSections();
+      else if(g==='__route') showRoute(); /* P2-B */
+      else if(g==='__back'){ if(routeBack){ routeBack = false; showRoute(); } else showList(detEl.dataset.back || '全部'); } /* P2-B：只回上一层 */
+      else showList(g);
+      return;
+    }
+    var head = e.target.closest('.yw-head');
+    if(head && head.hasAttribute('data-idx') && mlistEl.style.display!=='none'){
+      showMDetail(head.getAttribute('data-idx'));
+      return;
+    }
+    var mi = e.target.closest('.gw-item');
+    if(mi && mi.hasAttribute('data-idx')){ showDetail(parseInt(mi.getAttribute('data-idx'), 10)); return; }
+    /* 附带修（Q10 验证发现，P2-B 预留逻辑本就要求但缺处理）：路线图篇目用 data-route-idx，
+       原先点之无响应，routeBack 死代码；补上后进详情，详情"回篇目"按 routeBack 只回路线图 */
+    var ri = e.target.closest('[data-route-idx]');
+    if(ri){ routeBack = true; showDetail(parseInt(ri.getAttribute('data-route-idx'), 10)); return; }
+    /* 题库按类过滤 */
+    var fb = e.target.closest('[data-bank-filter]');
+    if(fb){
+      var parts = fb.getAttribute('data-bank-filter').split('|');
+      var fbid = parts[0];
+      var fst = bankState[fbid];
+      if(!fst) return;
+      e.stopPropagation();
+      fst.filter = parts[1];
+      fst.offset = 0; fst.score = 0; fst.answered = 0;
+      renderBank(fbid);
+      return;
+    }
+    /* 题库换批 */
+    var nb = e.target.closest('[data-bank-next]');
+    if(nb){
+      var bid = nb.getAttribute('data-bank-next');
+      var st = bankState[bid];
+      if(!st) return;
+      e.stopPropagation();
+      var flen = bankFiltered(bid).length;
+      if(flen) st.offset = (st.offset+10) % flen;
+      st.score = 0; st.answered = 0;
+      renderBank(bid);
+      return;
+    }
+    /* 题库答题（防重复点击） */
+    var bb = e.target.closest('[data-bqid]');
+    if(bb){
+      var bqid = bb.getAttribute('data-bqid');
+      var boi = parseInt(bb.getAttribute('data-boi'), 10);
+      var bq = bankQuizData[bqid];
+      var bqbox = document.getElementById(bqid);
+      if(!bq || !bqbox) return;
+      e.stopPropagation();
+      if(bqbox.getAttribute('data-done')) return;
+      bqbox.setAttribute('data-done', '1');
+      var bankBox = bqbox.closest('.yw-bank');
+      var bid2 = bankBox ? bankBox.id : null;
+      var st2 = bid2 ? bankState[bid2] : null;
+      if(st2) st2.answered++;
+      var bfb = bqbox.querySelector('.quiz-fb');
+      var bbtns = bqbox.querySelectorAll('[data-boi]');
+      for(var b2=0; b2<bbtns.length; b2++) bbtns[b2].classList.remove('right', 'wrong');
+      if(boi===bq.answer){
+        bb.classList.add('right');
+        if(st2) st2.score++;
+        bfb.innerHTML = '✅ 答对了！' + (bq['解析'] ? esc(bq['解析']) : '');
+      }else{
+        bb.classList.add('wrong');
+        bbtns[bq.answer].classList.add('right');
+        bfb.innerHTML = '❌ 再想想。' + (bq['解析'] ? esc(bq['解析']) : '');
+      }
+      /* 错题打通：答错进统一错题本（答对复习项推进间隔），不改反馈与计分 */
+      NHZReview.record({q:bq.q, options:bq.options, answer:bq.options[bq.answer] || '',
+        解析:bq['解析'] || '', src:'古文', point:st2 ? st2.key.split(':').pop() : ''}, boi===bq.answer);
+      if(bankBox && st2) bankBox.querySelector('.bank-head').textContent = bankHeadHtml(bid2);
+      return;
+    }
+    /* 动手练 / 小测答题 */
+    var qb = e.target.closest('[data-qid]');
+    if(qb){
+      var qid = qb.getAttribute('data-qid');
+      var oi = parseInt(qb.getAttribute('data-oi'), 10);
+      var q = quizData[qid];
+      var qbox = document.getElementById(qid);
+      if(!q || !qbox) return;
+      e.stopPropagation();
+      var fb2 = qbox.querySelector('.quiz-fb');
+      var btns = qbox.querySelectorAll('[data-oi]');
+      for(var b=0; b<btns.length; b++) btns[b].classList.remove('right', 'wrong');
+      if(oi===q.answer){
+        qb.classList.add('right');
+        fb2.innerHTML = '✅ 答对了！' + (q['解析'] ? esc(q['解析']) : '');
+      }else{
+        qb.classList.add('wrong');
+        btns[q.answer].classList.add('right');
+        fb2.innerHTML = '❌ 再想想。' + (q['解析'] ? esc(q['解析']) : '');
+      }
+      /* 错题打通（动手练/小测）：只记首次作答，不改反馈与计分 */
+      if(!quizRecorded[qid]){
+        quizRecorded[qid] = true;
+        var qbody = qbox.closest('.yw-body');
+        var qrec = qbody ? currentItems[qbody.getAttribute('data-idx')] : null;
+        NHZReview.record({q:q.q, options:q.options, answer:q.options[q.answer] || '',
+          解析:q['解析'] || '', src:'古文', point:qrec ? qrec.it.name : ''}, oi===q.answer);
+      }
+      return;
+    }
+  });
+
+  /* ---------- 导航：只有一个「返回」= 回上一级（负责人 2026-11-05/06：不要轻易回首页，不要内容里另放返回按钮） ----------
+     每次换页记下当前视图 navView，按层级算出面包屑 navCrumbs()：[{t, go}]，最后一项是当前页。
+     被首页 iframe 嵌入时把面包屑 postMessage 给首页，首页顶栏的「← 返回」调 NHZNav.up()，只有在本模块最外层才回首页；
+     单独打开本页时，本页顶栏的「← 返回」同样先回上一级。跨链接（篇目↔知识点）进来的页，返回回到点进来的那一页。 */
+  var navView = {k:'nav'}, navPendingCross = null;
+  function navNode(v){
+    var t, go;
+    if(v.k==='nav') return {t:'古文', go:function(){ showNav(); }};
+    if(v.k==='sec') return {t:'古文篇目', go:function(){ showSections(); }};
+    if(v.k==='list') return {t: v.cat==='全部' ? '全部篇目' : v.cat, go:function(){ showList(v.cat); }};
+    if(v.k==='route') return {t:'进阶路线', go:function(){ showRoute(); }};
+    if(v.k==='text') return {t:(D.texts[v.idx]||{}).title || '篇目', go:function(){ routeBack = v.from==='route'; lastTextList = v.cat; showDetail(v.idx); }};
+    if(v.k==='yhub') return {t:'语法', go:function(){ showMList('yufa'); }};
+    if(v.k==='mlist') return {t: v.group || modMeta(v.id).t, go:function(){ showMList(v.id, false, v.group || undefined); }};
+    if(v.k==='pt') return {t: v.name, go:function(){ showMList(v.base.id, false, v.base.group || undefined); if(currentItems[v.key]) showMDetail(v.key); }};
+    return {t:'古文', go:function(){ showNav(); }};
+  }
+  function navChain(v){
+    if(v.cross) return v.cross.concat([navNode(v)]);
+    var c;
+    switch(v.k){
+      case 'nav': return [navNode(v)];
+      case 'sec': return navChain({k:'nav'}).concat([navNode(v)]);
+      case 'list': case 'route': return navChain({k:'sec'}).concat([navNode(v)]);
+      case 'text': c = v.from==='route' ? navChain({k:'route'}) : navChain({k:'list', cat:v.cat}); return c.concat([navNode(v)]);
+      case 'yhub': return navChain({k:'nav'}).concat([navNode(v)]);
+      case 'mlist': c = (v.group || modMeta(v.id).parent==='yufa') ? navChain({k:'yhub'}) : navChain({k:'nav'}); return c.concat([navNode(v)]);
+      case 'pt': return navChain(v.base).concat([navNode(v)]);
+    }
+    return navChain({k:'nav'});
+  }
+  function navCrumbs(){ return navChain(navView); }
+  function navNotify(){
+    var cr = navCrumbs(), names = cr.map(function(c){ return c.t; });
+    var tt = document.getElementById('navtitle'); if(tt) tt.textContent = names.join(' › ');
+    if(window.parent && window.parent !== window){
+      try{ window.parent.postMessage({nhzNav:1, page:'guwen', crumbs:names}, '*'); }catch(e){}
+    }
+  }
+  function navSet(v, crossOk){
+    if(crossOk && navPendingCross){ v.cross = navPendingCross; }
+    navPendingCross = crossOk ? null : navPendingCross;
+    navView = v; navNotify();
+  }
+  window.NHZNav = {
+    crumbs: function(){ return navCrumbs().map(function(c){ return c.t; }); },
+    /* 回上一级；已在最外层返回 false（由调用方决定是否回首页） */
+    up: function(){ var c = navCrumbs(); if(c.length < 2) return false; c[c.length-2].go(); return true; },
+    go: function(i){ var c = navCrumbs(); if(i >= 0 && i < c.length - 1){ c[i].go(); return true; } return false; }
+  };
+  (function(){
+    var oNav = showNav; showNav = function(){ navPendingCross = null; oNav.apply(this, arguments); navSet({k:'nav'}); };
+    var oSec = showSections; showSections = function(){ navPendingCross = null; oSec.apply(this, arguments); navSet({k:'sec'}); };
+    var oList = showList; showList = function(cat){ navPendingCross = null; oList.apply(this, arguments); navSet({k:'list', cat:cat}); };
+    var oRoute = showRoute; showRoute = function(){ navPendingCross = null; oRoute.apply(this, arguments); navSet({k:'route'}); };
+    var oDet = showDetail; showDetail = function(idx){
+      var from = routeBack ? 'route' : 'list', cat = lastTextList || '全部';
+      oDet.apply(this, arguments); navSet({k:'text', idx:idx, from:from, cat:cat}, true);
+    };
+    var oHub = showYufaHub; showYufaHub = function(){ navPendingCross = null; oHub.apply(this, arguments); navSet({k:'yhub'}); };
+    var oML = showMList; showMList = function(id, keep, group){
+      if(id==='yufa' && !group){ oML.apply(this, arguments); return; }
+      oML.apply(this, arguments);
+      /* openPoint 先进列表再进点详情：列表这一步不消耗跨链接来源 */
+      /* 跨链接途中不通知首页，免得中间这一步把历史层级改乱 */
+      if(navPendingCross) navView = {k:'mlist', id:id, group:group || null};
+      else navSet({k:'mlist', id:id, group:group || null});
+    };
+    var oMD = showMDetail; showMDetail = function(key){
+      var base = navView.k==='mlist' ? {k:'mlist', id:navView.id, group:navView.group} : {k:'mlist', id:curMod, group:curGroup};
+      oMD.apply(this, arguments);
+      var rec = currentItems[key];
+      if(mdetEl.style.display !== 'none') navSet({k:'pt', key:key, name: rec && rec.it ? (rec.it.name || '详情') : '详情', base:base}, true);
+    };
+    var oHide = hideMDetail; hideMDetail = function(){ oHide.apply(this, arguments); if(navView.k==='pt') navSet(navView.base); };
+  })();
+  /* 单独打开本页时：顶栏「← 返回」先回上一级，最外层才回首页 */
+  (function(){
+    var bk = document.querySelector('.topbar .back');
+    if(bk) bk.addEventListener('click', function(e){ if(window.NHZNav.up()){ e.preventDefault(); } });
+  })();
+  if(!K.categories || !K.categories.length){
+    navEl.innerHTML = '<p class="gw-p">知识库加载失败，请确认 data/guwen_knowledge.js 存在。</p>';
+  }else{
+    showNav();
+  }
+})();
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

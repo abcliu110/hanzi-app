@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家长周报 · 识字星球</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.wk-section{margin:16px 0}
+.wk-section h2{margin:0 0 10px;font-size:20px}
+.wk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wk-cell{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--surface);text-align:center}
+.wk-cell b{display:block;font-size:24px;color:var(--accent-deep)}
+.wk-cell span{font-size:14px;color:var(--ink);opacity:.8}
+.wk-p{font-size:15px;line-height:1.8;margin:8px 0}
+.wk-weak{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:4px 14px}
+.wk-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.wk-row:last-child{border-bottom:none}
+.wk-note{font-size:13px;color:var(--ink);opacity:.7;margin-top:16px}
+</style>
+</head>
+<body class="page-sub">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">家长周报</span>
+</header>
+<main class="wrap" id="app">
+  <div class="loading">周报生成中…</div>
+</main>
+<script src="weekly.js"></script>
+<script src="nav-up.js"></script>
+</body>
+</html>

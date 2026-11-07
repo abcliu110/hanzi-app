@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>格律小作坊 · 古诗词</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--good:#2e7d4f;--bad:#b03a2e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:16px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:14px 14px 60px}
+.back{display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none}
+h1{font-size:21px;margin:14px 0 4px}
+.sub{font-size:14px;color:var(--muted);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.grid{margin:12px 0}
+.grow{display:flex;justify-content:center;gap:6px;margin:8px 0;flex-wrap:wrap}
+.cell{width:52px;text-align:center}
+.cell .box{min-height:56px;border:2px solid var(--line);border-radius:12px;background:var(--surface);font-size:26px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.cell.fixed .box{cursor:default;background:var(--card)}
+.cell.sel .box{border-color:#c46a2b;box-shadow:0 0 0 2px #f3d9a8}
+.cell .pu{font-size:13px;margin-top:2px}
+.cell .pu.two{color:#8a6d3b}
+.cell .pu b{font-weight:400}
+.cell .ru{position:absolute;top:-7px;right:-4px;font-size:11px;background:#b85a52;color:#fff;border-radius:5px;padding:1px 4px;font-family:sans-serif}
+.cell.ok .box{border-color:var(--good);background:#e2f3e6}
+.cell.no .box{border-color:var(--bad);background:#fbe9e6}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.bank button{min-width:52px;min-height:52px;font-size:24px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.bank button.used{opacity:.25}
+.bank button:hover{border-color:var(--accent)}
+.btn{display:block;width:100%;min-height:52px;font-size:18px;font-weight:700;border-radius:14px;border:0;background:var(--accent);color:#fff;cursor:pointer;margin:8px 0}
+.btn-ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.result{font-size:15px}
+.result .ok{color:var(--good);font-weight:700}
+.result .no{color:var(--bad);font-weight:700}
+a.poemlink{color:var(--accent-deep);font-weight:700}
+select.poemsel{width:100%;min-height:44px;font-size:16px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 10px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../../shici.html">← 返回</a>
+  <h1>🔲 格律小作坊</h1>
+  <p class="sub">COPE 式格子：每格下方就是这格应填的平仄（○=平，●=仄），点空格再点候选字填入，点“检查”色标对错。</p>
+  <div class="card">
+    <select class="poemsel" id="poemSel" aria-label="选一首诗"></select>
+    <h3 style="margin:0" id="poemTitle"></h3>
+    <div class="tip" id="poemTip"></div>
+    <div class="grid" id="grid"></div>
+    <div class="bank" id="bank"></div>
+    <button class="btn" id="btnCheck">检查</button>
+    <button class="btn btn-ghost" id="btnAgain">再来一局（候选字重新洗牌）</button>
+    <div class="result" id="result"></div>
+    <div class="tip">孤平 / 三平尾是简版教学检查：孤平只查押韵句 = 除韵脚外只有一个平声字、且它不与韵脚相连（“仄仄仄平平”末两字皆平，不算孤平）；三平尾 = 一句末尾三字全是平声。你填错字时如果撞上了，这里会报出来（正式格律校验以搜韵律诗校验为准）。“一三五不论”本局不扣分：只要字对，就算对。</div>
+  </div>
+  <div class="card" id="todoCard">
+    <h3 style="margin:0 0 6px">📊 平仄数据覆盖</h3>
+    <p style="margin:0;font-size:14px" id="todoText">核查中…</p>
+  </div>
+</div>
+<script src="../../data/shici.js"></script>
+<script src="../../data/pz_derive.js"></script>
+<script src="../../data/pingshui_pz.js"></script>
+<script>
+(function(){
+'use strict';
+/* 谱子来源：data/shici.js poems[].pz（平水韵逐字核对）+ data/pz_derive.js 推导的 ru / rhyme；
+   本页不自编任何诗的平仄谱。下拉框列出全部有 pz 的诗（91 首），默认登鹳雀楼（与旧版同一局）。 */
+var D = window.NHZ_SHICI || {poems:[]};
+var PZ = window.NHZ_PZ;
+/* 2026-11-07 SC2：pz 逐字对照平水韵字表（data/pingshui_pz.js，搜韵网《平水韵》，tools/content/gen_sc2_pingshui.py 生成）。
+   平水韵只有一个声调的字：pz 与字表一致才算可核；与字表冲突的诗本页不开放（不替数据改平仄）。
+   平仄两读的字（看/教/过/思…）字表不能单独判定，格子下标「◐两读」，不替孩子定平仄。 */
+var PS = (window.NHZ_PINGSHUI && window.NHZ_PINGSHUI.chars) || {};
+function psTone(c){
+  var gs = PS[c]; if(!gs || !gs.length) return '';
+  var ping = false, ze = false;
+  gs.forEach(function(g){ if(g.charAt(g.length - 1) === '平') ping = true; else ze = true; });
+  return ping && ze ? '两' : (ping ? '平' : '仄');
+}
+function hanChars(p){
+  var out = [];
+  p.lines.forEach(function(l){ Array.from(l).forEach(function(c){ if(/[\u3400-\u9fff]/.test(c)) out.push(c); }); });
+  return out;
+}
+function pzConflicts(p, d){
+  var cs = hanChars(p), f = d.pz.replace(/\|/g, '').split(''), bad = [];
+  cs.forEach(function(c, i){ var t = psTone(c); if(t !== '平' && t !== '仄' && t !== '两'){ bad.push(c + '（字表无此字）'); } else if(t !== '两' && t !== f[i]) bad.push(c); });
+  return bad;
+}
+var pzPoems = [], pzBlocked = [];
+D.poems.forEach(function(p){
+  var d = PZ && PZ.derive(p);
+  if(!d) return;
+  var bad = pzConflicts(p, d);
+  if(bad.length) pzBlocked.push({p:p, bad:bad}); else pzPoems.push(p);
+});
+pzPoems.sort(function(a, b){ return (a.order || 0) - (b.order || 0); });
+var jinti = 0;
+D.poems.forEach(function(p){
+  if(p.ticai === '五绝' || p.ticai === '七绝' || p.ticai === '五律' || p.ticai === '七律') jinti++;
+});
+var withPz = pzPoems.length + pzBlocked.length;
+document.getElementById('todoText').textContent =
+  '实测：data/shici.js ' + D.poems.length + ' 首诗中带 pz（平仄谱）的有 ' + withPz + ' 首；按 ticai 标为近体诗（五绝/七绝/五律/七律）的共 ' + jinti +
+  ' 首。逐字对照平水韵字表：' + pzPoems.length + ' 首与字表无冲突，本页开放；' + pzBlocked.length + ' 首有字与平水韵冲突，暂不开放（' +
+  pzBlocked.map(function(b){ return '《' + b.p.title + '》' + b.bad.join(''); }).join('、') +
+  '）。没有 pz 的诗不出题，古体诗与词只做节奏，不做平仄。平仄两读的字在格子下标「◐两读」。';
+var sel = document.getElementById('poemSel');
+sel.innerHTML = pzPoems.map(function(p){
+  return '<option value="' + p.order + '"' + (p.order === 38 ? ' selected' : '') + '>' +
+    p.title + ' · ' + p.author + '（' + p.ticai + '）</option>';
+}).join('');
+var poem = null, PZD = null, chars = [], pzFlat = [], psFlat = [], N = 0, L = 0;
+var BLANKS = [];
+var DISTRACT_POOL = ['明', '夜', '月', '春', '山', '水', '风', '花'];
+var DISTRACT_POOL2 = ['东', '南', '西', '北', '天', '地', '人', '云'];
+/* 干扰字按普通话声调定平仄（只用于你填错字时的格律检查提示） */
+var DISTRACT_TONE = {'明':'平', '夜':'仄', '月':'仄', '春':'平', '山':'平', '水':'仄', '风':'平', '花':'平',
+  '东':'平', '南':'平', '西':'平', '北':'仄', '天':'平', '地':'仄', '人':'平', '云':'平'};
+var DISTRACT = [];
+var bankChars = [], selIdx = -1, filled = {};
+function shuffled(arr){
+  var a = arr.slice();
+  for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+/* 韵脚字共有的平声韵部（如「十一尤平」→「尤韵」）；没有唯一共同韵部就不写 */
+function rhymeGroup(cs){
+  if(!cs.length) return '';
+  var common = null;
+  cs.forEach(function(c){
+    var gs = (PS[c] || []).filter(function(g){ return g.charAt(g.length - 1) === '平'; });
+    common = common === null ? gs : common.filter(function(g){ return gs.indexOf(g) >= 0; });
+  });
+  if(!common || common.length !== 1) return '';
+  var g = common[0];
+  return g.charAt(g.length - 2) + '韵';
+}
+function pickBlanks(){
+  /* 挖空 8 格：先取入声陷阱（最多 2 个）、韵脚（1 个），其余按步长均匀取；同首诗每次固定 */
+  var out = [];
+  function push(i){ if(i >= 0 && i < chars.length && out.indexOf(i) < 0) out.push(i); }
+  PZD.ru.slice(0, 2).forEach(push);
+  PZD.rhyme.slice(0, 1).forEach(push);
+  var step = Math.max(1, Math.floor(chars.length / 8));
+  for(var i = 2; out.length < 8 && i < chars.length; i += step) push(i);
+  for(var j = 0; out.length < 8 && j < chars.length; j++) push(j);
+  out.sort(function(a, b){ return a - b; });
+  return out.slice(0, 8);
+}
+function pickDistract(){
+  var inPoem = {};
+  chars.forEach(function(c){ inPoem[c] = 1; });
+  var d = DISTRACT_POOL.filter(function(c){ return !inPoem[c]; }).slice(0, 4);
+  if(d.length < 4){
+    DISTRACT_POOL2.forEach(function(c){ if(d.length < 4 && !inPoem[c] && d.indexOf(c) < 0) d.push(c); });
+  }
+  return d;
+}
+function loadPoem(order){
+  poem = null;
+  pzPoems.forEach(function(p){ if(p.order === order) poem = p; });
+  if(!poem) poem = pzPoems[0];
+  if(!poem){ document.getElementById('grid').innerHTML = '<p>诗库里没有带 pz 的诗，无法出题。</p>'; return false; }
+  PZD = PZ.derive(poem);
+  chars = [];
+  poem.lines.forEach(function(l){ Array.from(l).forEach(function(c){ if(/[\u3400-\u9fff]/.test(c)) chars.push(c); }); });
+  pzFlat = PZD.pz.replace(/\|/g, '').split('');
+  psFlat = chars.map(psTone);
+  N = poem.lines.length;
+  L = chars.length / N;
+  BLANKS = pickBlanks();
+  DISTRACT = pickDistract();
+  var titleEl = document.getElementById('poemTitle');
+  titleEl.innerHTML = poem.author + '《' + poem.title + '》（' + poem.ticai + '） <a class="poemlink" href="../../shici.html#poem-' + poem.order + '">去读这首诗 →</a>';
+  var ruChars = PZD.ru.map(function(i){ return chars[i]; }).join('、');
+  var rhymeChars = PZD.rhyme.map(function(i){ return chars[i]; }).join('、');
+  var rg = rhymeGroup(PZD.rhyme.map(function(i){ return chars[i]; }));
+  var tip = '平仄谱取自 data/shici.js 的 pz 字段，已逐字对照搜韵网《平水韵》字表（单读字全部一致；两读字标◐，看诗意定）：' + PZD.pz.replace(/\|/g, '｜') +
+    '。韵脚：' + rhymeChars + (rg ? '（平水韵' + rg + '）' : '') +
+    '。入声字（普通话会误判，古代算仄）：' + (ruChars || '本首无入声字') + '。';
+  document.getElementById('poemTip').textContent = tip;
+  return true;
+}
+function render(){
+  var grid = document.getElementById('grid'), html = '';
+  for(var li = 0; li < N; li++){
+    html += '<div class="grow">';
+    for(var ci = 0; ci < L; ci++){
+      var idx = li * L + ci, isBlank = BLANKS.indexOf(idx) >= 0, val = isBlank ? (filled[idx] || '') : chars[idx];
+      var cls = 'cell' + (isBlank ? '' : ' fixed') + (selIdx === idx ? ' sel' : '');
+      html += '<div class="' + cls + '" data-idx="' + idx + '"><div class="box">' + (val || '？') +
+        (PZD.ru.indexOf(idx) >= 0 ? '<span class="ru">入</span>' : '') +
+        (PZD.rhyme.indexOf(idx) >= 0 ? '<span class="ru" style="background:#c46a2b;left:-4px;right:auto">韵</span>' : '') +
+        '</div><div class="pu' + (psFlat[idx] === '两' ? ' two' : '') + '">' + (psFlat[idx] === '两' ? '◐两读' : (pzFlat[idx] === '平' ? '○平' : '●仄')) + '</div></div>';
+    }
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+  var bank = document.getElementById('bank');
+  bank.innerHTML = bankChars.map(function(c){
+    var used = false;
+    for(var key in filled) if(filled[key] === c) used = true;
+    return '<button type="button" data-c="' + c + '" class="' + (used ? 'used' : '') + '">' + c + '</button>';
+  }).join('');
+  grid.querySelectorAll('.cell').forEach(function(cell){
+    cell.addEventListener('click', function(){
+      var idx = +cell.getAttribute('data-idx');
+      if(BLANKS.indexOf(idx) < 0) return;
+      if(filled[idx]){ delete filled[idx]; selIdx = -1; render(); return; }
+      selIdx = idx; render();
+    });
+  });
+  bank.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(selIdx < 0) return;
+      var c = btn.getAttribute('data-c');
+      for(var key in filled) if(filled[key] === c) delete filled[key];
+      filled[selIdx] = c; selIdx = -1; render();
+    });
+  });
+}
+function newGame(){
+  filled = {}; selIdx = -1;
+  var correct = BLANKS.map(function(i){ return chars[i]; });
+  bankChars = shuffled(correct.concat(DISTRACT));
+  document.getElementById('result').innerHTML = '';
+  document.querySelectorAll('.cell.ok,.cell.no').forEach(function(c){ c.classList.remove('ok', 'no'); });
+  render();
+}
+function check(){
+  var missing = BLANKS.filter(function(i){ return !filled[i]; });
+  var res = document.getElementById('result');
+  if(missing.length){ res.innerHTML = '<span class="no">还有 ' + missing.length + ' 格没填。</span>'; return; }
+  var right = 0;
+  BLANKS.forEach(function(i){
+    var cell = document.querySelector('.cell[data-idx="' + i + '"]');
+    if(!cell) return;
+    cell.classList.remove('ok', 'no');
+    if(filled[i] === chars[i]){ cell.classList.add('ok'); right++; }
+    else cell.classList.add('no');
+  });
+  /* 简版孤平 / 三平尾检查：按当前填入的字算平仄——填对的字取本格谱位；
+     填错的字若在原诗中出现则取其谱位，干扰字按平水韵字表定平仄（两读才退回普通话声调表），未知字才退回格子应填平仄 */
+  var tones = [];
+  for(var i = 0; i < chars.length; i++){
+    if(BLANKS.indexOf(i) >= 0){
+      if(filled[i] === chars[i]) tones.push(pzFlat[i]);
+      else {
+        var ci = chars.indexOf(filled[i]);
+        var dt = psTone(filled[i]);
+        tones.push(ci >= 0 ? pzFlat[ci] : (dt === '平' || dt === '仄' ? dt : (DISTRACT_TONE[filled[i]] || pzFlat[i])));
+      }
+    } else tones.push(pzFlat[i]);
+  }
+  var msgs = [];
+  for(var li = 0; li < N; li++){
+    var row = tones.slice(li * L, li * L + L);
+    var endIdx = li * L + L - 1, rhymed = PZD.rhyme.indexOf(endIdx) >= 0;
+    if(rhymed){
+      /* 孤平：押韵句除韵脚外只有一个平声字，且它不在倒数第二位（不与韵脚相连） */
+      var pingAt = [];
+      for(var ci = 0; ci < L - 1; ci++) if(row[ci] === '平') pingAt.push(ci);
+      if(pingAt.length === 1 && pingAt[0] !== L - 2) msgs.push('第 ' + (li + 1) + ' 句疑似孤平（除韵脚外只有一个平声字）');
+    }
+    if(row[L - 3] === '平' && row[L - 2] === '平' && row[L - 1] === '平') msgs.push('第 ' + (li + 1) + ' 句疑似三平尾（末尾三字全平）');
+  }
+  res.innerHTML = (right === BLANKS.length
+    ? '<span class="ok">全对！🎉 ' + BLANKS.length + ' 格都填对了。</span>'
+    : '<span class="no">对了 ' + right + ' / ' + BLANKS.length + ' 格，红格是填错的字，再想想它该是什么平仄。</span>') +
+    (msgs.length ? '<br>格律检查：' + msgs.join('；') : '<br>格律检查：无孤平、无三平尾 ✅');
+}
+document.getElementById('btnCheck').addEventListener('click', check);
+document.getElementById('btnAgain').addEventListener('click', newGame);
+sel.addEventListener('change', function(){
+  if(loadPoem(+sel.value)) newGame();
+});
+if(loadPoem(38)) newGame();
+window.__gelu = {open: pzPoems.length, blocked: pzBlocked.map(function(b){ return b.p.order; })};
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

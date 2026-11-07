@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诗题 · 猜主题</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5;
+  --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6;
+  --line:#d5dfd0; --red:#b85a52; --green:#3f8e6b;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1a211c; --card:#243028; --surface:#1e2620; --ink:#e6eee4; --muted:#9aa89b;
+  --accent:#6fa87d; --accent-deep:#8fc49a; --accent-soft:#2a3a2e; --line:#33402f; }
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; font-size:17px; line-height:1.6;}
+.wrap{max-width:640px; margin:0 auto; padding:12px 14px 40px;}
+.proto-head{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px;}
+.proto-head h1{font-size:20px; margin:0 0 4px;}
+.proto-head .meta{font-size:13px; color:var(--muted); margin:0 0 6px;}
+.proto-head .note{display:inline-block; font-size:12px; background:var(--accent-soft); color:var(--accent-deep); border-radius:20px; padding:3px 12px; font-weight:bold;}
+.hud{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:15px;}
+.hud .pill{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:6px 14px;}
+.hud .score{font-weight:bold; color:var(--accent-deep);}
+.qcard{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 14px; margin-bottom:12px; text-align:center;}
+.qcard .ptitle{font-size:24px; font-weight:bold; margin:8px 0 4px;}
+.qcard .pauthor{font-size:14px; color:var(--muted); margin-bottom:14px;}
+.qcard .hint{font-size:15px; color:var(--muted); margin-bottom:6px;}
+.opts{display:flex; flex-direction:column; gap:10px; margin-top:10px;}
+.opts button{min-height:56px; font-size:18px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-family:inherit;}
+.opts button:active{transform:scale(.98);}
+.opts button.right{border-color:var(--green); background:var(--green); color:#fff;}
+.opts button.wrong{border-color:var(--red); background:var(--red); color:#fff;}
+.opts button:disabled{cursor:default; opacity:.85;}
+.btnrow{display:flex; gap:10px; margin-top:12px;}
+.btn{flex:1; min-height:56px; font-size:17px; border-radius:12px; border:2px solid var(--accent); cursor:pointer; font-family:inherit; font-weight:bold;}
+.btn.primary{background:var(--accent); color:#fff;}
+.btn.ghost{background:var(--card); color:var(--accent-deep);}
+.feedback{border-radius:12px; padding:12px 14px; margin-top:12px; display:none; font-size:15px; text-align:left;}
+.feedback.show{display:block;}
+.feedback.good{background:var(--accent-soft); border:1px solid var(--accent);}
+.feedback.bad{background:#f7e8e6; border:1px solid var(--red);}
+@media (prefers-color-scheme: dark){ .feedback.bad{background:#3a2422;} }
+.feedback .exp{margin-top:6px; color:var(--muted);}
+.result{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px 16px; text-align:center; display:none;}
+.result.show{display:block;}
+.result .big{font-size:44px; margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../../shici.html" style="display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">← 返回</a><h1 style="font-size:20px;margin:0;">🏷️ 诗题猜主题</h1></div>
+<div id="game">
+    <div class="hud">
+      <span class="pill" id="qno">第 1 题</span>
+      <span class="pill score" id="score">得分 0</span>
+    </div>
+    <div class="qcard">
+      <div class="hint">👆 看诗题，猜主题：</div>
+      <div class="ptitle" id="ptitle"></div>
+      <div class="pauthor" id="pauthor"></div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="fb"></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="btnNext">下一题 →</button>
+      </div>
+    </div>
+  </div>
+  <div class="result" id="result"></div>
+</div>
+<script src="../../../data/shici.js"></script>
+<script src="../poem_link.js"></script>
+<script>
+var DATA = [{"t": "静夜思", "a": "李白", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "望庐山瀑布水二首 一", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "赠汪伦", "a": "李白", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "早发白帝城", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "望天门山", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "独坐敬亭山·其二（存疑）", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "月下独酌四首 一", "a": "李白", "theme": "饮酒", "exp": "将进酒、月下独酌，借酒抒怀。"}, {"t": "黄鹤楼送孟浩然之广陵", "a": "李白", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "行路难三首 一", "a": "李白", "theme": "哲理", "exp": "标题如行路难、秋词，阐发人生哲理。"}, {"t": "将进酒", "a": "李白", "theme": "饮酒", "exp": "将进酒、月下独酌，借酒抒怀。"}, {"t": "蜀道难", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "峨眉山月歌", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "闻王昌龄左迁龙标遥有此寄", "a": "李白", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "白云歌送友人", "a": "李白", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "春夜洛城闻笛", "a": "李白", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "子夜吴歌 春歌", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "秋浦歌十七首 一", "a": "李白", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "宣州谢朓楼饯别校书叔云", "a": "李白", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "春夜喜雨", "a": "杜甫", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "春望", "a": "杜甫", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "望岳", "a": "杜甫", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "登高", "a": "杜甫", "theme": "登高怀古", "exp": "登高望远，抒发怀古之幽情。"}, {"t": "茅屋为秋风所破歌", "a": "杜甫", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "闻官军收河南河北", "a": "杜甫", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "江畔独步寻花七绝句 一", "a": "杜甫", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "相思", "a": "王维", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "九月九日忆山东兄弟", "a": "王维", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "渭城曲", "a": "王维", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "山居秋暝", "a": "王维", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "皇甫岳云溪杂题五首 鸟鸣涧", "a": "王维", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "辋川集 鹿柴", "a": "王维", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "辋川集 竹里馆", "a": "王维", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "使至塞上", "a": "王维", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "春晓", "a": "孟浩然", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "宿建德江", "a": "孟浩然", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "望洞庭湖赠张丞相", "a": "孟浩然", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "过故人庄", "a": "孟浩然", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "登鹳雀楼", "a": "王之涣", "theme": "登高怀古", "exp": "登高望远，抒发怀古之幽情。"}, {"t": "凉州词二首” 一", "a": "王之涣", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "回乡偶书二首 一", "a": "贺知章", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "咏柳", "a": "贺知章", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "咏鹅", "a": "骆宾王", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "在岳咏蝉", "a": "骆宾王", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "出塞二首 一", "a": "王昌龄", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "芙蓉楼送辛渐二首 一", "a": "王昌龄", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "逢入京使", "a": "岑参", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "白雪歌送武判官归京", "a": "岑参", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "山行", "a": "杜牧", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "泊秦淮", "a": "杜牧", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "赤壁", "a": "杜牧", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "赠别二首 一", "a": "杜牧", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "洛阳秋夕", "a": "杜牧", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "夜雨寄北", "a": "李商隐", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "常娥", "a": "李商隐", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "锦瑟", "a": "李商隐", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "乐游原", "a": "李商隐", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "竹枝词二首 一", "a": "刘禹锡", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "金陵五题 乌衣巷", "a": "刘禹锡", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "酬乐天扬州初逢席上见赠", "a": "刘禹锡", "theme": "哲理", "exp": "标题如行路难、秋词，阐发人生哲理。"}, {"t": "秋词二首 一", "a": "刘禹锡", "theme": "哲理", "exp": "标题如行路难、秋词，阐发人生哲理。"}, {"t": "浪淘沙九首 一", "a": "刘禹锡", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "江雪", "a": "柳宗元", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "渔翁", "a": "柳宗元", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "早春呈水部张十八员外二首 一", "a": "韩愈", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "左迁至蓝关示姪孙湘", "a": "韩愈", "theme": "贬谪", "exp": "左迁、被贬途中的诗。"}, {"t": "寻隐者不遇", "a": "贾岛", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "剑客", "a": "贾岛", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "题李凝幽居", "a": "贾岛", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "杜少府之任蜀州", "a": "王勃", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "登幽州台歌", "a": "陈子昂", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "别董大二首 一", "a": "高适", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "雁门太守行", "a": "李贺", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "马诗二十三首 一", "a": "李贺", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "商山早行", "a": "温庭筠", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "枫桥夜泊", "a": "张继", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "望月怀远", "a": "张九龄", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "次北固山下", "a": "王湾", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "题破山寺后禅院", "a": "常建", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "滁州西涧", "a": "韦应物", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "逢雪宿芙蓉山主人", "a": "刘长卿", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "送灵澈上人", "a": "刘长卿", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "夜上受降城闻笛", "a": "李益", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "雨过山村", "a": "王建", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "菊花", "a": "元稹", "theme": "咏物", "exp": "标题是咏物（如咏柳、咏鹅、菊花），借物言志。"}, {"t": "离思五首 一", "a": "元稹", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "夏夜李尚书筵送宇文石首赴县联句", "a": "杜甫", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "杂诗三首 二", "a": "王维", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "同赵二十二访张明府郊居联句", "a": "杜牧", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "无题", "a": "李商隐", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "白门前", "a": "李贺", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "水调歌头·明月几时有", "a": "苏轼", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "念奴娇·赤壁怀古", "a": "苏轼", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "江城子·密州出猎", "a": "苏轼", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "定风波·莫听穿林打叶声", "a": "苏轼", "theme": "哲理", "exp": "标题如行路难、秋词，阐发人生哲理。"}, {"t": "浣溪沙·游蕲水清泉寺", "a": "苏轼", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "江城子·乙卯正月二十日夜记梦", "a": "苏轼", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "如梦令·常记溪亭日暮", "a": "李清照", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "声声慢·寻寻觅觅", "a": "李清照", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "一剪梅·红藕香残玉簟秋", "a": "李清照", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "醉花阴·薄雾浓云愁永昼", "a": "李清照", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "青玉案·元夕", "a": "辛弃疾", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "破阵子·为陈同甫赋壮词以寄之", "a": "辛弃疾", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "永遇乐·京口北固亭怀古", "a": "辛弃疾", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "西江月·夜行黄沙道中", "a": "辛弃疾", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "雨霖铃·寒蝉凄切", "a": "柳永", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "望海潮·东南形胜", "a": "柳永", "theme": "写景", "exp": "标题多为山水名胜，直接描写自然风光。"}, {"t": "浣溪沙·一曲新词酒一杯", "a": "晏殊", "theme": "哲理", "exp": "标题如行路难、秋词，阐发人生哲理。"}, {"t": "蝶恋花·槛菊愁烟兰泣露", "a": "晏殊", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "鹊桥仙·纤云弄巧", "a": "秦观", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "踏莎行·郴州旅舍", "a": "秦观", "theme": "羁旅", "exp": "商山早行、枫桥夜泊，写旅途孤寂。"}, {"t": "渔家傲·秋思", "a": "范仲淹", "theme": "边塞", "exp": "标题中有塞、关、凉州、出塞等，写边关军旅。"}, {"t": "苏幕遮·怀旧", "a": "范仲淹", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "钗头凤·红酥手", "a": "陆游", "theme": "爱情", "exp": "相思、离思、无题等多为爱情主题。"}, {"t": "虞美人·春花秋月何时", "a": "李煜", "theme": "怀古", "exp": "标题中有古迹（赤壁、乌衣巷）或「怀古」，借古讽今。"}, {"t": "相见欢·无言独上西楼", "a": "李煜", "theme": "思乡", "exp": "标题中有「思」「忆」「怀」「寄北」等，多抒发思乡之情。"}, {"t": "夏日绝句", "a": "李清照", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "送杜少府之任蜀州", "a": "王勃", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}, {"t": "悯农二首·其一", "a": "李绅", "theme": "爱国", "exp": "忧国忧民、关心百姓疾苦的诗。"}, {"t": "饮酒·其五", "a": "陶渊明", "theme": "田园", "exp": "描写田园生活、归隐之乐。"}, {"t": "赋得古原草送别", "a": "白居易", "theme": "送别", "exp": "标题中有「送」「别」「赠」「饯」等多为送别诗。"}];
+var THEMES = ["送别","思乡","写景","咏物","怀古","爱国","田园","边塞","爱情","哲理","饮酒","羁旅"];
+var order = [], qi = 0, score = 0, locked = false, curOpts = [];
+function $(id){ return document.getElementById(id); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function start(){ order = shuffle(DATA.map(function(_,i){return i;})); qi=0; score=0; $("result").className="result"; $("game").style.display="block"; render(); }
+function render(){
+  if(qi >= order.length){ return end(); }
+  locked = false;
+  var q = DATA[order[qi]];
+  $("qno").textContent = "第 " + (qi+1) + " / " + order.length + " 题";
+  $("score").textContent = "得分 " + score;
+  $("ptitle").textContent = "《" + q.t + "》";
+  $("pauthor").textContent = q.a;
+  var others = shuffle(THEMES.filter(function(t){return t!==q.theme;})).slice(0,3);
+  curOpts = shuffle([q.theme].concat(others));
+  var box = $("opts"); box.innerHTML = "";
+  curOpts.forEach(function(t){
+    var b = document.createElement("button");
+    b.textContent = t; b.type = "button";
+    b.onclick = function(){ pick(t, b); };
+    box.appendChild(b);
+  });
+  var fb = $("fb"); fb.className="feedback"; fb.innerHTML="";
+}
+function pick(t, btn){
+  if(locked) return;
+  locked = true;
+  var q = DATA[order[qi]];
+  var btns = $("opts").children;
+  for(var i=0;i<btns.length;i++){ btns[i].disabled=true; if(curOpts[i]===q.theme) btns[i].className="right"; }
+  var good = (t === q.theme);
+  if(good){ score += 10; } else { btn.className="wrong"; }
+  $("score").textContent = "得分 " + score;
+  var fb = $("fb");
+  fb.className = "feedback show " + (good ? "good" : "bad");
+  fb.innerHTML = (good ? "✅ 答对了！「"+q.t+"」是"+q.theme+"诗。" : "❌ 答案是「"+q.theme+"」。") +
+    (q.exp ? '<div class="exp">📖 ' + q.exp + "</div>" : "") + POEM_LINK.linkHtml(null, q.t, q.a);
+}
+$("btnNext").onclick = function(){ qi++; render(); window.scrollTo(0,0); };
+function end(){
+  $("game").style.display="none";
+  var r = $("result"); r.className="result show";
+  var pct = Math.round(score/(order.length*10)*100);
+  var msg = pct>=90 ? "火眼金睛！" : pct>=60 ? "题感不错！" : "多看诗题，继续加油！";
+  r.innerHTML = '<div class="big">🏆</div><h2>'+msg+'</h2>' +
+    "<p>得分 " + score + " / " + (order.length*10) + "</p>" +
+    '<div class="btnrow"><button class="btn primary" onclick="start()">🔄 再来一轮</button></div>';
+}
+start();
+</script>
+<script src="../../../nav-up.js"></script>
+</body>
+</html>

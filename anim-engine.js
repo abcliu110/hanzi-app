@@ -1,0 +1,307 @@
+/**
+ * hanzi-app 动画引擎 v1.0 - 数据编译动画
+ * 
+ * 第一层跃升：从手编动画到「数据编译动画」
+ * 5 个机制原语，吃结构化数据，自动生成 SMIL SVG 动画
+ * 
+ * 数据格式：
+ * {
+ *   primitive: 'split' | 'replace' | 'clash' | 'path' | 'sequence',
+ *   data: { ... }  // 每个原语特定的数据
+ * }
+ * 
+ * 输出：SVG 字符串（含 SMIL 动画），可直接嵌入图示字段
+ */
+
+const AnimEngine = (function() {
+  'use strict';
+
+  // 语义颜色
+  const C = {
+    green: '#4a7a59',   // 正确/重点/平
+    blue: '#4a7a8c',    // 次要/轨迹
+    red: '#b85a52',     // 错误/警示/仄
+    yellow: '#b8892e',  // 强调
+    ink: '#2c3328',
+    muted: '#6b7566'
+  };
+
+  // 通用：转义 XML
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /**
+   * 原语1：拆/合 (split)
+   * 用于：偏旁拆分、句子成分拆分
+   * 数据：{whole, parts: [{text, color, dx, dy, label, strokes, bbox}], centerX, centerY}
+   * whole: 开头/结尾显示的整体（字卡里必须是汉字本身；不给时退回部件拼接，适用于“花+草=花草”这类词语）
+   * parts: 部件列表，每个有文字、颜色、位移、标注
+   *   strokes/bbox（可选）：部件不能用文字显示时（扩展区/私用区部件、数据占位符），
+   *   用本字的笔画轮廓画出来。strokes 为 hanzi-writer 坐标（1024 格、y 轴向上）的 path，
+   *   bbox=[minX,minY,maxX,maxY] 为这些笔画的范围；此时 text 只作说明，不输出。
+   */
+  function strokeGlyph(p, cx, cy, color) {
+    const [x0, y0, x1, y1] = p.bbox;
+    const s0 = 36 / 1024;                       // 与 36px 文字等大
+    const k = Math.min(1.8, 30 / (Math.max(x1 - x0, y1 - y0, 1) * s0)); // 小部件适当放大，最长边约 30px
+    const sc = +(s0 * k).toFixed(5);
+    const bx = (x0 + x1) / 2, by = (y0 + y1) / 2;
+    let g = `<g transform="translate(${cx},${cy - 13}) scale(${sc},${-sc}) translate(${-bx},${-by})" fill="${color}">`;
+    p.strokes.forEach(d => { g += `<path d="${d}"/>`; });
+    return g + `</g>`;
+  }
+
+  function split(data) {
+    const {parts, centerX = 320, centerY = 100} = data;
+    let svg = `<svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+    let t = 0.5;
+    
+    // 原字（先显示，后淡出）
+    const fullText = data.whole != null ? data.whole : parts.map(p => p.text).join('');
+    svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="48" fill="${C.ink}" id="fullChar">${esc(fullText)}`;
+    svg += `<animate attributeName="opacity" values="1;0" dur="0.4s" begin="${t}s" fill="freeze"/></text>`;
+    t += 0.5;
+    
+    // 部件散开（错开时间，避免初始重叠）
+    parts.forEach((p, i) => {
+      const x = centerX + (p.dx || 0);
+      const y = centerY + (p.dy || 0);
+      const bt = t + i * 0.4; // 每个部件错开0.4秒出现
+      const color = p.color || C.green;
+      const move = `<animateTransform attributeName="transform" type="translate" values="0,0;${p.dx||0},${p.dy||0}" dur="0.8s" begin="${bt}s" fill="freeze"/>`;
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.3s" begin="${bt}s" fill="freeze"/>`;
+      if (p.strokes && p.strokes.length) {
+        svg += `<g>${move}${strokeGlyph(p, centerX, centerY, color)}</g>`;
+      } else {
+        svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="36" fill="${color}">${esc(p.text)}`;
+        svg += `${move}</text>`;
+      }
+      if (p.label) {
+        svg += `<text x="${x}" y="${y+40}" text-anchor="middle" font-size="13" fill="${C.muted}">${esc(p.label)}</text>`;
+      }
+      svg += `</g>`;
+    });
+    t += 1.2 + parts.length * 0.4;
+    
+    // 合回
+    svg += `<text x="${centerX}" y="${centerY}" text-anchor="middle" font-size="48" fill="${C.ink}" opacity="0">${esc(fullText)}`;
+    svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="${t}s" fill="freeze"/></text>`;
+    
+    svg += `</svg>`;
+    return svg;
+  }
+
+  /**
+   * 原语2：替换 (replace)
+   * 用于：把字句↔被字句、时间词替换、词性替换
+   * 数据：{before: {tokens}, after: {tokens}, highlight}
+   */
+  function replace(data) {
+    const {before, after, note} = data;
+    let svg = `<svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+    
+    // Before
+    svg += `<text x="320" y="60" text-anchor="middle" font-size="20" fill="${C.ink}">${esc(before.text)}`;
+    svg += `<animate attributeName="opacity" values="1;0" dur="0.4s" begin="1.0s" fill="freeze"/></text>`;
+    
+    // 箭头
+    svg += `<path d="M320,90 L320,120" stroke="${C.blue}" stroke-width="3" stroke-linecap="round" opacity="0">`;
+    svg += `<animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.2s" fill="freeze"/></path>`;
+    
+    // After
+    svg += `<text x="320" y="160" text-anchor="middle" font-size="20" fill="${C.green}" font-weight="bold" opacity="0">${esc(after.text)}`;
+    svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="1.5s" fill="freeze"/></text>`;
+    
+    if (note) {
+      svg += `<text x="320" y="190" text-anchor="middle" font-size="13" fill="${C.muted}" opacity="0">${esc(note)}`;
+      svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="2.0s" fill="freeze"/></text>`;
+    }
+    
+    svg += `</svg>`;
+    return svg;
+  }
+
+  /**
+   * 原语3：对撞 (clash)
+   * 用于：正误句对比、病句纠错
+   * 数据：{wrong: {text}, right: {text}, reason}
+   */
+  function clash(data) {
+    const {wrong, right, reason} = data;
+    let svg = `<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+    
+    // 错句（红，抖动后碎裂）
+    svg += `<g id="wrongG"><text x="320" y="80" text-anchor="middle" font-size="20" fill="${C.red}">${esc(wrong.text)}</text>`;
+    svg += `<text x="320" y="105" text-anchor="middle" font-size="13" fill="${C.red}">✘ ${esc(wrong.note || '错误')}</text>`;
+    // 抖动
+    svg += `<animateTransform attributeName="transform" type="translate" values="0,0;-5,0;5,0;-5,0;0,0" dur="0.4s" begin="1.0s" fill="freeze"/>`;
+    // 碎裂淡出
+    svg += `<animate attributeName="opacity" values="1;0" dur="0.5s" begin="1.5s" fill="freeze"/></g>`;
+    
+    // 对勾
+    svg += `<text x="320" y="150" text-anchor="middle" font-size="32" fill="${C.green}" opacity="0">✓`;
+    svg += `<animate attributeName="opacity" values="0;1" dur="0.3s" begin="2.0s" fill="freeze"/></text>`;
+    
+    // 正句（绿）
+    svg += `<text x="320" y="200" text-anchor="middle" font-size="20" fill="${C.green}" font-weight="bold" opacity="0">${esc(right.text)}`;
+    svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="2.2s" fill="freeze"/></text>`;
+    
+    if (reason) {
+      svg += `<text x="320" y="240" text-anchor="middle" font-size="13" fill="${C.muted}" opacity="0">${esc(reason)}`;
+      svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="2.6s" fill="freeze"/></text>`;
+    }
+    
+    svg += `</svg>`;
+    return svg;
+  }
+
+  /**
+   * 原语4：路径 (path)
+   * 用于：四声曲线、"于"的方向、时间轴
+   * 数据：{path: "M...", points: [{x, y, label, color}], ball: bool}
+   */
+  /* 路径长度：调用方给了 length 就用它；否则在浏览器里量 d 的真实长度（游离的 path 也能量）；
+     量不了（非浏览器环境等）退回 500，与旧行为一致 */
+  function pathLength(d, explicit) {
+    if (explicit > 0) return explicit;
+    try {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      el.setAttribute('d', d);
+      const L = el.getTotalLength();
+      if (L > 0) return Math.ceil(L);
+    } catch (e) { /* 忽略：走兜底 */ }
+    return 500;
+  }
+
+  function path(data) {
+    const {path: d, points = [], label, length} = data;
+    let svg = `<svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+    
+    // 路径自己画出来
+    const len = pathLength(d, length);
+    svg += `<path d="${d}" fill="none" stroke="${C.blue}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${len}">`;
+    svg += `<animate attributeName="stroke-dashoffset" values="${len};0" dur="1.5s" begin="0.5s" fill="freeze"/></path>`;
+    
+    // 点
+    points.forEach((p, i) => {
+      const t = 0.8 + i * 0.4;
+      svg += `<circle cx="${p.x}" cy="${p.y}" r="8" fill="${p.color || C.green}" opacity="0">`;
+      svg += `<animate attributeName="opacity" values="0;1" dur="0.3s" begin="${t}s" fill="freeze"/></circle>`;
+      if (p.label) {
+        svg += `<text x="${p.x}" y="${p.y - 15}" text-anchor="middle" font-size="12" fill="${C.ink}" opacity="0">${esc(p.label)}`;
+        svg += `<animate attributeName="opacity" values="0;1" dur="0.3s" begin="${t+0.2}s" fill="freeze"/></text>`;
+      }
+    });
+    
+    // 小球沿路径运动
+    if (data.ball !== false) {
+      svg += `<circle r="6" fill="${C.red}" opacity="0">`;
+      svg += `<animate attributeName="opacity" values="0;1" dur="0.2s" begin="2.0s" fill="freeze"/>`;
+      svg += `<animateMotion dur="2s" begin="2.2s" fill="freeze" path="${d}"/></circle>`;
+    }
+    
+    if (label) {
+      svg += `<text x="320" y="260" text-anchor="middle" font-size="14" fill="${C.ink}" opacity="0">${esc(label)}`;
+      svg += `<animate attributeName="opacity" values="0;1" dur="0.4s" begin="2.5s" fill="freeze"/></text>`;
+    }
+    
+    svg += `</svg>`;
+    return svg;
+  }
+
+  /**
+   * 原语5：显现序列 (sequence) v2 - 增强版（2026-11-04）
+   * 用于：诗词/古文/部首知识卡、补语、"之"用法、关联词
+   * 数据：{items: [{title, color, text, wrong}], summary}
+   * - title 16px加粗；wrong 可选，显示 ✗ 红色错误对比
+   * - 要点间虚线连接线，显示逻辑流；序号圆点；总结卡片化
+   */
+  function sequence(data) {
+    const {items, summary} = data;
+    // 动态计算高度：有wrong的项需要更多空间
+    let y = 50;
+    const positions = [];
+    items.forEach((item, i) => {
+      positions.push(y);
+      y += item.wrong ? 95 : 75; // 有错误对比的项更高
+    });
+    const h = y + 60;
+    let svg = `<svg viewBox="0 0 640 ${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">`;
+
+    // 连接线（虚线，显示逻辑流）
+    if (items.length > 1) {
+      const lineTop = positions[0];
+      const lineBottom = positions[positions.length-1];
+      svg += `<line x1="32" y1="${lineTop}" x2="32" y2="${lineBottom}" stroke="${C.muted}" stroke-width="2" stroke-dasharray="6,4" opacity="0">`;
+      svg += `<animate attributeName="opacity" values="0;0.5" dur="0.5s" begin="0.4s" fill="freeze"/></line>`;
+    }
+
+    items.forEach((item, i) => {
+      const y = positions[i];
+      const t = 0.6 + i * 0.8;
+      const color = item.color || [C.green, C.blue, C.yellow, C.red][i % 4];
+
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.4s" begin="${t}s" fill="freeze"/>`;
+      // 序号圆点
+      svg += `<circle cx="32" cy="${y}" r="12" fill="${color}"/>`;
+      svg += `<text x="32" y="${y+5}" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">${i+1}</text>`;
+      // 卡片（有wrong时更高）
+      const cardH = item.wrong ? 68 : 52;
+      svg += `<rect x="52" y="${y-28}" width="568" height="${cardH}" rx="10" fill="${color}14" stroke="${color}" stroke-width="1.5"/>`;
+      // 标题（16px加粗）
+      svg += `<text x="70" y="${y-2}" text-anchor="start" font-size="16" fill="${color}" font-weight="bold">${esc(item.title)}</text>`;
+      // 正文
+      svg += `<text x="70" y="${y+20}" text-anchor="start" font-size="13" fill="${C.ink}">${esc(item.text)}</text>`;
+      // 错误对比（卡片内）
+      if (item.wrong) {
+        svg += `<text x="70" y="${y+38}" text-anchor="start" font-size="12" fill="${C.red}">✗ ${esc(item.wrong)}</text>`;
+      }
+      svg += `</g>`;
+    });
+
+    if (summary) {
+      const y = positions[positions.length-1] + (items[items.length-1].wrong ? 75 : 60);
+      const t = 0.6 + items.length * 0.8;
+      svg += `<g opacity="0"><animate attributeName="opacity" values="0;1" dur="0.5s" begin="${t}s" fill="freeze"/>`;
+      svg += `<rect x="52" y="${y-22}" width="568" height="36" rx="8" fill="${C.ink}0d" stroke="${C.ink}" stroke-width="1" stroke-dasharray="5,3"/>`;
+      svg += `<text x="320" y="${y+2}" text-anchor="middle" font-size="14" fill="${C.ink}" font-weight="bold">💡 ${esc(summary)}</text>`;
+      svg += `</g>`;
+    }
+
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // 主入口：编译
+  function compile(spec) {
+    const {primitive, data} = spec;
+    switch (primitive) {
+      case 'split': return split(data);
+      case 'replace': return replace(data);
+      case 'clash': return clash(data);
+      case 'path': return path(data);
+      case 'sequence': return sequence(data);
+      default: throw new Error('Unknown primitive: ' + primitive);
+    }
+  }
+
+  return {
+    compile,
+    split,
+    replace,
+    clash,
+    path,
+    sequence,
+    colors: C
+  };
+})();
+
+// 浏览器环境导出
+if (typeof window !== 'undefined') {
+  window.AnimEngine = AnimEngine;
+}
+// Node 环境导出
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = AnimEngine;
+}

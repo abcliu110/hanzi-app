@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>飞花令人机对战 · 原型</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--green:#3f8e6b;--blue:#4a7a8c;--red:#b85a52;--leaf:#9ed0ad}
+@media (prefers-color-scheme:dark){:root{--bg:#1a211c;--card:#243028;--surface:#1f2923;--ink:#e6eee4;--muted:#9aab9c;--accent:#6fa87d;--accent-deep:#8fbf9a;--accent-soft:#2a3a30;--line:#354339;--leaf:#4d7a5c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:17px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.proto-title{font-size:19px;font-weight:800;color:var(--accent-deep)}
+.proto-src{font-size:12px;color:var(--muted);margin-top:4px}
+.proto-badge{display:inline-block;font-size:12px;background:var(--accent-soft);color:var(--accent-deep);border-radius:999px;padding:2px 10px;margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.kw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.kw-btn{min-height:64px;font-size:26px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.kw-btn.sel{border-color:var(--accent);background:var(--accent-soft)}
+.btn{display:block;width:100%;min-height:56px;font-size:18px;font-weight:700;border-radius:14px;border:0;background:var(--accent);color:#fff;cursor:pointer;margin:8px 0}
+.btn-ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.log{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;margin:10px 0}
+.msg{border-radius:12px;padding:8px 12px;max-width:92%}
+.msg.user{align-self:flex-end;background:var(--accent-soft);color:var(--ink)}
+.msg.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--line)}
+.msg .who{font-size:12px;color:var(--muted)}
+.msg .info{font-size:12px;color:var(--muted);margin-top:2px}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1;font-size:17px;padding:12px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.input-row button{min-height:52px;padding:0 18px;font-size:17px;font-weight:700;border-radius:12px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+.scorebar{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.hidden{display:none}
+.verse-list{font-size:14px;color:var(--muted)}
+.verse-list li{margin:4px 0}
+.mode-btn{flex:1}
+.mode-btn.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-deep)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../shici.html" style="display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">← 返回</a><h1 style="font-size:20px;margin:0;">🌸 飞花令人机对战</h1></div>
+<div class="proto-src">玩法抄自：飞花小令（开源 github.com/kuriko1023/fhl）+ 飞花令AI对诗（CSDN 纯前端教程）</div>
+    <div class="proto-badge">原型待核对 · 未进 App</div>
+  </div>
+
+  <div id="screen-pick" class="card">
+    <h3 style="margin:0 0 6px">选一种令开局</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px" id="pickDesc">你一句、AI 一句，轮流说含这个字的诗句，共 5 轮。</p>
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <button class="btn btn-ghost mode-btn sel" data-mode="single">单字令</button>
+      <button class="btn btn-ghost mode-btn" data-mode="double">双字令</button>
+      <button class="btn btn-ghost mode-btn" data-mode="pos">指定位置令</button>
+    </div>
+    <div id="pickSingle">
+      <div class="kw-grid" id="kwGrid"></div>
+      <p class="tip">"水"字含水/江/河/湖/海/雨/雪都算；"雪"字含雪/霜。</p>
+    </div>
+    <div id="pickDouble" class="hidden">
+      <div class="kw-grid" id="pairGrid"></div>
+      <p class="tip">双字令：回答的诗句须同时含这两个字，如"春风"→"二月春风似剪刀"。</p>
+    </div>
+    <div id="pickPos" class="hidden">
+      <p style="font-size:13px;color:var(--muted);margin:0">先选令字，再选它在诗句里的位置：</p>
+      <div class="kw-grid" id="posCharGrid"></div>
+      <div class="kw-grid" id="posGrid"></div>
+      <p class="tip">指定位置令：如"月"在句末→"举头望明月"；"月"在第 3 字→"江清月近人"。一联两句时，任一句合乎位置即可。</p>
+    </div>
+    <button class="btn" id="btnStart">开战！</button>
+  </div>
+
+  <div id="screen-play" class="hidden">
+    <div class="scorebar"><span id="roundLab">第 1/5 轮</span><span id="scoreLab">得分 0</span></div>
+    <div class="log" id="log"></div>
+    <div class="tip" id="tip">在下面输入一句含"<b id="kwShow"></b>"的诗句，点"出句"。</div>
+    <div class="input-row">
+      <input id="verseInput" placeholder="输入一句诗，如：举头望明月" autocomplete="off">
+      <button id="btnSend">出句</button>
+    </div>
+    <button class="btn btn-ghost" id="btnSkip">跳过这一轮</button>
+    <button class="btn btn-ghost" id="btnGiveUp">认输，看本令全部句子</button>
+  </div>
+
+  <div id="screen-end" class="card hidden">
+    <h3 style="margin:0 0 6px">对战结束</h3>
+    <p id="finalScore" style="font-size:22px;font-weight:800;color:var(--accent-deep)"></p>
+    <ul class="verse-list" id="verseList"></ul>
+    <div id="fullBox" class="hidden">
+      <h3 id="fullTitle" style="margin:14px 0 6px"></h3>
+      <ul class="verse-list" id="fullList"></ul>
+    </div>
+    <button class="btn btn-ghost hidden" id="btnShowFull">📜 看看本令在诗库的全部句子</button>
+    <button class="btn" id="btnAgain">再来一局</button>
+  </div>
+</div>
+<script src="../../data/shici.js"></script>
+<script src="data_feihua.js"></script>
+<script>
+var KW = {月:["月"],花:["花"],山:["山"],水:["水","江","河","湖","海","雨","雪","泉","瀑","溪","波","浪","潮"],风:["风"],雪:["雪","霜"]};
+var PAIRS = ["春风","明月","千里","万里","青山","流水","白云","青天"];
+var POS_CHARS = ["月","花","山","风"];
+var POSITIONS = [{v:"首",t:"句首"},{v:"末",t:"句末"},{v:"2",t:"第2字"},{v:"3",t:"第3字"},{v:"4",t:"第4字"},{v:"5",t:"第5字"}];
+var TOTAL = 5;
+var mode = "single", kw = "月", pair = "春风", posChar = "月", pos = "首";
+var round = 1, score = 0, usedAI = {}, userVerses = [];
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+var $=function(id){return document.getElementById(id);};
+function posLabel(){ var p = POSITIONS.filter(function(x){ return x.v === pos; })[0]; return p ? p.t : pos; }
+function tokenLabel(){
+  if(mode==="double") return "双字令“"+pair+"”";
+  if(mode==="pos") return "指定位置令“"+posChar+"”在"+posLabel();
+  return "“"+kw+"”字令";
+}
+function tokenRule(){
+  if(mode==="double") return "回答的诗句须同时含“"+pair[0]+"”和“"+pair[1]+"”两个字。";
+  if(mode==="pos") return "回答的诗句里，“"+posChar+"”须出现在"+posLabel()+"。";
+  var extra = kw==="水" ? "（水字：水/江/河/湖/海/雨/雪都算）" : kw==="雪" ? "（雪字：雪/霜都算）" : "";
+  return "回答的诗句须含“"+kw+"”"+extra+"。";
+}
+function bankFor(){
+  if(mode==="double") return FEIHUA.bankDouble(pair[0], pair[1]);
+  if(mode==="pos") return FEIHUA.bankPos(posChar, pos);
+  return FEIHUA.bankSingle(KW[kw]);
+}
+function okVerse(v){
+  if(mode==="double") return FEIHUA.okDouble(v, pair[0], pair[1]);
+  if(mode==="pos") return FEIHUA.okPos(v, posChar, pos);
+  return FEIHUA.okSingle(v, KW[kw]);
+}
+function poemLink(o){ return o ? ' <a href="../../shici.html#poem-'+o+'">📖读整首</a>' : ''; }
+
+function buildGrid(elId, items, getSel, onPick){
+  var box = $(elId); box.innerHTML = "";
+  items.forEach(function(it){
+    var b = document.createElement("button");
+    b.className = "kw-btn" + (getSel(it) ? " sel" : "");
+    b.textContent = (typeof it === "string" ? it : it.t);
+    b.onclick = function(){ onPick(it); var bs = box.children; for(var j = 0; j < bs.length; j++) bs[j].classList.remove("sel"); b.classList.add("sel"); };
+    box.appendChild(b);
+  });
+}
+buildGrid("kwGrid", Object.keys(KW), function(k){ return k === kw; }, function(k){ kw = k; });
+buildGrid("pairGrid", PAIRS, function(p){ return p === pair; }, function(p){ pair = p; });
+buildGrid("posCharGrid", POS_CHARS, function(c){ return c === posChar; }, function(c){ posChar = c; });
+buildGrid("posGrid", POSITIONS, function(p){ return p.v === pos; }, function(p){ pos = p.v; });
+
+var MODE_DESC = {
+  single: "你一句、AI 一句，轮流说含这个字的诗句，共 5 轮。",
+  double: "你一句、AI 一句，轮流说同时含两个令字的诗句，共 5 轮。",
+  pos: "你一句、AI 一句，轮流说令字出现在指定位置的诗句，共 5 轮。"
+};
+document.querySelectorAll(".mode-btn").forEach(function(b){
+  b.onclick = function(){
+    mode = b.getAttribute("data-mode");
+    document.querySelectorAll(".mode-btn").forEach(function(x){ x.classList.remove("sel"); });
+    b.classList.add("sel");
+    $("pickSingle").classList.toggle("hidden", mode !== "single");
+    $("pickDouble").classList.toggle("hidden", mode !== "double");
+    $("pickPos").classList.toggle("hidden", mode !== "pos");
+    $("pickDesc").textContent = MODE_DESC[mode];
+  };
+});
+$("btnStart").onclick=function(){
+  if(!window.FEIHUA || !FEIHUA.bank.length){ $("pickDesc").textContent = "诗库没加载出来，请从古诗词首页进入再试。"; return; }
+  var bank = bankFor();
+  if(bank.length < 3){ $("pickDesc").textContent = "这个组合在诗库里只有 " + bank.length + " 句，换一个组合试试。"; return; }
+  round=1;score=0;usedAI={};userVerses=[];
+  $("screen-pick").classList.add("hidden");$("screen-end").classList.add("hidden");
+  $("screen-play").classList.remove("hidden");
+  $("log").innerHTML="";
+  aiSay("我是 AI 小诗童，" + tokenLabel() + "开局，你先出句吧！","");
+  updateBar();$("verseInput").focus();
+  $("tip").innerHTML = "规则：" + esc(tokenRule()) + "在下面输入，点“出句”。";
+};
+function updateBar(){$("roundLab").textContent="第 "+round+"/"+TOTAL+" 轮";$("scoreLab").textContent="得分 "+score;}
+function addMsg(who,text,infoHtml){
+  var d=document.createElement("div");d.className="msg "+who;
+  d.innerHTML='<div class="who">'+(who==="user"?"你":"🤖 AI 小诗童")+'</div><div>'+esc(text)+'</div>'+(infoHtml?'<div class="info">'+infoHtml+'</div>':"");
+  $("log").appendChild(d);$("log").scrollTop=$("log").scrollHeight;
+}
+function aiSay(t,i){addMsg("ai",t,i);}
+$("btnSend").onclick=function(){
+  var raw=$("verseInput").value.trim(), v=FEIHUA.strip(raw);
+  if(v.length<5){$("tip").innerHTML="太短啦，写一句完整的诗句。规则："+esc(tokenRule());return;}
+  if(!okVerse(raw)){$("tip").innerHTML="这句不符合"+esc(tokenLabel())+"。规则："+esc(tokenRule())+"换一句试试。";return;}
+  if(userVerses.indexOf(v)>=0){$("tip").innerHTML="这句你已经出过啦，换一句新的。";return;}
+  userVerses.push(v);score++;
+  addMsg("user",v,"第"+round+"轮 · +1");
+  $("verseInput").value="";updateBar();
+  $("tip").innerHTML="好句！AI 正在想下一句……";
+  setTimeout(aiTurn,700);
+};
+$("btnSkip").onclick=function(){
+  addMsg("user","（跳过）","");
+  setTimeout(aiTurn,400);
+};
+$("btnGiveUp").onclick=function(){
+  addMsg("user","（认输）","");
+  endGame(true);
+};
+function aiTurn(){
+  var bank=bankFor().filter(function(x){return !usedAI[x.s] && userVerses.indexOf(x.s)<0;}); /* AI 不重复你出过的句子 */
+  if(bank.length===0){aiSay("哎呀，我的"+tokenLabel()+"诗句用完了，你赢了！","");return endGame(false);}
+  var pick=bank[Math.floor(Math.random()*bank.length)];
+  usedAI[pick.s]=1;
+  aiSay(pick.v,"——"+esc(pick.a)+"《"+esc(pick.t)+"》"+poemLink(pick.o));
+  round++;
+  if(round>TOTAL){setTimeout(function(){ endGame(false); },900);}else{updateBar();$("tip").innerHTML='轮到你了。规则：'+esc(tokenRule());}
+}
+function endGame(lost){
+  $("screen-play").classList.add("hidden");$("screen-end").classList.remove("hidden");
+  var s=score>=5?"🌟 诗仙转世！":score>=3?"👏 很厉害！":"💪 多背几首再来战！";
+  $("finalScore").textContent="你得了 "+score+" / "+TOTAL+" 分 "+s;
+  var msgs=$("log").querySelectorAll(".msg");
+  var h="";
+  msgs.forEach(function(m){h+="<li>"+m.querySelector("div:nth-child(2)").textContent+"</li>";});
+  $("verseList").innerHTML=h;
+  var full=bankFor();
+  $("fullTitle").textContent="📜 "+tokenLabel()+"在"+(FEIHUA.src==="诗库"?"诗库（"+((window.NHZ_SHICI&&NHZ_SHICI.poems||[]).length)+" 首）":"题库")+"的全部句子（共 "+full.length+" 句）";
+  $("fullList").innerHTML=full.map(function(x){
+    return "<li>"+esc(x.v)+" ——"+esc(x.a)+"《"+esc(x.t)+"》"+poemLink(x.o)+"</li>";
+  }).join("");
+  var didLose = lost || score < TOTAL;
+  if(didLose){ $("fullBox").classList.remove("hidden"); $("btnShowFull").classList.add("hidden"); }
+  else { $("fullBox").classList.add("hidden"); $("btnShowFull").classList.remove("hidden"); }
+}
+$("btnShowFull").onclick=function(){ $("fullBox").classList.remove("hidden"); $("btnShowFull").classList.add("hidden"); };
+$("btnAgain").onclick=function(){
+  $("screen-end").classList.add("hidden");$("screen-play").classList.add("hidden");
+  $("screen-pick").classList.remove("hidden");
+  $("pickDesc").textContent = MODE_DESC[mode];
+};
+$("verseInput").addEventListener("keydown",function(e){if(e.key==="Enter")$("btnSend").click();});
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

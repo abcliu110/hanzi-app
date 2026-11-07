@@ -1,0 +1,190 @@
+/* 拼音区知识点页（pinyin/kp.js 渲染 pinyin/content/<id>.js）。只用 zika.css 护眼 token；触控 ≥44px；不做 3D/悬浮特效。
+   版式沿用原型 docs/ui-prototypes/pinyin-proto.html 的 B1/B2：纵向长页 + 顶部「看 / 听读 / 练 / 用」段内跳转 + 右上浅/中/深。 */
+:root{
+  /* 声调色：沿用首页 index.js 的 TONE_COLORS（1 红 2 绿 3 青灰 4 橄榄 5 灰） */
+  --t1:var(--red); --t2:var(--green); --t3:var(--blue); --t4:#66734f; --t5:var(--muted);
+  --ok:var(--green); --bad:var(--red);
+  --py:"Noto Sans","Noto Sans CJK SC","PingFang SC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --t1:#d98a82; --t2:#7cc4a0; --t3:#8db8c8; --t4:#b3c094; --ok:#7cc4a0; --bad:#d98a82; }
+}
+.kp{font-size:16px;line-height:1.7}
+.kp .py{font-family:var(--py)}
+.kp .t1{color:var(--t1)} .kp .t2{color:var(--t2)} .kp .t3{color:var(--t3)} .kp .t4{color:var(--t4)} .kp .t5{color:var(--t5)}
+.kp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:2px 0 4px}
+.kp-head h2{margin:0;font-size:24px;color:var(--accent-deep)}
+.kp-head .ex{font-family:var(--py);font-size:16px;color:var(--accent-deep)}
+.kp-lead{margin:0 0 6px;font-size:15px;color:var(--ink)}
+.kp-nav{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 0;margin:0 0 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.kp-btn{min-height:48px;min-width:48px;padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--accent-deep);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.kp-btn:hover{border-color:var(--accent)}
+.kp-btn.pri{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+@media (prefers-color-scheme: dark){.kp-btn.pri{color:#14211a}}
+.kp-btn:disabled{opacity:.45;cursor:default}
+.kp-jump{min-width:72px}
+.kp-seg{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--accent-soft);margin-left:auto}
+.kp-seg button{min-height:44px;min-width:68px;border:0;background:transparent;border-radius:10px;font:inherit;font-size:16px;font-weight:700;color:var(--accent-deep);cursor:pointer}
+.kp-seg button small{font-weight:400;font-size:12px;margin-left:4px;color:var(--muted)}
+.kp-seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 0 var(--line)}
+.kp button:focus-visible,.kp a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stage{margin:0 0 22px;scroll-margin-top:76px}
+.stage>h3{display:flex;align-items:center;gap:10px;font-size:20px;margin:6px 0 10px;color:var(--ink)}
+.stage>h3 .sn{min-width:34px;height:34px;padding:0 8px;border-radius:17px;background:var(--accent-deep);color:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.stage>h3 small{font-size:13px;font-weight:400;color:var(--muted)}
+.blk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:0 0 12px}
+.blk-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.blk-h b{font-size:17px;color:var(--accent-deep)}
+.blk p{margin:4px 0;font-size:15.5px;line-height:1.8}
+.blk .note{font-size:13px;color:var(--muted);line-height:1.6;margin-top:6px}
+.kp .tag{display:inline-block;font-size:12px;font-weight:700;line-height:1;padding:4px 7px;border-radius:7px;border:1px solid var(--line);color:var(--accent-deep);background:var(--card);white-space:nowrap}
+.lvhide{display:none!important}
+.more{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:0 0 12px}
+.kp-src{font-size:12.5px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+.kp-outline{border:1px dashed var(--line);background:var(--card)}
+
+/* 芯片（沿用 pinyin.html 的 .py-chip / .py-tones 类，见 pinyin.html） */
+.prow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.prow .lab{min-width:64px;font-size:14px;color:var(--muted)}
+.kp .py-chip .t1,.kp .py-chip .t2,.kp .py-chip .t3,.kp .py-chip .t4{font-weight:600}
+.pair{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 8px}
+.pair .sl{color:var(--muted)}
+.pyi{display:inline;min-height:0;padding:0 3px;border:0;border-bottom:2px solid var(--accent-soft);background:transparent;border-radius:4px;font:inherit;font-family:var(--py);color:var(--accent-deep);cursor:pointer}
+.pyi:hover{background:var(--accent-soft)}
+.kp a.zi-l{color:var(--accent-deep);text-decoration:none;border-bottom:2px dotted var(--accent);padding:0 1px}
+.ptable{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+.ptable th,.ptable td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.6}
+.ptable th{background:var(--card);color:var(--accent-deep)}
+.tblwrap{overflow-x:auto}
+
+/* 看：情境卡 */
+.scenes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@container (min-width:880px){.scenes{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.scene{font:inherit;color:var(--ink);text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:44px}
+.scene:hover{border-color:var(--accent)}
+.scene .pic{position:relative;background:var(--surface);border-radius:10px}
+.scene svg{width:100%;height:150px;display:block}
+.scene .sl{position:absolute;right:12px;top:6px;font-family:var(--py);font-size:56px;font-weight:700;line-height:1;color:var(--accent-deep);opacity:0;transition:opacity .4s}
+.scene.show .sl{opacity:.9}
+.scene .sc{font-size:14px;line-height:1.55}
+.scene .sc b{font-family:var(--py);font-size:20px;color:var(--accent-deep);margin-right:4px}
+/* 镜子 */
+.mirror{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.mglyph{width:150px;height:150px;border-radius:16px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--py);font-size:110px;line-height:1;color:var(--accent-deep)}
+.mglyph span{display:inline-block;transition:transform .5s ease}
+.mname{font-family:var(--py);font-size:40px;font-weight:700;color:var(--ink)}
+.mtips{font-size:14px;color:var(--muted);line-height:1.7}
+/* 声调路 */
+.roads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@container (min-width:880px){.roads{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.road{display:flex;flex-direction:column;align-items:stretch;gap:6px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;cursor:pointer;min-height:44px}
+.road:hover{border-color:var(--accent)}
+.road.playing{border-color:var(--accent-deep);background:var(--accent-soft)}
+.road canvas{width:100%;height:150px;display:block;border-radius:10px;background:var(--surface)}
+.road .rh{display:flex;align-items:baseline;gap:8px}
+.road .rh b{font-size:16px}
+.road .rh .py{font-size:30px;margin-left:auto;line-height:1}
+.road .rd{font-size:13px;color:var(--muted);line-height:1.5}
+.pchip{min-width:56px;min-height:48px;padding:6px 12px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font:inherit;font-family:var(--py);font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.pchip:hover{background:var(--accent-soft)}
+.pchip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-deep);font-weight:700}
+.pchip small{font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;font-size:13px;color:var(--muted)}
+.pchip.mute,.pchip:disabled{border-style:dashed;color:var(--muted);cursor:default;background:var(--card)}
+.pchip.flash{background:var(--accent-soft)}
+.rule{border-left:4px solid var(--accent);background:var(--card);border-radius:0 12px 12px 0;padding:8px 14px;margin:8px 0;font-size:16px}
+.fallback{border:1px dashed var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-size:15px;line-height:1.8}
+/* 碰撞 */
+.bump{display:flex;align-items:center;justify-content:center;min-height:130px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden;position:relative}
+.bk{font-family:var(--py);display:inline-flex;align-items:center;justify-content:center;height:88px;transition:transform .18s cubic-bezier(.6,0,1,1),opacity .18s;font:inherit;font-family:var(--py)}
+.bk.ini{background:var(--accent-soft);color:var(--accent-deep);font-size:34px;min-width:58px;padding:0 10px;border:1px solid var(--line);border-right:0;border-radius:14px 0 0 14px}
+.bk.med{background:var(--accent-soft);color:var(--accent-deep);font-size:34px;min-width:50px;padding:0 8px;border:1px solid var(--line);border-right:0}
+.bk.fin{background:var(--surface);color:var(--ink);font-size:46px;min-width:96px;padding:0 14px;border:2px solid var(--accent);border-radius:0 14px 14px 0;cursor:pointer}
+.bk.away{transform:translateX(-200px);opacity:.5}
+.bk.med.away{transform:translateX(-110px)}
+.bk.merged{border-radius:14px;min-width:150px;font-size:54px;border:2px solid var(--accent-deep);background:var(--surface);animation:kpPop .35s ease-out;cursor:pointer}
+@keyframes kpPop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.bump .eq{position:absolute;left:12px;top:8px;font-size:14px;color:var(--muted);font-family:var(--py)}
+/* 练 */
+.quiz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.qtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.qscore{margin-left:auto;font-size:14px;color:var(--muted)}
+.qopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 6px}
+@container (min-width:640px){.qopts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.qopt{min-height:64px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font:inherit;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 10px;text-align:left}
+.qopt svg{width:40px;height:28px;flex:none}
+.qopt .py{font-size:26px}
+.qopt.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px}
+.qopt.wrong{border-color:var(--bad);border-width:2px;border-style:dashed}
+.qfb{min-height:30px;font-size:15px;line-height:1.7}
+.qfb .ok{color:var(--ok);font-weight:700}
+.qfb .no{color:var(--bad);font-weight:700}
+.qq{font-size:17px;margin:8px 0 0}
+.letters{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;margin:12px 0 6px}
+.letter{min-width:56px;min-height:64px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--ink);font-family:var(--py);font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 8px}
+.letter:hover{background:var(--accent-soft)}
+.letter.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px}
+.letter.wrong{border-color:var(--bad);border-style:dashed;border-width:2px}
+.target{font-size:15px;color:var(--muted)}
+.target b{font-size:18px}
+.grid-tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:10px 0}
+.tile{min-height:72px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);font-family:var(--py);font-size:40px;color:var(--ink);cursor:pointer;line-height:1}
+.tile.right{background:var(--accent-soft);border-color:var(--ok);border-width:2px;color:var(--ok)}
+.tile.wrong{border-color:var(--bad);border-style:dashed;border-width:2px}
+.bsel{display:flex;flex-wrap:wrap;gap:8px}
+/* 用：注音字串 */
+.pwords{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:880px){.pwords{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.word{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 8px}
+.sent{display:flex;flex-wrap:wrap;gap:4px 2px;align-items:flex-end;margin:6px 0 10px}
+.zi{display:inline-flex;flex-direction:column;align-items:center;min-width:48px}
+.zi .pyb{min-height:44px;min-width:48px;padding:2px 6px;border:0;border-bottom:2px solid transparent;background:transparent;font-family:var(--py);font-size:19px;cursor:pointer;border-radius:8px}
+.zi .pyb:hover{background:var(--accent-soft)}
+.zi .pyb.nos{cursor:default;opacity:.85;border-bottom:2px dotted var(--line);display:inline-flex;align-items:center;justify-content:center}
+.zi a,.zi .zc{font-size:28px;line-height:1.3;color:var(--ink);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding:0 4px;border-radius:8px}
+.zi a:hover{background:var(--accent-soft)}
+.zi.punc{min-width:18px}
+.zi.punc .pyb{min-width:0;padding:0}
+.zi .sd{font-size:12px;color:var(--muted);font-family:var(--py);min-height:18px}
+.kp[data-level="1"] .zi .sd{visibility:hidden}
+.verse-t{font-size:17px;font-weight:700;color:var(--accent-deep);margin:2px 0 4px}
+@media (prefers-reduced-motion: reduce){ .bk,.mglyph span,.scene .sl{transition:none} .bk.merged{animation:none} }
+.kp .py-chip.is-static{cursor:default;background:var(--card);color:var(--accent-deep)}
+.road.mini{cursor:default;min-width:150px;flex:1 1 150px;max-width:240px;padding:6px 8px 8px}
+.road.mini canvas{height:96px}
+.road.mini .rh .py{font-size:24px;margin-left:0}
+.sandhi .kp-btn{align-self:center}
+/* 复韵母动程 / 前后鼻：静态步进示意图（pinyin-11） */
+.gstage,.nstage{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}
+.gsvg{width:100%;max-width:520px;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.ncol{margin:0;flex:1 1 240px;max-width:360px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px}
+.ncol figcaption{font-size:15px;color:var(--ink)}.ncol figcaption .py{font-size:22px}.ncol figcaption small{color:var(--muted)}
+.nsvg{width:100%;height:auto;display:block}
+.gsvg text,.nsvg text{font-family:system-ui,"PingFang SC","Noto Sans CJK SC",sans-serif;fill:var(--muted);text-anchor:middle}
+.gsvg .glab,.nsvg .nlab{font-size:11px}.nsvg .nlab.sm{font-size:9px}
+.gsvg .gcap{font-size:15px;fill:var(--ink);font-family:var(--py)}
+.gsvg .gax{font-size:10px}
+.gsvg .gv{font-size:15px;fill:var(--ink);font-family:var(--py);font-weight:700}
+.gsvg .ghid{font-size:13px;fill:var(--accent-deep)}
+.gmouth{fill:var(--accent-soft);stroke:var(--accent-deep);stroke-width:3}
+.gghost{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}
+.gtrap{fill:none;stroke:var(--line);stroke-width:2}
+.gdot0,.gdot1{fill:var(--card);stroke:var(--muted);stroke-width:1.5}.gdot1.on{stroke:var(--accent-deep)}
+.gball{fill:var(--accent);stroke:var(--accent-deep);stroke-width:2}
+.garrow,.nair{fill:none;stroke:var(--accent-deep);stroke-width:2.5;stroke-linecap:round}
+.nair{stroke-dasharray:6 4}
+.gahd{fill:var(--accent-deep)}
+.nwall{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ntooth{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.nvel{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.ntongue{fill:none;stroke:var(--accent-deep);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.nhit{fill:none;stroke:var(--bad);stroke-width:2.5}
+.gcapt{font-size:16px;line-height:1.7;margin:4px 0}
+.gfb summary{cursor:pointer;color:var(--accent-deep);min-height:44px;display:flex;align-items:center}
+.nlead{stroke:var(--muted);stroke-width:1;fill:none}
+/* 拼读机：同音字链字卡 */
+.hz{margin-top:8px}.hz-h{font-size:15px;color:var(--muted)}
+.hz-l{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.hz-l .zi-l{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.hz-l .zi-l:hover{border-color:var(--accent)}
+.py-chip.kp-focus{outline:3px solid var(--accent-deep);outline-offset:3px}
+.kp .erh{text-decoration:underline dotted var(--muted);text-underline-offset:3px}

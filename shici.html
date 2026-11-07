@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古诗词 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px}
+.sc-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 14px;cursor:pointer}
+.sc-card h3{margin:0 0 8px;font-size:17px;color:var(--accent-deep)}
+.sc-card p{margin:0;font-size:13px;line-height:1.7;color:var(--muted)}
+.sc-card[data-go]:active,a.sc-card:active{transform:scale(.98);background:var(--accent-soft)}
+.sc-poem{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
+.sc-poem:active{background:var(--accent-soft)}
+.sc-ptitle{font-size:18px;font-weight:700}
+.sc-pmeta{font-size:13px;color:var(--muted);margin-top:4px}
+.sc-badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:10px;background:var(--accent-soft);border:1px solid var(--line);margin-right:6px;color:var(--accent-deep)}
+.sc-lines{font-size:20px;line-height:2;text-align:center;padding:18px 8px}
+/* 阅读条（改进设计 P0-2）：朗读高亮 / 节奏 / 渐隐背诵 */
+.sc-readbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}
+.sc-readbar button,.sc-readbar a{min-height:44px;padding:8px 16px;border-radius:12px;border:2px solid var(--accent-deep,#3f6b4f);background:var(--accent-soft,#e8f0e4);color:var(--accent-deep,#3f6b4f);font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.sc-readbar button.on{background:var(--accent-deep,#3f6b4f);color:#fff}
+.sc-line.reading{background:#fff3c4;border-radius:10px}
+.sc-line .rb{color:#b08d57;margin:0 .15em;font-weight:400}
+.sc-line .hz.hid{color:transparent;border-bottom:2px solid #c9d6c2}
+/* 拼音注音（Q17）：拼音在字上方，11px 次要色；竖排与注音互斥，万一同开注音优先横排 */
+.sc-lines.py{line-height:2.9}
+.sc-line .hzpy{display:inline-flex;flex-direction:column;align-items:center;line-height:1.2;vertical-align:top}
+.sc-line .hzpy i{font-style:normal;font-size:11px;color:var(--muted);line-height:1.4}
+.sc-vertical .sc-lines.py{writing-mode:horizontal-tb;height:auto}
+.sc-memo-tip{text-align:center;color:#6b7c6b;font-size:14px;margin-top:4px}
+.sc-lines p{margin:0}
+/* 古籍竖排（改进设计 P2-5）：只改诗详情原文区；竖排时轻微飘动，减动效偏好下关闭 */
+.sc-vertical .sc-lines{writing-mode:vertical-rl;text-orientation:upright;height:340px;overflow:auto;margin:0 auto}
+.sc-vertical .sc-lines p{margin:0 12px}
+/* 打拍器 + 平仄格（改进设计 P0-3） */
+.sc-beat{margin:10px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.sc-beat .bk-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
+.sc-beat .bk-ctl button{min-height:44px;padding:6px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;cursor:pointer}
+.sc-beat .bk-ctl button.on{background:var(--accent-deep,#3f6b4f);border-color:var(--accent-deep,#3f6b4f);color:#fff}
+.sc-beat .bk-row{display:flex;justify-content:center;gap:10px;margin:6px 0}
+.sc-beat .bk-g{display:flex;gap:2px;padding:4px 6px;border:2px solid var(--line);border-radius:10px;background:var(--card)}
+.sc-beat .bk-g.lit{border-color:#c46a2b;background:#fff3c4}
+.sc-beat .bk-g.gold{border-color:#c9a227;background:#fbe9a6}
+.sc-beat .bk-c{position:relative;display:flex;flex-direction:column;align-items:center;width:34px;font-size:22px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-beat .bk-pz{height:10px;display:flex;align-items:center}
+.sc-beat .bk-pz i{display:block;background:#4a7a59;border-radius:3px}
+.sc-beat .bk-pz i.ping{width:26px;height:5px}
+.sc-beat .bk-pz i.ze{width:7px;height:7px;border-radius:50%;background:#8f1d3f}
+.sc-beat .bk-ru{position:absolute;top:-6px;right:-4px;font-size:11px;line-height:1;padding:2px 3px;border-radius:5px;background:#b85a52;color:#fff;cursor:pointer;font-family:sans-serif}
+.sc-beat .bk-rhyme{position:absolute;top:-8px;left:-4px;font-size:12px}
+.sc-beat .bk-tap{min-height:64px;min-width:160px;font-size:22px;font-weight:700;border-radius:16px;border:2px solid #c46a2b;background:#fff3c4;color:#7a3e12;cursor:pointer}
+.sc-beat .bk-msg{text-align:center;font-size:15px;color:var(--muted);min-height:1.6em;margin-top:6px}
+.sc-poet{padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--surface);cursor:pointer}
+.sc-poet .sc-pname{font-size:17px;font-weight:700}
+.sc-poet .sc-pbio{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.7}
+.sc-know{margin:12px 16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sc-kmod{font-size:17px;font-weight:700;color:var(--accent-deep);margin:20px 16px 6px}
+.sc-knowtitle{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:8px 16px;font-size:16px;cursor:pointer}
+.sc-svg{margin:8px 0}
+.sc-svg svg{width:100%;height:auto;display:block;background:var(--accent-deep);border-radius:10px}
+.sc-svg .svg-muted{fill:#c8d8cc} .sc-svg .svg-muted-s{stroke:#c8d8cc}
+.sc-svg .svg-ink{fill:#f2f6ee}
+.sc-extlink{display:inline-block;margin:3px 6px 3px 0;padding:5px 12px;border-radius:14px;background:var(--accent-soft);color:var(--accent-deep);font-size:13px;text-decoration:none}
+.sc-know h3{margin:0 0 8px;font-size:16px}
+.sc-know p{margin:0;font-size:14px;line-height:1.8;color:var(--ink)}
+.sc-know .sc-exp{font-size:15px;line-height:2;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.sc-know .sc-ex{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;line-height:2.1;font-family:Georgia,"Noto Serif SC","Songti SC",serif}
+.sc-story{margin:12px 16px;padding:14px;border-radius:12px;background:var(--accent-soft);border:1px dashed var(--line)}
+.sc-story h4{margin:0 0 8px;font-size:15px}
+.sc-story p{margin:0;font-size:14px;line-height:1.8}
+.sc-dyn{margin:0 16px;padding:14px 0 14px 18px;border-left:3px solid var(--accent);position:relative}
+.sc-dyn::before{content:'';position:absolute;left:-8px;top:18px;width:13px;height:13px;border-radius:50%;background:var(--accent)}
+.sc-dyn h3{margin:0;font-size:18px}
+.sc-dyn .sc-dyntime{font-size:13px;color:var(--muted);margin:4px 0 8px}
+.sc-dyn p{margin:6px 0;font-size:14px;line-height:1.8}
+.sc-dyn .sc-why{color:var(--ink)}
+.sc-famous{margin:12px 16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sc-famous .sc-fline{font-size:17px;font-weight:700;line-height:1.7}
+.sc-famous .sc-fbai{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.7}
+.sc-famous .sc-fstory{font-size:14px;margin-top:8px;line-height:1.8}
+.sc-famous .sc-flink{margin-top:8px;font-size:13px}
+.sc-hitline{font-size:16px;line-height:1.9;color:var(--ink)}
+.sc-hitline mark{background:var(--leaf);color:var(--accent-deep);padding:0 2px;border-radius:3px}
+.sc-imgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 16px}
+.sc-im{aspect-ratio:1;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--surface)}
+.sc-im .sc-imzi{font-size:30px;font-weight:700}
+.sc-im .sc-immean{font-size:12px;color:var(--muted);margin-top:4px}
+.sc-detail-head{text-align:center;padding:20px 16px 6px}
+.sc-detail-head h2{margin:0;font-size:26px}
+.sc-detail-meta{margin-top:8px;font-size:14px;color:var(--muted)}
+.sc-src{font-size:12px;color:var(--muted);text-align:center;padding:16px}
+.sc-chips{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
+.sc-chip{padding:6px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;color:var(--ink)}
+.sc-chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+.sc-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 20px}
+.sc-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 12px;cursor:pointer;text-align:center;color:var(--ink)}
+.sc-panel:active{background:var(--accent-soft)}
+.sc-panel-ic{font-size:32px;margin-bottom:8px}
+.sc-panel-t{font-size:16px;font-weight:700;margin-bottom:4px}
+.sc-panel-n{font-size:12px;color:var(--muted)}
+.sc-zrow{display:flex;gap:8px;padding:14px 16px}
+.sc-zrow input{flex:1;font-size:18px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;max-width:120px}
+.sc-zrow button{font-size:15px;padding:10px 18px;border-radius:10px;border:1px solid var(--accent-deep);background:var(--accent-deep);color:#fff;cursor:pointer}
+.sc-worklink{color:var(--accent-deep);cursor:pointer}
+/* 内容分型标签（复用yuwen.js配色体系） */
+.sc-typetag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:bold;color:var(--tc,#3d5a40);background:color-mix(in srgb,var(--tc,#3d5a40) 12%,transparent);border:1px solid color-mix(in srgb,var(--tc,#3d5a40) 30%,transparent);margin-bottom:8px}
+/* 意象卡牌（改进设计 P1-2）：翻面 + 点亮 + 三层展开 */
+.sc-imcount{margin-top:6px !important;color:var(--muted) !important}
+.sc-imcards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:6px 16px 16px;max-width:1080px;margin:0 auto;grid-auto-flow:dense}
+.sc-imcard{perspective:900px;cursor:pointer;min-height:210px}
+.sc-imcard.wide{grid-column:span 2}
+.sc-imin{position:relative;display:grid;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.sc-imcard.flip .sc-imin{transform:rotateY(180deg)}
+.sc-imface{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:12px;display:flex;flex-direction:column;align-items:center;min-height:210px;box-sizing:border-box}
+.sc-imback{transform:rotateY(180deg);align-items:stretch}
+.sc-imfront{justify-content:center;filter:grayscale(1);opacity:.55}
+.sc-imcard.lit .sc-imfront{filter:none;opacity:1;border-color:#c9a227;box-shadow:0 0 0 3px #fbe9a6}
+.sc-imart{width:100%;max-width:150px}.sc-imart svg{width:100%;height:auto;display:block}
+.sc-imzi2{font-size:28px;font-weight:700;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-imink{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 45% 40%,rgba(44,51,40,.18),rgba(44,51,40,.05) 60%,transparent 72%)}
+.sc-imink span{font-size:58px;font-family:"Kaiti SC","STKaiti","KaiTi",serif;color:var(--ink)}
+.sc-imstate{margin-top:8px;font-size:13px;color:var(--muted);text-align:center}
+.sc-imcard.lit .sc-imstate{color:#9a7a12;font-weight:700}
+.sc-imbzi{font-size:30px;font-weight:700;text-align:center;font-family:"Kaiti SC","STKaiti","KaiTi",serif}
+.sc-immean2{text-align:center;font-size:18px;font-weight:700;color:var(--accent-deep);margin:2px 0 6px}
+.sc-imdesc{margin:0;font-size:14px;line-height:1.7;color:var(--ink)}
+.sc-imopen,.sc-imfull{min-height:44px;margin-top:8px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent-soft);color:var(--accent-deep);font-size:15px;font-weight:700;cursor:pointer}
+.sc-imfull{background:transparent;border-style:dashed}
+.sc-imlines{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.sc-imsrc{font-size:13px;color:var(--muted)}
+@media (min-width:1200px){.sc-imcards{grid-template-columns:repeat(5,1fr)}}
+@media (prefers-reduced-motion:reduce){.sc-imin{transition:none}}
+@media (min-width:768px){
+  .sc-grid{grid-template-columns:repeat(3,1fr);max-width:920px;margin:0 auto}
+  .sc-imgrid{grid-template-columns:repeat(8,1fr);max-width:920px;margin:0 auto}
+}
+@media (min-width:1200px){
+  .sc-grid{grid-template-columns:repeat(4,1fr);max-width:1080px}
+}
+</style>
+</head>
+<body class="page-sub page-shici">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">古诗词</span>
+</header>
+
+<main class="listwrap">
+  <div id="sclist"></div>
+  <div id="scdetail" style="display:none"></div>
+  <p class="sc-src" id="scsrc"></p>
+</main>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="data/shici.js"></script>
+<script src="data/pinyin_lookup.js"></script>
+<script src="data/pz_derive.js"></script>
+<script src="data/shangxi.js"></script>
+<script src="data/shiju.js"></script>
+<script src="wb/index.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
+<script>
+(function(){
+var D = window.NHZ_SHICI || {poems:[]};
+var SHIJU = (window.NHZ_SHIJU && window.NHZ_SHIJU.idx) || {};
+var listEl = document.getElementById('sclist');
+var detEl = document.getElementById('scdetail');
+var navTitle = document.getElementById('navtitle');
+document.getElementById('scsrc').textContent = '诗文：' + (D.src || '');
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* 卡片 d 字段含 <br><b> 排版标签：转义后把允许的标签恢复 */
+function escD(s){return esc(s).replace(/&lt;br&gt;/g,'<br>').replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>');}
+/* ---- 界面层级导航（不使用浏览器历史）----
+   setTitle 只暂存标题；showList 确认它是「分区」，showDetail 确认它是「条目」。
+   层级：[古诗词] / [古诗词, 分区] / [古诗词, 分区, 条目]；回上一级 = 重新打开上一层视图。 */
+var navSection = '', navDetail = false, navDetailTitle = '', navTitleTmp = '';
+function navReport(){
+  if(!window.NHZNavPage) return;
+  if(!navSection || navSection === '古诗词'){ NHZNavPage.set(['古诗词'], []); return; }
+  if(navDetail){ NHZNavPage.set(['古诗词', navSection, navDetailTitle || '详情'], [function(){ goHome(); }, navSectionGo, null]); return; }
+  NHZNavPage.set(['古诗词', navSection], [function(){ goHome(); }, null]);
+}
+function goHome(){ navDetail = false; vHome(); }
+var NAV_SECTION_FN = { '诗词常识': function(){ vKnow(); }, '朝代长河': function(){ vDyn(); }, '诗人小传': function(){ vPoets(); }, '名句典故': function(){ vFamous(); }, '意象地图': function(){ vImagery(); }, '字→诗句链': function(){ vZilian(); }, '诗库': function(){ vPoems(); } };
+function navSectionGo(){ var f = NAV_SECTION_FN[navSection]; if(f) f(); else goHome(); }
+function showList(){ detEl.style.display='none'; listEl.style.display='block'; window.scrollTo(0,0); navDetail = false; navSection = navTitleTmp; navReport(); }
+function showDetail(){ listEl.style.display='none'; detEl.style.display='block'; window.scrollTo(0,0); navDetail = true; navDetailTitle = navTitleTmp; navReport(); }
+function setTitle(t){ if(navTitle) navTitle.textContent = t; navTitleTmp = t; }
+function poemByOrder(o){ for(var i=0;i<D.poems.length;i++) if(D.poems[i].order===o) return D.poems[i]; return null; }
+function worksOf(name){ return D.poems.filter(function(p){return p.author===name;}); }
+
+var SECTIONS = [
+  {id:'know', icon:'📖', t:'诗词常识', d:'体裁·格律·手法·词牌·典故·读诗法，配视频动画和图解'},
+  {id:'dyn', icon:'🏛️', t:'朝代长河', d:'诗经→楚辞→汉乐府→唐诗→宋词→元曲，一条时间线讲清每个时代为什么写这种体裁'},
+  {id:'poets', icon:'👤', t:'诗人小传', d:'李白、杜甫、苏轼、李清照等：生平一句话＋代表作＋一个小故事'},
+  {id:'famous', icon:'✨', t:'名句典故', d:'每句名句配出处、白话、典故（如“床前明月光”背后的思乡意象）'},
+  {id:'imagery', icon:'🗺️', t:'意象地图', d:'月=思乡、柳=送别、菊=隐逸、梅=高洁……可点开的意象网络'},
+  {id:'zilian', icon:'🔗', t:'字→诗句链', d:'输入一个字，找出含这个字的诗句；字卡里也能直接跳过来'}
+];
+
+function vHome(){
+  setTitle('古诗词');
+  var h = '<div class="sc-grid">' + SECTIONS.map(function(s){
+    return '<div class="sc-card" data-go="'+s.id+'"><h3>'+s.icon+' '+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></div>';
+  }).join('') + '</div>';
+  h += '<a class="sc-card" href="quiz/index.html?tab=shici&from=shici.html" target="_top" style="display:block;text-decoration:none;margin-top:12px;user-select:none;-webkit-user-select:none"><h3>🎮 互动练习</h3><p>7种玩法：选择、判断、排序、填空、配对、找错、改写，把诗词知识玩成闯关</p></a>';
+  h += '<div class="sc-card" style="margin-top:12px"><h3>📚 诗歌基础互动（17 款）</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
+    '<a href="games/shici/feihua.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌸 飞花令人机对战</a>' +
+    '<a href="games/shici/jichu/duiou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">⚖️ 对偶对仗</a><a href="games/shici/jichu/yayun.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎵 押韵点韵脚</a><a href="games/shici/jichu/pingze.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📏 平仄判断</a><a href="games/shici/jichu/ticaid.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📜 绝句律诗</a><a href="games/shici/jichu/wuyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔢 五言七言</a><a href="games/shici/jichu/guti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">📖 古体近体</a><a href="games/shici/jichu/yuefu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎶 乐府知识</a><a href="games/shici/jichu/qicheng.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔄 起承转合</a><a href="games/shici/jichu/jiezou.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✂️ 节奏断句</a><a href="games/shici/jichu/silian.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🧩 四联归位</a><a href="games/shici/jichu/lianju.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔗 联句配对</a><a href="games/shici/jichu/shiyan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">👁️ 找诗眼</a><a href="games/shici/jichu/yixiang.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🌙 意象配对</a><a href="games/shici/jichu/shiti.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🏷️ 诗题猜主题</a><a href="games/shici/jichu/langdu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🗣️ 朗读断句</a><a href="games/shici/jichu/beisong.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">✍️ 背诵填空</a>' +
+    '</div></div>';
+  h += '<div class="sc-card" style="margin-top:12px"><h3>🎮 诗词新玩法</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
+    '<a href="games/shici/pengyouquan.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">💬 唐朝朋友圈</a><a href="games/shici/gelu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔧 格律小作坊</a><a href="games/shici/chaodai.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🏛️ 朝代长河</a><a href="games/shici/beisong.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎙️ 背诵评测</a>' +
+    '</div></div>';
+  h += '<button class="sc-backbtn" data-go="poems">📜 诗库（全部'+D.poems.length+'首）</button>';
+  listEl.innerHTML = h; showList();
+  listEl.querySelectorAll('[data-go]').forEach(function(el){
+    el.addEventListener('click', function(){ go(el.getAttribute('data-go')); });
+  });
+}
+
+var KNOW_MODS = [['ticai','📝','诗的体裁'],['gelv','🎵','格律'],['gelv2','🧭','格律进阶'],['shoufa','✨','作诗手法'],['cipai','🎼','词牌名'],['shishi','🏛️','诗歌史'],['liupai','⛰️','流派与大家'],['diangu','📚','典故出处'],['dufa','🔍','读诗方法'],['yingyong','🛠️','诗词应用'],['wenhua','🌏','诗词与历史文化'],['donghua','🎬','动画·把诗看活'],['jilu','🎥','纪录片·实拍'],['jichu','🌱','诗歌基础'],['yixiang','🌙','意象'],['cixi','🎶','词'],['shangxifa','🔬','赏析方法'],['gelv3','📐','格律深化'],['chuangzuo','✍️','创作入门']];
+
+/* 内容分型：8型（CONTENT_PATTERNS.md v2.0），按模块m+标题细分 */
+function knowType(m, t){
+  var title = t || '';
+  /* 程序型：方法/步骤类 */
+  if (/shangxifa|chuangzuo|dufa|yingyong/.test(m)) return '程序';
+  /* 故事型：历史/典故叙事 */
+  if (/diangu|shishi/.test(m)) return '故事';
+  /* 清单型：速查参考 */
+  if (/ticai|wenhua|liupai|jilu/.test(m)) return '清单';
+  /* 模式型：词牌格式/格律模式 */
+  if (/cipai/.test(m)) return '模式';
+  if (m === 'cixi' && /浣溪沙|菩萨蛮|如梦令|水调歌头|虞美人|双调|单调|^\S+：\d+/.test(title)) return '模式';
+  /* 辨析型：易混对比 */
+  if (m === 'shoufa' && /与|结合|比兴/.test(title)) return '辨析';
+  if (m === 'cixi' && /豪放|婉约|派|令|慢词/.test(title)) return '辨析';
+  /* 动画模块保持原样 */
+  if (/donghua/.test(m)) return '动画';
+  /* 默认规律型 */
+  return '规律';
+}
+var SC_TYPE_LABEL = { '规律':'规律型', '辨析':'辨析型', '程序':'程序型', '模式':'模式型', '故事':'故事型', '清单':'清单型', '材料':'材料型', '动画':'动画' };
+var SC_TYPE_COLOR = { '规律':'#3d5a40', '辨析':'#5a4a7a', '程序':'#7a5a3a', '模式':'#4a6a7a', '故事':'#8a5a44', '清单':'#6b7566', '材料':'#4a7a59', '动画':'#b8860b' };
+/* 按型的例句区标题 */
+var SC_EX_TITLE = { '规律':'📜 例句', '辨析':'⚖️ 分水岭例句', '程序':'🎬 全程演示', '模式':'📐 模式实例', '故事':'📖 故事', '清单':'📋 一览', '材料':'📜 原文', '动画':'🎬 动画' };
+
+function svgSisheng(){
+  var rows = [
+    ['平','M60,22 L210,22','平坦 → 平','svg-accent-s'],
+    ['上','M60,34 L210,12','上扬 → 仄','svg-red-s'],
+    ['去','M60,12 L210,34','下降 → 仄','svg-red-s'],
+    ['入','M60,23 L130,23','短促截断 → 仄','svg-red-s']
+  ];
+  var s = '<svg viewBox="0 0 320 152">';
+  rows.forEach(function(r,i){
+    var y = i*38;
+    s += '<text x="10" y="'+(y+27)+'" font-size="17" class="svg-ink">'+r[0]+'</text>';
+    s += '<path d="'+r[1]+'" transform="translate(0,'+y+')" class="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    if(i===3) s += '<line x1="130" y1="'+(y+16)+'" x2="130" y2="'+(y+30)+'" class="'+r[3]+'" stroke-width="3" stroke-linecap="round"/>';
+    s += '<text x="312" y="'+(y+28)+'" font-size="12" text-anchor="end" class="svg-muted">'+r[2]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgYayun(){
+  var lines = ['床前明月光，','疑是地上霜。','举头望明月，','低头思故乡。'];
+  var s = '<svg viewBox="0 0 320 136">';
+  lines.forEach(function(ln,i){
+    s += '<text x="16" y="'+(30+i*26)+'" font-size="16" class="svg-ink">'+ln+'</text>';
+  });
+  [0,1,3].forEach(function(i){
+    s += '<rect x="76" y="'+(30+i*26-18)+'" width="26" height="25" rx="6" fill="none" stroke-width="2" class="svg-accent-s"/>';
+  });
+  s += '<text x="122" y="56" font-size="13" class="svg-accent">韵脚都有 ang 的尾巴</text>';
+  s += '<text x="122" y="108" font-size="13" class="svg-muted">“月”不押韵</text>';
+  return s + '</svg>';
+}
+function svgZhandui(){
+  function dots(y, pat){
+    var s = '';
+    for(var i=0;i<5;i++){
+      var x = 56 + i*26, isP = pat[i]==='P';
+      s += '<circle cx="'+x+'" cy="'+y+'" r="9" class="svg-accent-s '+(isP?'svg-accent':'svg-panel')+'" stroke-width="1.5"/>';
+    }
+    return s;
+  }
+  var s = '<svg viewBox="0 0 320 138">';
+  s += '<text x="6" y="30" font-size="12" class="svg-muted">上句</text>' + dots(25,'ZZPPZ');
+  s += '<text x="6" y="66" font-size="12" class="svg-muted">下句</text>' + dots(61,'PPZZP');
+  s += '<text x="196" y="50" font-size="12" class="svg-accent">对：平仄相反</text><text x="196" y="66" font-size="12" class="svg-muted">像照镜子</text>';
+  s += '<text x="6" y="102" font-size="12" class="svg-muted">下联</text>' + dots(97,'PPZZP');
+  s += '<text x="196" y="92" font-size="12" class="svg-accent">粘：平仄相同</text><text x="196" y="108" font-size="12" class="svg-muted">像胶水粘住</text>';
+  s += '<text x="6" y="130" font-size="11" class="svg-muted">●＝平　○＝仄</text>';
+  return s + '</svg>';
+}
+function svgDuizhang(){
+  var s = '<svg viewBox="0 0 340 118">';
+  s += '<text x="20" y="30" font-size="16" class="svg-ink">两个黄鹂鸣翠柳，</text>';
+  s += '<text x="20" y="62" font-size="16" class="svg-ink">一行白鹭上青天。</text>';
+  [[0,2,'数量'],[2,4,'鸟名'],[4,5,'动作'],[5,6,'颜色'],[6,7,'景物']].forEach(function(b){
+    var cx = 20 + (b[0]+b[1])/2*16;
+    s += '<line x1="'+cx+'" y1="36" x2="'+cx+'" y2="48" stroke-width="1.2" class="svg-accent-s"/>';
+    s += '<text x="'+cx+'" y="94" font-size="11" text-anchor="middle" class="svg-accent">'+b[2]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgJueju(){
+  var s = '<svg viewBox="0 0 320 88">';
+  ['起','承','转','合'].forEach(function(w,i){
+    var x = 12 + i*78;
+    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" stroke-width="1.5" class="svg-panel svg-accent-s"/>';
+    s += '<text x="'+(x+33)+'" y="39" font-size="20" text-anchor="middle" class="svg-accent">'+w+'</text>';
+  });
+  s += '<text x="160" y="76" font-size="12" text-anchor="middle" class="svg-muted">四句一首 · 五绝20字 · 七绝28字</text>';
+  return s + '</svg>';
+}
+function svgLvshi(){
+  var s = '<svg viewBox="0 0 320 152">';
+  [['首联',0],['颔联',1],['颈联',1],['尾联',0]].forEach(function(r,i){
+    var y = 8 + i*36, st = r[1] ? 'svg-accent' : 'svg-muted';
+    s += '<text x="8" y="'+(y+22)+'" font-size="13" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="52" y="'+y+'" width="100" height="28" rx="6" class="svg-panel '+st+'" stroke-width="1.5"/>';
+    s += '<rect x="160" y="'+y+'" width="100" height="28" rx="6" class="svg-panel '+st+'" stroke-width="1.5"/>';
+    if(r[1]) s += '<text x="268" y="'+(y+20)+'" font-size="12" class="svg-accent">对仗</text>';
+  });
+  return s + '</svg>';
+}
+function svgCidiao(){
+  var s = '<svg viewBox="0 0 320 108">';
+  [['小令','≤58字 · S',58],['中调','59–90字 · M',90],['长调','≥91字 · L',130]].forEach(function(r,i){
+    var y = 10 + i*32, w = Math.round(r[2]/130*180);
+    s += '<text x="8" y="'+(y+18)+'" font-size="13" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="52" y="'+y+'" width="'+w+'" height="22" rx="6" opacity="0.85" class="svg-accent"/>';
+    s += '<text x="'+(60+w)+'" y="'+(y+17)+'" font-size="12" class="svg-muted">'+r[1]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgAnimSisheng(){
+  var rows = [
+    ['平','M60,22 L210,22','平坦 → 平','svg-accent-s'],
+    ['上','M60,34 L210,12','上扬 → 仄','svg-red-s'],
+    ['去','M60,12 L210,34','下降 → 仄','svg-red-s'],
+    ['入','M60,23 L130,23','短促截断 → 仄','svg-red-s']
+  ];
+  var s = '<svg viewBox="0 0 320 184">';
+  rows.forEach(function(r,i){
+    var y = i*38;
+    var kp = ['0'];
+    for(var j=1;j<=4;j++) kp.push(j>i ? '1' : '0');
+    var kA = i*0.25, kB = (i+1)*0.25;
+    var kt = '0;'+Math.max(0.001,kA-0.03).toFixed(3)+';'+(kA+0.03).toFixed(3)+';'+(kB-0.03).toFixed(3)+';'+Math.min(0.999,kB+0.03).toFixed(3)+';1';
+    s += '<g transform="translate(0,'+y+')">';
+    s += '<path d="'+r[1]+'" class="'+r[3]+'" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"/>';
+    if(i===3) s += '<line x1="130" y1="16" x2="130" y2="30" class="'+r[3]+'" stroke-width="3" stroke-linecap="round" opacity="0.55"/>';
+    s += '<circle r="6" class="svg-deep">'
+      + '<animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" keyPoints="'+kp.join(';')+'" keyTimes="0;0.25;0.5;0.75;1" path="'+r[1]+'"/>'
+      + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/>'
+      + '</circle>';
+    s += '</g>';
+    s += '<text x="10" y="'+(y+27)+'" font-size="17" class="svg-accent">'+r[0]
+      + '<animate attributeName="opacity" values="0.35;0.35;1;1;0.35;0.35" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+    s += '<text x="312" y="'+(y+28)+'" font-size="12" text-anchor="end" class="svg-muted">'+r[2]+'</text>';
+  });
+  s += '<text x="160" y="172" font-size="12" text-anchor="middle" class="svg-muted">白点依次走过四条线，注意每条线的走向</text>';
+  return s + '</svg>';
+}
+function svgAnimPingze(){
+  var rows = [
+    ['首句','PPZZZPP','二四六分明'],
+    ['对句','ZZPPZZP','对句相对'],
+    ['三句','ZZPPPZZ','粘：二四六同'],
+    ['四句','PPZZZPP','对句相对']
+  ];
+  var s = '<svg viewBox="0 0 320 156">';
+  s += '<text x="10" y="16" font-size="12" class="svg-accent">●＝平</text>';
+  s += '<text x="66" y="16" font-size="12" class="svg-red">○＝仄</text>';
+  s += '<text x="140" y="16" font-size="12" class="svg-muted">七绝 · 平起首句押韵式</text>';
+  rows.forEach(function(r,i){
+    var cy = 36 + i*32;
+    s += '<text x="8" y="'+(cy+4)+'" font-size="11" class="svg-muted">'+r[0]+'</text>';
+    for(var j=0;j<7;j++){
+      var x = 48 + j*28, isP = r[1][j]==='P';
+      s += '<circle cx="'+x+'" cy="'+cy+'" r="8" class="'+(isP?'svg-accent':'svg-panel')+'" class="'+(isP?'svg-accent':'svg-red')+'" stroke-width="2"/>';
+    }
+    var nc = (i===2) ? 'svg-muted' : 'svg-accent';
+    s += '<text x="236" y="'+(cy+4)+'" font-size="11" class="'+nc+'">'+r[2]+'</text>';
+  });
+  s += '<rect x="36" y="21" width="192" height="30" rx="8" fill="none" stroke-width="1.5" opacity="0.85" class="svg-accent-s">'
+    + '<animate attributeName="y" values="21;53;85;117;21" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/></rect>';
+  return s + '</svg>';
+}
+function svgAnimDuizhang(){
+  var x0 = 104;
+  var groups = [[0,2,'数量'],[2,4,'鸟名'],[4,5,'动作'],[5,6,'颜色'],[6,7,'景物']];
+  var s = '<svg viewBox="0 0 320 136">';
+  s += '<text x="56" y="32" font-size="12" class="svg-muted">出句</text>';
+  s += '<text x="'+x0+'" y="32" font-size="16" class="svg-ink">两个黄鹂鸣翠柳，</text>';
+  s += '<text x="56" y="64" font-size="12" class="svg-muted">对句</text>';
+  s += '<text x="'+x0+'" y="64" font-size="16" class="svg-ink">一行白鹭上青天。</text>';
+  for(var i=0;i<7;i++){
+    var cx = x0 + 8 + i*16;
+    var k1 = (i*0.85/7).toFixed(3), k2 = ((i*0.85+0.45)/7).toFixed(3);
+    s += '<line x1="'+cx+'" y1="38" x2="'+cx+'" y2="52" stroke-width="1.5" stroke-dasharray="4 3" opacity="0" class="svg-accent-s">'
+      + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+k1+';'+k2+';1" dur="7s" repeatCount="indefinite"/>'
+      + '<animate attributeName="stroke-dashoffset" from="14" to="0" dur="1.2s" repeatCount="indefinite"/>'
+      + '</line>';
+  }
+  groups.forEach(function(b){
+    var cx = x0 + 8*(b[0]+b[1]);
+    var t = ((b[1]-1)*0.85+0.45)/7;
+    s += '<text x="'+cx+'" y="94" font-size="11" class="svg-accent" text-anchor="middle" opacity="0">'+b[2]
+      + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+t.toFixed(3)+';'+(t+0.06).toFixed(3)+';1" dur="7s" repeatCount="indefinite"/></text>';
+  });
+  s += '<text x="160" y="120" font-size="12" class="svg-accent" text-anchor="middle" opacity="0">字数相等 · 词性相对 · 平仄相对'
+    + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.85;0.92;1" dur="7s" repeatCount="indefinite"/></text>';
+  return s + '</svg>';
+}
+function svgAnimQicheng(){
+  var ws = [['起','开头点题'],['承','承接铺展'],['转','转折变化'],['合','收束点睛']];
+  var s = '<svg viewBox="0 0 320 96">';
+  s += '<line x1="40" y1="31" x2="280" y2="31" stroke-width="2" class="svg-muted-s"/>';
+  [82,160,238].forEach(function(cx){
+    s += '<polygon points="'+cx+',26 '+cx+',36 '+(cx+8)+',31" class="svg-accent"/>';
+  });
+  s += '<circle r="5" class="svg-accent"><animateMotion dur="2.4s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
+  s += '<circle r="5" opacity="0.6" class="svg-accent"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M40,31 L280,31"/></circle>';
+  ws.forEach(function(w,i){
+    var x = 12 + i*78;
+    s += '<rect x="'+x+'" y="8" width="66" height="46" rx="8" stroke-width="1.5" class="svg-panel svg-accent-s"/>';
+    s += '<text x="'+(x+33)+'" y="39" font-size="20" text-anchor="middle" class="svg-accent">'+w[0]+'</text>';
+    s += '<text x="'+(x+33)+'" y="80" font-size="11" text-anchor="middle" class="svg-muted">'+w[1]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgAnimCipai(){
+  var lines = [
+    ['常记溪亭日暮',6],
+    ['沉醉不知归路',6],
+    ['兴尽晚回舟',5],
+    ['误入藕花深处',6],
+    ['争渡，争渡',[3,3]],
+    ['惊起一滩鸥鹭',6]
+  ];
+  var s = '<svg viewBox="0 0 320 210">';
+  s += '<text x="160" y="20" font-size="14" text-anchor="middle" class="svg-ink">《如梦令》· 长短句</text>';
+  lines.forEach(function(ln,i){
+    var y = 34 + i*26;
+    s += '<text x="8" y="'+(y+14)+'" font-size="13" class="svg-ink">'+ln[0]+'</text>';
+    var ns = (typeof ln[1]==='number') ? [ln[1]] : ln[1];
+    var bx = 104;
+    ns.forEach(function(n,k){
+      var w = n*20;
+      s += '<rect x="'+bx+'" y="'+y+'" width="0" height="18" rx="5" opacity="0.85" class="svg-accent">'
+        + '<animate attributeName="width" from="0" to="'+w+'" dur="0.7s" begin="'+(0.3+i*0.35+k*0.2).toFixed(2)+'s" fill="freeze"/></rect>';
+      bx += w + 10;
+    });
+    var total = (typeof ln[1]==='number') ? ln[1]+'字' : '3+3字';
+    s += '<text x="'+(bx+2)+'" y="'+(y+14)+'" font-size="12" class="svg-muted">'+total+'</text>';
+  });
+  s += '<text x="160" y="202" font-size="12" text-anchor="middle" class="svg-muted">长短句：参差错落，依曲填词</text>';
+  return s + '</svg>';
+}
+function svgTangshiFenqi(){
+  var segs = [
+    ['初唐',20,111,['王勃','陈子昂','张若虚']],
+    ['盛唐',112,162,['李白','杜甫','王维']],
+    ['中唐',163,230,['白居易','韩愈','刘禹锡']],
+    ['晚唐',231,300,['李商隐','杜牧','温庭筠']]
+  ];
+  var s = '<svg viewBox="0 0 320 148">';
+  s += '<text x="160" y="18" font-size="14" text-anchor="middle" class="svg-ink">唐诗分期 · 618–907</text>';
+  s += '<line x1="20" y1="66" x2="300" y2="66" stroke-width="2" class="svg-muted-s"/>';
+  s += '<text x="20" y="58" font-size="11" text-anchor="middle" class="svg-muted">618</text>';
+  s += '<text x="300" y="58" font-size="11" text-anchor="middle" class="svg-muted">907</text>';
+  segs.forEach(function(g,i){
+    var cx = Math.round((g[1]+g[2])/2);
+    if(i>0) s += '<line x1="'+g[1]+'" y1="60" x2="'+g[1]+'" y2="72" stroke-width="2" class="svg-muted-s"/>';
+    var col = g[0]==='盛唐' ? 'svg-accent' : 'svg-ink';
+    s += '<circle cx="'+cx+'" cy="66" r="4" class="'+col+'"/>';
+    s += '<text x="'+cx+'" y="48" font-size="13" class="'+col+'" text-anchor="middle">'+g[0]+'</text>';
+    g[3].forEach(function(p,j){
+      s += '<text x="'+cx+'" y="'+(92+j*18)+'" font-size="12" text-anchor="middle" class="svg-muted">'+p+'</text>';
+    });
+  });
+  return s + '</svg>';
+}
+function svgPingshuiyun(){
+  var yun = [
+    ['一东','东同'],['二冬','冬钟'],['三江','江窗'],
+    ['四支','支诗'],['五微','微归'],['六鱼','鱼书'],
+    ['七虞','虞珠'],['八齐','齐鸡'],['九佳','佳街'],
+    ['十灰','灰梅'],['十一真','真人'],['十二文','文云'],
+    ['十三元','元原'],['十四寒','寒山'],['十五删','删关']
+  ];
+  var s = '<svg viewBox="0 0 320 162">';
+  s += '<text x="160" y="20" font-size="14" text-anchor="middle" class="svg-ink">平水韵 · 上平十五韵</text>';
+  yun.forEach(function(y,i){
+    var col = i%3, row = Math.floor(i/3);
+    var x = 6 + col*104, yy = 46 + row*25;
+    s += '<rect x="'+x+'" y="'+(yy-18)+'" width="100" height="23" rx="5" fill="none" stroke-width="1" class="svg-muted-s"/>';
+    s += '<text x="'+(x+6)+'" y="'+yy+'" font-size="13" class="svg-accent">'+y[0]+'</text>';
+    s += '<text x="'+(x+56)+'" y="'+yy+'" font-size="13" class="svg-ink">'+y[1]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgLiupai(){
+  var s = '<svg viewBox="0 0 320 150">';
+  s += '<text x="80" y="28" font-size="16" text-anchor="middle" class="svg-accent">唐诗</text>';
+  s += '<text x="240" y="28" font-size="16" text-anchor="middle" class="svg-accent">宋词</text>';
+  s += '<circle cx="80" cy="36" r="3" class="svg-accent"/>';
+  s += '<circle cx="240" cy="36" r="3" class="svg-accent"/>';
+  s += '<line x1="80" y1="36" x2="40" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="80" y1="36" x2="120" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="240" y1="36" x2="200" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  s += '<line x1="240" y1="36" x2="280" y2="62" stroke-width="1.5" class="svg-muted-s"/>';
+  var ps = [
+    ['田园',40,['王维','孟浩然']],
+    ['边塞',120,['高适','岑参']],
+    ['婉约',200,['柳永','李清照']],
+    ['豪放',280,['苏轼','辛弃疾']]
+  ];
+  ps.forEach(function(p){
+    s += '<text x="'+p[1]+'" y="80" font-size="14" text-anchor="middle" class="svg-ink">'+p[0]+'</text>';
+    s += '<line x1="'+p[1]+'" y1="88" x2="'+p[1]+'" y2="96" stroke-width="1" class="svg-muted-s"/>';
+    p[2].forEach(function(po,j){
+      s += '<text x="'+p[1]+'" y="'+(110+j*20)+'" font-size="12" text-anchor="middle" class="svg-muted">'+po+'</text>';
+    });
+  });
+  return s + '</svg>';
+}
+/* ===== 图式卡推广·诗词区25张（2026-11-04） ===== */
+function svgTushi135(){
+  var s = '<svg viewBox="0 0 340 104">';
+  var pos = [[1,0],[2,1],[3,0],[4,1],[5,0],[6,1],[7,1]];
+  pos.forEach(function(p,i){
+    var x = 20 + i*46;
+    s += '<circle cx="'+x+'" cy="30" r="15" fill="none" stroke-width="1.8" class="'+(p[1]?'svg-accent-s':'svg-muted-s')+'"/>';
+    s += '<text x="'+x+'" y="36" font-size="14" text-anchor="middle" class="'+(p[1]?'svg-accent':'svg-muted')+'">'+(p[1]?'●':'△')+'</text>';
+    s += '<text x="'+x+'" y="64" font-size="12" text-anchor="middle" class="svg-muted">第'+p[0]+'字</text>';
+  });
+  s += '<text x="170" y="90" font-size="12" text-anchor="middle" class="svg-muted">△=不论（可平可仄）　●=分明（平仄必须守住）</text>';
+  return s + '</svg>';
+}
+function svgTushiGp(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="28" font-size="14" class="svg-ink">仄仄仄平仄</text>';
+  [0,1,2,4].forEach(function(i){
+    s += '<circle cx="'+(30+i*26)+'" cy="48" r="10" class="svg-red" opacity="0.85"/>';
+    s += '<text x="'+(30+i*26)+'" y="53" font-size="12" text-anchor="middle" fill="#fff">仄</text>';
+  });
+  s += '<circle cx="'+(30+3*26)+'" cy="48" r="10" class="svg-accent" opacity="0.85"/>';
+  s += '<text x="'+(30+3*26)+'" y="53" font-size="12" text-anchor="middle" fill="#fff">平</text>';
+  s += '<text x="200" y="32" font-size="13" class="svg-red">✗ 孤平：全句只有一个平声字</text>';
+  s += '<text x="200" y="54" font-size="12" class="svg-muted">诗家大忌，无法补救</text>';
+  s += '<text x="16" y="88" font-size="12" class="svg-muted">对比：仄仄平平仄（两个平声，不算孤平）</text>';
+  return s + '</svg>';
+}
+function svgTushiDou(){
+  var s = '<svg viewBox="0 0 340 104">';
+  s += '<text x="16" y="30" font-size="16" class="svg-ink">落霞与孤鹜齐飞，</text>';
+  s += '<text x="16" y="58" font-size="16" class="svg-ink">秋水共长天一色。</text>';
+  s += '<rect x="14" y="12" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<rect x="62" y="12" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<text x="170" y="30" font-size="12" class="svg-accent">句中自对：落霞 ↔ 孤鹜</text>';
+  s += '<rect x="14" y="40" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-blue-s"/>';
+  s += '<rect x="62" y="40" width="34" height="24" rx="5" fill="none" stroke-width="1.6" class="svg-blue-s"/>';
+  s += '<text x="170" y="58" font-size="12" class="svg-blue">句中自对：秋水 ↔ 长天</text>';
+  s += '<text x="16" y="90" font-size="12" class="svg-muted">同一句内，前后两截互相对仗</text>';
+  return s + '</svg>';
+}
+function svgTushiPulu(){
+  var s = '<svg viewBox="0 0 340 210">';
+  var lines = ['仄仄平平仄','平平仄仄平','平平平仄仄','仄仄仄平平','仄仄平平仄','平平仄仄平','平平平仄仄','仄仄仄平平'];
+  var yun = [1,3,5,7];
+  lines.forEach(function(ln,i){
+    var y = 24 + i*24;
+    s += '<text x="16" y="'+y+'" font-size="13" class="svg-muted">'+(i+1)+'</text>';
+    for(var j=0;j<5;j++){
+      var isP = ln[j]==='平';
+      s += '<circle cx="'+(52+j*30)+'" cy="'+(y-5)+'" r="10" class="'+(isP?'svg-accent':'svg-red')+'" opacity="0.8"/>';
+      s += '<text x="'+(52+j*30)+'" y="'+(y-1)+'" font-size="11" text-anchor="middle" fill="#fff">'+ln[j]+'</text>';
+    }
+    if(yun.indexOf(i)>=0) s += '<text x="215" y="'+y+'" font-size="12" class="svg-accent">● 押韵</text>';
+  });
+  s += '<text x="16" y="206" font-size="11" class="svg-muted">七律平仄谱（仄起首句不入韵式）　○=平　●=仄</text>';
+  return s + '</svg>';
+}
+function svgTushiRy(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="14" class="svg-accent">首句入韵</text>';
+  ['句1 ●','句2 ●','句3','句4 ●'].forEach(function(t,i){
+    var x = 16 + i*78;
+    s += '<rect x="'+x+'" y="34" width="66" height="30" rx="6" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+33)+'" y="54" font-size="12" text-anchor="middle" class="svg-ink">'+t+'</text>';
+  });
+  s += '<text x="16" y="92" font-size="14" class="svg-blue">首句不入韵</text>';
+  ['句1','句2 ●','句3','句4 ●'].forEach(function(t,i){
+    var x = 16 + i*78;
+    s += '<rect x="'+x+'" y="98" width="66" height="30" rx="6" class="svg-panel svg-blue-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+33)+'" y="118" font-size="12" text-anchor="middle" class="svg-ink">'+t+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgTushiZicha(){
+  var s = '<svg viewBox="0 0 340 84">';
+  var steps = ['1数句数','2查押韵','3标平仄','4看粘对','5找拗救'];
+  steps.forEach(function(st,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="12" width="58" height="34" rx="8" class="svg-accent" opacity="0.9"/>';
+    s += '<text x="'+(x+29)+'" y="34" font-size="12" text-anchor="middle" fill="#fff">'+st+'</text>';
+    if(i<4) s += '<text x="'+(x+62)+'" y="34" font-size="14" class="svg-accent">→</text>';
+  });
+  s += '<text x="170" y="68" font-size="12" text-anchor="middle" class="svg-muted">五步走完，一首诗格律合不合格就有数了</text>';
+  return s + '</svg>';
+}
+function svgTushiAoju(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="28" font-size="16" class="svg-ink">国破山河在</text>';
+  s += '<text x="16" y="52" font-size="12" class="svg-muted">标准：仄仄平平仄（第1字该仄）</text>';
+  s += '<rect x="14" y="62" width="26" height="26" rx="5" fill="none" stroke-width="2" class="svg-red-s"/>';
+  s += '<text x="60" y="80" font-size="13" class="svg-red">“国”是入声字=仄声，但古音里它也算仄</text>';
+  s += '<text x="16" y="104" font-size="12" class="svg-muted">按今音“国”是阳平，该用平却用了仄 → 拗</text>';
+  return s + '</svg>';
+}
+function svgTushiPswj(){
+  var s = '<svg viewBox="0 0 340 104">';
+  var vols = [['上平','15韵'],['下平','15韵'],['上声','29韵'],['去声','30韵'],['入声','17韵']];
+  vols.forEach(function(v,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="10" width="58" height="52" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+    s += '<text x="'+(x+29)+'" y="32" font-size="13" text-anchor="middle" class="svg-ink">'+v[0]+'</text>';
+    s += '<text x="'+(x+29)+'" y="52" font-size="12" text-anchor="middle" class="svg-accent">'+v[1]+'</text>';
+  });
+  s += '<text x="170" y="86" font-size="12" text-anchor="middle" class="svg-muted">平水韵共106韵：写诗押韵只能在同卷内</text>';
+  return s + '</svg>';
+}
+function svgTushiBjzj(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="13" class="svg-red">拗：仄仄仄平仄（第3字该平用了仄）</text>';
+  s += '<rect x="150" y="10" width="22" height="22" rx="4" fill="none" stroke-width="2" class="svg-red-s"/>';
+  s += '<text x="200" y="28" font-size="14" class="svg-accent">↓ 本句自救</text>';
+  s += '<text x="16" y="62" font-size="13" class="svg-accent">救：仄仄仄平仄 → 第4字改仄找补</text>';
+  s += '<text x="16" y="88" font-size="12" class="svg-muted">口诀：三拗四救（第3字拗，第4字来救）</text>';
+  s += '<text x="16" y="108" font-size="12" class="svg-muted">救在本句内部完成，不麻烦对句</text>';
+  return s + '</svg>';
+}
+function svgTushiDjzj(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">上句：<tspan class="svg-red">仄仄平平仄</tspan>（拗）</text>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">下句：<tspan class="svg-accent">平平仄仄平</tspan>（救）</text>';
+  s += '<line x1="120" y1="30" x2="120" y2="44" stroke-width="1.6" class="svg-accent-s"/>';
+  s += '<text x="200" y="42" font-size="12" class="svg-accent">对句在对应位置找补</text>';
+  s += '<text x="16" y="82" font-size="12" class="svg-muted">口诀：上句拗，下句救</text>';
+  s += '<text x="16" y="102" font-size="12" class="svg-muted">救在对句完成，上下句互相成全</text>';
+  return s + '</svg>';
+}
+function svgTushiAjdy(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<rect x="8" y="8" width="100" height="44" rx="8" class="svg-red" opacity="0.12"/>';
+  s += '<text x="58" y="28" font-size="14" text-anchor="middle" class="svg-red">拗</text>';
+  s += '<text x="58" y="46" font-size="11" text-anchor="middle" class="svg-muted">该平用仄/该仄用平</text>';
+  s += '<text x="128" y="36" font-size="18" class="svg-accent">+</text>';
+  s += '<rect x="148" y="8" width="100" height="44" rx="8" class="svg-accent" opacity="0.12"/>';
+  s += '<text x="198" y="28" font-size="14" text-anchor="middle" class="svg-accent">救</text>';
+  s += '<text x="198" y="46" font-size="11" text-anchor="middle" class="svg-muted">在别处找补回来</text>';
+  s += '<text x="268" y="36" font-size="18" class="svg-accent">=</text>';
+  s += '<rect x="288" y="8" width="44" height="44" rx="8" class="svg-deep" opacity="0.9"/>';
+  s += '<text x="310" y="36" font-size="14" text-anchor="middle" fill="#fff">拗救</text>';
+  s += '<text x="170" y="78" font-size="12" text-anchor="middle" class="svg-muted">破了格律再补回来，诗味反而更足</text>';
+  s += '<text x="170" y="98" font-size="12" text-anchor="middle" class="svg-muted">救法：本句自救 / 对句相救</text>';
+  return s + '</svg>';
+}
+function svgTushiNddy(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<rect x="8" y="8" width="156" height="60" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="86" y="30" font-size="14" text-anchor="middle" class="svg-accent">对</text>';
+  s += '<text x="86" y="50" font-size="11" text-anchor="middle" class="svg-muted">一联内：上句↔下句</text>';
+  s += '<text x="86" y="64" font-size="11" text-anchor="middle" class="svg-muted">平仄相反（照镜子）</text>';
+  s += '<rect x="176" y="8" width="156" height="60" rx="8" class="svg-panel svg-blue-s" stroke-width="1.4"/>';
+  s += '<text x="254" y="30" font-size="14" text-anchor="middle" class="svg-blue">粘</text>';
+  s += '<text x="254" y="50" font-size="11" text-anchor="middle" class="svg-muted">两联间：上联↔下联</text>';
+  s += '<text x="254" y="64" font-size="11" text-anchor="middle" class="svg-muted">平仄相同（胶水粘住）</text>';
+  s += '<text x="170" y="92" font-size="12" text-anchor="middle" class="svg-muted">对管联内，粘管联间 —— 记住这句就不会混</text>';
+  return s + '</svg>';
+}
+function svgTushiCi(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">明月几时有</text>';
+  s += '<rect x="130" y="10" width="90" height="18" rx="4" class="svg-accent" opacity="0.7"/>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">把酒问青天</text>';
+  s += '<rect x="130" y="38" width="90" height="18" rx="4" class="svg-accent" opacity="0.7"/>';
+  s += '<text x="16" y="80" font-size="13" class="svg-ink">不知天上宫阙，今夕是何年</text>';
+  s += '<rect x="200" y="66" width="130" height="18" rx="4" class="svg-blue" opacity="0.7"/>';
+  s += '<text x="16" y="104" font-size="12" class="svg-muted">词=长短句：句子长短参差，不像诗那么整齐</text>';
+  return s + '</svg>';
+}
+function svgTushiGuti(){
+  var s = '<svg viewBox="0 0 340 110">';
+  var rows = [['句数','不限（几句到几百句）'],['字数','每句可长可短'],['平仄','不讲'],['押韵','宽松，可换韵']];
+  rows.forEach(function(r,i){
+    var y = 14 + i*24;
+    s += '<text x="16" y="'+y+'" font-size="13" class="svg-accent">'+r[0]+'</text>';
+    s += '<text x="70" y="'+y+'" font-size="13" class="svg-ink">'+r[1]+'</text>';
+  });
+  s += '<text x="240" y="38" font-size="14" class="svg-muted">自由体</text>';
+  s += '<text x="240" y="62" font-size="12" class="svg-muted">代表：《将进酒》</text>';
+  s += '<text x="240" y="82" font-size="12" class="svg-muted">《蜀道难》《琵琶行》</text>';
+  return s + '</svg>';
+}
+function svgTushiJinti(){
+  var s = '<svg viewBox="0 0 340 110">';
+  var rows = [['绝句','4句（五绝20字/七绝28字）'],['律诗','8句（颔联颈联必对仗）'],['排律','8句以上（中间两两对仗）']];
+  rows.forEach(function(r,i){
+    var y = 20 + i*30;
+    s += '<rect x="8" y="'+(y-16)+'" width="60" height="24" rx="6" class="svg-accent" opacity="0.85"/>';
+    s += '<text x="38" y="'+(y)+'" font-size="12" text-anchor="middle" fill="#fff">'+r[0]+'</text>';
+    s += '<text x="80" y="'+y+'" font-size="12" class="svg-ink">'+r[1]+'</text>';
+  });
+  s += '<text x="16" y="104" font-size="11" class="svg-muted">近体诗=格律诗：句数/字数/平仄/押韵全有规矩</text>';
+  return s + '</svg>';
+}
+function svgTushiFbx(){
+  var s = '<svg viewBox="0 0 340 116">';
+  var rows = [['赋','直陈其事','“关关雎鸠，在河之洲”','svg-accent'],['比','打比方','“如切如磋，如琢如磨”','svg-blue'],['兴','先言他物','“桃之夭夭，灼灼其华”','svg-green']];
+  rows.forEach(function(r,i){
+    var y = 16 + i*32;
+    s += '<circle cx="28" cy="'+(y-4)+'" r="13" class="'+r[3]+'" opacity="0.85"/>';
+    s += '<text x="28" y="'+y+'" font-size="13" text-anchor="middle" fill="#fff">'+r[0]+'</text>';
+    s += '<text x="50" y="'+y+'" font-size="12" class="svg-ink">'+r[1]+'：'+r[2]+'</text>';
+  });
+  return s + '</svg>';
+}
+function svgTushiYxfl(){
+  var s = '<svg viewBox="0 0 340 130">';
+  var cats = [['天文','月/风/霜/雪','svg-blue'],['植物','柳/梅/菊/竹','svg-green'],['动物','雁/蝉/杜鹃','svg-accent'],['器物','酒/剑/舟/镜','svg-red'],['建筑','楼/桥/亭/道','svg-deep']];
+  cats.forEach(function(c,i){
+    var x = 8 + i*66;
+    s += '<rect x="'+x+'" y="8" width="58" height="66" rx="8" class="svg-panel" stroke-width="1.4" stroke="currentColor"/>';
+    s += '<text x="'+(x+29)+'" y="30" font-size="12" text-anchor="middle" class="'+c[2]+'">'+c[0]+'</text>';
+    s += '<text x="'+(x+29)+'" y="50" font-size="10" text-anchor="middle" class="svg-muted">'+c[1]+'</text>';
+  });
+  s += '<text x="170" y="96" font-size="12" text-anchor="middle" class="svg-muted">意象=寄托了情感的物：看到物，想到情</text>';
+  s += '<text x="170" y="114" font-size="12" text-anchor="middle" class="svg-muted">五大类全记住，读诗先看意象</text>';
+  return s + '</svg>';
+}
+function svgTushiJjq(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="14" width="120" height="44" rx="8" class="svg-blue" opacity="0.12"/>';
+  s += '<text x="68" y="34" font-size="14" text-anchor="middle" class="svg-blue">景</text>';
+  s += '<text x="68" y="52" font-size="11" text-anchor="middle" class="svg-muted">月/柳/雨/山水</text>';
+  s += '<text x="148" y="42" font-size="20" class="svg-accent">→</text>';
+  s += '<rect x="172" y="14" width="120" height="44" rx="8" class="svg-red" opacity="0.12"/>';
+  s += '<text x="232" y="34" font-size="14" text-anchor="middle" class="svg-red">情</text>';
+  s += '<text x="232" y="52" font-size="11" text-anchor="middle" class="svg-muted">愁/喜/思乡/壮志</text>';
+  s += '<text x="310" y="42" font-size="12" class="svg-muted">生发</text>';
+  s += '<text x="170" y="82" font-size="12" text-anchor="middle" class="svg-muted">借景生情：先写景，情从景里长出来</text>';
+  return s + '</svg>';
+}
+function svgTushiTwyz(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="14" width="120" height="44" rx="8" class="svg-green" opacity="0.12"/>';
+  s += '<text x="68" y="34" font-size="14" text-anchor="middle" class="svg-green">物</text>';
+  s += '<text x="68" y="52" font-size="11" text-anchor="middle" class="svg-muted">松/竹/梅/兰</text>';
+  s += '<text x="148" y="42" font-size="20" class="svg-accent">→</text>';
+  s += '<rect x="172" y="14" width="120" height="44" rx="8" class="svg-deep" opacity="0.12"/>';
+  s += '<text x="232" y="34" font-size="14" text-anchor="middle" class="svg-deep">志</text>';
+  s += '<text x="232" y="52" font-size="11" text-anchor="middle" class="svg-muted">气节/操守/理想</text>';
+  s += '<text x="310" y="42" font-size="12" class="svg-muted">寄托</text>';
+  s += '<text x="170" y="82" font-size="12" text-anchor="middle" class="svg-muted">托物言志：不直说志向，借物的品格来说</text>';
+  return s + '</svg>';
+}
+function svgTushiYongd(){
+  var s = '<svg viewBox="0 0 340 104">';
+  s += '<rect x="8" y="10" width="140" height="48" rx="8" class="svg-panel svg-muted-s" stroke-width="1.4"/>';
+  s += '<text x="78" y="30" font-size="13" text-anchor="middle" class="svg-ink">典故</text>';
+  s += '<text x="78" y="48" font-size="11" text-anchor="middle" class="svg-muted">历史故事/前人诗句</text>';
+  s += '<text x="168" y="38" font-size="18" class="svg-accent">→</text>';
+  s += '<rect x="192" y="10" width="140" height="48" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="262" y="30" font-size="13" text-anchor="middle" class="svg-ink">诗句</text>';
+  s += '<text x="262" y="48" font-size="11" text-anchor="middle" class="svg-muted">含蓄/典雅/有深度</text>';
+  s += '<text x="170" y="80" font-size="12" text-anchor="middle" class="svg-muted">例：“怀旧空吟闻笛赋”→向秀《思旧赋》</text>';
+  s += '<text x="170" y="98" font-size="11" text-anchor="middle" class="svg-muted">用典三法：正用/反用/化用</text>';
+  return s + '</svg>';
+}
+function svgTushiLian(){
+  var s = '<svg viewBox="0 0 340 116">';
+  s += '<text x="16" y="22" font-size="13" class="svg-accent">联 = 上句 + 下句（两句为一联）</text>';
+  var lians = [['首联','1·2'],['颔联','3·4'],['颈联','5·6'],['尾联','7·8']];
+  lians.forEach(function(L,i){
+    var x = 8 + i*82;
+    s += '<rect x="'+x+'" y="32" width="74" height="52" rx="8" class="svg-panel '+(i===1||i===2?'svg-accent-s':'svg-muted-s')+'" stroke-width="1.4"/>';
+    s += '<text x="'+(x+37)+'" y="54" font-size="13" text-anchor="middle" class="svg-ink">'+L[0]+'</text>';
+    s += '<text x="'+(x+37)+'" y="72" font-size="11" text-anchor="middle" class="svg-muted">第'+L[1]+'句</text>';
+  });
+  s += '<text x="170" y="104" font-size="12" text-anchor="middle" class="svg-muted">颔联颈联必须对仗（绿框）</text>';
+  return s + '</svg>';
+}
+function svgTushiJz(){
+  var s = '<svg viewBox="0 0 340 110">';
+  s += '<text x="16" y="24" font-size="13" class="svg-ink">五言（2-2-1）：</text>';
+  s += '<text x="120" y="24" font-size="14" class="svg-ink">床前<tspan class="svg-accent">|</tspan>明月<tspan class="svg-accent">|</tspan>光</text>';
+  s += '<text x="16" y="52" font-size="13" class="svg-ink">七言（2-2-2-1）：</text>';
+  s += '<text x="140" y="52" font-size="14" class="svg-ink">白日<tspan class="svg-accent">|</tspan>依山<tspan class="svg-accent">|</tspan>尽</text>';
+  s += '<line x1="120" y1="62" x2="300" y2="62" stroke-width="1" stroke-dasharray="4" class="svg-muted-s"/>';
+  s += '<text x="16" y="84" font-size="12" class="svg-muted">朗读时按 | 停顿，节奏感就出来了</text>';
+  s += '<text x="16" y="102" font-size="12" class="svg-muted">五言多为2-3式，七言多为4-3式（2-2-2-1）</text>';
+  return s + '</svg>';
+}
+function svgTushiWq(){
+  var s = '<svg viewBox="0 0 340 100">';
+  s += '<rect x="8" y="10" width="150" height="56" rx="8" class="svg-panel svg-accent-s" stroke-width="1.5"/>';
+  s += '<text x="83" y="32" font-size="14" text-anchor="middle" class="svg-accent">五言</text>';
+  s += '<text x="83" y="52" font-size="12" text-anchor="middle" class="svg-muted">每句5字 · 节奏2-2-1</text>';
+  s += '<rect x="182" y="10" width="150" height="56" rx="8" class="svg-panel svg-blue-s" stroke-width="1.5"/>';
+  s += '<text x="257" y="32" font-size="14" text-anchor="middle" class="svg-blue">七言</text>';
+  s += '<text x="257" y="52" font-size="12" text-anchor="middle" class="svg-muted">每句7字 · 节奏2-2-2-1</text>';
+  s += '<text x="170" y="88" font-size="12" text-anchor="middle" class="svg-muted">五言+绝句=五绝（20字）　七言+律诗=七律（56字）</text>';
+  return s + '</svg>';
+}
+function svgTushiGjjt(){
+  var s = '<svg viewBox="0 0 340 120">';
+  s += '<rect x="8" y="8" width="156" height="76" rx="8" class="svg-panel svg-green-s" stroke-width="1.4"/>';
+  s += '<text x="86" y="30" font-size="14" text-anchor="middle" class="svg-green">古体诗</text>';
+  s += '<text x="86" y="50" font-size="11" text-anchor="middle" class="svg-muted">句数/字数不限</text>';
+  s += '<text x="86" y="66" font-size="11" text-anchor="middle" class="svg-muted">不讲平仄 · 可换韵</text>';
+  s += '<rect x="176" y="8" width="156" height="76" rx="8" class="svg-panel svg-accent-s" stroke-width="1.4"/>';
+  s += '<text x="254" y="30" font-size="14" text-anchor="middle" class="svg-accent">近体诗</text>';
+  s += '<text x="254" y="50" font-size="11" text-anchor="middle" class="svg-muted">4句/8句 · 5言/7言</text>';
+  s += '<text x="254" y="66" font-size="11" text-anchor="middle" class="svg-muted">讲平仄 · 一韵到底</text>';
+  s += '<text x="170" y="106" font-size="12" text-anchor="middle" class="svg-muted">分水岭：唐朝。唐以前多古体，唐以后格律定型</text>';
+  return s + '</svg>';
+}
+function svgTushiQch(){
+  var s = '<svg viewBox="0 0 340 96">';
+  var steps = [['起','开篇','svg-accent'],['承','承接','svg-blue'],['转','转折','svg-red'],['合','收束','svg-deep']];
+  steps.forEach(function(st,i){
+    var x = 8 + i*82;
+    s += '<circle cx="'+(x+33)+'" cy="28" r="22" class="'+st[2]+'" opacity="0.85"/>';
+    s += '<text x="'+(x+33)+'" y="34" font-size="16" text-anchor="middle" fill="#fff">'+st[0]+'</text>';
+    s += '<text x="'+(x+33)+'" y="64" font-size="11" text-anchor="middle" class="svg-muted">'+st[1]+'</text>';
+    if(i<3) s += '<text x="'+(x+66)+'" y="34" font-size="16" class="svg-muted">→</text>';
+  });
+  s += '<text x="170" y="86" font-size="12" text-anchor="middle" class="svg-muted">绝句四句正好对应：起承转合一气呵成</text>';
+  return s + '</svg>';
+}
+
+function knowSVG(g){
+  if(g==='sisheng') return svgSisheng();
+  if(g==='yayun') return svgYayun();
+  if(g==='zhandui') return svgZhandui();
+  if(g==='duizhang') return svgDuizhang();
+  if(g==='jueju') return svgJueju();
+  if(g==='lvshi') return svgLvshi();
+  if(g==='cidiao') return svgCidiao();
+  if(g==='animsisheng') return svgAnimSisheng();
+  if(g==='animpingze') return svgAnimPingze();
+  if(g==='animduizhang') return svgAnimDuizhang();
+  if(g==='animqicheng') return svgAnimQicheng();
+  if(g==='animcipai') return svgAnimCipai();
+  if(g==='tangshifenqi') return svgTangshiFenqi();
+  if(g==='pingshuiyun') return svgPingshuiyun();
+  if(g==='liupai') return svgLiupai();
+  if(g==='tushi135') return svgTushi135();
+  if(g==='tushigp') return svgTushiGp();
+  if(g==='tushidou') return svgTushiDou();
+  if(g==='tusipulu') return svgTushiPulu();
+  if(g==='tushiry') return svgTushiRy();
+  if(g==='tushizicha') return svgTushiZicha();
+  if(g==='tushiaoju') return svgTushiAoju();
+  if(g==='tushipswj') return svgTushiPswj();
+  if(g==='tushibjzj') return svgTushiBjzj();
+  if(g==='tushidjzj') return svgTushiDjzj();
+  if(g==='tushiajdy') return svgTushiAjdy();
+  if(g==='tushinddy') return svgTushiNddy();
+  if(g==='tushici') return svgTushiCi();
+  if(g==='tushiguti') return svgTushiGuti();
+  if(g==='tushijinti') return svgTushiJinti();
+  if(g==='tushifbx') return svgTushiFbx();
+  if(g==='tushiyxfl') return svgTushiYxfl();
+  if(g==='tushijjq') return svgTushiJjq();
+  if(g==='tushitwyz') return svgTushiTwyz();
+  if(g==='tushiyongd') return svgTushiYongd();
+  if(g==='tushilian') return svgTushiLian();
+  if(g==='tushijz') return svgTushiJz();
+  if(g==='tushiwq') return svgTushiWq();
+  if(g==='tushigjjt') return svgTushiGjjt();
+  if(g==='tusihqch') return svgTushiQch();
+  return '';
+}
+function vKnow(){
+  setTitle('诗词常识');
+  var h = '';
+  h += '<div class="sc-know"><p>诗词常识，配着例子看。🎬 是延伸视频，📊 是图解资料。</p></div>';
+  var mods = [];
+  KNOW_MODS.forEach(function(mm){
+    var idxs = [];
+    D.knowledge.forEach(function(k, i){ if(k.m===mm[0]) idxs.push(i); });
+    if(idxs.length) mods.push({mm: mm, idxs: idxs});
+  });
+  /* 面板网格：19个模块各一张面板，点进单独明细页 */
+  h += '<div class="sc-panels">' + mods.map(function(m){
+    return '<div class="sc-panel" data-midx="'+m.mm[0]+'">'+
+      '<div class="sc-panel-ic">'+m.mm[1]+'</div>'+
+      '<div class="sc-panel-t">'+m.mm[2]+'</div>'+
+      '<div class="sc-panel-n">'+m.idxs.length+'卡</div>'+
+      '</div>';
+  }).join('') + '</div>';
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('.sc-panel').forEach(function(el){
+    el.addEventListener('click', function(){ vKnowList(el.getAttribute('data-midx')); });
+  });
+}
+/* 模块明细列表页：单独一页，只显示该模块的条目 */
+function vKnowList(midx){
+  var mm = null, idxs = [];
+  KNOW_MODS.forEach(function(x){ if(x[0]===midx) mm = x; });
+  if(!mm) return;
+  D.knowledge.forEach(function(k, i){ if(k.m===midx) idxs.push(i); });
+  setTitle(mm[2]);
+  var h = '';
+  h += '<div class="sc-kmod">'+mm[1]+' '+mm[2]+'（'+idxs.length+'）</div>';
+  idxs.forEach(function(i){
+    h += '<div class="sc-knowtitle" data-idx="'+i+'">'+esc(D.knowledge[i].t)+'</div>';
+  });
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('[data-idx]').forEach(function(el){
+    el.addEventListener('click', function(){ openKnow(parseInt(el.getAttribute('data-idx'),10)); });
+  });
+}
+
+function openKnow(idx){
+  var k = D.knowledge[idx]; if(!k) return;
+  setTitle(k.t);
+  var mm = null;
+  KNOW_MODS.forEach(function(x){ if(x[0]===k.m) mm = x; });
+  var modName = mm ? mm[2] : '诗词常识';
+  var h = '';
+  h += '<div class="sc-know"><h3>'+esc(k.t)+'</h3>';
+  /* 学前先看：仅当有真实前置时显示 */
+  if(k['前置知识'] && k['前置知识'].length){
+    h += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+k['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
+  }
+  var svg = knowSVG(k.g);
+  if(svg) h += '<div class="sc-svg">'+svg+'</div>';
+  /* 图示字段：数据编译动画（SMIL），配重播按钮 */
+  if(k['图示']){
+    h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+k['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
+  }
+  var dHtml = escD(k.d);
+  /* Q15 四型模板：图式/对照表/决策树/时间轴，均取自本卡 d 文本里的对应块；已转成模板的块从正文里去掉，避免同一内容贴两遍 */
+  var PT = window.NHZPatterns;
+  if (PT) {
+    var scRows = PT.schemaFromShiciText(k.d);
+    if (scRows) { h += PT.renderSchema(scRows); dHtml = dHtml.replace(/<b>\[图式\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var cmpRows = PT.compareFromShiciText(k.d);
+    if (cmpRows) { h += PT.renderGrid(cmpRows); dHtml = dHtml.replace(/<b>\[对照表\]<\/b>[\s\S]*?(?=<br><br>|<b>\[|<b>📜)/, ''); }
+    var decT = PT.decisionFromShiciText(k.d);
+    if (decT) { h += PT.renderDecision(decT); dHtml = dHtml.replace(/<b>\[决策树\]<\/b>[\s\S]*?(?=<br><br>|<b>📜|$)/, ''); }
+    var tlEv = PT.timelineFromShici(k);
+    if (tlEv) h += PT.renderTimeline(tlEv);
+  }
+  var tp = knowType(k.m, k.t);
+  /* 解释与例句分开样式：匹配 <b>📜 例句...</b>，按型换标题 */
+  var parts = dHtml.split(/<b>📜 例句.*?<\/b>/);
+  if (parts.length > 1) {
+    var exTitle = SC_EX_TITLE[tp] || '📜 例句';
+    h += '<div class="sc-exp">'+parts[0]+'</div><div class="sc-ex"><b>'+exTitle+'</b>'+parts[1]+'</div>';
+  } else {
+    h += '<p>'+dHtml+'</p>';
+  }
+  var links = '';
+  (k.v||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
+  (k.l||[]).forEach(function(x){ links += '<a class="sc-extlink" href="'+x.u+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>'; });
+  if(links) h += '<div style="margin-top:6px">'+links+'</div>';
+  h += '</div>';
+  detEl.innerHTML = h; showDetail();
+  }
+
+function vDyn(){
+  setTitle('朝代长河');
+  var h = '<div style="padding:14px 0">';
+  h += D.dynasties.map(function(d){
+    return '<div class="sc-dyn"><h3>'+esc(d.name)+'</h3><div class="sc-dyntime">'+esc(d.time)+' · '+esc(d.tag)+'</div><p>'+esc(d.desc)+'</p><p class="sc-why">💡 为什么是这个体裁：'+esc(d.why)+'</p></div>';
+  }).join('') + '</div>';
+  listEl.innerHTML = h; showList(); wireBack();
+}
+
+function wireBack(){
+  listEl.querySelectorAll('[data-go]').forEach(function(el){
+    el.addEventListener('click', function(){ go(el.getAttribute('data-go')); });
+  });
+}
+
+function vPoets(){
+  setTitle('诗人小传');
+  var names = Object.keys(D.poets).sort();
+  var h = '';
+  h += names.map(function(n){
+    return '<div class="sc-poet" data-poet="'+esc(n)+'"><div class="sc-pname">'+esc(n)+'</div><div class="sc-pbio">'+esc(D.poets[n]).slice(0,60)+'……</div></div>';
+  }).join('');
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('[data-poet]').forEach(function(el){
+    el.addEventListener('click', function(){ openPoet(el.getAttribute('data-poet')); });
+  });
+}
+
+function openPoet(name){
+  setTitle(name);
+  var works = worksOf(name);
+  var h = '<div class="sc-detail-head"><h2>'+esc(name)+'</h2></div>';
+  h += '<div class="sc-know"><p>'+esc(D.poets[name]||'')+'</p></div>';
+  var routeKey = '诗人足迹:'+name, hasRoute = !!(window.NHZ_WB_INDEX||{})[routeKey];
+  if(hasRoute) h += '<div class="sc-readbar"><button type="button" data-route="1">🗺️ 诗人足迹（按年谱）</button></div><div id="scroute"></div>';
+  if(D.stories && D.stories[name]){
+    h += '<div class="sc-story"><h4>📖 小故事</h4><p>'+esc(D.stories[name])+'</p></div>';
+  }
+  h += '<div class="sc-know"><h3>代表作（'+works.length+'）</h3><p>' +
+    works.map(function(p){return '<span class="sc-worklink" data-o="'+p.order+'">《'+esc(p.title)+'》</span>';}).join(' · ') +
+    '</p></div>';
+  detEl.innerHTML = h; showDetail();
+  detEl.querySelectorAll('.sc-worklink').forEach(function(a){
+    a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+  });
+  var rb = detEl.querySelector('[data-route]');
+  if(rb) rb.addEventListener('click', function(){
+    var box = document.getElementById('scroute'); if(!box) return;
+    if(rb.classList.contains('on')){ rb.classList.remove('on'); box.innerHTML = ''; return; }
+    rb.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
+    scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'data/poet_trails.js', 'wb/s/' + window.NHZ_WB_INDEX[routeKey] + '.js'], function(ok){
+      if(!ok || !window.NHZWB || !window.NHZWB.has(routeKey)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; rb.classList.remove('on'); return; }
+      box.innerHTML = '<p class="sc-memo-tip">点地图上的站点看这里写的诗和依据（年谱）。</p>'; var holder = document.createElement('div'); box.appendChild(holder);
+      var pl = window.NHZWB.mount(holder, routeKey); if(pl) pl.autoplay();
+    });
+  });
+}
+
+function vFamous(){
+  setTitle('名句典故');
+  var h = '';
+  h += D.famous.map(function(f, i){
+    return '<div class="sc-knowtitle" data-fidx="'+i+'">'+esc(f.line)+'</div>';
+  }).join('');
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('[data-fidx]').forEach(function(el){
+    el.addEventListener('click', function(){ openFamous(parseInt(el.getAttribute('data-fidx'),10)); });
+  });
+}
+
+function openFamous(i){
+  var f = D.famous[i]; if(!f) return;
+  setTitle('名句典故');
+  var link = f.order ? '<div class="sc-flink">📜 出自<span class="sc-worklink" data-o="'+f.order+'">《'+esc(f.title)+'》</span>（'+esc(f.author)+'）</div>' : '<div class="sc-flink">📜 '+esc(f.author)+'《'+esc(f.title)+'》</div>';
+  var h = '';
+  h += '<div class="sc-famous"><div class="sc-fline">'+esc(f.line)+'</div><div class="sc-fbai">白话：'+esc(f.baihua)+'</div><div class="sc-fstory">典故：'+esc(f.story)+'</div>'+link+'</div>';
+  detEl.innerHTML = h; showDetail();
+  detEl.querySelectorAll('.sc-worklink').forEach(function(a){
+    a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+  });
+}
+
+/* ===== 意象卡牌（docs/gaijin/shici-gaijin-sheji.md P1-2）=====
+   第一层：卡片正面（意象字；有「图示」的取其左半幅线稿）；
+   第二层：翻面看含义（imagery.mean + desc）；
+   第三层：展开 2–3 句诗，每句注明出处并可点开那首诗。
+   诗句只取诗库原句：imagery.line（在 imagery.poems 里核到原文的才用）→ imagery.poems 里含该字的句子 → data/shiju.js 倒排里含该字的诗。
+   点亮：孩子打开过（openPoem）含该字的诗、或该意象自带的诗，记在 localStorage nhz_shici_read。 */
+var SC_READ_KEY = 'nhz_shici_read';
+function scReadList(){ try{ var v = JSON.parse(localStorage.getItem(SC_READ_KEY) || '[]'); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+function scMarkRead(order){
+  try{ var a = scReadList(); if(a.indexOf(order) < 0){ a.push(order); localStorage.setItem(SC_READ_KEY, JSON.stringify(a)); } }catch(e){}
+}
+function imLit(g, read){
+  for(var i=0; i<read.length; i++){
+    if(g.poems.indexOf(read[i]) >= 0) return true;
+    var p = poemByOrder(read[i]);
+    if(p && p.lines.join('').indexOf(g.zi) >= 0) return true;
+  }
+  return false;
+}
+function imExamples(g){
+  var out = [], used = {};
+  function add(p, line){ if(out.length >= 3 || !p || used[p.order]) return; used[p.order] = 1; out.push({p:p, l:line}); }
+  var key = String(g.line||'').replace(/[。，！？；、\s]/g,'');
+  g.poems.forEach(function(o){
+    var p = poemByOrder(o); if(!p || !key) return;
+    var full = p.lines.join('');
+    if(full.replace(/[。，！？；、\s]/g,'').indexOf(key) >= 0) add(p, g.line);
+  });
+  /* 字面含该字但不是这个意象的词（地名、颜色、泛称），不拿来当例句 */
+  var NOT_IM = {'燕':['燕山','燕然'], '雪':['雪白'], '海':['四海']}[g.zi] || [];
+  function usable(l){
+    if(l.indexOf(g.zi) < 0) return false;
+    var t = l; NOT_IM.forEach(function(w){ t = t.split(w).join(''); });
+    return t.indexOf(g.zi) >= 0;
+  }
+  g.poems.concat(SHIJU[g.zi] || []).forEach(function(o){
+    var p = poemByOrder(o); if(!p) return;
+    var c = p.lines.filter(usable);
+    var pick = c.filter(function(l){ return l.replace(/[。，！？；、\s]/g,'').length > 3; })[0] || c[0];
+    if(pick) add(p, pick);
+  });
+  return out;
+}
+function imFront(g){
+  /* 正面只留「图示」左半幅的线稿：去掉文字（含义、诗句留给背面），视口裁到左半 */
+  var svg = g['图示'] ? String(g['图示']).replace(/<text[\s\S]*?<\/text>/g, '').replace(/viewBox="0 0 340 170"/, 'viewBox="0 0 170 150"') : '';
+  return svg ? '<div class="sc-imart">'+svg+'</div><div class="sc-imzi2">'+esc(g.zi)+'</div>'
+             : '<div class="sc-imink"><span>'+esc(g.zi)+'</span></div>';
+}
+function vImagery(){
+  setTitle('意象地图');
+  var read = scReadList(), lit = 0;
+  var cards = D.imagery.map(function(g,i){
+    var on = imLit(g, read); if(on) lit++;
+    var ex = imExamples(g);
+    var lines = ex.map(function(x){
+      var l = esc(x.l); if(x.l.indexOf(g.zi) >= 0) l = l.split(esc(g.zi)).join('<mark>'+esc(g.zi)+'</mark>');
+      return '<div class="sc-hitline">'+l+' <span class="sc-imsrc">——<span class="sc-worklink" data-o="'+x.p.order+'">'+esc(x.p.author)+'《'+esc(x.p.title)+'》</span></span></div>';
+    }).join('');
+    return '<div class="sc-imcard'+(on?' lit':'')+'" data-im="'+i+'"><div class="sc-imin">'
+      + '<div class="sc-imface sc-imfront">'+imFront(g)+'<div class="sc-imstate">'+(on?'✨ 已点亮':'读一首含“'+esc(g.zi)+'”的诗来点亮')+'</div></div>'
+      + '<div class="sc-imface sc-imback"><div class="sc-imbzi">'+esc(g.zi)+'</div><div class="sc-immean2">'+esc(g.mean)+'</div>'
+      + '<p class="sc-imdesc">'+esc(g.desc)+'</p>'
+      + (lines ? '<button type="button" class="sc-imopen" data-lines="'+i+'">看诗句 ▾</button><div class="sc-imlines" hidden>'+lines+'</div>' : '')
+      + '<button type="button" class="sc-imfull" data-full="'+i+'">完整讲解 →</button></div>'
+      + '</div></div>';
+  }).join('');
+  var h = '';
+  h += '<div class="sc-know"><p>点卡片翻过来看它代表什么，再点「看诗句」读原句。读过含这个字的诗，卡片就会点亮。</p><p class="sc-imcount">已点亮 <b>'+lit+'</b> / '+D.imagery.length+'</p></div>';
+  h += '<div class="sc-imcards">'+cards+'</div>';
+  listEl.innerHTML = h; showList(); wireBack();
+  listEl.querySelectorAll('.sc-imcard').forEach(function(card){
+    card.addEventListener('click', function(e){
+      var t;
+      if((t = e.target.closest('[data-o]'))){ e.stopPropagation(); openPoem(parseInt(t.getAttribute('data-o'),10)); return; }
+      if((t = e.target.closest('[data-full]'))){ e.stopPropagation(); openImagery(parseInt(t.getAttribute('data-full'),10)); return; }
+      if((t = e.target.closest('[data-lines]'))){
+        e.stopPropagation();
+        var box = card.querySelector('.sc-imlines'), open = box.hidden;
+        box.hidden = !open; card.classList.toggle('wide', open);
+        t.textContent = open ? '收起诗句 ▴' : '看诗句 ▾';
+        return;
+      }
+      var flip = !card.classList.contains('flip');
+      card.classList.toggle('flip', flip);
+      if(!flip){ var b = card.querySelector('.sc-imlines'); if(b){ b.hidden = true; card.classList.remove('wide'); card.querySelector('[data-lines]').textContent = '看诗句 ▾'; } }
+    });
+  });
+}
+
+function openImagery(i){
+  var g = D.imagery[i];
+  setTitle('意象 · '+g.zi);
+  var h = '<div class="sc-detail-head"><h2 style="font-size:44px">'+esc(g.zi)+'</h2><div class="sc-detail-meta">'+esc(g.mean)+'</div></div>';
+  h += '<div class="sc-know"><p style="font-size:17px">“'+esc(g.line)+'”</p></div>';
+  h += '<div class="sc-know"><p>'+esc(g.desc)+'</p></div>';
+  /* 图示字段：意象动画 */
+  if(g['图示']){
+    h += '<div class="sc-svg sc-anim"><div style="text-align:center;margin:8px 0;font-weight:700;color:#4a7a59;">🎬 动画演示</div>'+g['图示']+'<div style="text-align:center;margin-top:8px;"><button class="sc-backbtn" data-replay onclick="var d=this.closest(\'.sc-anim\');var s=d&&d.querySelector(\'svg\');if(s){var c=s.cloneNode(true);s.parentNode.replaceChild(c,s);}">↻ 重播</button></div></div>';
+  }
+  var hits = [];
+  D.poems.forEach(function(p){
+    p.lines.forEach(function(l){
+      if(l.indexOf(g.zi)>=0 && l!==g.line) hits.push({p:p, l:l});
+    });
+  });
+  hits = hits.slice(0,15);
+  if(hits.length){
+    h += '<div class="sc-know"><h3>含“'+esc(g.zi)+'”的诗句（'+hits.length+'条）</h3>' + hits.map(function(hh){
+      return '<div class="sc-hitline">'+esc(hh.l).split(esc(g.zi)).join('<mark>'+esc(g.zi)+'</mark>')+
+        ' <span style="font-size:12px;color:var(--xzq-muted,#8a8578)">——<span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span></span></div>';
+    }).join('') + '</div>';
+  }
+  detEl.innerHTML = h; showDetail();
+  detEl.querySelectorAll('.sc-worklink').forEach(function(a){
+    a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+  });
+}
+
+function vZilian(preZi){
+  setTitle('字→诗句链');
+  var h = '';
+  h += '<div class="sc-know"><p>输入一个汉字，找出诗库里含这个字的<b>原句</b>，字会标黄。字卡里的“诗句里的这个字”也是从这里链过来的。</p></div>';
+  h += '<div class="sc-zrow"><input id="ziinput" maxlength="1" placeholder="如：月"><button id="zigo">找诗句</button></div>';
+  h += '<div class="sc-chips">' + ['月','柳','剑','酒','山','花','风','雪'].map(function(z){
+    return '<span class="sc-chip" data-zi="'+z+'">'+z+'</span>';
+  }).join('') + '</div>';
+  h += '<div id="ziresult"></div>';
+  listEl.innerHTML = h; showList(); wireBack();
+  function run(zi){
+    var box = document.getElementById('ziresult');
+    var hits = [];
+    D.poems.forEach(function(p){
+      var ls = p.lines.filter(function(l){ return l.indexOf(zi) >= 0; });
+      if(ls.length) hits.push({p:p, ls:ls.slice(0,3)});
+    });
+    if(!hits.length){ box.innerHTML = '<div class="sc-know"><p>“'+esc(zi)+'”在诗库里没有出现，换个字试试。</p></div>'; return; }
+    var shown = hits.slice(0,20);
+    box.innerHTML = '<div class="sc-know"><h3>含“'+esc(zi)+'”的诗句（'+hits.length+'首）</h3>' + shown.map(function(hh){
+      var lines = hh.ls.map(function(l){
+        return '<div class="sc-hitline">'+esc(l).split(esc(zi)).join('<mark>'+esc(zi)+'</mark>')+'</div>';
+      }).join('');
+      return '<div style="margin:10px 0 4px"><span class="sc-worklink" data-o="'+hh.p.order+'">《'+esc(hh.p.title)+'》</span><span style="font-size:12px;color:var(--xzq-muted,#8a8578)"> '+esc(hh.p.author)+'</span></div>' + lines;
+    }).join('') + (hits.length>20?'<p style="font-size:13px;color:var(--xzq-muted,#8a8578)">还有 '+(hits.length-20)+' 首，在诗库里搜“'+esc(zi)+'”查看</p>':'') + '</div>';
+    box.querySelectorAll('.sc-worklink').forEach(function(a){
+      a.addEventListener('click', function(){ openPoem(parseInt(a.getAttribute('data-o'),10)); });
+    });
+  }
+  document.getElementById('zigo').addEventListener('click', function(){
+    var v = document.getElementById('ziinput').value.trim(); if(v) run(v);
+  });
+  listEl.querySelectorAll('[data-zi]').forEach(function(el){
+    el.addEventListener('click', function(){ document.getElementById('ziinput').value = el.getAttribute('data-zi'); run(el.getAttribute('data-zi')); });
+  });
+  if(preZi){ document.getElementById('ziinput').value = preZi; run(preZi); }
+}
+
+var poemQ = '', poemDyn = 'all', poemKe = '课内', poemGrade = 'all';
+function vPoems(){
+  setTitle('诗库');
+  /* 朝代按时间排，只列当前课内/拓展+年级筛选后实有的诗 */
+  var DYN_ORDER = ['先秦','汉','魏','晋','南北朝','隋','唐','五代','宋','金','元','明','清','近代','现代'];
+  var base = D.poems.filter(function(p){
+    if(poemKe!=='all' && p.ke!==poemKe) return false;
+    if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
+    return true;
+  });
+  var have = {}; base.forEach(function(p){ if(p.dynasty) have[p.dynasty] = 1; });
+  var dyns = ['all'].concat(DYN_ORDER.filter(function(d){ return have[d]; }), Object.keys(have).filter(function(d){ return DYN_ORDER.indexOf(d) < 0; }));
+  if(poemDyn!=='all' && dyns.indexOf(poemDyn)<0) poemDyn = 'all';
+  var h = '';
+  h += '<div class="searchbox" style="padding:10px 16px 0"><input id="pq" type="text" placeholder="搜诗名 / 诗人 / 诗句" value="'+esc(poemQ)+'" autocomplete="off"></div>';
+  h += '<div class="sc-chips">' + ['课内','拓展','all'].map(function(k){
+    return '<span class="sc-chip'+(poemKe===k?' active':'')+'" data-ke="'+k+'">'+(k==='all'?'全部':k)+'</span>';
+  }).join('') + '</div>';
+  if(poemKe==='课内'){
+    h += '<div class="sc-chips">' + ['all','1-2','3-4','5-6'].map(function(g){
+      return '<span class="sc-chip'+(poemGrade===g?' active':'')+'" data-grade="'+g+'">'+(g==='all'?'全部年级':g+'年级')+'</span>';
+    }).join('') + '</div>';
+  }
+  h += '<div class="sc-chips">' + dyns.map(function(d){
+    return '<span class="sc-chip'+(poemDyn===d?' active':'')+'" data-dyn="'+d+'">'+(d==='all'?'全部':d)+'</span>';
+  }).join('') + '</div><div id="poemcount" style="padding:6px 16px;color:#888;font-size:13px"></div><div id="poemlist"></div>';
+  listEl.innerHTML = h; showList(); wireBack();
+  function render(){
+    var q = poemQ.trim();
+    var arr = D.poems.filter(function(p){
+      if(poemKe!=='all' && p.ke!==poemKe) return false;
+      if(poemKe==='课内' && poemGrade!=='all' && p.grade!==poemGrade) return false;
+      if(poemDyn!=='all' && p.dynasty!==poemDyn) return false;
+      if(!q) return true;
+      return p.title.indexOf(q)>=0 || p.author.indexOf(q)>=0 || p.lines.join('').indexOf(q)>=0;
+    });
+    document.getElementById('poemcount').textContent = '共 ' + arr.length + ' 首';
+    document.getElementById('poemlist').innerHTML = arr.map(function(p){
+      return '<div class="sc-poem" data-o="'+p.order+'"><div class="sc-ptitle">'+esc(p.title)+'</div><div class="sc-pmeta"><span class="sc-badge">'+esc(p.dynasty||'')+'</span><span class="sc-badge">'+esc(p.ticai||'')+'</span>'+esc(p.author)+'</div></div>';
+    }).join('');
+    document.getElementById('poemlist').querySelectorAll('.sc-poem').forEach(function(el){
+      el.addEventListener('click', function(){ openPoem(parseInt(el.getAttribute('data-o'),10)); });
+    });
+  }
+  document.getElementById('pq').addEventListener('input', function(e){ poemQ = e.target.value; render(); });
+  listEl.querySelectorAll('[data-dyn]').forEach(function(el){
+    el.addEventListener('click', function(){ poemDyn = el.getAttribute('data-dyn'); vPoems(); });
+  });
+  listEl.querySelectorAll('[data-ke]').forEach(function(el){
+    el.addEventListener('click', function(){ poemKe = el.getAttribute('data-ke'); if(poemKe!=='课内') poemGrade = 'all'; vPoems(); });
+  });
+  listEl.querySelectorAll('[data-grade]').forEach(function(el){
+    el.addEventListener('click', function(){ poemGrade = el.getAttribute('data-grade'); vPoems(); });
+  });
+  render();
+}
+
+function openPoem(order){
+  var p = poemByOrder(order);
+  if(!p){ vHome(); return; }
+  scMarkRead(order);
+  setTitle(p.title);
+  var h = '<div class="sc-detail-head"><h2>'+esc(p.title)+'</h2><div class="sc-detail-meta">'+esc(p.author)+' · '+esc(p.dynasty||'')+' · '+esc(p.ticai||'')+'</div></div>';
+  /* 逐句锚点：每句可点，点击滚动到对应讲解 */
+  h += '<div class="sc-readbar"><button type="button" data-rb="read">🔊 朗读全诗</button><button type="button" data-rb="py"'+(scPyOn?' class="on"':'')+'>🔤 拼音</button><button type="button" data-rb="beat">🥁 节奏</button><button type="button" data-rb="memo">🙈 背一背</button><button type="button" data-rb="vert">📜 竖排</button><button type="button" data-rb="metro">🎵 打拍器</button>'+(scWbName(p)?'<button type="button" data-rb="wb">🎨 诗画白板</button>':'')+(scWbName(p)?'<a href="games/shici/huazhong.html?tab=shici">🎨 画中有诗</a>':'')+'</div><div id="scwb"></div><div id="scbeat"></div>';
+  h += '<div class="sc-lines'+(scPyOn?' py':'')+'">'+p.lines.map(function(l,i){return '<p class="sc-line" data-li="'+i+'">'+scLineHTML(l,false,0,i,p,scPyOn)+'</p>';}).join('')+'</div>'+scPronNote(p)+'<div class="sc-memo-tip" id="scmemotip"></div>';
+  /* 名篇精讲赏析 */
+  try{
+    var sx = (window.NHZ_SHANGXI||[]).filter(function(x){return x.t===p.title && x.a===p.author;})[0];
+    if(sx){
+      h += '<div class="sc-card" style="margin-top:12px"><h3>📜 背景</h3><p>'+esc(sx.bg)+'</p></div>';
+      h += '<div class="sc-card" style="margin-top:8px"><h3>🔍 逐句讲</h3>'+sx.zj.map(function(z,zi){return '<p class="sc-zj" id="sczj-'+zi+'">'+esc(z)+'</p>';}).join('')+'</div>';
+      h += '<div class="sc-card" style="margin-top:8px"><h3>✨ 艺术特色</h3><p>'+esc(sx.ys)+'</p></div>';
+    }
+  }catch(e){}
+  detEl.innerHTML = h; showDetail();
+  /* 逐句锚点点击事件 */
+  try{
+    var lineEls = detEl.querySelectorAll('.sc-line');
+    for(var li=0; li<lineEls.length; li++){
+      (function(el, idx){
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', function(){
+          var target = document.getElementById('sczj-'+idx);
+          if(target){
+            target.scrollIntoView({behavior:'smooth', block:'center'});
+            target.style.background = '#fff8e1';
+            setTimeout(function(){ target.style.background = ''; }, 2000);
+          }
+        });
+      })(lineEls[li], li);
+    }
+  }catch(e){}
+  try{ scReadBar(p); }catch(e){}
+  
+}
+
+/* ===== 阅读条（docs/gaijin/shici-gaijin-sheji.md P0-2）=====
+   节奏：只给纯五言（2/3）、纯七言（2/2/3）的句子加停顿线，其余句子不硬加；
+   背一背：四档渐隐——全显 → 隔字隐 → 只留句首字 → 全隐，点一句可看一眼；
+   朗读：浏览器自带中文语音逐句读，读到哪句高亮哪句。 */
+function scHanzi(c){ return /[\u3400-\u9fff]/.test(c); }
+/* ===== 拼音注音（Q17）=====
+   读音来源：逐首校过的 pron 覆盖（@行号 键只对该行生效）> 查表主音（pinyin_lookup.js 首音）。
+   pron 只记「语境读音 ≠ 查表主音」的字（少数注释性 pron 如山行斜 xié 除外）；其余字开关显示主音。
+   开关跨诗保持（scPyOn），与竖排互斥。 */
+var scPyOn = false;
+function scPyFor(p, li, ch){
+  if(p && p.pron){
+    var k = ch+'@'+li; if(p.pron[k]) return p.pron[k];
+    if(p.pron[ch]) return p.pron[ch];
+  }
+  try{ var v = (window.NHZ_PINYIN||{})[ch]; if(v) return v.split(',')[0]; }catch(e){}
+  return '';
+}
+function scPronNote(p){
+  if(!p.pron) return '';
+  var seen = {}, items = [];
+  Object.keys(p.pron).forEach(function(k){
+    var m = k.match(/^(.*)@(\d+)$/), ch = m?m[1]:k, li = m?+m[2]:null, r = p.pron[k];
+    var s = ch+'|'+r+'|'+(li===null?'':li); if(seen[s]) return; seen[s] = 1;
+    items.push(ch+'读 '+r+(li!=null?'（第'+(li+1)+'句）':''));
+  });
+  return '<div class="sc-memo-tip">📌 读音：'+items.join('；')+'</div>';
+}
+function scLineHTML(l, beat, memo, li, p, pyOn){
+  var chars = Array.from(l), hz = chars.filter(scHanzi).length, cut = {};
+  if(beat && (hz===5 || hz===7)){ if(hz===5) cut[2]=1; else { cut[2]=1; cut[4]=1; } }
+  var out = '', k = 0;
+  chars.forEach(function(c){
+    if(!scHanzi(c)){ out += esc(c); return; }
+    if(cut[k]) out += '<span class="rb">/</span>';
+    var hide = memo===3 || (memo===2 && k>0) || (memo===1 && k%2===1);
+    var py = (pyOn && !hide && p) ? scPyFor(p, li, c) : '';
+    var hzHtml = '<span class="hz'+(hide?' hid':'')+'">'+esc(c)+'</span>';
+    out += py ? '<span class="hzpy"><i>'+esc(py)+'</i>'+hzHtml+'</span>' : hzHtml;
+    k++;
+  });
+  return out;
+}
+function scReadBar(p){
+  var bar = detEl.querySelector('.sc-readbar'); if(!bar) return;
+  var st = {beat:false, memo:0, py:scPyOn};
+  var tips = ['', '隔一个字藏一个，试着读出来', '只留每句第一个字', '全藏起来了，点一句可以偷看一眼'];
+  /* 竖排是跨诗的模式：按钮初始态跟 detEl 上的 class 走（换诗不重置） */
+  var vb = bar.querySelector('[data-rb=vert]'); if(vb) vb.classList.toggle('on', detEl.classList.contains('sc-vertical'));
+  function redraw(){
+    detEl.querySelectorAll('.sc-line').forEach(function(el){ var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i, p, st.py); });
+    var sl = detEl.querySelector('.sc-lines'); if(sl) sl.classList.toggle('py', st.py);
+    var pb = bar.querySelector('[data-rb=py]'); if(pb) pb.classList.toggle('on', st.py);
+    bar.querySelector('[data-rb=beat]').classList.toggle('on', st.beat);
+    var mb = bar.querySelector('[data-rb=memo]'); mb.classList.toggle('on', st.memo>0); mb.textContent = st.memo ? '🙈 背一背 '+st.memo+'/3' : '🙈 背一背';
+    var t = document.getElementById('scmemotip'); if(t) t.textContent = tips[st.memo];
+  }
+  function stopRead(){ try{ speechSynthesis.cancel(); }catch(e){} detEl.querySelectorAll('.sc-line.reading').forEach(function(x){ x.classList.remove('reading'); }); bar.querySelector('[data-rb=read]').classList.remove('on'); }
+  function readFrom(i){
+    var els = detEl.querySelectorAll('.sc-line');
+    if(i >= els.length || !document.body.contains(bar)){ stopRead(); return; }
+    els.forEach(function(x){ x.classList.remove('reading'); }); els[i].classList.add('reading');
+    var u = new SpeechSynthesisUtterance(p.lines[i].replace(/[，。！？、；：]/g,' '));
+    u.lang = 'zh-CN'; u.rate = 0.8;
+    u.onend = function(){ if(bar.querySelector('[data-rb=read]').classList.contains('on')) readFrom(i+1); };
+    speechSynthesis.speak(u);
+  }
+  bar.addEventListener('click', function(e){
+    var b = e.target.closest('[data-rb]'); if(!b) return;
+    var a = b.getAttribute('data-rb');
+    if(a==='read'){
+      if(b.classList.contains('on')){ stopRead(); return; }
+      if(!('speechSynthesis' in window)){ b.textContent = '🔇 这台设备不能朗读'; return; }
+      stopRead(); b.classList.add('on'); readFrom(0);
+    } else if(a==='vert'){ var wasPy = st.py; if(!detEl.classList.contains('sc-vertical') && wasPy){ st.py = false; scPyOn = false; } detEl.classList.toggle('sc-vertical'); b.classList.toggle('on', detEl.classList.contains('sc-vertical')); if(wasPy) redraw(); }
+    else if(a==='py'){ st.py = !st.py; scPyOn = st.py; if(st.py){ detEl.classList.remove('sc-vertical'); var v2 = bar.querySelector('[data-rb=vert]'); if(v2) v2.classList.remove('on'); } redraw(); }
+    else if(a==='beat'){ st.beat = !st.beat; redraw(); }
+    else if(a==='memo'){ st.memo = (st.memo+1)%4; redraw(); }
+    else if(a==='wb'){ scWb(p, b); }
+    else if(a==='metro'){ b.classList.toggle('on'); scBeatBox(p, b.classList.contains('on')); }
+  });
+  /* 背诵模式下点一句：偷看 2 秒 */
+  detEl.querySelectorAll('.sc-line').forEach(function(el){
+    el.addEventListener('click', function(){
+      if(!st.memo) return;
+      var i = +el.getAttribute('data-li'); el.innerHTML = scLineHTML(p.lines[i], st.beat, 0, i, p, st.py);
+      setTimeout(function(){ if(st.memo) el.innerHTML = scLineHTML(p.lines[i], st.beat, st.memo, i, p, st.py); }, 2000);
+    });
+  });
+  }
+
+/* ===== 打拍器 + 平仄格（docs/gaijin/shici-gaijin-sheji.md P0-3）=====
+   节拍分组：有逐首校过的 beats 用它；否则纯五言 2/3、纯七言 2/2/3（与「节奏」按钮同规则），别的句式不出打拍器。
+   平仄格：pz 取自 poems[].pz（91 首近体诗，平水韵逐字核对），ru / rhyme 由 data/pz_derive.js 推导
+   （入声字 = 粤语 -p/-t/-k 收尾，Unihan kCantonese；韵脚 = 偶句句末 + 首句平收入韵），下标按去标点后的字序；
+   无 pz 的诗只做节奏，不自动标平仄。SC_PZ 只留登鹳雀楼的 beats（逐首校过）与兜底。
+   木鱼声用 WebAudio 合成，每组敲一下，句间空一拍；孩子点「拍」，离最近的一拍不超过 1/4 拍算准，那组亮金。 */
+var SC_PZ = {
+  /* 王之涣《登鹳雀楼》：节奏、平仄、入声、韵脚取自设计 (e) 之二，按平水韵逐字核过（白日入欲目一 为入声，流、楼 押尤韵） */
+  '登鹳雀楼|王之涣': { beats:['白日/依山/尽','黄河/入海/流','欲穷/千里/目','更上/一层/楼'],
+    pz:'仄仄平平仄|平平仄仄平|仄平平仄仄|仄仄仄平平', ru:[0,1,7,10,14,17], rhyme:[9,19] }
+};
+/* 平仄数据：优先用 poems[].pz 推导（data/pz_derive.js，91 首）；无 pz 时回落到 SC_PZ 手工条目 */
+function scPZData(p){
+  if(window.NHZ_PZ && p && p.pz){ var r = window.NHZ_PZ.derive(p); if(r) return r; }
+  return SC_PZ[p.title+'|'+p.author] || null;
+}
+function scBeatGroups(p){
+  var d = SC_PZ[p.title+'|'+p.author];
+  if(d && d.beats) return d.beats.map(function(b){ return b.split('/'); });
+  var out = [];
+  for(var i=0;i<p.lines.length;i++){
+    var hz = Array.from(p.lines[i]).filter(scHanzi).join('');
+    if(hz.length===5) out.push([hz.slice(0,2), hz.slice(2)]);
+    else if(hz.length===7) out.push([hz.slice(0,2), hz.slice(2,4), hz.slice(4)]);
+    else return null;
+  }
+  return out;
+}
+/* 诗画白板（P0-2 scroll 模板）：wb/index.js 里登记「诗:题目|作者」的诗才出按钮；点了才加载引擎与场景 */
+function scWbName(p){ var k = '诗:'+p.title+'|'+p.author; return (window.NHZ_WB_INDEX||{})[k] ? k : null; }
+var scLoaded = {};
+function scLoad(list, cb){
+  var i = 0;
+  (function next(ok){
+    if(!ok) return cb(false);
+    if(i >= list.length) return cb(true);
+    var src = list[i++]; if(scLoaded[src]) return next(true);
+    var sc = document.createElement('script'); sc.src = src;
+    sc.onload = function(){ scLoaded[src] = 1; next(true); }; sc.onerror = function(){ next(false); };
+    document.body.appendChild(sc);
+  })(true);
+}
+function scWb(p, btn){
+  var box = document.getElementById('scwb'), name = scWbName(p); if(!box || !name) return;
+  if(btn.classList.contains('on')){ btn.classList.remove('on'); box.innerHTML = ''; return; }
+  btn.classList.add('on'); box.innerHTML = '<p class="sc-memo-tip">加载中…</p>';
+  scLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'data/poet_trails.js', 'wb/s/' + window.NHZ_WB_INDEX[name] + '.js'], function(ok){
+    if(!ok || !window.NHZWB || !window.NHZWB.has(name)){ box.innerHTML = '<p class="sc-memo-tip">白板加载失败，再点一次试试。</p>'; btn.classList.remove('on'); return; }
+    box.innerHTML = ''; var pl = window.NHZWB.mount(box, name); if(pl) pl.autoplay();
+  });
+}
+var scAudio = null;
+function scTick(strong){
+  try{
+    scAudio = scAudio || new (window.AudioContext || window.webkitAudioContext)();
+    var t = scAudio.currentTime, o = scAudio.createOscillator(), g = scAudio.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(strong ? 880 : 660, t); o.frequency.exponentialRampToValueAtTime(220, t + .08);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.5, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .12);
+    o.connect(g); g.connect(scAudio.destination); o.start(t); o.stop(t + .14);
+  }catch(e){}
+}
+function scBeatBox(p, on){
+  var box = document.getElementById('scbeat'); if(!box) return;
+  if(box._stop) box._stop();
+  if(!on){ box.innerHTML = ''; return; }
+  var G = scBeatGroups(p);
+  if(!G){ box.innerHTML = '<div class="sc-beat"><div class="bk-msg">这首诗句式长短不一，暂不出打拍器（节拍只给纯五言、纯七言）。</div></div>'; return; }
+  var d = scPZData(p), pz = d ? d.pz.replace(/\|/g,'') : '', st = { bpm:80, pz:false, timer:null, sched:[], hit:0, total:0 };
+  function grid(){
+    var k = 0, gi = 0;
+    return G.map(function(row){
+      return '<div class="bk-row">' + row.map(function(grp){
+        var h = '<div class="bk-g" data-g="'+(gi++)+'">' + Array.from(grp).map(function(c){
+          var i = k++, ru = d && d.ru.indexOf(i) >= 0, rh = d && d.rhyme.indexOf(i) >= 0;
+          return '<span class="bk-c">' + (rh ? '<span class="bk-rhyme" title="韵脚">🔔</span>' : '') + esc(c) +
+            (st.pz && d ? '<span class="bk-pz"><i class="'+(pz[i]==='平'?'ping':'ze')+'"></i></span>' + (ru ? '<span class="bk-ru" data-ru="'+esc(c)+'">入</span>' : '') : '') + '</span>';
+        }).join('') + '</div>';
+        return h;
+      }).join('') + '</div>';
+    }).join('');
+  }
+  function draw(msg){
+    box.innerHTML = '<div class="sc-beat"><div class="bk-ctl">' + [60,80,100].map(function(b){ return '<button type="button" data-bpm="'+b+'" class="'+(st.bpm===b?'on':'')+'">'+b+' 拍/分</button>'; }).join('') +
+      (d ? '<button type="button" data-pzt="1" class="'+(st.pz?'on':'')+'">平仄格</button>' : '') +
+      '<button type="button" data-go="1">'+(st.timer?'⏹ 停':'▶ 开始')+'</button></div>' + grid() +
+      '<div class="bk-ctl"><button type="button" class="bk-tap" data-tap="1">拍！</button></div>' +
+      '<div class="bk-msg" id="bkmsg">' + (msg || (d ? '跟着木鱼点「拍」；打开「平仄格」：长条是平声，圆点是仄声，红「入」是入声字。' : '跟着木鱼点「拍」。这首诗只做节奏，平仄格还没逐首核对，暂不显示。')) + '</div></div>';
+  }
+  function stop(){ if(st.timer){ clearTimeout(st.timer); st.timer = null; } box.querySelectorAll('.bk-g.lit').forEach(function(x){ x.classList.remove('lit'); }); }
+  box._stop = stop;
+  function start(){
+    stop(); st.hit = 0; st.total = 0; st.sched = [];
+    var iv = 60000 / st.bpm, t0 = performance.now() + 400, n = 0, seq = [];
+    G.forEach(function(row, ri){ row.forEach(function(){ seq.push(n++); }); seq.push(-1); });
+    var times = seq.map(function(g, i){ return { g:g, t:t0 + i * iv }; });
+    st.sched = times.filter(function(x){ return x.g >= 0; }); st.total = st.sched.length;
+    draw(); box.querySelectorAll('.bk-g.gold').forEach(function(x){ x.classList.remove('gold'); });
+    var i = 0;
+    (function step(){
+      if(i >= times.length){ st.timer = null; draw('打完了：准拍 '+st.hit+' / '+st.total+'。'); return; }
+      var x = times[i++];
+      st.timer = setTimeout(function(){
+        box.querySelectorAll('.bk-g.lit').forEach(function(e){ e.classList.remove('lit'); });
+        if(x.g >= 0){ var el = box.querySelector('.bk-g[data-g="'+x.g+'"]'); if(el) el.classList.add('lit'); scTick(false); }
+        step();
+      }, Math.max(0, x.t - performance.now()));
+    })();
+  }
+  box.onclick = function(e){
+    var b;
+    if((b = e.target.closest('[data-bpm]'))){ st.bpm = +b.getAttribute('data-bpm'); var run = !!st.timer; stop(); draw(); if(run) start(); return; }
+    if(e.target.closest('[data-pzt]')){ st.pz = !st.pz; var keep = box.querySelectorAll('.bk-g.gold'); var golds = [].map.call(keep, function(x){ return x.getAttribute('data-g'); }); if(!st.timer){ draw(); golds.forEach(function(g){ var el = box.querySelector('.bk-g[data-g="'+g+'"]'); if(el) el.classList.add('gold'); }); } return; }
+    if(e.target.closest('[data-go]')){ if(st.timer){ stop(); draw(); } else start(); return; }
+    if((b = e.target.closest('[data-ru]'))){ var m = document.getElementById('bkmsg'); if(m) m.textContent = '「'+b.getAttribute('data-ru')+'」在古代是入声字，算仄声。今天普通话里入声消失了，有的入声字读成第一、二声，按普通话判就容易错当平声。'; return; }
+    if(e.target.closest('[data-tap]')){
+      if(!st.timer) return;
+      var now = performance.now(), iv = 60000 / st.bpm, best = null;
+      st.sched.forEach(function(x){ if(!x.done && Math.abs(x.t - now) <= iv / 4 && (!best || Math.abs(x.t - now) < Math.abs(best.t - now))) best = x; });
+      if(best){ best.done = 1; st.hit++; var el = box.querySelector('.bk-g[data-g="'+best.g+'"]'); if(el) el.classList.add('gold'); }
+    }
+  };
+  draw();
+}
+
+function go(v){
+  if(v==='home') vHome();
+  else if(v==='know') vKnow();
+  else if(v==='dyn') vDyn();
+  else if(v==='poets') vPoets();
+  else if(v==='famous') vFamous();
+  else if(v==='imagery') vImagery();
+  else if(v==='zilian') vZilian();
+  else if(v==='poems') vPoems();
+  else vHome();
+}
+
+/* 深链：shici.html#poem-12 / shici.html#zilian-月 */
+(function init(){
+  var hash = location.hash || '';
+  var m = hash.match(/#poem-(\d+)/);
+  var mz = hash.match(/#zilian-(.+)/);
+  if(m){ openPoem(parseInt(m[1],10)); }
+  else if(mz){ vZilian(decodeURIComponent(mz[1])); }
+  else vHome();
+})();
+})();
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>
