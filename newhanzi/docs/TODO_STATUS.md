@@ -84,6 +84,8 @@
 
 **领取 2026-11-07 A23C（12:50 JST，接手 A23 内容部分；负责人 2026-11-07「别人没有做完的你全部做完」）：** 误解标注 61→577（选项级误解说明）与啊哈块补 54 处——先统计现状、查清单来源，已做的补登记，缺的用幂等脚本 tools/content/fix_a23c_<批>.py 补；只改 quiz/data_*.js 的「误解标注」字段与 yuwen/data.js 的「类比」字段，不改 quiz/engine.js（FUXI 在改）。副本 /workspace/work/hz-a23c，Playwright 端口 4208。
 
+**领取 2026-11-08 PZ（接手 A22-17 遗留「格律小作坊 pz 与平水韵冲突 5 处」；副本 /workspace/work/hz-pz，端口 4211）：** 只改 data/shici.js 5 首的 pz（悯农其一颗、凉州词场、己亥杂诗究、过故人庄场、春夜喜雨俱），脚本 tools/content/fix_shici_pz5.py；不碰 pron（读音线 fix_shici_duyin.py）。
+
 ## 二、待确认（需产品负责人拍板，本轮不做）
 
 | ID | 来源 | 事项 |
