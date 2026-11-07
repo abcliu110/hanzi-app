@@ -313,6 +313,56 @@
 
   var SEG_LABEL = { due: '到期复习', retry: '错题回炉', 'new': '新学' };
 
+  /* 选项级反馈（A23 · MASTER_PLAN 阶段三「选项级反馈全量」，2026-11-07 FUXI）：
+   * 复习页点错选项时，和 quiz 一样指出「你可能误解了」。误解标注只读 fuxi.html 已加载的
+   * quiz/data_<tab>.js（NHZ_POOLS），按记录时的题面 + 选项原序对上题目，再按选项文字对上标注；
+   * 不改错题记录格式，旧错题、新学题都能用；对不上（语法/古文 bank 等无标注题）就不显示。
+   * 题面口径与 quiz/engine.js finishQuestion 记录时一致：choice/hua=q，blank=s，spot=s+' '+prompt，
+   * rewrite=from+' → '+target，judge=q 且选项 ['正确','错误']（标注 A=点了「错」、B=点了「对」）。 */
+  var mzIndex = null;
+  function mzKey(q, opts) { return q + '\n' + (opts || []).join('\n'); }
+  function buildMz() {
+    mzIndex = {};
+    (window.NHZ_POOLS || []).forEach(function (pool) {
+      if (!pool || !pool.modes) return;
+      Object.keys(pool.modes).forEach(function (m) {
+        (pool.modes[m] || []).forEach(function (q) {
+          var list = q && q['误解标注'];
+          if (!Array.isArray(list) || !list.length) return;
+          var stem, opts;
+          if (m === 'judge') { stem = q.q; opts = ['正确', '错误']; }
+          else if (!Array.isArray(q.opts)) return;
+          else if (m === 'blank') { stem = q.s; opts = q.opts; }
+          else if (m === 'spot') { stem = q.s + ' ' + q.prompt; opts = q.opts; }
+          else if (m === 'rewrite') { stem = q.from + ' → ' + q.target; opts = q.opts; }
+          else if (q.q) { stem = q.q; opts = q.opts; }
+          else return;
+          var byText = {};
+          list.forEach(function (mz) {
+            var k = String(mz['选项'] || '').charCodeAt(0) - 65, txt;
+            if (m === 'judge') txt = k === 0 ? '错误' : (k === 1 ? '正确' : null);
+            else txt = (k >= 0 && k < opts.length) ? opts[k] : null;
+            if (txt != null && mz['误解']) byText[txt] = mz;
+          });
+          mzIndex[mzKey(stem, opts)] = byText;
+        });
+      });
+    });
+  }
+  function misconOf(it, picked) {
+    if (!it) return null;
+    if (!mzIndex) buildMz();
+    var t = mzIndex[mzKey(it.q, it.options)];
+    return (t && t[picked]) || null;
+  }
+  function misconHtml(mz) {
+    var h = '<div class="fx-miscon"><b>💡 你可能误解了：</b>' + esc(mz['误解']) + '</div>';
+    if (mz['正反例'] && mz['正反例'].length) {
+      h += '<div class="fx-pair">' + mz['正反例'].map(function (pr) { return '<p>' + esc(pr) + '</p>'; }).join('') + '</div>';
+    }
+    return h;
+  }
+
   /* 有 2 个以上选项且答案在选项里：直接点选作答（提取练习），否则「显示答案→记得/忘了」自评 */
   function canPick(w) {
     return !!(w && w.options && w.options.length >= 2 && w.options.indexOf(w.answer) >= 0);
@@ -515,7 +565,11 @@
         ps[pi].disabled = true;
         if (en.it.options[pi] === en.it.answer) ps[pi].classList.add('fx-right');
       }
-      if (!ok) btn.classList.add('fx-wrong');
+      if (!ok) {
+        btn.classList.add('fx-wrong');
+        var mz = misconOf(en.it, picked), ansBox = card.querySelector('.fx-ans');
+        if (mz && ansBox) ansBox.insertAdjacentHTML('afterbegin', misconHtml(mz));
+      }
       grade(card, ok);
     } else if (act === 'remember' || act === 'forget') {
       grade(card, act === 'remember');

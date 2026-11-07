@@ -159,3 +159,72 @@ test.describe('fuxi recall practice (A23 提取练习)', () => {
     expect(errors).toEqual([]);
   });
 });
+
+// A23 选项级反馈（FUXI）：quiz 引擎误解显示各区生效（古文、错题重练）+ 复习页点错选项也显示误解
+test.describe('fuxi option-level feedback (A23 选项级反馈)', () => {
+  const hash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'q' + (h < 0 ? -h : h); };
+
+  test('fuxi review: wrong pick on choice / judge shows misconception', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/fuxi.html');
+    // 按 quiz 引擎 finishQuestion 的记录口径造两道到期错题：逻辑 choice 一道、语法 judge 一道
+    const items = await page.evaluate(() => {
+      const pools = window.NHZ_POOLS;
+      const lg = pools.find((p) => p.tab === 'logic'), yw = pools.find((p) => p.tab === 'yuwen');
+      const c = lg.modes.choice.find((q) => q['误解标注'] && q['误解标注'].length);
+      const j = yw.modes.judge.find((q) => q['误解标注'] && q['误解标注'].length);
+      const mzC = c['误解标注'][0], mzJ = j['误解标注'][0];
+      return [
+        { it: { q: c.q, options: c.opts, answer: c.opts[c.a], 解析: c.exp || '', src: '练习', point: '逻辑 · 选择题' },
+          pick: mzC['选项文本'], mz: mzC['误解'] },
+        { it: { q: j.q, options: ['正确', '错误'], answer: j.a ? '正确' : '错误', 解析: j.exp || '', src: '练习', point: '语法 · 判断题' },
+          pick: mzJ['选项'] === 'A' ? '错误' : '正确', mz: mzJ['误解'] }
+      ];
+    });
+    const now = Date.now(), wrong = [], srs = {};
+    items.forEach((x, i) => {
+      const id = hash(x.it.q + '\n' + x.it.options.join('\n') + '\n' + x.it.answer);
+      x.id = id;
+      wrong.push(Object.assign({ id, addedAt: now - 86400000 * (2 + i) }, x.it));
+      srs[id] = { iv: 1, next: now - 86400000 };
+    });
+    await page.evaluate(([wrong, srs]) => {
+      localStorage.clear();
+      localStorage.setItem('nhz_wrong', JSON.stringify(wrong));
+      localStorage.setItem('nhz_srs', JSON.stringify(srs));
+      localStorage.setItem('nhz_queue_cfg', JSON.stringify({ newPerDay: 0, maxPerSession: 25 }));
+    }, [wrong, srs]);
+    await page.reload();
+    for (const x of items) {
+      const card = page.locator(`.fx-qcard[data-qid="${x.id}"]`);
+      await card.locator('.fx-pick', { hasText: x.pick }).first().click();
+      await expect(card.locator('.fx-miscon')).toContainText(x.mz.slice(0, 8));
+      await expect(card.locator('.fx-ans')).toBeVisible();
+    }
+    expect(errors).toEqual([]);
+  });
+
+  test('quiz: guwen choice and 错题重练 show misconception', async ({ page }) => {
+    await page.goto('newhanzi/quiz/index.html?tab=guwen');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await page.locator('[data-mode="choice"]').click({ timeout: 15000 });
+    const pickWrong = async (modeKey) => {
+      const qt = (await page.locator('#qbox .qz-q').innerText()).trim();
+      const btns = page.locator('#qbox button[data-act="pick"]');
+      const texts = (await btns.allInnerTexts()).map((t) => t.trim());
+      // 同题干可能有多道（义项题），按题干 + 选项集合对上
+      const q = await page.evaluate(([qt, m, texts]) => window.NHZ_QUIZ.modes[m].find((x) => x.q === qt &&
+        x.opts.length === texts.length && x.opts.every((o) => texts.indexOf(String(o).trim()) >= 0)), [qt, modeKey, texts]);
+      const mz = q['误解标注'][0];
+      await btns.nth(texts.indexOf(mz['选项文本'])).click();
+      await expect(page.locator('.qz-miscon')).toContainText(mz['误解'].slice(0, 8));
+    };
+    await pickWrong('choice');
+    // 刚答错的进了 quiz 错题本：回首页 -> 错题重练，再答错同一道仍有误解提示
+    await page.click('#btnBack');
+    await page.locator('[data-mode="wrong"]').click();
+    await pickWrong('choice');
+  });
+});
