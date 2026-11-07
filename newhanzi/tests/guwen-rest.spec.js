@@ -69,3 +69,17 @@ test('guwen texts 学段 field: only 小学/初中/高中 with 学段源, defaul
   await page.locator('[data-mod="pianmu"]').first().click();
   await expect(page.locator('[data-go="全部"]')).toContainText('59');
 });
+
+// GW 2026-11-07：A22-15 P2-B 进阶路线补缺——无册次篇目按 学段 分出统编初中 / 高中两段，未标学段的才按分类排
+test('guwen route groups no-ce texts by 学段 (P2-B)', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('newhanzi/guwen.html');
+  await page.locator('[data-mod="pianmu"]').first().click();
+  await page.locator('[data-go="__route"]').click();
+  await expect(page.locator('#gwroute .gw-item')).toHaveCount(59);
+  await expect(page.locator('[data-route-xd="初中"]')).toContainText('统编初中');
+  await expect(page.locator('[data-route-xd="高中"]')).toContainText('统编高中');
+  await expect(page.locator('.gw-route-sec').last()).toContainText('未标学段');
+  expect(errors).toEqual([]);
+});

@@ -294,7 +294,7 @@ window.NHZReview = window.NHZReview || (function () {
   function showSections(){
     curListCat = null;
     hideAll(); listEl.style.display='block'; window.scrollTo(0,0);
-    var h = '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→分类排）</button>'; /* P2-B */
+    var h = '<button class="gw-backbtn" data-go="__route">🗺️ 进阶路线（共'+D.texts.length+'篇 · 按册次→学段→分类排）</button>'; /* P2-B */
     h += levelFilterHtml(levelCounts(D.texts, textLevel));
     h += '<div class="gw-grid">' + SECTIONS.map(function(s){
       var n = D.texts.filter(function(t){ return t.cat === s.id && textMatch(t); }).length;
@@ -329,6 +329,7 @@ window.NHZReview = window.NHZReview || (function () {
        世说新语→魏晋散文→名家短篇→小学课文；组内保持数据原顺序。
        其中小学课文 6 篇全有 ce，故第二段无小学课文组（空组不显示）。
        第二段组名下明确标注“未标册次 · 按分类排，不是难度等级”。
+     · 2026-11-07 GW：guwen.js 有了 学段 字段后，无 ce 的篇目先分「统编初中」「统编高中」两段（段内按分类），未标学段的才按分类分组。
      掌握度计算方式（只读现有账本，不实现新模型、不改账本格式）：
      · nhz_wrong（NHZReview.loadWrong()）：错题数组，每条 {q, options, answer, 解析, src, point, addedAt}。
        只有互动练习的填今译/断句题把篇名写进题干（《篇名》），才能无歧义归属到篇；
@@ -360,6 +361,12 @@ window.NHZReview = window.NHZReview || (function () {
       var d = CE_ORDER.indexOf(a.t.ce) - CE_ORDER.indexOf(b.t.ce);
       return d !== 0 ? d : a.idx - b.idx;
     });
+    /* GW 2026-11-07：无 ce 的篇目先按 学段（data/guwen.js 学段/学段源，统编篇目可核才标）分出 初中、高中，
+       学段内按分类序、同类保持原顺序；没有 学段 的才进下面按分类排的组。 */
+    function byCat(a, b){ var d = CAT_ORDER.indexOf(a.t.cat) - CAT_ORDER.indexOf(b.t.cat); return d !== 0 ? d : a.idx - b.idx; }
+    var xd = {'初中': [], '高中': []};
+    noCe = noCe.filter(function(x){ var st = x.t['学段']; if(xd[st]){ xd[st].push(x); return false; } return true; });
+    xd['初中'].sort(byCat); xd['高中'].sort(byCat);
     var groups = [];
     CAT_ORDER.forEach(function(cat){
       var items = noCe.filter(function(x){ return x.t.cat === cat; });
@@ -369,7 +376,7 @@ window.NHZReview = window.NHZReview || (function () {
       if(CAT_ORDER.indexOf(x.t.cat) < 0 && !groups.some(function(g){ return g.cat === x.t.cat; }))
         groups.push({cat: x.t.cat, items: noCe.filter(function(y){ return y.t.cat === x.t.cat; })});
     });
-    return {withCe: withCe, groups: groups};
+    return {withCe: withCe, xd: xd, groups: groups};
   }
   function showRoute(){
     hideAll(); routeEl.style.display='block'; window.scrollTo(0,0);
@@ -382,16 +389,22 @@ window.NHZReview = window.NHZReview || (function () {
       return '<div class="gw-item" data-route-idx="'+x.idx+'"><span class="gw-route-num">'+n+'</span>' +
         '<span class="gw-ititle">'+esc(x.t.title)+'</span>' + badge +
         '<div class="gw-imeta">'+esc(x.t.author)+' · '+esc(x.t.source)+' · '+esc(x.t.cat) +
-        (x.t.ce ? ' · ' + esc(x.t.ce) : '') + '</div></div>';
+        (x.t.ce ? ' · ' + esc(x.t.ce) : (x.t['学段'] ? ' · 统编' + esc(x.t['学段']) : '')) + '</div></div>';
     }
     var h = '<div class="gw-head"><h2>🗺️ 古文进阶路线</h2><div class="gw-meta">共 '+D.texts.length+' 篇 · 点击篇目进详情</div></div>';
     h += '<div class="gw-route-sec">第一段 · 有册次（'+g.withCe.length+' 篇，按册次 3上→6下）</div>';
     h += g.withCe.map(itemHtml).join('');
-    h += '<div class="gw-route-sec">第二段 · 未标册次（'+g.groups.reduce(function(s, gr){ return s + gr.items.length; }, 0)+' 篇，按分类排）</div>';
-    h += '<p class="gw-route-note">第二段的篇目在数据里没有册次、也没有难度字段，'
+    ['初中', '高中'].forEach(function(st, k){
+      if(!g.xd[st].length) return;
+      h += '<div class="gw-route-sec" data-route-xd="'+st+'">第'+(k ? '三' : '二')+'段 · 统编'+st+'课文（'+g.xd[st].length+' 篇）</div>';
+      h += '<p class="gw-route-note">依据：篇目的「学段」字段（统编目录 + 原文逐句核对，见篇目数据 学段源）。数据里没有'+st+'册次，段内只按分类排。</p>';
+      h += g.xd[st].map(itemHtml).join('');
+    });
+    h += '<div class="gw-route-sec">'+(g.xd['初中'].length || g.xd['高中'].length ? '最后' : '第二段')+' · 未标学段（'+g.groups.reduce(function(s, gr){ return s + gr.items.length; }, 0)+' 篇，按分类排）</div>';
+    h += '<p class="gw-route-note">这些篇目统编教材里没有这篇文言原文（或只有白话改写），数据里没有册次、学段或难度，'
       + '这里只按分类分组排先后，不是难度等级，不要按组序理解为由易到难。</p>';
     g.groups.forEach(function(gr){
-      h += '<div class="gw-route-group">'+esc(gr.cat)+'（'+gr.items.length+' 篇 · 未标册次）</div>';
+      h += '<div class="gw-route-group">'+esc(gr.cat)+'（'+gr.items.length+' 篇 · 未标学段）</div>';
       h += gr.items.map(itemHtml).join('');
     });
     h += '<p class="gw-route-note">掌握度说明：只认本地错题本（nhz_wrong）里题干带《篇名》的错题；'
