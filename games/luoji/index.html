@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>逻辑互动</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --line:#d5dfd0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1a211c; --card:#243028; --ink:#e6eee4; --muted:#9aab9c; --accent:#6fa87d; --accent-deep:#8fbf9a; --line:#354339; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top h1{font-size:20px;margin:0}
+a.game{display:block;margin:10px 0;padding:13px 16px;border-radius:12px;border:1px solid var(--accent-deep);background:var(--card);color:var(--ink);font-weight:700;text-decoration:none;user-select:none;-webkit-user-select:none}
+a.game span{font-weight:400;color:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>逻辑互动</h1></div>
+  <a class="game" href="daily.html">⏱️ 逻辑一分钟：每日一句 <span>— 每天一句，三选一找毛病</span></a>
+  <a class="game" href="taoquan.html">⭕ 套圈判官 <span>— 自己摆圈判推理</span></a>
+  <a class="game" href="fanpai.html">🃏 十五贯翻牌验证 <span>— 如果…就…</span></a>
+  <a class="game" href="miuwu.html">🃏 谬误卡牌册 <span>— 出牌点名</span></a>
+  <a class="game" href="fenchouti.html">🗄️ 分抽屉 <span>— 一个标准一次分完</span></a>
+  <a class="game" href="domino.html">🁢 多米诺 <span>— 因果链</span></a>
+  <a class="game" href="zebra.html">🦓 斑马谜题格 <span>— 点线索卡排除，剩唯一解</span></a>
+  <a class="game" href="blocks.html">🧱 规则积木 <span>— 拼一句看圈怎么变</span></a>
+</div>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

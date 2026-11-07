@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>偏旁部首 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.bs-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+.bs-char{font-size:44px;line-height:1;min-width:56px;text-align:center;font-weight:700}
+.bs-info{flex:1;min-width:0}
+.bs-meaning{font-size:15px;color:var(--ink)}
+.bs-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.bs-count{font-size:12px;color:#fff;background:var(--accent);border-radius:10px;padding:2px 8px;white-space:nowrap}
+.bs-arrow{color:var(--muted);transition:transform .2s}
+.bs-item{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.bs-item.open .bs-arrow{transform:rotate(180deg)}
+.bs-body{display:none;padding:0 16px 16px}
+.bs-item.open .bs-body{display:block}
+.bs-sec{margin:10px 0}
+.bs-sec h4{font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:600}
+.bs-shuowen{background:var(--accent-soft);border-left:3px solid var(--accent);padding:8px 10px;font-size:13px;color:var(--ink);border-radius:0 6px 6px 0}
+.bs-shuowen a{font-size:12px;color:var(--accent-deep)}
+.bs-sem{font-size:14px;color:var(--ink);line-height:1.7}
+.bs-ex{display:flex;flex-wrap:wrap;gap:8px}
+.bs-ex a{background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--accent-deep);text-decoration:none}
+.bs-ex a small{color:var(--muted);margin-left:4px}
+.bs-explain{background:var(--card);border:1px dashed var(--line);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--muted)}
+.bs-explain small{color:var(--muted);margin-left:4px}
+.bs-grid{display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto}
+.bs-grid a{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none}
+.bs-grid a:active{background:var(--accent-soft)}
+.bs-grid a.hasfm{width:auto;min-width:40px;height:auto;min-height:40px;flex-direction:column;padding:4px 8px;background:var(--accent-soft);border:1px solid var(--line)}
+.bs-z{font-size:20px;line-height:1.2}
+.bs-fm{font-size:10px;color:var(--accent-deep);line-height:1.3;max-width:72px;text-align:center}
+.bs-filter{display:flex;gap:8px;padding:0 16px 8px}
+.bs-filter .chip{font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.bs-filter .chip.active{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+/* 独立详情页：列表只显示标题，点进详情看全文（对标古诗词列表明细标准） */
+#bsdetail .bs-body{display:block;padding:4px 16px 16px}
+.bs-detail-head{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 6px}
+.bs-know{margin:12px 16px 0;background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--ink);line-height:1.8}
+.bs-know-title{font-weight:700;font-size:15px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.bs-know-toggle{font-size:12px;color:var(--accent-deep);font-weight:400}
+.bs-know p{margin:6px 0}
+.bs-know-ex{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
+.bs-know-motto{color:var(--accent-deep);font-weight:600}
+.bs-know.closed .bs-know-body{display:none}
+.pp-sec{padding:8px 16px 28px}
+.pp-sec h3{font-size:16px;margin:8px 0 10px}
+.pp-sec h3 small{font-size:12px;color:var(--muted);font-weight:400}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pp-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--ink);display:block}
+.pp-card:active{background:var(--accent-soft)}
+.pp-top{display:flex;align-items:baseline;gap:8px}
+.pp-p{font-size:26px;font-weight:700}
+.pp-name{font-size:12px;color:var(--accent-deep)}
+.pp-m{font-size:13px;color:var(--muted);margin:4px 0}
+.pp-ex{font-size:12px;color:var(--muted)}
+@media (min-width:768px){
+  .bs-know{max-width:920px;margin-left:auto;margin-right:auto}
+  .pp-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+}
+@media (min-width:1200px){
+  .pp-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+}
+</style>
+</head>
+<body class="page-sub page-bushou">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">偏旁部首</span>
+</header>
+
+<section class="bs-know" id="bsknow">
+  <div class="bs-know-title"><span>💡 偏旁 vs 部首，一分钟弄懂</span><span class="bs-know-toggle">收起 ▾</span></div>
+  <div class="bs-know-body">
+    <p><b>部首</b>是查字典用的"部门"：比如"水部"，专门收留带水的字，是给汉字上户口、归类的。</p>
+    <p><b>偏旁</b>是汉字的"零件"：比如"氵"（三点水），是拼字的积木块。</p>
+    <p><b>关系</b>：同一个"水"，查字典时叫"水部"；跑到"江"字左边，就变成偏旁"氵"。</p>
+    <p class="bs-know-ex">手 → 扌（提手旁）　心 → 忄（竖心旁）　人 → 亻（单人旁）　火 → 灬（四点底）　衣 → 衤（衣字旁）　言 → 讠（言字旁）</p>
+    <p class="bs-know-motto">口诀：部首是户口本，偏旁是积木块。</p>
+  </div>
+</section>
+
+<div class="controls" id="bscontrols">
+  <div class="searchbox">
+    <input id="bq" type="text" placeholder="搜部首或含义，如：氵 / 水 / 三点水" autocomplete="off">
+  </div>
+  <div class="bs-filter">
+    <button class="chip active" data-f="all">全部</button>
+    <button class="chip" data-f="rich">常用</button>
+  </div>
+</div>
+
+<main class="listwrap">
+  <div id="bslist"></div>
+  <div id="bsdetail" style="display:none"></div>
+</main>
+
+<section class="pp-sec" id="ppsec">
+  <h3>📋 常用表义偏旁表 <span class="yw-typetag" style="--tc:#6b7566">清单型</span> <small><span id="ppcount"></span>个 · 点偏旁直达对应部首</small></h3>
+  <div class="pp-grid" id="ppgrid"></div>
+</section>
+
+<a href="quiz/index.html?tab=bushou&from=bushou.html" target="_top" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：7种玩法，测测你学会了没 →</a>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="bushou/data.js"></script>
+<script src="bushou/pianpang.js"></script>
+<script src="bushou/anim.js"></script>
+<script src="bushou.js"></script>
+<script>
+/* 常用偏旁表渲染 + 常识区折叠 */
+(function () {
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  var grid = document.getElementById('ppgrid');
+  var list = window.NHZ_PIANPANG || [];
+  grid.innerHTML = list.map(function (it) {
+    return '<a class="pp-card" href="bushou.html?b=' + encodeURIComponent(it.to) + '">' +
+      '<div class="pp-top"><span class="pp-p">' + esc(it.p) + '</span>' +
+      '<span class="pp-name">' + esc(it.name) + '</span></div>' +
+      '<div class="pp-m">' + esc(it.meaning) + '</div>' +
+      '<div class="pp-ex">' + it.ex.map(function (e) { return esc(e[0]); }).join(' · ') + '</div></a>';
+  }).join('');
+  document.getElementById('ppcount').textContent = list.length;
+  var know = document.getElementById('bsknow');
+  know.querySelector('.bs-know-title').addEventListener('click', function () {
+    know.classList.toggle('closed');
+    know.querySelector('.bs-know-toggle').textContent = know.classList.contains('closed') ? '展开 ▸' : '收起 ▾';
+  });
+})();
+</script>
+<script>
+/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

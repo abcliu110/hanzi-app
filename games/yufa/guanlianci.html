@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关联词连线配对 · 互动原型</title>
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --leaf:#9ed0ad;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+    --leaf:#4d7a5c;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+.proto-head{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.proto-head h1{margin:0 0 6px;font-size:20px}
+.proto-head .meta{margin:0;font-size:13px;color:var(--muted)}
+.proto-head .note{display:inline-block;margin-top:8px;font-size:12px;background:var(--accent-soft);
+  color:var(--accent-deep);border-radius:8px;padding:2px 10px}
+.sec-title{font-size:15px;color:var(--muted);margin:18px 0 8px}
+.match{display:flex;gap:12px}
+.col{flex:1;display:flex;flex-direction:column;gap:10px}
+.pill{min-height:60px;font-size:19px;border-radius:12px;cursor:pointer;
+  background:var(--surface);border:2px solid var(--line);color:var(--ink)}
+.pill small{display:block;font-size:12px;color:var(--muted)}
+.pill.sel{border-color:var(--accent);background:var(--accent-soft)}
+.pill.done{border-color:var(--green);background:var(--accent-soft);opacity:.75;cursor:default}
+.pill.bad{border-color:var(--red);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.vs{align-self:center;font-size:14px;color:var(--muted)}
+.pairbar{text-align:center;font-size:15px;color:var(--muted);margin-top:10px}
+.findcard{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px;margin-top:10px}
+.srow{padding:12px;font-size:19px;border-radius:10px;border:2px solid var(--line);
+  background:var(--surface);margin-bottom:10px;cursor:pointer;color:var(--ink);width:100%;text-align:left}
+.srow.ok{border-color:var(--green);background:var(--accent-soft)}
+.srow.bad{border-color:var(--red);animation:shake .3s}
+.srow:disabled{cursor:default}
+.fbf{font-size:15px;color:var(--muted);display:none;margin-top:4px}
+.fbf.show{display:block}
+.tip{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);
+  border-radius:10px;padding:10px 12px;margin-top:14px}
+.alldone{background:var(--accent-soft);border:1px solid var(--accent);border-radius:14px;
+  padding:16px;text-align:center;margin-top:16px;font-size:17px;display:none}
+.alldone.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../yuwen.html" style="display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">← 返回</a><h1 style="font-size:20px;margin:0;">🔗 关联词连线</h1></div>
+<div class="sec-title">① 配对：左边点一个，右边点它的搭档（每轮 6 对，有时反过来考你）</div>
+  <div class="match">
+    <div class="col" id="left"></div>
+    <div class="vs">⇄</div>
+    <div class="col" id="right"></div>
+  </div>
+  <div class="pairbar" id="pairbar"></div>
+  <div style="text-align:center;margin-top:8px;"><button type="button" id="btnSkipMatch" style="font-size:15px;padding:8px 20px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;">换一组 →</button></div>
+
+  <div id="phase2" style="display:none">
+    <div class="sec-title">② 找错：下面 3 句里有 1 句关联词用错了，点出来</div>
+    <div class="findcard" id="findcard"></div>
+  </div>
+
+  <div class="tip">💡 46344.com #20 的思路：关联词要"门当户对"——"因为"只跟"所以"，"虽然"只跟"但是"。配错了，句子就闹笑话。</div>
+  <div class="alldone" id="alldone"></div>
+</div>
+
+<script src="data_guanlianci.js"></script>
+<script>
+function $(id){ return document.getElementById(id); }
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* 题库：data_guanlianci.js 提供 window.GUANLIANCI_PAIRS / window.GUANLIANCI_FINDS */
+var PAIRS_ALL = window.GUANLIANCI_PAIRS || [];
+var FINDS_ALL = window.GUANLIANCI_FINDS || [];
+var ROUND_N = 6;
+
+/* 洗牌取样器：取完自动重洗，保证 500 题轮流出现 */
+function makeDeck(arr){
+  var o = [];
+  for(var i=0;i<arr.length;i++) o.push(i);
+  return {a:arr, order:shuffle(o), pos:0};
+}
+function draw(deck, k){
+  var out = [];
+  for(var j=0;j<k;j++){
+    if(deck.pos >= deck.order.length){ deck.order = shuffle(deck.order); deck.pos = 0; }
+    out.push(deck.a[deck.order[deck.pos++]]);
+  }
+  return out;
+}
+var pairDeck = makeDeck(PAIRS_ALL);
+var wrongDeck = makeDeck(FINDS_ALL.filter(function(f){ return f.wrong; }));
+var okDeck = makeDeck(FINDS_ALL.filter(function(f){ return !f.wrong; }));
+
+/* ---------- 第一关：配对 ---------- */
+var PAIRS = [];
+var selL = null, doneCount = 0;
+
+function hintFor(ex, shown){
+  var parts = ex.split(/[，。；]/);
+  for(var i=0;i<parts.length;i++){
+    if(parts[i] && parts[i].indexOf(shown) >= 0) return parts[i] + "…";
+  }
+  return parts[0] + "…";
+}
+
+function newRound(){
+  PAIRS = draw(pairDeck, ROUND_N).map(function(p){
+    var sw = (p.l !== p.r) && Math.random() < 0.4; /* 40% 反向出题 */
+    return {l:p.l, r:p.r, ex:p.ex, dL: sw ? p.r : p.l, dR: sw ? p.l : p.r};
+  });
+  selL = null; doneCount = 0;
+  $("pairbar").textContent = "已配对 0 / " + PAIRS.length +
+    "（配对题库共 " + PAIRS_ALL.length + " 道）";
+  $("phase2").style.display = "none";
+  $("alldone").className = "alldone";
+  renderMatch();
+}
+
+function renderMatch(){
+  var L = $("left"), R = $("right");
+  L.innerHTML = ""; R.innerHTML = "";
+  var rights = shuffle(PAIRS.map(function(p,i){ return {t:p.dR, i:i}; }));
+  PAIRS.forEach(function(p, i){
+    var b = document.createElement("button");
+    b.className = "pill"; b.type = "button";
+    b.innerHTML = p.dL + "<small>" + hintFor(p.ex, p.dL) + "</small>";
+    b.setAttribute("data-i", i);
+    b.onclick = function(){ tapL(b, i); };
+    L.appendChild(b);
+  });
+  rights.forEach(function(o){
+    var b = document.createElement("button");
+    b.className = "pill"; b.type = "button"; b.textContent = o.t;
+    b.setAttribute("data-i", o.i);
+    b.onclick = function(){ tapR(b, o.i); };
+    R.appendChild(b);
+  });
+}
+
+function tapL(el, i){
+  if(el.classList.contains("done")) return;
+  selL = {el:el, i:i};
+  var ls = $("left").children;
+  for(var k=0;k<ls.length;k++) ls[k].classList.remove("sel");
+  el.classList.add("sel");
+}
+
+function tapR(el, i){
+  if(el.classList.contains("done") || !selL) return;
+  if(selL.i === i){
+    selL.el.classList.remove("sel");
+    selL.el.classList.add("done");
+    el.classList.add("done");
+    doneCount++;
+    $("pairbar").textContent = "已配对 " + doneCount + " / " + PAIRS.length +
+      "　✅ " + PAIRS[i].l + "… " + PAIRS[i].r;
+    selL = null;
+    if(doneCount >= PAIRS.length){
+      setTimeout(function(){
+        $("phase2").style.display = "block";
+        renderFind();
+        $("phase2").scrollIntoView({behavior:"smooth", block:"start"});
+      }, 600);
+    }
+  }else{
+    el.classList.add("bad");
+    setTimeout(function(){ el.classList.remove("bad"); }, 400);
+  }
+}
+
+/* ---------- 第二关：找错（陷阱） ---------- */
+var FINDS = [];
+
+function renderFind(){
+  FINDS = shuffle(draw(wrongDeck, 1).concat(draw(okDeck, 2)));
+  var box = $("findcard"); box.innerHTML = "";
+  FINDS.forEach(function(f){
+    var b = document.createElement("button");
+    b.className = "srow"; b.type = "button";
+    b.innerHTML = f.s;
+    b.onclick = function(){ tapFind(b, f); };
+    box.appendChild(b);
+  });
+  var d = document.createElement("div");
+  d.className = "fbf"; d.id = "findfb";
+  box.appendChild(d);
+}
+
+function tapFind(btn, f){
+  var fb = $("findfb");
+  if(f.wrong){
+    btn.classList.add("ok");
+    fb.className = "fbf show";
+    fb.innerHTML = "✅ 抓到了！<br>📖 " + f.why;
+    var rows = $("findcard").querySelectorAll(".srow");
+    for(var i=0;i<rows.length;i++) rows[i].disabled = true;
+    var done = $("alldone");
+    done.className = "alldone show";
+    done.innerHTML = "🏁 两关全过！关联词小达人就是你。<br><span style='font-size:14px;color:var(--muted)'>记住：关联词要'门当户对'，'虽然'配'但是'，'因为'配'所以'。</span><br><br>" +
+      "<button id='again' type='button' style='font-size:17px;padding:10px 26px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-soft);color:var(--accent-deep);font-weight:bold;cursor:pointer;'>🔄 再来一轮</button>";
+    $("again").onclick = function(){
+      newRound();
+      window.scrollTo({top:0, behavior:"smooth"});
+    };
+  }else{
+    btn.classList.add("bad");
+    setTimeout(function(){ btn.classList.remove("bad"); }, 400);
+    fb.className = "fbf show";
+    fb.textContent = "这句没问题，再找找～";
+  }
+}
+
+newRound();
+$("btnSkipMatch").onclick = function(){ newRound(); window.scrollTo(0,0); };
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

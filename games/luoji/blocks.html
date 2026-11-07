@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>规则积木 · 拼一句看圈怎么变</title>
+<!--
+  逻辑 P2-1 规则积木（Baba 式），设计 docs/gaijin/luoji-gaijin-sheji.md P2-1。
+  独立页，不改现有游戏页。欧拉图按任务要求在页内用 SVG 画两个圈实现同样效果
+  （wb-engine.js 的 euler 是白板动画模板，带时间轴/旁白，不适合实时拼句，故不复用引擎）：
+    所有A是B ＝ A 圈在 B 圈内；有的A是B ＝ 两圈相交；没有A是B ＝ 两圈分离；「不是」取反。
+  名词与预设例全部取自仓库已有数据（yuwen/data.js 逻辑区），没有编新名词：
+    「三段论」：所有金属都导电、铜是金属、鲸是哺乳动物、鸽子是鸟类；
+    「概念：定义与划分」：人是能制造工具的动物、椅子是供人坐的家具、学生按年级分；
+    「四大逻辑规律」：矛盾律（两句不能同时成立）是本页矛盾检测的依据。
+  本页只判「两句能不能同时成立」，不判单句真假。
+-->
+<style>
+:root{
+  --bg:#e4eedf; --card:#f2f6ee; --surface:#f8faf5; --ink:#2c3328; --muted:#6b7566;
+  --accent:#4a7a59; --accent-deep:#3d5a40; --accent-soft:#d3e5d6; --line:#d5dfd0;
+  --green:#3f8e6b; --blue:#4a7a8c; --red:#b85a52; --orange:#c46a2b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1a211c; --card:#243028; --surface:#1f2923; --ink:#e6eee4; --muted:#9aab9c;
+    --accent:#6fa87d; --accent-deep:#8fbf9a; --accent-soft:#2a3a30; --line:#354339;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top a{display:inline-flex;align-items:center;padding:10px 16px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.top .back{background:var(--accent);border:2px solid var(--accent-deep);color:#fff}
+.top h1{font-size:20px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.layout{display:flex;gap:14px;align-items:stretch}
+.layout .left{flex:1 1 52%;min-width:0}
+.layout .right{flex:1 1 48%;min-width:0}
+@media (max-width:720px){ .layout{flex-direction:column} }
+h2{font-size:18px;margin:4px 0 8px}
+.blkrow{margin:8px 0}
+.blkrow .lbl{font-size:15px;color:var(--muted);margin-bottom:4px}
+.blk{display:inline-block;min-height:48px;padding:10px 16px;margin:0 8px 8px 0;font-size:17px;font-weight:700;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.blk.q{border-color:var(--blue);color:var(--blue)}
+.blk.n{border-color:var(--accent-deep)}
+.blk.c{border-color:var(--orange);color:var(--orange)}
+.blk:hover{border-color:var(--accent-deep)}
+.slots{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0;min-height:56px;padding:10px;border:1px dashed var(--line);border-radius:12px;background:var(--surface)}
+.slot{min-width:74px;min-height:48px;padding:10px 14px;border-radius:10px;border:2px solid var(--line);background:var(--card);font-size:17px;font-weight:700;text-align:center;cursor:pointer}
+.slot.empty{color:var(--muted);font-weight:400;border-style:dashed}
+.slot.filled{border-color:var(--accent-deep)}
+.sent-preview{font-size:19px;font-weight:700;margin:6px 0;min-height:1.7em}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.btn{min-height:48px;padding:10px 16px;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.btn.warn{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.55;cursor:default}
+.hint{font-size:15px;color:var(--muted);min-height:1.7em}
+.hint.bad{color:var(--red);font-weight:700}
+.preset{font-size:15px}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+svg text{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;pointer-events:none}
+.expl{font-size:16px;margin:10px 0 0;min-height:3.4em}
+.expl b{color:var(--accent-deep)}
+.sentlist{list-style:none;margin:8px 0 0;padding:0}
+.sentlist li{display:flex;gap:8px;align-items:center;padding:10px 12px;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.sentlist li .txt{flex:1;font-size:18px;font-weight:700}
+.sentlist li .del{flex:0 0 auto;min-height:40px;padding:6px 12px;font-size:15px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+@keyframes flashred{0%,100%{border-color:var(--red);background:var(--surface)}50%{border-color:var(--red);background:#f6d9d4}}
+.sentlist li.bad{border:2px solid var(--red);animation:flashred 1s infinite}
+.sentlist li.bad .txt{color:var(--red)}
+.banner{display:none;margin:10px 0;padding:12px 14px;border:2px solid var(--red);border-radius:12px;color:var(--red);font-size:17px;font-weight:700;background:var(--surface);animation:flashred 1s infinite}
+.banner.show{display:block}
+.rule{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../../index.html" target="_top">← 返回</a><h1>🧱 规则积木：拼一句，看圈怎么变</h1></div>
+
+  <div class="card">点下面的词块，拼成一句「量词 + 名词 + 是 / 不是 + 名词」。拼好一句点「拼成一句」，再拼第二句——如果两句互相矛盾，两句会一起闪红。</div>
+
+  <div class="layout">
+    <div class="left card">
+      <h2>词块</h2>
+      <div class="blkrow"><div class="lbl">① 量词块（点一下，填进第 1 格）</div>
+        <button class="blk q" data-t="q" data-v="所有">所有</button><button class="blk q" data-t="q" data-v="有的">有的</button><button class="blk q" data-t="q" data-v="没有">没有</button></div>
+      <div class="blkrow"><div class="lbl">② 名词块（先点填主语，再点填谓语；点第三次换掉谓语）</div>
+        <button class="blk n" data-t="n" data-v="人">人</button><button class="blk n" data-t="n" data-v="动物">动物</button><button class="blk n" data-t="n" data-v="鸟">鸟</button><button class="blk n" data-t="n" data-v="鸟类">鸟类</button><button class="blk n" data-t="n" data-v="金属">金属</button><button class="blk n" data-t="n" data-v="导电的东西">导电的东西</button><button class="blk n" data-t="n" data-v="哺乳动物">哺乳动物</button><button class="blk n" data-t="n" data-v="植物">植物</button><button class="blk n" data-t="n" data-v="鸽子">鸽子</button><button class="blk n" data-t="n" data-v="鲸">鲸</button><button class="blk n" data-t="n" data-v="学生">学生</button><button class="blk n" data-t="n" data-v="椅子">椅子</button><button class="blk n" data-t="n" data-v="家具">家具</button></div>
+      <div class="blkrow"><div class="lbl">③ 系词块（点一下，填进第 3 格）</div>
+        <button class="blk c" data-t="c" data-v="是">是</button><button class="blk c" data-t="c" data-v="不是">不是</button></div>
+
+      <h2>拼句区（点已填的格子可以清空它）</h2>
+      <div class="slots" id="slots"></div>
+      <div class="sent-preview" id="preview"></div>
+      <div class="btns">
+        <button class="btn main" id="save">拼成一句 ↓</button>
+        <button class="btn" id="clear">清除重拼</button>
+      </div>
+      <div class="hint" id="hint">先点一块量词，再点两块名词、中间点「是 / 不是」。</div>
+
+      <h2>预设示例（取自「三段论」专题的现成例子）</h2>
+      <div class="btns">
+        <button class="btn preset" data-p="0">所有金属是导电的东西</button>
+        <button class="btn preset" data-p="1">有的金属不是导电的东西</button>
+        <button class="btn preset" data-p="2">所有鸽子是鸟类</button>
+        <button class="btn preset" data-p="3">所有鲸是哺乳动物</button>
+      </div>
+      <div class="btns"><button class="btn main" id="demo">演示：拼出互相矛盾的一对</button></div>
+      <div class="hint">预设只装进拼句区；「演示」会直接拼出第 1、2 句，看它们怎么闪红。</div>
+    </div>
+
+    <div class="right card">
+      <h2>欧拉图（实时变化）</h2>
+      <svg id="euler" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="欧拉图">
+        <ellipse id="cB" cx="200" cy="150" rx="120" ry="105" fill="none" stroke="#4a7a8c" stroke-width="3" stroke-dasharray="10 8"/>
+        <ellipse id="cA" cx="200" cy="150" rx="120" ry="105" fill="none" stroke="#c46a2b" stroke-width="3" stroke-dasharray="10 8"/>
+        <text id="tB" x="200" y="70" text-anchor="middle" font-size="20" fill="#4a7a8c" font-weight="bold">B</text>
+        <text id="tA" x="200" y="160" text-anchor="middle" font-size="20" fill="#c46a2b" font-weight="bold">A</text>
+        <text id="tOut" x="200" y="285" text-anchor="middle" font-size="16" fill="#6b7566"></text>
+      </svg>
+      <div class="expl" id="expl">拼一句，两个圈就会按这句的意思摆好：A 圈（橙）是主语，B 圈（蓝）是谓语。圈只看位置关系，不看大小。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>已经拼出的句子（点一句，右边的图就画它）</h2>
+    <div class="banner" id="banner"></div>
+    <ul class="sentlist" id="list"></ul>
+    <div class="btns"><button class="btn warn" id="clearAll">清空已拼的句子</button></div>
+    <div class="hint">本页只判「两句能不能同时成立」，不判单句真假：比如「所有金属是导电的东西」对不对，要查知识，不是圈能说的。</div>
+  </div>
+
+  <div class="rule">读图口诀：所有 A 是 B ＝ A 圈整个装进 B 圈；有的 A 是 B ＝ 两圈相交，重叠处就是既是 A 又是 B 的；没有 A 是 B ＝ 两圈完全分开；「不是」取反——所有 A 不是 B ＝ 两圈分开，没有 A 不是 B ＝ A 圈整个在 B 圈里。<br>矛盾律：同一意义上，两句不能同时成立——一对矛盾句里，必有一句是错的。</div>
+</div>
+<script>
+(function(){
+  /* 量词 + 系词 → 传统四种句式（全称肯定 A / 全称否定 E / 特称肯定 I / 特称否定 O） */
+  function formOf(q, cop){
+    if(q === '所有') return cop === '是' ? 'A' : 'E';
+    if(q === '有的') return cop === '是' ? 'I' : 'O';
+    return cop === '是' ? 'E' : 'A'; /* 没有…是 ＝ 全称否定；没有…不是 ＝ 全称肯定 */
+  }
+  /* 同一主语、同一谓语时不能同时成立的组合：矛盾对 A–O、E–I，以及反对对 A–E */
+  function contradict(s1, s2){
+    if(s1.a !== s2.a || s1.b !== s2.b) return false;
+    var f1 = formOf(s1.q, s1.cop), f2 = formOf(s2.q, s2.cop);
+    var pair = [f1, f2].sort().join('');
+    return pair === 'AO' || pair === 'EI' || pair === 'AE';
+  }
+  function textOf(s){ return s.q + s.a + s.cop + s.b; }
+  /* 句式 → 拓扑：in（A 在 B 内）/ out（两圈分离）/ cross（两圈相交） */
+  function topoOf(s){
+    var f = formOf(s.q, s.cop);
+    if(f === 'A') return 'in';
+    if(f === 'E') return 'out';
+    return 'cross'; /* I：重叠处即既是 A 又是 B；O：A 露在 B 外的部分即不是 B 的 A */
+  }
+  var EXPL = {
+    in: 'A 圈整个装在 B 圈里：每一个 A 都是 B。',
+    out: 'A 圈和 B 圈完全分开：没有一个 A 是 B。',
+    crossI: '两圈相交：重叠的地方就是既是 A 又是 B 的。',
+    crossO: 'A 圈有一部分露在 B 圈外面：★ 那一部分就是不是 B 的 A。'
+  };
+  var slots = [null, null, null, null]; /* 量词，主语，系词，谓语 */
+  var SLOT_NAMES = ['量词', '主语', '是 / 不是', '谓语'];
+  var sents = [];
+  var $ = function(id){ return document.getElementById(id); };
+
+  function draw(s){
+    var cA = $('cA'), cB = $('cB'), tA = $('tA'), tB = $('tB'), tOut = $('tOut');
+    if(!s){
+      cA.setAttribute('stroke-dasharray', '10 8'); cB.setAttribute('stroke-dasharray', '10 8');
+      cA.setAttribute('cx', 200); cA.setAttribute('cy', 150); cA.setAttribute('rx', 120); cA.setAttribute('ry', 105);
+      cB.setAttribute('cx', 200); cB.setAttribute('cy', 150); cB.setAttribute('rx', 120); cB.setAttribute('ry', 105);
+      tA.textContent = 'A'; tB.textContent = 'B'; tOut.textContent = '';
+      $('expl').innerHTML = '拼一句，两个圈就会按这句的意思摆好：A 圈（橙）是主语，B 圈（蓝）是谓语。圈只看位置关系，不看大小。';
+      return;
+    }
+    var topo = topoOf(s), f = formOf(s.q, s.cop);
+    cA.removeAttribute('stroke-dasharray'); cB.removeAttribute('stroke-dasharray');
+    if(topo === 'in'){
+      cB.setAttribute('cx', 200); cB.setAttribute('cy', 150); cB.setAttribute('rx', 120); cB.setAttribute('ry', 105);
+      cA.setAttribute('cx', 200); cA.setAttribute('cy', 160); cA.setAttribute('rx', 62); cA.setAttribute('ry', 55);
+      tB.setAttribute('x', 200); tB.setAttribute('y', 68);
+      tA.setAttribute('x', 200); tA.setAttribute('y', 168);
+      tOut.textContent = '';
+    } else if(topo === 'out'){
+      cA.setAttribute('cx', 100); cA.setAttribute('cy', 150); cA.setAttribute('rx', 78); cA.setAttribute('ry', 78);
+      cB.setAttribute('cx', 300); cB.setAttribute('cy', 150); cB.setAttribute('rx', 78); cB.setAttribute('ry', 78);
+      tA.setAttribute('x', 100); tA.setAttribute('y', 158);
+      tB.setAttribute('x', 300); tB.setAttribute('y', 158);
+      tOut.textContent = '';
+    } else {
+      cA.setAttribute('cx', 150); cA.setAttribute('cy', 150); cA.setAttribute('rx', 95); cA.setAttribute('ry', 95);
+      cB.setAttribute('cx', 250); cB.setAttribute('cy', 150); cB.setAttribute('rx', 95); cB.setAttribute('ry', 95);
+      tA.setAttribute('x', 105); tA.setAttribute('y', 158);
+      tB.setAttribute('x', 295); tB.setAttribute('y', 158);
+      tOut.textContent = (f === 'O') ? '★ 左边露在外面的部分：不是 B 的 A' : '重叠处：既是 A 又是 B';
+    }
+    tA.textContent = s.a; tB.textContent = s.b;
+    var key = topo === 'cross' ? (f === 'O' ? 'crossO' : 'crossI') : topo;
+    $('expl').innerHTML = '「<b>' + textOf(s) + '</b>」：' + EXPL[key];
+  }
+
+  function renderSlots(){
+    var el = $('slots'); el.innerHTML = '';
+    slots.forEach(function(v, i){
+      var d = document.createElement('span');
+      d.className = 'slot ' + (v ? 'filled' : 'empty');
+      d.textContent = v || SLOT_NAMES[i];
+      d.title = v ? '点一下清空这格' : '';
+      d.addEventListener('click', function(){ if(v){ slots[i] = null; renderSlots(); } });
+      el.appendChild(d);
+    });
+    var full = slots.every(function(v){ return v; });
+    $('preview').textContent = full ? textOf({ q: slots[0], a: slots[1], cop: slots[2], b: slots[3] }) : '';
+    var hint = $('hint');
+    if(full){ hint.className = 'hint'; hint.textContent = '拼好了，点「拼成一句」。'; }
+    else {
+      var missing = slots.map(function(v, i){ return v ? null : SLOT_NAMES[i]; }).filter(Boolean);
+      hint.className = 'hint'; hint.textContent = '还差：' + missing.join('、') + '。';
+    }
+    if(full) draw({ q: slots[0], a: slots[1], cop: slots[2], b: slots[3] });
+  }
+
+  function renderList(){
+    var badIdx = {};
+    for(var i = 0; i < sents.length; i++) for(var j = i + 1; j < sents.length; j++)
+      if(contradict(sents[i], sents[j])){ badIdx[i] = 1; badIdx[j] = 1; }
+    var list = $('list'); list.innerHTML = '';
+    sents.forEach(function(s, i){
+      var li = document.createElement('li');
+      if(badIdx[i]) li.className = 'bad';
+      var sp = document.createElement('span'); sp.className = 'txt'; sp.textContent = textOf(s);
+      sp.addEventListener('click', function(){ draw(s); });
+      var del = document.createElement('button'); del.className = 'del'; del.textContent = '删除';
+      del.addEventListener('click', function(ev){ ev.stopPropagation(); sents.splice(i, 1); renderList(); });
+      li.appendChild(sp); li.appendChild(del); list.appendChild(li);
+    });
+    var banner = $('banner');
+    var bad = Object.keys(badIdx).map(function(k){ return +k; });
+    if(bad.length >= 2){
+      var a = sents[bad[0]], b = sents[bad[1]];
+      banner.className = 'banner show';
+      banner.textContent = '⚠️ 这两句不能同时成立：「' + textOf(a) + '」和「' + textOf(b) + '」——按矛盾律，必有一句是错的。';
+    } else banner.className = 'banner';
+  }
+
+  document.querySelectorAll('.blk').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = btn.getAttribute('data-t'), v = btn.getAttribute('data-v');
+      if(t === 'q') slots[0] = v;
+      else if(t === 'c') slots[2] = v;
+      else { if(!slots[1]) slots[1] = v; else slots[3] = v; }
+      renderSlots();
+    });
+  });
+  $('clear').addEventListener('click', function(){ slots = [null, null, null, null]; renderSlots(); draw(null); });
+  $('save').addEventListener('click', function(){
+    if(!slots.every(function(v){ return v; })){
+      var hint = $('hint'); hint.className = 'hint bad'; hint.textContent = '还没拼完，先把四格填满。'; return;
+    }
+    var s = { q: slots[0], a: slots[1], cop: slots[2], b: slots[3] };
+    sents.push(s); draw(s); slots = [null, null, null, null]; renderSlots(); renderList();
+  });
+  $('clearAll').addEventListener('click', function(){ sents = []; renderList(); draw(null); });
+  var PRESETS = [
+    { q: '所有', a: '金属', cop: '是', b: '导电的东西' },
+    { q: '有的', a: '金属', cop: '不是', b: '导电的东西' },
+    { q: '所有', a: '鸽子', cop: '是', b: '鸟类' },
+    { q: '所有', a: '鲸', cop: '是', b: '哺乳动物' }
+  ];
+  document.querySelectorAll('.preset').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var p = PRESETS[+btn.getAttribute('data-p')];
+      slots = [p.q, p.a, p.cop, p.b]; renderSlots();
+    });
+  });
+  $('demo').addEventListener('click', function(){
+    sents.push(PRESETS[0]); sents.push(PRESETS[1]);
+    draw(PRESETS[1]); renderList();
+    document.getElementById('list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  renderSlots(); renderList(); draw(null);
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

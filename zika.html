@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字卡 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="stylesheet" href="stroke-player.css">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="page-sub page-zika">
+<header class="topbar nav">
+  <a href="index.html?m=shizi" target="_top" class="back">← 返回</a>
+  <span id="navtitle">字卡</span>
+</header>
+<main class="wrap" id="app">
+  <div class="loading">字卡加载中…</div>
+</main>
+<script src="bushou/data.js"></script>
+<script src="bushou/zi_map.js"></script>
+<script src="data/shiju.js"></script>
+<script src="data/wenxue.js"></script>
+<script src="data/pinyin_lookup.js"></script>
+<script src="stroke-player.js"></script>
+<script src="pinyin/syllables.js"></script>
+<script src="pinyin/syllable.js"></script>
+<script src="pinyin/audio/index.js"></script>
+<script src="pinyin/player.js"></script>
+<script src="zika.js"></script>
+<script>
+/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

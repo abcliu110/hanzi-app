@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复习 · 识字星球</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.fx-section{margin:16px 0}
+.fx-section h2{margin:0 0 10px;font-size:20px}
+.fx-empty{color:var(--muted);font-size:15px}
+.fx-card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0;background:var(--surface)}
+.fx-card p{margin:8px 0}
+.fx-src{font-size:13px;color:var(--muted)}
+.fx-q{font-size:17px;font-weight:bold}
+.fx-ans{border-top:1px dashed var(--line);margin-top:10px;padding-top:6px}
+.fx-opts{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.fx-opt{border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:14px;background:var(--card)}
+.fx-opt.fx-right{border-color:var(--accent);color:var(--accent-deep);font-weight:bold}
+.fx-btn{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:6px 16px;font-size:14px;cursor:pointer;margin-right:8px}
+.fx-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.fx-note{color:var(--accent-deep);font-size:15px;min-height:22px}
+.fx-seg{display:inline-block;font-size:12px;font-weight:bold;border-radius:6px;padding:2px 8px;margin-right:6px}
+.fx-seg-due{background:#fdecea;color:#b85a52}
+.fx-seg-retry{background:#fff8e1;color:#8a6d1a}
+.fx-seg-new{background:#d3e5d6;color:#3d5a40}
+.fx-pick{cursor:pointer;font-size:15px;padding:6px 14px;color:var(--ink)}
+.fx-pick:disabled{cursor:default}
+.fx-opt.fx-wrong{border-color:#b85a52;color:#b85a52;text-decoration:line-through}
+.fx-hint{font-size:13px;color:var(--muted)}
+.fx-res{font-size:15px;color:var(--accent-deep);font-weight:bold}
+.fx-done{opacity:.8}
+.fx-head{font-size:15px;color:var(--accent-deep);font-weight:bold;min-height:20px;margin:0 0 6px}
+.fx-wb summary{cursor:pointer;list-style:none}
+.fx-wb summary::-webkit-details-marker{display:none}
+.fx-wb summary h2{display:inline-block}
+.fx-wb summary h2::after{content:' ▾';font-size:14px;color:var(--muted)}
+.fx-chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fx-chip{border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:14px;background:var(--card);color:var(--ink);cursor:pointer}
+.fx-chip.on{border-color:var(--accent);color:var(--accent-deep);font-weight:bold}
+.fx-cfg{font-size:14px;color:var(--muted);margin:8px 0}
+.fx-cfg input,.fx-cfg select{font-size:14px;border:1px solid var(--line);border-radius:8px;padding:2px 8px;background:var(--card);color:var(--ink)}
+.fx-miscon{background:#fff8e1;color:#5a4a12;border-left:4px solid #f5c518;padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0;font-size:14px}
+.fx-pair{margin:6px 0;padding:6px 12px;background:#f8faf5;color:#3d5a40;border-radius:8px;font-size:14px}
+.fx-pair p{margin:4px 0}
+</style>
+</head>
+<body class="page-sub">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">复习</span>
+</header>
+<main class="wrap" id="app">
+  <div class="loading">复习加载中…</div>
+</main>
+<script>window.NHZ_POOLS=[];</script>
+<script src="quiz/data_yuwen.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_zika.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_bushou.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_shici.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_logic.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_lab.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="quiz/data_guwen.js"></script>
+<script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="review-log.js"></script>
+<script src="fuxi.js"></script>
+<script src="nav-up.js"></script>
+</body>
+</html>

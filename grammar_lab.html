@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语法实验室 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<style>
+.lab-hero{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;padding:24px 16px;border-radius:0 0 20px 20px;margin-bottom:16px}
+.lab-hero h1{margin:0 0 8px;font-size:22px}
+.lab-hero p{margin:0;opacity:.9;font-size:14px}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 24px}
+.lab-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;text-align:center;color:var(--ink)}
+.lab-card:active{background:var(--accent-soft)}
+.lab-card .ic{font-size:36px;margin-bottom:8px}
+.lab-card h3{margin:0 0 4px;font-size:16px}
+.lab-card p{margin:0;font-size:12px;color:var(--muted)}
+.lab-page{display:none;padding:16px;max-width:640px;margin:0 auto}
+.lab-page.active{display:block}
+.sym-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.sym-btn{border:2px solid var(--line);background:var(--card);border-radius:8px;padding:8px;cursor:pointer;text-align:center;min-width:64px;color:var(--ink)}
+.sym-btn svg{width:36px;height:36px;display:block;margin:0 auto 4px}
+.sym-btn.sel{border-color:var(--accent);background:var(--accent-soft)}
+.word-tok{display:inline-block;padding:8px 14px;margin:4px;background:var(--card);border:2px solid var(--line);border-radius:8px;font-size:17px;cursor:pointer}
+.word-tok.done{background:var(--accent-soft);border-color:var(--green)}
+.word-tok .badge{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.drop-zone{min-height:60px;border:2px dashed var(--line);border-radius:8px;padding:8px;margin:12px 0;background:var(--surface)}
+.drop-zone .word-tok{cursor:default}
+.quiz-btn{display:block;width:100%;margin:6px 0;padding:10px;border:2px solid var(--line);background:var(--card);border-radius:8px;font-size:15px;text-align:left;color:var(--ink)}
+.quiz-btn.right{border-color:var(--green);background:var(--accent-soft)}
+.quiz-btn.wrong{border-color:var(--red);background:#f3e4e2}
+.fb{margin:10px 0;padding:10px;border-radius:8px;font-size:14px}
+.fb.ok{background:var(--accent-soft);color:var(--accent-deep)}
+.fb.no{background:#f3e4e2;color:var(--red)}
+.back-btn{display:inline-block;margin-bottom:12px;padding:10px 18px;border-radius:12px;border:2px solid var(--accent-deep);background:var(--accent);color:#fff;font-size:17px;font-weight:700;text-decoration:none}
+@media (prefers-color-scheme: dark){.back-btn{color:#14211a}}
+.lab-anim{margin:14px 0}
+.lab-anim svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.tree-node{margin:8px 0;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.tree-node .q{font-weight:700;margin-bottom:8px}
+@media (min-width:768px){
+  .lab-grid{max-width:920px;margin:0 auto;grid-template-columns:repeat(4,1fr)}
+  .lab-hero{max-width:920px;margin:0 auto 16px;border-radius:20px}
+}
+@media (min-width:1200px){
+  .lab-page{max-width:880px}
+}
+.lab-animbtn{margin-left:auto;padding:8px 14px;border-radius:20px;border:1px solid #d5dfd0;background:#f8faf5;color:#2c3328;font-size:14px;font-weight:bold;cursor:pointer}
+</style>
+</head>
+<body class="page-sub page-lab">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span>语法实验室</span>
+  <button class="lab-animbtn" id="btnAnimPause" type="button">⏸ 动画</button>
+</header>
+
+<div id="lab-home">
+  <div class="lab-hero">
+    <h1>🧪 语法实验室</h1>
+    <p>动手玩语法：贴符号、拼句子、做决策，玩会为止</p>
+  </div>
+  <div class="lab-grid">
+    <div class="lab-card" data-lab="symbols">
+      <div class="ic"><span style="color:#1a1a1a">▲</span></div><h3>符号标注</h3><p>给词戴上蒙特梭利符号帽</p>
+    </div>
+    <div class="lab-card" data-lab="baju">
+      <div class="ic">🤏</div><h3>把字句拼装</h3><p>S把OVC，亲手抓宾语</p>
+    </div>
+    <div class="lab-card" data-lab="le">
+      <div class="ic">⏱️</div><h3>了着过决策树</h3><p>三问选出对的助词</p>
+    </div>
+    <div class="lab-card" data-lab="dede">
+      <div class="ic">🎯</div><h3>的地得射击</h3><p>三色定位，一击即中</p>
+    </div>
+    <div class="lab-card" data-lab="zibian">
+      <div class="ic">🦴</div><h3>汉字演变</h3><p>甲骨文→楷书时光机</p>
+    </div>
+    <div class="lab-card" data-lab="pingze">
+      <div class="ic">🎵</div><h3>平仄标注</h3><p>给诗句贴平仄标签</p>
+    </div>
+    <div class="lab-card" data-lab="pinzi">
+      <div class="ic">🧩</div><h3>部首拼字</h3><p>偏旁合体造新字</p>
+    </div>
+    <div class="lab-card" data-lab="xuzi">
+      <div class="ic">📜</div><h3>文言虚词</h3><p>之乎者也断案台</p>
+    </div>
+    <div class="lab-card" data-lab="xiuci">
+      <div class="ic">✨</div><h3>修辞识别</h3><p>比喻拟人夸张排比</p>
+    </div>
+    <div class="lab-card" data-lab="cuobie">
+      <div class="ic">🩺</div><h3>错别字诊所</h3><p>揪出捣乱的错别字</p>
+    </div>
+    <a class="lab-card" href="quiz/index.html?tab=lab&from=grammar_lab.html" target="_top" style="text-decoration:none;color:inherit;user-select:none;-webkit-user-select:none">
+      <div class="ic">🎮</div><h3>互动练习场</h3><p>8种玩法大闯关，错题自动收录</p>
+    </a>
+  </div>
+</div>
+
+<div id="lab-symbols" class="lab-page">
+  <h2>🎩 符号标注大冒险</h2>
+  <p style="color:#666">给整句话的每个词戴上正确的符号帽</p>
+  <div style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px">
+    <b>先想一想</b>：蒙特梭利教室里，孩子把符号实物摆在每个词的上方。先点一个词，再点它的符号帽——戴对了留下，戴错了弹回来。
+  </div>
+  <div class="lab-anim" id="lab-anim-symbols"></div>
+  <div id="sym-progress" style="font-weight:700;margin-bottom:8px"></div>
+  <div id="sym-sent" style="margin:16px 0"></div>
+  <div class="sym-grid" id="sym-opts"></div>
+  <div style="margin-top:12px">
+    <button class="quiz-btn" id="sym-check" style="display:inline-block;width:auto;padding:10px 24px;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
+    <button class="quiz-btn" id="sym-next" style="display:inline-block;width:auto;padding:10px 24px">下一句 →</button>
+  </div>
+  <div class="fb" id="sym-fb" style="display:none"></div>
+  <div class="fb" id="sym-hint" style="display:none;background:#e3f2fd;color:#1565c0"></div>
+  <div>得分：<b id="sym-score">0</b></div>
+</div>
+
+<div id="lab-baju" class="lab-page">
+  <h2>🤏 把字句拼装</h2>
+  <p>口诀 <b>S把OVC</b>：按顺序点词块，拼出正确的把字句</p>
+  <div class="lab-anim" id="lab-anim-baju"></div>
+  <div class="drop-zone" id="baju-drop"><span style="color:#aaa">点下方词块，按顺序拼句…</span></div>
+  <div id="baju-words"></div>
+  <div class="fb" id="baju-fb" style="display:none"></div>
+  <button class="quiz-btn" id="baju-check" style="text-align:center;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
+  <button class="quiz-btn" id="baju-reset" style="text-align:center">重来</button>
+</div>
+
+<div id="lab-le" class="lab-page">
+  <h2>⏱️ 了着过决策树</h2>
+  <p>三问决策：完成了吗？经历过吗？持续着吗？</p>
+  <div class="lab-anim" id="lab-anim-le"></div>
+  <div id="le-q"></div>
+</div>
+
+<div id="lab-dede" class="lab-page">
+  <h2>🎯 的地得射击</h2>
+  <p>看准位置，一击即中！</p>
+  <div class="lab-anim" id="lab-anim-dede"></div>
+  <div id="dede-q"></div>
+</div>
+<div id="lab-zibian" class="lab-page">
+  <h2>🦴 汉字演变时光机</h2>
+  <p>从甲骨文到楷书，看汉字五次大变身。先穿越，再挑战配对！</p>
+  <div class="lab-anim" id="lab-anim-zibian"></div>
+  <div id="zibian-chars" style="margin:12px 0"></div>
+  <div id="zibian-stage"></div>
+  <div style="margin-top:12px">
+    <button class="quiz-btn" id="zibian-next" style="display:inline-block;width:auto;padding:10px 24px;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">穿越 →</button>
+    <button class="quiz-btn" id="zibian-reset" style="display:inline-block;width:auto;padding:10px 24px">重来</button>
+  </div>
+  <h3 style="margin-top:20px">🎯 甲骨文配对挑战</h3>
+  <div id="zibian-quiz"></div>
+  <div>得分：<b id="zibian-score">0</b></div>
+</div>
+
+<div id="lab-pingze" class="lab-page">
+  <h2>🎵 平仄标注</h2>
+  <p>点每个字切换 <b style="color:#3f8e6b">平</b> / <b style="color:#b85a52">仄</b>，标出整句的平仄</p>
+  <div class="lab-anim" id="lab-anim-pingze"></div>
+  <div id="pingze-progress" style="font-weight:700;margin-bottom:8px"></div>
+  <div id="pingze-line" style="margin:16px 0;text-align:center"></div>
+  <div class="fb" id="pingze-fb" style="display:none"></div>
+  <div style="margin-top:12px">
+    <button class="quiz-btn" id="pingze-check" style="display:inline-block;width:auto;padding:10px 24px;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
+    <button class="quiz-btn" id="pingze-next" style="display:inline-block;width:auto;padding:10px 24px">下一句 →</button>
+  </div>
+  <div>得分：<b id="pingze-score">0</b></div>
+</div>
+
+<div id="lab-pinzi" class="lab-page">
+  <h2>🧩 部首拼字</h2>
+  <p>点偏旁放进格子，拼出目标汉字。点格子可拿回偏旁。</p>
+  <div class="lab-anim" id="lab-anim-pinzi"></div>
+  <div id="pinzi-target" style="text-align:center;margin:12px 0"></div>
+  <div id="pinzi-slots" style="display:flex;gap:12px;justify-content:center;margin:12px 0"></div>
+  <div id="pinzi-pool" style="text-align:center;margin:12px 0"></div>
+  <div class="fb" id="pinzi-fb" style="display:none"></div>
+  <div style="margin-top:12px;text-align:center">
+    <button class="quiz-btn" id="pinzi-check" style="display:inline-block;width:auto;padding:10px 24px;background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">检查</button>
+    <button class="quiz-btn" id="pinzi-next" style="display:inline-block;width:auto;padding:10px 24px">下一个 →</button>
+  </div>
+  <div style="text-align:center">得分：<b id="pinzi-score">0</b></div>
+</div>
+
+<div id="lab-xuzi" class="lab-page">
+  <h2>📜 文言虚词断案台</h2>
+  <p>之乎者也，一字多义，看准语境再断案</p>
+  <div class="lab-anim" id="lab-anim-xuzi"></div>
+  <div id="xuzi-q"></div>
+  <div>得分：<b id="xuzi-score">0</b></div>
+</div>
+
+<div id="lab-xiuci" class="lab-page">
+  <h2>✨ 修辞手法识别</h2>
+  <p>读出诗句用的什么修辞手法</p>
+  <div class="lab-anim" id="lab-anim-xiuci"></div>
+  <div id="xiuci-q"></div>
+  <div>得分：<b id="xiuci-score">0</b></div>
+</div>
+
+<div id="lab-cuobie" class="lab-page">
+  <h2>🩺 错别字诊所</h2>
+  <p>点出句子里的错别字，再选出正确的字</p>
+  <div class="lab-anim" id="lab-anim-cuobie"></div>
+  <div id="cuobie-progress" style="font-weight:700;margin-bottom:8px"></div>
+  <div id="cuobie-sent" style="font-size:20px;text-align:center;margin:16px 0;line-height:2.2"></div>
+  <div id="cuobie-opts" style="text-align:center"></div>
+  <div class="fb" id="cuobie-fb" style="display:none"></div>
+  <div style="margin-top:12px;text-align:center">
+    <button class="quiz-btn" id="cuobie-next" style="display:inline-block;width:auto;padding:10px 24px">下一句 →</button>
+  </div>
+  <div style="text-align:center">得分：<b id="cuobie-score">0</b></div>
+</div>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script>
+(function(){
+'use strict';
+var $ = function(id){return document.getElementById(id);};
+
+/* ---- 动画图解（SMIL，护眼配色，随主题切换） ---- */
+function svgLabSymbols(){
+  var syms = [
+    ['名词','tri','svg-muted'],
+    ['形容词','tri','svg-blue'],
+    ['代词','tri','svg-accent'],
+    ['动词','circ','svg-red'],
+    ['副词','circS','svg-accent'],
+    ['介词','arch','svg-green'],
+    ['连词','rect','svg-red'],
+    ['感叹词','bang','svg-accent']
+  ];
+  var s = '<svg viewBox="0 0 320 200">';
+  s += '<text x="160" y="18" font-size="14" text-anchor="middle" class="svg-ink">蒙特梭利语法符号 · 八顶帽子</text>';
+  syms.forEach(function(sm,i){
+    var col = i%4, row = Math.floor(i/4);
+    var cx = 40 + col*80;
+    var cy = row===0 ? 58 : 128;
+    var ly = row===0 ? 94 : 164;
+    var t1 = (i*0.09).toFixed(3), t2 = (i*0.09+0.04).toFixed(3);
+    var shape = '';
+    if(sm[1]==='tri') shape = '<polygon points="'+cx+','+(cy-14)+' '+(cx+14)+','+(cy+10)+' '+(cx-14)+','+(cy+10)+'" class="'+sm[2]+'"/>';
+    else if(sm[1]==='circ') shape = '<circle cx="'+cx+'" cy="'+cy+'" r="12" class="'+sm[2]+'"/>';
+    else if(sm[1]==='circS') shape = '<circle cx="'+cx+'" cy="'+cy+'" r="7" class="'+sm[2]+'"/>';
+    else if(sm[1]==='arch') shape = '<path d="M'+(cx-13)+','+(cy+8)+' A15,15 0 0,1 '+(cx+13)+','+(cy+8)+'" fill="none" class="'+sm[2]+'-s" stroke-width="5" stroke-linecap="round"/>';
+    else if(sm[1]==='rect') shape = '<rect x="'+(cx-13)+'" y="'+(cy-6)+'" width="26" height="12" rx="3" class="'+sm[2]+'"/>';
+    else shape = '<text x="'+cx+'" y="'+(cy+10)+'" font-size="26" text-anchor="middle" class="'+sm[2]+'">!</text>';
+    s += '<g opacity="0">'
+      + '<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;'+t1+';'+t2+';1" dur="10s" repeatCount="indefinite"/>'
+      + shape
+      + '<text x="'+cx+'" y="'+ly+'" font-size="12" text-anchor="middle" class="svg-muted">'+sm[0]+'</text>'
+      + '</g>';
+  });
+  s += '<text x="160" y="192" font-size="12" text-anchor="middle" class="svg-muted">形状记词性：一看形状就知道它是谁</text>';
+  return s + '</svg>';
+}
+
+/* 2. 把字句：词块滑动变成被字句 */
+
+function svgLabBaju(){
+  var words = [
+    ['我',40,120],['把',40,24],['苹果',64,-96],['吃',40,0],['了',40,0]
+  ];
+  var s = '<svg viewBox="0 0 320 160">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">把字句 ↔ 被字句：词块大挪移</text>';
+  var x = 32;
+  var kt = '0;0.32;0.42;0.62;0.72;1';
+  words.forEach(function(w){
+    var wd = w[1], dx = w[2];
+    var cx = x + wd/2;
+    var hl = (w[0]==='把');
+    s += '<g><animateTransform attributeName="transform" type="translate" values="0,0;'+dx+',0;'+dx+',0;0,0" keyTimes="0;0.35;0.65;1" dur="8s" repeatCount="indefinite"/>';
+    s += '<rect x="'+x+'" y="44" width="'+wd+'" height="40" rx="8" class="svg-panel '+(hl?'svg-accent-s':'svg-muted-s')+'" stroke-width="'+(hl?2:1)+'"/>';
+    if(hl){
+      s += '<text x="'+cx+'" y="70" font-size="18" class="svg-accent" text-anchor="middle">把'
+        + '<animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+      s += '<text x="'+cx+'" y="70" font-size="18" class="svg-accent" text-anchor="middle" opacity="0">被'
+        + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+    } else {
+      s += '<text x="'+cx+'" y="70" font-size="18" text-anchor="middle" class="svg-ink">'+w[0]+'</text>';
+    }
+    s += '</g>';
+    x += wd + 8;
+  });
+  s += '<text x="160" y="128" font-size="13" class="svg-accent" text-anchor="middle">把字句：我主动处置苹果 🖐'
+    + '<animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="128" font-size="13" class="svg-accent" text-anchor="middle" opacity="0">被字句：苹果被我处置'
+    + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="'+kt+'" dur="8s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="150" font-size="12" text-anchor="middle" class="svg-muted">S把OVC：主语→把→宾语→动词→补语</text>';
+  return s + '</svg>';
+}
+
+/* 3. "了"：时间线小人从"没吃"走到"吃了" */
+
+function svgLabLe(){
+  var s = '<svg viewBox="0 0 320 190">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">了：动作完成的哨声</text>';
+  s += '<line x1="30" y1="100" x2="290" y2="100" stroke-width="2" class="svg-muted-s"/>';
+  /* 左：没吃（满碗） */
+  s += '<ellipse cx="60" cy="100" rx="16" ry="6" fill="none" stroke-width="2" class="svg-muted-s"/>';
+  s += '<circle cx="54" cy="93" r="2.5" class="svg-ink"/><circle cx="61" cy="91" r="2.5" class="svg-ink"/><circle cx="67" cy="94" r="2.5" class="svg-ink"/>';
+  s += '<text x="60" y="126" font-size="13" text-anchor="middle" class="svg-muted">没吃</text>';
+  /* 右：吃了（空碗） */
+  s += '<ellipse cx="260" cy="100" rx="16" ry="6" fill="none" stroke-width="2" class="svg-accent-s"/>';
+  s += '<text x="260" y="126" font-size="13" text-anchor="middle" class="svg-accent">吃了</text>';
+  /* 小人走路 */
+  s += '<g opacity="0">'
+    + '<animate attributeName="opacity" values="0;1;1;1;0;0" keyTimes="0;0.05;0.8;0.9;0.95;1" dur="6s" repeatCount="indefinite"/>'
+    + '<animateMotion dur="6s" repeatCount="indefinite" path="M30,96 L290,96"/>'
+    + '<circle cx="0" cy="-16" r="5" class="svg-accent"/>'
+    + '<line x1="0" y1="-11" x2="0" y2="4" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="-6" y1="-4" x2="6" y2="-4" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="0" y1="4" x2="-6" y2="16" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '<line x1="0" y1="4" x2="6" y2="16" stroke-width="2.5" stroke-linecap="round" class="svg-accent-s"/>'
+    + '</g>';
+  /* 了闪一下 */
+  s += '<text x="262" y="52" font-size="36" class="svg-accent" text-anchor="middle" opacity="0">了'
+    + '<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.72;0.8;0.92;0.97;1" dur="6s" repeatCount="indefinite"/></text>';
+  s += '<text x="160" y="168" font-size="12" text-anchor="middle" class="svg-muted">小人从"没吃"走到"吃了" → 动作完成，"了"闪一下</text>';
+  return s + '</svg>';
+}
+
+/* 4. 的 / 地 / 得：三姐妹站位 */
+
+function svgLabDede(){
+  var rows = [
+    ['美丽','的','svg-green','花','修饰名词 · 白勺的'],
+    ['认真','地','svg-accent','听','修饰动词 · 土也地'],
+    ['跑','得','svg-blue','快','补充结果 · 双人得']
+  ];
+  var s = '<svg viewBox="0 0 320 205">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">的 / 地 / 得：三姐妹站位</text>';
+  rows.forEach(function(r,i){
+    var y = 58 + i*40;
+    var bx = r[0].length===1 ? 44 : 58;
+    s += '<text x="20" y="'+y+'" font-size="17" class="svg-ink">'+r[0]+'</text>';
+    s += '<rect x="'+bx+'" y="'+(y-18)+'" width="32" height="30" rx="6" class="'+r[2]+'"/>';
+    s += '<text x="'+(bx+16)+'" y="'+(y+4)+'" font-size="17" text-anchor="middle" class="svg-deep">'+r[1]+'</text>';
+    s += '<text x="'+(bx+40)+'" y="'+y+'" font-size="17" class="svg-ink">'+r[3]+'</text>';
+    s += '<text x="'+(bx+78)+'" y="'+y+'" font-size="12" class="svg-muted">'+r[4]+'</text>';
+  });
+  s += '<rect x="12" y="36" width="296" height="38" rx="8" fill="none" stroke-width="2" class="svg-accent-s">'
+    + '<animate attributeName="y" values="36;76;116;36" keyTimes="0;0.33;0.66;1" dur="9s" repeatCount="indefinite"/></rect>';
+  s += '<text x="160" y="192" font-size="12" text-anchor="middle" class="svg-muted">口诀：白勺的贴名词，土也地跟动词，得后补结果</text>';
+  return s + '</svg>';
+}
+
+/* 5. 了 / 着 / 过：三问决策 */
+
+function svgLabLezheguo(){
+  var nodes = [
+    ['完成了吗？','了','svg-accent'],
+    ['经历过吗？','过','svg-red'],
+    ['还在持续吗？','着','svg-blue']
+  ];
+  var s = '<svg viewBox="0 0 320 175">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">了 / 着 / 过：三问决策</text>';
+  nodes.forEach(function(n,i){
+    var x = 16 + i*100;
+    var t = (0.06 + i*0.3).toFixed(3), t2 = (0.10 + i*0.3).toFixed(3);
+    var t3 = (0.30 + i*0.3).toFixed(3), t4 = (0.36 + i*0.3).toFixed(3);
+    s += '<g opacity="0.3">'
+      + '<animate attributeName="opacity" values="0.3;0.3;1;1;0.3;0.3" keyTimes="0;'+t+';'+t2+';'+t3+';'+t4+';1" dur="9s" repeatCount="indefinite"/>'
+      + '<rect x="'+x+'" y="46" width="88" height="60" rx="10" class="svg-panel '+n[2]+'-s" stroke-width="2"/>'
+      + '<text x="'+(x+44)+'" y="68" font-size="11" text-anchor="middle" class="svg-muted">'+n[0]+'</text>'
+      + '<text x="'+(x+44)+'" y="98" font-size="26" class="'+n[2]+'" text-anchor="middle">'+n[1]+'</text>'
+      + '</g>';
+  });
+  [108,208].forEach(function(ax){
+    s += '<polygon points="'+ax+',70 '+ax+',82 '+(ax+8)+',76" class="svg-muted"/>';
+  });
+  s += '<text x="160" y="140" font-size="12" text-anchor="middle" class="svg-muted">三问选一：完成→了，经历→过，持续→着</text>';
+  s += '<text x="160" y="160" font-size="12" text-anchor="middle" class="svg-muted">顺序固定，先问"完成了吗"</text>';
+  return s + '</svg>';
+}
+
+
+
+/* 6 个新实验的动画图解（SMIL，沿用 svg-* 配色类） */
+function svgLabZibian(){
+  var stages = ['甲骨文','金文','小篆','隶书','楷书'];
+  var s = '<svg viewBox="0 0 320 120">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">汉字演变：五次大变身</text>';
+  stages.forEach(function(st,i){
+    var x = 14 + i*60;
+    var t = (0.05+i*0.18).toFixed(3), t2 = (0.10+i*0.18).toFixed(3);
+    s += '<g opacity="0.25">'
+      + '<animate attributeName="opacity" values="0.25;0.25;1;1;0.25;0.25" keyTimes="0;'+t+';'+t2+';0.9;0.96;1" dur="8s" repeatCount="indefinite"/>'
+      + '<rect x="'+x+'" y="40" width="52" height="44" rx="8" class="svg-panel svg-accent-s" stroke-width="2"/>'
+      + '<text x="'+(x+26)+'" y="66" font-size="12" text-anchor="middle" class="svg-ink">'+st+'</text>'
+      + '</g>';
+    if(i<4) s += '<polygon points="'+(x+54)+',58 '+(x+62)+',62 '+(x+54)+',66" class="svg-muted"/>';
+  });
+  s += '<text x="160" y="108" font-size="12" text-anchor="middle" class="svg-muted">从画画到写字，越变越好写</text>';
+  return s + '</svg>';
+}
+
+function svgLabPingze(){
+  var s = '<svg viewBox="0 0 320 130">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">平仄：长的是平，短促的是仄</text>';
+  s += '<line x1="60" y1="60" x2="140" y2="60" stroke-width="6" stroke-linecap="round" class="svg-green-s"/>';
+  s += '<text x="100" y="92" font-size="13" text-anchor="middle" class="svg-muted">平（长音，拉长读）</text>';
+  s += '<line x1="210" y1="46" x2="210" y2="74" stroke-width="6" stroke-linecap="round" class="svg-red-s"/>';
+  s += '<text x="210" y="92" font-size="13" text-anchor="middle" class="svg-muted">仄（短音，急停）</text>';
+  s += '<text x="160" y="118" font-size="12" text-anchor="middle" class="svg-muted">春眠不觉晓：平平仄仄仄</text>';
+  return s + '</svg>';
+}
+
+function svgLabPinzi(){
+  var s = '<svg viewBox="0 0 320 130">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">偏旁合体：1+1=新字</text>';
+  s += '<g><animateTransform attributeName="transform" type="translate" values="-40,0;0,0;0,0;-40,0" keyTimes="0;0.3;0.7;1" dur="6s" repeatCount="indefinite"/>'
+    + '<rect x="72" y="44" width="52" height="52" rx="8" class="svg-panel svg-accent-s" stroke-width="2"/>'
+    + '<text x="98" y="80" font-size="28" text-anchor="middle" class="svg-ink">女</text></g>';
+  s += '<g><animateTransform attributeName="transform" type="translate" values="40,0;0,0;0,0;40,0" keyTimes="0;0.3;0.7;1" dur="6s" repeatCount="indefinite"/>'
+    + '<rect x="196" y="44" width="52" height="52" rx="8" class="svg-panel svg-blue-s" stroke-width="2"/>'
+    + '<text x="222" y="80" font-size="28" text-anchor="middle" class="svg-ink">子</text></g>';
+  s += '<text x="160" y="80" font-size="22" text-anchor="middle" class="svg-muted">+</text>';
+  s += '<text x="160" y="122" font-size="13" text-anchor="middle" class="svg-muted">女 + 子 = 好（美好）</text>';
+  return s + '</svg>';
+}
+
+function svgLabXuzi(){
+  var chars = ['之','乎','者','也'];
+  var s = '<svg viewBox="0 0 320 120">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">虚词：文言文的"润滑剂"</text>';
+  chars.forEach(function(c,i){
+    var x = 50 + i*74;
+    var t = (0.05+i*0.22).toFixed(3), t2 = (0.12+i*0.22).toFixed(3);
+    s += '<text x="'+x+'" y="70" font-size="34" text-anchor="middle" class="svg-accent" opacity="0.3">'+c
+      + '<animate attributeName="opacity" values="0.3;0.3;1;1;0.3;0.3" keyTimes="0;'+t+';'+t2+';0.9;0.96;1" dur="8s" repeatCount="indefinite"/>'
+      + '<animate attributeName="y" values="70;70;60;60;70;70" keyTimes="0;'+t+';'+t2+';0.9;0.96;1" dur="8s" repeatCount="indefinite"/>'
+      + '</text>';
+  });
+  s += '<text x="160" y="108" font-size="12" text-anchor="middle" class="svg-muted">之乎者也：无实义，管语气和关系</text>';
+  return s + '</svg>';
+}
+
+function svgLabXiuci(){
+  var s = '<svg viewBox="0 0 320 130">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">比喻：A 像 B</text>';
+  s += '<rect x="24" y="44" width="64" height="44" rx="8" class="svg-panel svg-accent-s" stroke-width="2"/>';
+  s += '<text x="56" y="72" font-size="16" text-anchor="middle" class="svg-ink">雪</text>';
+  s += '<text x="112" y="72" font-size="16" text-anchor="middle" class="svg-muted">像</text>';
+  s += '<rect x="136" y="44" width="64" height="44" rx="8" class="svg-panel svg-blue-s" stroke-width="2"/>';
+  s += '<text x="168" y="72" font-size="16" text-anchor="middle" class="svg-ink">梨花</text>';
+  s += '<text x="240" y="72" font-size="13" class="svg-muted">忽如一夜</text>';
+  s += '<text x="160" y="116" font-size="12" text-anchor="middle" class="svg-muted">本体（雪）＋喻词（像/如）＋喻体（梨花）</text>';
+  return s + '</svg>';
+}
+
+function svgLabCuobie(){
+  var s = '<svg viewBox="0 0 320 130">';
+  s += '<text x="160" y="16" font-size="14" text-anchor="middle" class="svg-ink">错别字诊所：放大镜找不同</text>';
+  s += '<text x="56" y="70" font-size="22" class="svg-ink">再接再</text>';
+  s += '<text x="146" y="70" font-size="22" class="svg-red">励</text>';
+  s += '<text x="146" y="94" font-size="14" text-anchor="middle" class="svg-red">✗</text>';
+  s += '<text x="200" y="70" font-size="22" class="svg-green">厉</text>';
+  s += '<text x="200" y="94" font-size="14" text-anchor="middle" class="svg-green">✓</text>';
+  s += '<circle cx="0" cy="0" r="24" fill="none" stroke-width="3" class="svg-accent-s">'
+    + '<animateMotion dur="6s" repeatCount="indefinite" path="M157,62 L157,62 L211,62 L211,62 L157,62 Z"/></circle>';
+  s += '<text x="160" y="122" font-size="12" text-anchor="middle" class="svg-muted">形近字最爱捣乱：励 → 厉</text>';
+  return s + '</svg>';
+}
+
+
+/* 页面切换（界面层级：实验 › 某个实验；回上一级 = 回实验首页，不用浏览器历史） */
+function showLabHome(){
+  document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
+  $('lab-home').style.display='block';
+  window.scrollTo(0,0);
+  if(window.NHZNavPage) NHZNavPage.set(['实验'], []);
+}
+document.querySelectorAll('[data-lab]').forEach(function(c){
+  c.addEventListener('click', function(){
+    $('lab-home').style.display='none';
+    document.querySelectorAll('.lab-page').forEach(function(p){p.classList.remove('active');});
+    $('lab-'+c.getAttribute('data-lab')).classList.add('active');
+    initLab(c.getAttribute('data-lab'));
+    window.scrollTo(0,0);
+    if(window.NHZNavPage) NHZNavPage.set(['实验', (c.textContent||'').trim().split('\n')[0]], [showLabHome, null]);
+  });
+});
+
+/* 蒙特梭利符号 */
+var SYMS = [
+  {n:'名词', svg:'<polygon points="15,4 28,26 2,26" fill="#222"/>'},
+  {n:'形容词', svg:'<polygon points="15,4 28,26 2,26" fill="#1565c0"/>'},
+  {n:'代词', svg:'<polygon points="15,4 28,26 2,26" fill="#7b1fa2"/>'},
+  {n:'动词', svg:'<circle cx="15" cy="15" r="11" fill="#d32f2f"/>'},
+  {n:'副词', svg:'<circle cx="15" cy="15" r="7" fill="#ef6c00"/>'},
+  {n:'介词', svg:'<path d="M4,20 A11,11 0 0,1 26,20" fill="none" stroke="#2e7d32" stroke-width="4"/>'},
+  {n:'连词', svg:'<rect x="4" y="11" width="22" height="8" rx="2" fill="#ec407a"/>'},
+  {n:'感叹词', svg:'<text x="15" y="24" font-size="20" text-anchor="middle" fill="#f9a825">!</text>'},
+];
+var SYM_SENTS = [
+  {words:[['小狗','名词'],['在','介词'],['院子里','名词'],['追','动词'],['皮球','名词']],
+   hint:'院子里：地点也是「物」，戴名词三角。'},
+  {words:[['他','代词'],['已经','副词'],['飞快','副词'],['地','助词'],['跑','动词'],['出','动词'],['教室','名词']],
+   hint:'已经/飞快都是副词（小橙圆）；地是助词，暂无符号可戴，跳过。'},
+  {words:[['美丽','形容词'],['的','助词'],['花','名词'],['开','动词'],['了','助词']],
+   hint:'美丽是形容词（蓝三角）；的/了是助词，跳过。'},
+];
+var symIdx = 0, symScore = 0, symPlaced = {};
+
+function initLab(which){
+  if(which==='symbols') initSymbols();
+  if(which==='baju') initBaju();
+  if(which==='le') initLe();
+  if(which==='dede') initDede();
+  if(which==='zibian') initZibian();
+  if(which==='pingze') initPingze();
+  if(which==='pinzi') initPinzi();
+  if(which==='xuzi') initXuzi();
+  if(which==='xiuci') initXiuci();
+  if(which==='cuobie') initCuobie();
+}
+function initSymbols(){
+  symIdx = 0; symScore = 0;
+  $('sym-score').textContent = '0';
+  renderSymSent();
+}
+function renderSymSent(){
+  var data = SYM_SENTS[symIdx];
+  symPlaced = {};
+  $('sym-progress').textContent = '第 ' + (symIdx+1) + ' 句 / 共 ' + SYM_SENTS.length + ' 句';
+  $('sym-fb').style.display = 'none';
+  var hint = $('sym-hint'); hint.style.display = 'none';
+  /* 句子：每个词上方一个虚线槽 */
+  var s = $('sym-sent'); s.innerHTML = '';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center';
+  data.words.forEach(function(wd, i){
+    var cell = document.createElement('div');
+    cell.style.cssText = 'text-align:center;min-width:64px';
+    cell.innerHTML =
+      '<div class="sym-slot" data-i="'+i+'" style="width:56px;height:56px;margin:0 auto 6px;border:2px dashed #ccc;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#fafafa"></div>' +
+      '<div class="word-tok" data-i="'+i+'" style="margin:0">'+wd[0]+'</div>';
+    row.appendChild(cell);
+  });
+  s.appendChild(row);
+  /* 符号选项 */
+  var o = $('sym-opts'); o.innerHTML = '';
+  SYMS.forEach(function(sym){
+    var b = document.createElement('div');
+    b.className = 'sym-btn';
+    b.innerHTML = '<svg viewBox="0 0 30 30" width="36" height="36">'+sym.svg+'</svg><div style="font-size:11px">'+sym.n+'</div>';
+    b.addEventListener('click', function(){ placeSym(sym.n, b); });
+    o.appendChild(b);
+  });
+  /* 点词选中 */
+  s.querySelectorAll('.word-tok').forEach(function(t){
+    t.addEventListener('click', function(){
+      s.querySelectorAll('.word-tok').forEach(function(x){x.style.borderColor='#ddd';});
+      t.style.borderColor = 'var(--accent)';
+      s.dataset.sel = t.getAttribute('data-i');
+    });
+  });
+}
+function placeSym(symName, btn){
+  var s = $('sym-sent');
+  var sel = s.dataset.sel;
+  if(sel === undefined || sel === '') return;
+  var i = parseInt(sel);
+  var data = SYM_SENTS[symIdx];
+  var word = data.words[i][0], correct = data.words[i][1];
+  /* 助词跳过 */
+  if(correct === '助词'){
+    var fb0 = $('sym-fb'); fb0.style.display='block';
+    fb0.className='fb'; fb0.style.background='#fff3e0'; fb0.style.color='#e65100';
+    fb0.textContent='「'+word+'」是助词，暂无符号，跳过它';
+    return;
+  }
+  var slot = s.querySelector('.sym-slot[data-i="'+i+'"]');
+  if(symName === correct){
+    slot.innerHTML = '<svg viewBox="0 0 30 30" width="36" height="36">'+SYMS.filter(function(x){return x.n===symName;})[0].svg+'</svg>';
+    slot.style.border = '2px solid #3f8e6b';
+    slot.style.background = '#e8f5e9';
+    symPlaced[i] = true;
+    symScore += 10; $('sym-score').textContent = symScore;
+  } else {
+    /* 弹回动画 */
+    slot.style.border = '2px solid #b85a52';
+    setTimeout(function(){ slot.style.border='2px dashed #ccc'; }, 400);
+    var fb = $('sym-fb'); fb.style.display='block';
+    fb.className='fb no'; fb.textContent='❌ 「'+word+'」不是'+symName+'，弹回来了';
+  }
+  s.dataset.sel = '';
+  s.querySelectorAll('.word-tok').forEach(function(x){x.style.borderColor='#ddd';});
+}
+$('sym-check').addEventListener('click', function(){
+  var data = SYM_SENTS[symIdx];
+  var need = data.words.filter(function(w){return w[1]!=='助词';}).length;
+  var got = Object.keys(symPlaced).length;
+  var fb = $('sym-fb'); fb.style.display='block';
+  var hint = $('sym-hint');
+  if(got >= need){
+    fb.className='fb ok'; fb.textContent='✅ 全对！+'+(need*10)+'分';
+    symScore += need*10; $('sym-score').textContent = symScore;
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 还差 '+(need-got)+' 个没戴对';
+    hint.style.display='block'; hint.textContent='💡 '+data.hint;
+  }
+});
+$('sym-next').addEventListener('click', function(){
+  symIdx = (symIdx + 1) % SYM_SENTS.length;
+  renderSymSent();
+  window.scrollTo(0,0);
+});
+
+/* 把字句拼装 */
+var BAJU = ['我','把','书','看','完','了'];
+var bajuCur = [];
+function initBaju(){
+  bajuCur=[];
+  var d = $('baju-drop'); d.innerHTML='<span style="color:#aaa">点下方词块，按顺序拼句…</span>';
+  var w = $('baju-words'); w.innerHTML='';
+  var words = BAJU.slice().sort(function(){return Math.random()-0.5;});
+  words.forEach(function(wd){
+    var b = document.createElement('span');
+    b.className='word-tok'; b.textContent=wd;
+    b.addEventListener('click', function(){
+      if(bajuCur.indexOf(wd)>=0) return;
+      bajuCur.push(wd); b.classList.add('done');
+      renderBaju();
+    });
+    w.appendChild(b);
+  });
+  $('baju-fb').style.display='none';
+}
+function renderBaju(){
+  var d = $('baju-drop');
+  d.innerHTML = bajuCur.length ? '' : '<span style="color:#aaa">点下方词块，按顺序拼句…</span>';
+  bajuCur.forEach(function(wd){
+    var s = document.createElement('span');
+    s.className='word-tok'; s.textContent=wd;
+    d.appendChild(s);
+  });
+}
+$('baju-check').addEventListener('click', function(){
+  var fb = $('baju-fb'); fb.style.display='block';
+  if(bajuCur.join('')==='我把书看完了'){
+    fb.className='fb ok'; fb.textContent='✅ 完美！S把OVC：我＋把＋书＋看＋完了';
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 口诀S把OVC：主语→把→宾语→动词→补语，再试试';
+  }
+});
+$('baju-reset').addEventListener('click', initBaju);
+
+/* 了着过决策树 */
+var LE_QS = [
+  {s:'我吃饭___', opts:['了','着','过'], ans:0, why:'动作完成，用了₁'},
+  {s:'门开___', opts:['了','着','过'], ans:1, why:'状态持续，用着'},
+  {s:'我去___北京', opts:['了','着','过'], ans:2, why:'曾经经历，用过＝人生履历'},
+  {s:'下雨___', opts:['了','着','过'], ans:0, why:'新情况出现，用了₂'},
+];
+var leIdx = 0;
+function initLe(){
+  leIdx=0; renderLe();
+}
+function renderLe(){
+  var box = $('le-q');
+  if(leIdx>=LE_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 全对！三问决策树掌握了：完成→了，经历→过，持续→着</div><button class="quiz-btn" style="text-align:center" onclick="location.reload()">再来一轮</button>';
+    return;
+  }
+  var q = LE_QS[leIdx];
+  var h = '<div class="tree-node"><div class="q">'+(leIdx+1)+'. '+q.s+'</div>';
+  q.opts.forEach(function(op,oi){
+    h += '<button class="quiz-btn" data-oi="'+oi+'">'+op+'</button>';
+  });
+  h += '<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi = parseInt(b.getAttribute('data-oi'));
+      var fb = box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        setTimeout(function(){leIdx++; renderLe();}, 1200);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+
+/* 的地得 */
+var DEDE_QS = [
+  {s:'认真___听讲', opts:['的','地','得'], ans:1, why:'修饰动词"听"，用"地"'},
+  {s:'美丽___花', opts:['的','地','得'], ans:0, why:'修饰名词"花"，用"的"'},
+  {s:'跑___很快', opts:['的','地','得'], ans:2, why:'动词后补结果，用"得"'},
+  {s:'他高兴___跳起来', opts:['的','地','得'], ans:1, why:'修饰动词"跳"，用"地"'},
+];
+var dedeIdx=0;
+function initDede(){dedeIdx=0; renderDede();}
+function renderDede(){
+  var box = $('dede-q');
+  if(dedeIdx>=DEDE_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 通关！口诀：白勺的贴名，土也地跟动，得后补结果</div>';
+    return;
+  }
+  var q = DEDE_QS[dedeIdx];
+  var h = '<div class="tree-node"><div class="q">'+(dedeIdx+1)+'. '+q.s+'</div>';
+  var colors = ['#3f8e6b','#b8893d','#4a7a8c'];
+  q.opts.forEach(function(op,oi){
+    h += '<button class="quiz-btn" data-oi="'+oi+'" style="border-color:'+colors[oi]+'">'+op+'</button>';
+  });
+  h += '<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi = parseInt(b.getAttribute('data-oi'));
+      var fb = box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        setTimeout(function(){dedeIdx++; renderDede();}, 1200);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+
+/* ============ 汉字演变 ============ */
+var ZIBIAN = [
+  {ch:'日', jia:'<circle cx="30" cy="30" r="18" fill="none" stroke-width="3.5"/><circle cx="30" cy="30" r="3.5"/>', note:'画一个太阳，中间点一点'},
+  {ch:'月', jia:'<path d="M38,8 C22,18 22,42 38,52 C30,42 30,18 38,8 Z" fill="none" stroke-width="3.5"/>', note:'一弯新月'},
+  {ch:'山', jia:'<path d="M8,48 L18,22 L26,40 L34,14 L42,40 L52,48" fill="none" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>', note:'三座山峰连绵'},
+  {ch:'水', jia:'<path d="M22,8 C30,18 14,28 22,38 C30,48 16,50 22,56 M40,8 C48,18 32,28 40,38" fill="none" stroke-width="3.5" stroke-linecap="round"/>', note:'蜿蜒的水流'},
+  {ch:'人', jia:'<path d="M36,6 C30,18 28,34 20,52 M36,6 C42,16 46,26 50,36" fill="none" stroke-width="3.5" stroke-linecap="round"/>', note:'侧面站立的人'},
+  {ch:'木', jia:'<path d="M30,6 L30,54 M30,18 L14,8 M30,18 L46,8 M30,32 L16,26 M30,32 L44,26" fill="none" stroke-width="3.5" stroke-linecap="round"/>', note:'树：枝干分明'}
+];
+var ZIBIAN_STAGES = [
+  {n:'甲骨文', c:'#8b5a2b', d:'刻在龟甲兽骨上 · 商朝'},
+  {n:'金文', c:'#7a5c3e', d:'铸在青铜器上 · 西周'},
+  {n:'小篆', c:'#a03a2a', d:'秦始皇统一文字'},
+  {n:'隶书', c:'#4a5a6c', d:'化圆为方，书写更快'},
+  {n:'楷书', c:'#2c3328', d:'一直用到今天'}
+];
+var zbChar=0, zbStage=0, zbScore=0, zbQuizIdx=0, zbQuizOrder=[];
+function initZibian(){
+  zbChar=0; zbStage=0; zbScore=0; zbQuizIdx=0;
+  $('zibian-score').textContent='0';
+  renderZibianChars(); renderZibianStage();
+  zbQuizOrder=[0,1,2,3,4,5].sort(function(){return Math.random()-0.5;});
+  renderZibianQuiz();
+}
+function renderZibianChars(){
+  var box=$('zibian-chars'); box.innerHTML='';
+  ZIBIAN.forEach(function(z,i){
+    var b=document.createElement('span');
+    b.className='word-tok'; b.textContent=z.ch; b.style.fontSize='20px';
+    if(i===zbChar){ b.style.borderColor='var(--accent)'; b.style.background='var(--accent-soft)'; }
+    b.addEventListener('click', function(){ zbChar=i; zbStage=0; renderZibianChars(); renderZibianStage(); });
+    box.appendChild(b);
+  });
+}
+function renderZibianStage(){
+  var z=ZIBIAN[zbChar], st=ZIBIAN_STAGES[zbStage], visual;
+  if(zbStage===0){
+    visual='<svg viewBox="0 0 60 60" width="96" height="96"><g stroke="#5a3a1a" fill="#5a3a1a">'+z.jia+'</g></svg>';
+  } else {
+    visual='<div style="font-size:64px;color:'+st.c+';font-family:serif">'+z.ch+'</div><div style="font-size:11px;color:#999">（字形示意）</div>';
+  }
+  var dots='';
+  for(var i=0;i<5;i++) dots+='<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px;background:'+(i<=zbStage?'var(--accent)':'#ddd')+'"></span>';
+  $('zibian-stage').innerHTML='<div style="text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px">'
+    +'<div style="font-size:14px;color:#666;margin-bottom:8px">'+st.n+' · '+st.d+'</div>'
+    +visual
+    +'<div style="margin-top:8px;font-size:14px">'+(zbStage===0?z.note:'')+'</div>'
+    +'<div style="margin-top:10px">'+dots+'</div></div>';
+}
+$('zibian-next').addEventListener('click', function(){
+  zbStage = zbStage<4 ? zbStage+1 : 0;
+  renderZibianStage();
+});
+$('zibian-reset').addEventListener('click', function(){ zbStage=0; renderZibianStage(); });
+function renderZibianQuiz(){
+  var box=$('zibian-quiz');
+  if(zbQuizIdx>=zbQuizOrder.length){
+    box.innerHTML='<div class="fb ok">🎉 配对挑战完成！你是甲骨文认字小达人</div>';
+    return;
+  }
+  var zi=zbQuizOrder[zbQuizIdx], z=ZIBIAN[zi];
+  var others=[0,1,2,3,4,5].filter(function(i){return i!==zi;}).sort(function(){return Math.random()-0.5;});
+  var opts=[zi].concat(others.slice(0,3)).sort(function(){return Math.random()-0.5;});
+  var h='<div class="tree-node" style="text-align:center"><div class="q">这个甲骨文是哪个字？</div>'
+    +'<svg viewBox="0 0 60 60" width="84" height="84"><g stroke="#5a3a1a" fill="#5a3a1a">'+z.jia+'</g></svg><div style="margin-top:8px">';
+  opts.forEach(function(oi){
+    h+='<button class="quiz-btn" data-oi="'+oi+'" style="display:inline-block;width:auto;min-width:60px;margin:4px;font-size:22px;text-align:center">'+ZIBIAN[oi].ch+'</button>';
+  });
+  h+='</div><div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi=parseInt(b.getAttribute('data-oi'));
+      var fb=box.querySelector('.fb'); fb.style.display='block';
+      if(oi===zi){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ 对！'+z.note;
+        zbScore+=10; $('zibian-score').textContent=zbScore;
+        setTimeout(function(){zbQuizIdx++; renderZibianQuiz();}, 1200);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ 再看看：'+z.note;
+      }
+    });
+  });
+}
+
+/* ============ 平仄标注 ============ */
+var PINGZE = [
+  {line:'春眠不觉晓', pz:'平平仄仄仄'},
+  {line:'处处闻啼鸟', pz:'仄仄平平仄'},
+  {line:'夜来风雨声', pz:'仄平平仄平'},
+  {line:'花落知多少', pz:'平仄平平仄'},
+  {line:'白日依山尽', pz:'仄仄平平仄'},
+  {line:'黄河入海流', pz:'平平仄仄平'}
+];
+var pzIdx=0, pzScore=0, pzMarks=[];
+function initPingze(){
+  pzIdx=0; pzScore=0; $('pingze-score').textContent='0'; renderPingze();
+}
+function renderPingze(){
+  var q=PINGZE[pzIdx];
+  pzMarks=[];
+  for(var i=0;i<q.line.length;i++) pzMarks.push('');
+  $('pingze-progress').textContent='第 '+(pzIdx+1)+' 句 / 共 '+PINGZE.length+' 句';
+  $('pingze-fb').style.display='none';
+  var box=$('pingze-line'); box.innerHTML='';
+  for(var i=0;i<q.line.length;i++){
+    (function(i){
+      var sp=document.createElement('span');
+      sp.className='word-tok'; sp.style.minWidth='46px'; sp.style.textAlign='center';
+      sp.innerHTML=q.line[i]+'<span class="badge">&nbsp;</span>';
+      sp.addEventListener('click', function(){
+        pzMarks[i] = pzMarks[i]==='' ? '平' : (pzMarks[i]==='平' ? '仄' : '');
+        paintPz(sp, pzMarks[i]);
+      });
+      box.appendChild(sp);
+    })(i);
+  }
+}
+function paintPz(sp, m){
+  var badge=sp.querySelector('.badge');
+  if(m==='平'){ badge.textContent='平'; badge.style.color='#3f8e6b'; sp.style.borderColor='#3f8e6b'; }
+  else if(m==='仄'){ badge.textContent='仄'; badge.style.color='#b85a52'; sp.style.borderColor='#b85a52'; }
+  else { badge.innerHTML='&nbsp;'; sp.style.borderColor=''; }
+}
+$('pingze-check').addEventListener('click', function(){
+  var q=PINGZE[pzIdx], ok=0;
+  for(var i=0;i<q.line.length;i++) if(pzMarks[i]===q.pz[i]) ok++;
+  var fb=$('pingze-fb'); fb.style.display='block';
+  if(ok===q.line.length){
+    fb.className='fb ok'; fb.textContent='✅ 全对！'+q.line+'：'+q.pz.split('').join(' ');
+    pzScore+=10; $('pingze-score').textContent=pzScore;
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 对了 '+ok+'/'+q.line.length+' 个，正确答案：'+q.pz.split('').join(' ');
+  }
+});
+$('pingze-next').addEventListener('click', function(){
+  pzIdx=(pzIdx+1)%PINGZE.length; renderPingze(); window.scrollTo(0,0);
+});
+
+/* ============ 部首拼字 ============ */
+var PINZI = [
+  {ch:'好', py:'hǎo', mean:'美好', parts:['女','子'], struct:'左右'},
+  {ch:'明', py:'míng', mean:'明亮', parts:['日','月'], struct:'左右'},
+  {ch:'休', py:'xiū', mean:'休息', parts:['亻','木'], struct:'左右'},
+  {ch:'林', py:'lín', mean:'树林', parts:['木','木'], struct:'左右'},
+  {ch:'妈', py:'mā', mean:'妈妈', parts:['女','马'], struct:'左右'},
+  {ch:'河', py:'hé', mean:'河流', parts:['氵','可'], struct:'左右'},
+  {ch:'采', py:'cǎi', mean:'采摘', parts:['爪','木'], struct:'上下'},
+  {ch:'忠', py:'zhōng', mean:'忠诚', parts:['中','心'], struct:'上下'}
+];
+var pinziIdx=0, pinziScore=0, pinziSlots=[null,null];
+function initPinzi(){
+  pinziIdx=0; pinziScore=0; $('pinzi-score').textContent='0'; renderPinzi();
+}
+function renderPinzi(){
+  var q=PINZI[pinziIdx];
+  pinziSlots=[null,null];
+  $('pinzi-fb').style.display='none';
+  $('pinzi-target').innerHTML='<div style="font-size:15px;color:#666">'+q.py+' · '+q.mean+' · '+q.struct+'结构</div><div style="font-size:15px;margin-top:6px">拼出这个字 👇</div>';
+  renderPinziSlots();
+  var pool=q.parts.slice(), others=[];
+  PINZI.forEach(function(o){ if(o!==q) others=others.concat(o.parts); });
+  others=others.filter(function(p){return q.parts.indexOf(p)<0;});
+  others=others.filter(function(p,i){return others.indexOf(p)===i;});
+  others.sort(function(){return Math.random()-0.5;});
+  pool=pool.concat(others.slice(0,4)).sort(function(){return Math.random()-0.5;});
+  var box=$('pinzi-pool'); box.innerHTML='';
+  pool.forEach(function(p){
+    var b=document.createElement('span');
+    b.className='word-tok'; b.textContent=p;
+    b.style.fontSize='22px'; b.style.minWidth='52px'; b.style.textAlign='center';
+    b.addEventListener('click', function(){
+      var idx=pinziSlots[0]===null?0:(pinziSlots[1]===null?1:-1);
+      if(idx<0||b.dataset.used==='1') return;
+      pinziSlots[idx]=p; b.dataset.used='1'; b.style.visibility='hidden';
+      renderPinziSlots();
+    });
+    box.appendChild(b);
+  });
+}
+function renderPinziSlots(){
+  var box=$('pinzi-slots'); box.innerHTML='';
+  var q=PINZI[pinziIdx];
+  var labels=q.struct==='左右'?['左','右']:['上','下'];
+  for(var i=0;i<2;i++){
+    (function(i){
+      var d=document.createElement('div');
+      d.style.cssText='width:84px;height:84px;border:2px dashed #ccc;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;background:#fafafa;cursor:pointer';
+      d.textContent=pinziSlots[i]||labels[i];
+      if(!pinziSlots[i]) d.style.color='#bbb';
+      d.addEventListener('click', function(){
+        if(pinziSlots[i]){
+          var pool=$('pinzi-pool');
+          for(var k=0;k<pool.children.length;k++){
+            var b=pool.children[k];
+            if(b.dataset.used==='1'&&b.textContent===pinziSlots[i]){ b.style.visibility='visible'; b.dataset.used=''; break; }
+          }
+          pinziSlots[i]=null; renderPinziSlots();
+        }
+      });
+      box.appendChild(d);
+    })(i);
+  }
+}
+$('pinzi-check').addEventListener('click', function(){
+  var q=PINZI[pinziIdx];
+  var fb=$('pinzi-fb'); fb.style.display='block';
+  if(pinziSlots[0]===q.parts[0]&&pinziSlots[1]===q.parts[1]){
+    fb.className='fb ok'; fb.textContent='✅ 拼对了！'+q.parts[0]+' + '+q.parts[1]+' = '+q.ch+'（'+q.mean+'）';
+    pinziScore+=10; $('pinzi-score').textContent=pinziScore;
+  } else {
+    fb.className='fb no'; fb.textContent='❌ 再想想：'+q.mean+'（'+q.py+'），'+q.struct+'结构';
+  }
+});
+$('pinzi-next').addEventListener('click', function(){
+  pinziIdx=(pinziIdx+1)%PINZI.length; renderPinzi(); window.scrollTo(0,0);
+});
+
+/* ============ 文言虚词 ============ */
+var XUZI_QS = [
+  {s:'“学而时习之”中“之”指代什么？', opts:['学过的内容','老师','时间','地方'], ans:0, why:'之是代词，指代所学的内容'},
+  {s:'“马之千里者”中“之”的作用？', opts:['相当于“的”','指代马','表示去','无实义'], ans:0, why:'结构助词：千里马'},
+  {s:'“久之”中“之”的作用？', opts:['凑音节','指代时间','表示去','相当于的'], ans:0, why:'音节助词，无实义，凑足音节'},
+  {s:'“送杜少府之任蜀州”中“之”的意思？', opts:['到……去','的','他','呢'], ans:0, why:'动词：到蜀州去上任'},
+  {s:'“其恕乎”中“其”表示？', opts:['揣测（大概）','指代他','难道','还是'], ans:0, why:'副词表揣测：大概是宽恕吧'},
+  {s:'“攻其不备”中“其”指代？', opts:['对方','自己','军队','国家'], ans:0, why:'代词，指代对方'},
+  {s:'“马之千里者”中“者”表示？', opts:['……的人','语气词','时间','地方'], ans:0, why:'助词：……的人/东西'},
+  {s:'“不亦说乎”中“乎”表示？', opts:['疑问语气','感叹','命令','陈述'], ans:0, why:'语气词表疑问：不也愉快吗？'}
+];
+var xuziIdx=0, xuziScore=0;
+function initXuzi(){ xuziIdx=0; xuziScore=0; $('xuzi-score').textContent='0'; renderXuzi(); }
+function renderXuzi(){
+  var box=$('xuzi-q');
+  if(xuziIdx>=XUZI_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 通关！虚词断案要诀：一字多义看语境</div>';
+    return;
+  }
+  var q=XUZI_QS[xuziIdx];
+  var h='<div class="tree-node"><div class="q">'+(xuziIdx+1)+'. '+q.s+'</div>';
+  q.opts.forEach(function(op,oi){ h+='<button class="quiz-btn" data-oi="'+oi+'">'+op+'</button>'; });
+  h+='<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi=parseInt(b.getAttribute('data-oi'));
+      var fb=box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        xuziScore+=10; $('xuzi-score').textContent=xuziScore;
+        setTimeout(function(){xuziIdx++; renderXuzi();}, 1400);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+
+/* ============ 修辞识别 ============ */
+var XIUCI_QS = [
+  {s:'忽如一夜春风来，千树万树梨花开', opts:['比喻','拟人','夸张','排比'], ans:0, why:'把雪比作梨花：比喻'},
+  {s:'春风又绿江南岸', opts:['拟人','比喻','夸张','对偶'], ans:0, why:'“绿”作动词，春风像人一样动手：拟人'},
+  {s:'飞流直下三千尺', opts:['夸张','比喻','拟人','设问'], ans:0, why:'三千尺言过其实：夸张'},
+  {s:'海内存知己，天涯若比邻', opts:['对偶','排比','比喻','夸张'], ans:0, why:'上下句字数相等、结构相同：对偶'},
+  {s:'燕子去了，有再来的时候；杨柳枯了，有再青的时候', opts:['排比','对偶','比喻','设问'], ans:0, why:'分句结构相同、语气连贯：排比'},
+  {s:'问渠那得清如许？为有源头活水来', opts:['设问','反问','对偶','夸张'], ans:0, why:'自问自答：设问'}
+];
+var xiuciIdx=0, xiuciScore=0;
+function initXiuci(){ xiuciIdx=0; xiuciScore=0; $('xiuci-score').textContent='0'; renderXiuci(); }
+function renderXiuci(){
+  var box=$('xiuci-q');
+  if(xiuciIdx>=XIUCI_QS.length){
+    box.innerHTML='<div class="fb ok">🎉 通关！修辞口诀：比拟夸排偶设问，对号入座看特征</div>';
+    return;
+  }
+  var q=XIUCI_QS[xiuciIdx];
+  var h='<div class="tree-node"><div class="q">'+(xiuciIdx+1)+'. '+q.s+'</div>';
+  q.opts.forEach(function(op,oi){ h+='<button class="quiz-btn" data-oi="'+oi+'">'+op+'</button>'; });
+  h+='<div class="fb" style="display:none"></div></div>';
+  box.innerHTML=h;
+  box.querySelectorAll('[data-oi]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var oi=parseInt(b.getAttribute('data-oi'));
+      var fb=box.querySelector('.fb'); fb.style.display='block';
+      if(oi===q.ans){
+        b.classList.add('right');
+        fb.className='fb ok'; fb.textContent='✅ '+q.why;
+        xiuciScore+=10; $('xiuci-score').textContent=xiuciScore;
+        setTimeout(function(){xiuciIdx++; renderXiuci();}, 1400);
+      } else {
+        b.classList.add('wrong');
+        fb.className='fb no'; fb.textContent='❌ '+q.why;
+      }
+    });
+  });
+}
+
+/* ============ 错别字诊所 ============ */
+var CUOBIE = [
+  {sent:'他迫不急待地冲了出去', wrong:'待', right:'及', opts:['及','急','即','级'], idiom:'迫不及待', mean:'急得等不及了'},
+  {sent:'这件事让我刻骨明心', wrong:'明', right:'铭', opts:['铭','明','名','鸣'], idiom:'刻骨铭心', mean:'牢记在心，永远不忘'},
+  {sent:'我们要再接再励', wrong:'励', right:'厉', opts:['厉','励','历','立'], idiom:'再接再厉', mean:'继续努力，更进一步'},
+  {sent:'消息不径而走', wrong:'径', right:'胫', opts:['胫','径','经','劲'], idiom:'不胫而走', mean:'没有腿却跑得快，比喻消息传得快'},
+  {sent:'他终于原形必露了', wrong:'必', right:'毕', opts:['毕','必','闭','壁'], idiom:'原形毕露', mean:'本来面目完全暴露'},
+  {sent:'他急得一愁莫展', wrong:'愁', right:'筹', opts:['筹','愁','酬','绸'], idiom:'一筹莫展', mean:'一点办法也想不出来'},
+  {sent:'说话要直接了当', wrong:'接', right:'截', opts:['截','接','捷','结'], idiom:'直截了当', mean:'干脆爽快，不绕弯子'},
+  {sent:'真是走头无路了', wrong:'头', right:'投', opts:['投','头','透','偷'], idiom:'走投无路', mean:'无路可走，陷入绝境'}
+];
+var cuobieIdx=0, cuobieScore=0, cuobieFound=false;
+function initCuobie(){
+  cuobieIdx=0; cuobieScore=0; $('cuobie-score').textContent='0'; renderCuobie();
+}
+function renderCuobie(){
+  var q=CUOBIE[cuobieIdx];
+  cuobieFound=false;
+  $('cuobie-progress').textContent='第 '+(cuobieIdx+1)+' 句 / 共 '+CUOBIE.length+' 句';
+  $('cuobie-fb').style.display='none';
+  $('cuobie-opts').innerHTML='';
+  var box=$('cuobie-sent'); box.innerHTML='';
+  for(var i=0;i<q.sent.length;i++){
+    (function(i){
+      var sp=document.createElement('span');
+      sp.textContent=q.sent[i];
+      sp.style.cssText='cursor:pointer;padding:4px 2px;border-radius:6px';
+      sp.addEventListener('click', function(){ pickCuobie(i, sp); });
+      box.appendChild(sp);
+    })(i);
+  }
+}
+function pickCuobie(i, sp){
+  var q=CUOBIE[cuobieIdx];
+  if(cuobieFound) return;
+  var fb=$('cuobie-fb'); fb.style.display='block';
+  if(q.sent[i]===q.wrong){
+    cuobieFound=true;
+    sp.style.background='#f3e4e2'; sp.style.color='#b85a52'; sp.style.fontWeight='700';
+    fb.className='fb ok'; fb.textContent='🎯 揪出来了！「'+q.wrong+'」是错别字，选出正确的字：';
+    var box=$('cuobie-opts'); box.innerHTML='';
+    q.opts.slice().sort(function(){return Math.random()-0.5;}).forEach(function(op){
+      var b=document.createElement('button');
+      b.className='quiz-btn';
+      b.style.cssText='display:inline-block;width:auto;min-width:64px;margin:4px;font-size:20px;text-align:center';
+      b.textContent=op;
+      b.addEventListener('click', function(){
+        if(op===q.right){
+          b.classList.add('right');
+          fb.className='fb ok';
+          fb.innerHTML='✅ 答对！<b>'+q.idiom+'</b>：'+q.mean;
+          cuobieScore+=10; $('cuobie-score').textContent=cuobieScore;
+          box.querySelectorAll('button').forEach(function(x){x.disabled=true;});
+        } else {
+          b.classList.add('wrong');
+          fb.className='fb no'; fb.textContent='❌ 不是「'+op+'」，再想想';
+        }
+      });
+      box.appendChild(b);
+    });
+  } else {
+    sp.style.background='#fff3e0';
+    setTimeout(function(){ sp.style.background=''; }, 500);
+    fb.className='fb no'; fb.textContent='「'+q.sent[i]+'」没问题，再找找';
+  }
+}
+$('cuobie-next').addEventListener('click', function(){
+  cuobieIdx=(cuobieIdx+1)%CUOBIE.length; renderCuobie(); window.scrollTo(0,0);
+});
+/* 动画图解初始化 */
+$('lab-anim-symbols').innerHTML = svgLabSymbols();
+$('lab-anim-baju').innerHTML = svgLabBaju();
+$('lab-anim-le').innerHTML = svgLabLezheguo() + svgLabLe();
+$('lab-anim-dede').innerHTML = svgLabDede();
+$('lab-anim-zibian').innerHTML = svgLabZibian();
+$('lab-anim-pingze').innerHTML = svgLabPingze();
+$('lab-anim-pinzi').innerHTML = svgLabPinzi();
+$('lab-anim-xuzi').innerHTML = svgLabXuzi();
+$('lab-anim-xiuci').innerHTML = svgLabXiuci();
+$('lab-anim-cuobie').innerHTML = svgLabCuobie();
+
+})();
+</script>
+<script>
+/* 实验页 SMIL 动效总开关：把字句词块、偏旁合体两个无限循环 SVG 动画没有暂停键，
+   且 prefers-reduced-motion 关不掉 SMIL；减弱时默认暂停 */
+(function () {
+  var paused = false;
+  try { paused = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+  function apply() {
+    document.querySelectorAll('svg').forEach(function (sv) {
+      try {
+        if (paused) { if (sv.pauseAnimations) sv.pauseAnimations(); }
+        else { if (sv.unpauseAnimations) sv.unpauseAnimations(); }
+      } catch (e) {}
+    });
+    var b = document.getElementById('btnAnimPause');
+    if (b) b.textContent = paused ? '▶ 动画' : '⏸ 动画';
+  }
+  var b = document.getElementById('btnAnimPause');
+  if (b) b.addEventListener('click', function () { paused = !paused; apply(); });
+  apply();
+})();
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

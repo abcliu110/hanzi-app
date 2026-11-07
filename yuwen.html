@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语文知识库 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="page-sub page-yuwen">
+<header class="topbar nav">
+  <a href="index.html" target="_top" class="back">← 返回</a>
+  <span id="navtitle">语法</span>
+</header>
+<main class="listwrap">
+  <div id="ywlist"></div>
+  <div id="ywdetail" style="display:none"></div>
+  <p class="src-note">实验内容：<a href="proto-yuwen.html">图解课堂原型（蒙特梭利语法符号等）</a>，不在主知识库内，内容以正式版为准。</p>
+  <a href="quiz/index.html?tab=yuwen&from=yuwen.html" target="_top" style="display:block;text-align:center;margin:14px 0 10px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：8种玩法，测测你学会了没 →</a>
+<div style="margin:0 0 10px;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--line);">
+  <div style="font-weight:bold;margin-bottom:8px;">🎮 语法互动游戏</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+    <a href="games/yufa/juzi-chengfen.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔍 句子成分标注</a>
+    <a href="games/yufa/bazi-beizi.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔄 把被字句变形机</a>
+    <a href="games/yufa/dedide-dashu.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🎯 的地得打地鼠</a>
+    <a href="games/yufa/guanlianci.html" style="display:block;text-align:center;padding:12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:bold;user-select:none;-webkit-user-select:none;">🔗 关联词连线</a>
+  </div>
+</div>
+</main>
+
+<script>
+/* 被首页以 iframe 嵌入时隐藏本页顶栏，避免出现两层顶栏和 iframe 内回首页 */
+if (window.self !== window.top) {
+  var tb = document.querySelector('.topbar');
+  if (tb) tb.style.display = 'none';
+}
+</script>
+<script src="yuwen/data.js"></script>
+<!-- 语法题库按需加载：只引入清单，进入知识点详情时 yuwen.js 再加载对应 quiz_bank_*.js -->
+<script src="yuwen/quiz_bank_index.js"></script>
+<!-- 白板动画清单：语法点名称 -> wb/s/<id>.js；引擎和场景点播放时才加载 -->
+<script src="wb/index.js"></script>
+<!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
+<script src="pattern-templates.js"></script>
+<script src="yuwen.js"></script>
+<script>
+/* PWA：只在 http(s) 下注册 service worker；file:// 打开时不注册 */
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+<script src="nav-up.js"></script>
+</body>
+</html>

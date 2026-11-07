@@ -1,0 +1,49 @@
+/* 笔顺动画组件样式（独立文件；颜色只用 zika.css 护眼色板值） */
+.nhz-sp {
+  box-sizing: border-box;
+  background: #f8faf5;
+  border: 1px solid #d5dfd0;
+  border-radius: 12px;
+  padding: 12px;
+  max-width: 420px;
+}
+.nhz-sp-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #f2f6ee;
+  border-radius: 8px;
+}
+.nhz-sp-outline,
+.nhz-sp-trace {
+  transition: opacity 0.15s ease;
+}
+.nhz-sp-ctrls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.nhz-sp-btn {
+  background: #f2f6ee;
+  color: #2c3328;
+  border: 1px solid #d5dfd0;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.nhz-sp-btn:focus-visible,
+.nhz-sp-speed:focus-visible {
+  outline: 3px solid #4a7a59;
+  outline-offset: 2px;
+}
+.nhz-sp-speed {
+  background: #f2f6ee;
+  color: #2c3328;
+  border: 1px solid #d5dfd0;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 14px;
+}

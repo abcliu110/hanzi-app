@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>唐朝朋友圈 · 古诗词</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--song:#4a7a8c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:16px;line-height:1.7}
+.wrap{max-width:980px;margin:0 auto;padding:14px 14px 60px}
+.back{display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none}
+h1{font-size:21px;margin:14px 0 4px}
+.sub{font-size:14px;color:var(--muted);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.tip{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.filters button{min-height:40px;padding:6px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:15px;cursor:pointer}
+.filters button.on{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
+#graph{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.g-edge{stroke:#9db89e;stroke-width:1.6;cursor:pointer}
+.g-edge:hover,.g-edge.hl{stroke:#c46a2b;stroke-width:3}
+.g-hit{stroke:transparent;stroke-width:16;cursor:pointer}
+.g-node{cursor:pointer}
+.g-node circle{stroke:#fff;stroke-width:2}
+.g-node text{font-size:13px;fill:var(--ink)}
+.g-node.hl circle{stroke:#c46a2b;stroke-width:3}
+.edge-list{margin:10px 0 0;padding:0;list-style:none}
+.edge-list li{padding:9px 10px;border-bottom:1px dashed var(--line);font-size:15px}
+.edge-list li:last-child{border-bottom:0}
+.edge-list a{color:var(--accent-deep);font-weight:700;text-decoration:none}
+.edge-list .tp{display:inline-block;font-size:12px;background:var(--accent-soft);color:var(--accent-deep);border-radius:999px;padding:1px 9px;margin-left:6px}
+.edge-list .note{font-size:13px;color:var(--muted)}
+.edge-list .ev{font-size:12px;color:var(--muted);margin-top:2px}
+#personBox:empty{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../../shici.html">← 返回</a>
+  <h1>🤝 唐朝朋友圈 · 诗人交往图</h1>
+  <p class="sub">一首赠别诗，就是诗人之间的一条连线。点一条线，打开那首诗；点一个人，看他所有的交往诗。</p>
+  <div class="card">
+    <div class="filters" id="filters">
+      <button type="button" data-f="all" class="on">全部</button>
+      <button type="button" data-f="tang">唐朝</button>
+      <button type="button" data-f="song">宋朝</button>
+    </div>
+    <svg id="graph" viewBox="0 0 960 560" role="img" aria-label="诗人交往图"></svg>
+    <div class="tip">图是手写力导向排布（无外部库）：绿点是写过交往诗的诗人，浅点是只作为收件人出现的人。线点不准时，下面的边表每一条都能点开。</div>
+    <div class="card" id="personBox" style="margin:12px 0 0"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 6px" id="edgeHead">📜 交往边（全部对应诗库收录诗）</h3>
+    <div class="tip" style="margin:0 0 6px">每条边下面写着依据：诗题、本库赏析背景、诗人小传或诗人足迹年谱，查不到出处的关系不写；年份只在诗人足迹年谱列了这首诗时显示（带年谱名）。未具名者单独成节点，不与他人合并。注意：王勃《送杜少府之任蜀州》的杜少府是王勃友人，不是杜甫。</div>
+    <ul class="edge-list" id="edgeList"></ul>
+  </div>
+  <div class="tip">数据来源：data/shici.js（诗题、作者、序号、诗人小传）、data/shangxi.js（赏析背景）、data/poet_trails.js（诗人足迹年谱，含年谱出处）。点诗名打开 shici.html 对应诗详情（#poem-序号 深链）。</div>
+</div>
+<script src="../../data/shici.js"></script>
+<script src="../../data/shangxi.js"></script>
+<script src="../../data/poet_trails.js"></script>
+<script>
+(function(){
+'use strict';
+/* 交往边：from 作者，to 收件人，order 诗库序号，type 交往类型。
+   ev 依据（每条至少一项，页面运行时逐项核对，核不上的边标 ⚠️ 并不画线）：
+     {k:'t', s:'…'}     诗题里含这几个字（data/shici.js poems[].title）
+     {k:'bg', s:'…'}    本库赏析背景里含这句（data/shangxi.js 该诗 bg）
+     {k:'trail', s:'…'} 诗人足迹年谱数据里含这句（data/poet_trails.js，带年谱出处）
+     {k:'poet', a:'诗人', s:'…'} 诗人小传里含这几个字（data/shici.js poets）
+   年份不手写：只在 data/poet_trails.js 该诗人某站列了这首诗时显示那一站的年份与年谱出处。
+   2026-11-07 SC2 核对：柳永《望海潮》赠孙何一条，诗题与本库赏析都没有孙何，查不到出处，按「有出处才写」撤下；
+   陆游一条按本库赏析写「唐婉」；李商隐《夜雨寄北》按本库赏析写「妻子（或友人）」，不定为一人。 */
+var EDGES = [
+  {from:'李白', to:'汪伦', order:3, type:'赠', dyn:'tang', ev:[{k:'t', s:'汪伦'}]},
+  {from:'李白', to:'孟浩然', order:8, type:'送', dyn:'tang', ev:[{k:'t', s:'孟浩然'}]},
+  {from:'高适', to:'董大', order:71, type:'别', dyn:'tang', note:'董大即董庭兰，乐师', ev:[{k:'t', s:'董大'}, {k:'bg', s:'董庭兰，乐师'}]},
+  {from:'李白', to:'王昌龄', order:13, type:'寄', dyn:'tang', ev:[{k:'t', s:'王昌龄'}]},
+  {from:'王昌龄', to:'辛渐', order:45, type:'送', dyn:'tang', ev:[{k:'t', s:'辛渐'}]},
+  {from:'王维', to:'元二', order:28, type:'送', dyn:'tang', note:'元二姓元、排行第二，名字不详，不写全名', ev:[{k:'t', s:'元二'}]},
+  {from:'杨万里', to:'林子方', order:137, type:'送', dyn:'song', ev:[{k:'t', s:'林子方'}]},
+  {from:'苏轼', to:'刘景文', order:154, type:'赠', dyn:'song', ev:[{k:'t', s:'刘景文'}]},
+  {from:'王观', to:'鲍浩然', order:192, type:'送', dyn:'song', ev:[{k:'t', s:'鲍浩然'}]},
+  {from:'李白', to:'李云', order:18, type:'饯别', dyn:'tang', note:'诗题“校书叔云”即族叔李云', ev:[{k:'t', s:'叔云'}, {k:'bg', s:'族叔李云'}]},
+  {from:'孟浩然', to:'张九龄', order:36, type:'赠', dyn:'tang', note:'诗题“张丞相”即张九龄', ev:[{k:'t', s:'张丞相'}, {k:'bg', s:'丞相张九龄'}]},
+  {from:'岑参', to:'武判官', order:47, type:'送', dyn:'tang', note:'武判官姓名不详，诗题只称官职', ev:[{k:'t', s:'武判官'}]},
+  {from:'刘禹锡', to:'白居易', order:59, type:'酬赠', dyn:'tang', note:'乐天即白居易', ev:[{k:'t', s:'乐天'}, {k:'bg', s:'白居易（乐天）'}]},
+  {from:'刘长卿', to:'灵澈上人', order:81, type:'送', dyn:'tang', ev:[{k:'t', s:'灵澈上人'}]},
+  {from:'王勃', to:'杜少府', order:117, type:'送', dyn:'tang', note:'杜少府是王勃友人，不是杜甫（王勃650—676，杜甫712年才出生）', ev:[{k:'t', s:'杜少府'}, {k:'poet', a:'王勃', s:'650—676'}, {k:'poet', a:'杜甫', s:'712—770'}]},
+  {from:'辛弃疾', to:'陈同甫', order:102, type:'寄', dyn:'song', note:'陈同甫即陈亮', ev:[{k:'t', s:'陈同甫'}, {k:'trail', s:'陈同甫（陈亮）'}]},
+  {from:'杜甫', to:'宇文石首', order:86, type:'联句送别', dyn:'tang', ev:[{k:'t', s:'宇文石首'}]},
+  {from:'韩愈', to:'张籍', order:64, type:'呈', dyn:'tang', note:'水部张十八员外即张籍', ev:[{k:'t', s:'张十八员外'}, {k:'bg', s:'张籍'}]},
+  {from:'贾岛', to:'李凝', order:68, type:'题赠', dyn:'tang', ev:[{k:'t', s:'李凝'}]},
+  {from:'李白', to:'友人（未具名）', order:14, type:'送', dyn:'tang', note:'诗题只写“友人”，不与他诗的友人合并', ev:[{k:'t', s:'友人'}]},
+  {from:'苏轼', to:'苏辙', order:91, type:'怀', dyn:'song', note:'中秋思念弟弟苏辙', ev:[{k:'bg', s:'思念弟弟苏辙'}]},
+  {from:'苏轼', to:'惠崇', order:147, type:'题画', dyn:'song', note:'题惠崇画的《春江晚景》，不是写信给惠崇', ev:[{k:'t', s:'惠崇'}, {k:'bg', s:'他画了《春江晚景》图'}]},
+  {from:'王安石', to:'杨德逢', order:182, type:'题壁', dyn:'song', note:'湖阴先生即杨德逢，王安石的邻居', ev:[{k:'t', s:'湖阴先生'}, {k:'bg', s:'湖阴先生名叫杨德逢'}]},
+  {from:'陆游', to:'唐婉', order:113, type:'寄怀', dyn:'song', note:'写给前妻唐婉', ev:[{k:'bg', s:'写给前妻唐婉'}]},
+  {from:'李清照', to:'赵明诚', order:99, type:'寄怀', dyn:'song', note:'写给丈夫赵明诚', ev:[{k:'bg', s:'写给丈夫赵明诚'}]},
+  {from:'李清照', to:'赵明诚', order:100, type:'思念', dyn:'song', note:'重阳思念丈夫（丈夫即赵明诚，见《一剪梅》赏析）', ev:[{k:'bg', s:'思念丈夫'}]},
+  {from:'王维', to:'山东兄弟', order:27, type:'忆家人', dyn:'tang', ev:[{k:'t', s:'山东兄弟'}]},
+  {from:'白居易', to:'送别对象（未具名）', order:120, type:'送别', dyn:'tang', note:'诗题只写“送别”，送谁没有写，单独立节点', ev:[{k:'t', s:'送别'}]},
+  {from:'李商隐', to:'远方亲友（未具名）', order:53, type:'寄', dyn:'tang', note:'寄给妻子还是友人，本库赏析写“妻子（或友人）”，不定为一人', ev:[{k:'t', s:'寄北'}, {k:'bg', s:'妻子（或友人）'}]}
+];
+var D = window.NHZ_SHICI || {poems:[]};
+var poemByOrder = {};
+D.poems.forEach(function(p){ poemByOrder[p.order] = p; });
+var SX = {};
+(window.NHZ_SHANGXI || []).forEach(function(x){ SX[x.a + '|' + x.t] = x.bg || ''; });
+var TRAILS = (window.NHZ_POET_TRAILS && window.NHZ_POET_TRAILS.poets) || [];
+var TRAIL_TXT = JSON.stringify(TRAILS);
+var POETS = D.poets || {};
+/* 该诗在诗人足迹年谱里的一站（有才显示年份） */
+function trailStop(author, title){
+  for(var i = 0; i < TRAILS.length; i++){
+    if(TRAILS[i].name !== author) continue;
+    var tr = TRAILS[i].trail || [];
+    for(var j = 0; j < tr.length; j++) if((tr[j].poems || []).indexOf(title) >= 0) return tr[j];
+  }
+  return null;
+}
+/* 运行时核对：序号、作者与诗库一致，且 ev 每一项都能在所列数据里找到；不符的边不画线、边表标 ⚠️ */
+EDGES.forEach(function(e){
+  var p = poemByOrder[e.order];
+  e.poem = p || null;
+  e.bad = !p || p.author !== e.from;
+  e.evText = [];
+  if(!e.bad) (e.ev || []).forEach(function(v){
+    var ok = false, label = '';
+    if(v.k === 't'){ ok = p.title.indexOf(v.s) >= 0; label = '诗题'; }
+    else if(v.k === 'bg'){ var bg = SX[p.author + '|' + p.title] || ''; ok = bg.indexOf(v.s) >= 0; label = '本库赏析：' + bg; }
+    else if(v.k === 'trail'){ ok = TRAIL_TXT.indexOf(v.s) >= 0; label = '诗人足迹年谱数据：“' + v.s + '”'; }
+    else if(v.k === 'poet'){ ok = (POETS[v.a] || '').indexOf(v.s) >= 0; label = '诗人小传：' + v.a + ' ' + v.s; }
+    if(!ok) e.bad = true;
+    if(v.k !== 't' && label && e.evText.indexOf(label) < 0) e.evText.push(label);
+  });
+  if(!e.ev || !e.ev.length) e.bad = true;
+  e.stop = p ? trailStop(p.author, p.title) : null;
+  if(e.bad && window.console) console.warn('朋友圈边数据不符', e);
+});
+var authors = {};
+EDGES.forEach(function(e){ authors[e.from] = 1; });
+var names = [], nodeIndex = {};
+function addNode(n){ if(!(n in nodeIndex)){ nodeIndex[n] = names.length; names.push(n); } }
+EDGES.forEach(function(e){ addNode(e.from); addNode(e.to); });
+/* 手写力导向：确定性随机初位 + 斥力 + 弹簧 + 向心，240 轮 */
+function mulberry(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+var rnd = mulberry(42), W = 960, H = 560;
+var nodes = names.map(function(n){
+  var deg = 0; EDGES.forEach(function(e){ if(e.from === n || e.to === n) deg++; });
+  return {name:n, x:80 + rnd() * (W - 160), y:50 + rnd() * (H - 100), vx:0, vy:0, deg:deg};
+});
+for(var iter = 0; iter < 240; iter++){
+  for(var i = 0; i < nodes.length; i++){
+    for(var j = i + 1; j < nodes.length; j++){
+      var a = nodes[i], b = nodes[j], dx = a.x - b.x, dy = a.y - b.y;
+      var d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2), f = 2600 / d2;
+      a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f;
+    }
+  }
+  EDGES.forEach(function(e){
+    var a = nodes[nodeIndex[e.from]], b = nodes[nodeIndex[e.to]];
+    var dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) + 0.01, f = (d - 130) * 0.02;
+    a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f;
+  });
+  nodes.forEach(function(n){
+    n.vx += (W / 2 - n.x) * 0.002; n.vy += (H / 2 - n.y) * 0.002;
+    n.vx *= 0.85; n.vy *= 0.85; n.x += n.vx; n.y += n.vy;
+    n.x = Math.max(70, Math.min(W - 150, n.x)); n.y = Math.max(30, Math.min(H - 30, n.y));
+  });
+}
+var svg = document.getElementById('graph'), NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent){
+  var o = document.createElementNS(NS, tag);
+  for(var k in attrs) o.setAttribute(k, attrs[k]);
+  parent.appendChild(o); return o;
+}
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function poemLink(order){ return '../../shici.html#poem-' + order; }
+var curFilter = 'all', selPerson = null;
+function visibleEdges(){
+  return EDGES.filter(function(e){ return curFilter === 'all' || e.dyn === curFilter; });
+}
+function graphEdges(){
+  return visibleEdges().filter(function(e){ return !e.bad; });
+}
+function draw(){
+  svg.innerHTML = '';
+  var vis = graphEdges();
+  var visNames = {};
+  vis.forEach(function(e){ visNames[e.from] = 1; visNames[e.to] = 1; });
+  vis.forEach(function(e){
+    var a = nodes[nodeIndex[e.from]], b = nodes[nodeIndex[e.to]];
+    var g = el('g', {}, svg);
+    el('line', {'class':'g-hit', x1:a.x, y1:a.y, x2:b.x, y2:b.y}, g);
+    var ln = el('line', {'class':'g-edge' + (selPerson && (e.from === selPerson || e.to === selPerson) ? ' hl' : ''), x1:a.x, y1:a.y, x2:b.x, y2:b.y}, g);
+    var t = document.createElementNS(NS, 'title');
+    t.textContent = e.from + ' → ' + e.to + '《' + (e.poem ? e.poem.title : '？') + '》';
+    g.appendChild(t);
+    g.addEventListener('click', function(){ if(e.poem) location.href = poemLink(e.order); });
+  });
+  nodes.forEach(function(n){
+    if(!visNames[n.name]) return;
+    var g = el('g', {'class':'g-node' + (selPerson === n.name ? ' hl' : '')}, svg);
+    var c = el('circle', {cx:n.x, cy:n.y, r:Math.min(22, 10 + n.deg * 2), fill:authors[n.name] ? '#4a7a59' : '#cfe0d2'}, g);
+    var tx = el('text', {x:n.x + 14, y:n.y + 4}, g); tx.textContent = n.name;
+    g.addEventListener('click', function(){ selPerson = (selPerson === n.name ? null : n.name); draw(); renderPerson(); });
+  });
+}
+function renderPerson(){
+  var box = document.getElementById('personBox');
+  if(!selPerson){ box.innerHTML = ''; return; }
+  var es = EDGES.filter(function(e){ return e.from === selPerson || e.to === selPerson; });
+  box.innerHTML = '<h3 style="margin:0 0 6px">' + esc(selPerson) + ' 的交往诗（' + es.length + ' 条）</h3><ul class="edge-list">' +
+    es.map(function(e){
+      var other = e.from === selPerson ? e.to : e.from;
+      var dir = e.from === selPerson ? '→ ' + esc(other) : '← ' + esc(other);
+      return '<li>' + dir + ' <span class="tp">' + esc(e.type) + '</span> <a href="' + poemLink(e.order) + '">《' + esc(e.poem ? e.poem.title : '？') + '》</a></li>';
+    }).join('') + '</ul>';
+}
+function renderList(){
+  var ul = document.getElementById('edgeList');
+  ul.innerHTML = visibleEdges().map(function(e){
+    return '<li>' + esc(e.from) + ' → ' + esc(e.to) + ' <span class="tp">' + esc(e.type) + '</span> ' +
+      (e.poem ? '<a href="' + poemLink(e.order) + '">《' + esc(e.poem.title) + '》</a>' : '（诗库无此序号）') +
+      (e.note ? ' <span class="note">（' + esc(e.note) + '）</span>' : '') +
+      (e.stop ? ' <span class="tp">' + e.stop.year + (e.stop.tag ? '，' + esc(e.stop.tag) : '') + '</span>' : '') +
+      (e.bad ? ' <span class="note">⚠️ 本条依据核不上，未画线</span>' : '') +
+      '<div class="ev">依据：' + ((e.ev || []).some(function(v){ return v.k === 't'; }) ? '诗题' + (e.evText.length ? '；' : '') : '') + esc(e.evText.join('；')) +
+      (e.stop ? '；年份据 ' + esc(e.stop.src || '诗人足迹年谱') : '') + '</div></li>';
+  }).join('');
+}
+document.getElementById('filters').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-f]'); if(!b) return;
+  curFilter = b.getAttribute('data-f');
+  document.querySelectorAll('#filters button').forEach(function(x){ x.classList.toggle('on', x === b); });
+  selPerson = null; renderPerson(); draw(); renderList();
+});
+(function(){
+  var n = {all:0, tang:0, song:0};
+  EDGES.forEach(function(e){ if(e.bad) return; n.all++; n[e.dyn]++; });
+  var lab = {all:'全部', tang:'唐朝', song:'宋朝'};
+  document.querySelectorAll('#filters button').forEach(function(b){ var f = b.getAttribute('data-f'); b.textContent = lab[f] + ' ' + n[f] + ' 条'; });
+  document.getElementById('edgeHead').textContent = '📜 ' + n.all + ' 条交往边（全部对应诗库收录诗，逐条有依据）';
+})();
+draw(); renderList();
+})();
+</script>
+<script src="../../nav-up.js"></script>
+</body>
+</html>

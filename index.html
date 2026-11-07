@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>识字星球 · newhanzi</title>
+<link rel="stylesheet" href="zika.css">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="page-home">
+<!-- 首页：品牌 + 今日学习 + 7面板 -->
+<div id="view-home" class="home-view">
+  <div class="brand"><h1>识字星球</h1><p>护眼学习</p></div>
+  <div class="today">
+    <div><div class="t-num" id="stTotal">0</div><div class="t-label">已学字数</div></div>
+    <div class="t-mid">
+      <div class="t-row"><span id="heroPct">完成度 0%</span><span id="learnedCount">已学 0 / 3500</span></div>
+      <div class="t-bar"><div class="t-fill" id="pfill"></div></div>
+    </div>
+    <div class="t-side"><b id="stToday">0</b> 今日新字 · <a href="fuxi.html" style="color:inherit;text-decoration:underline">今日复习 <b id="stReview">0</b> 道</a></div>
+  </div>
+  <div class="today-task" id="todayTask" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 14px 12px">
+    <h2 style="margin:0 0 4px;font-size:17px">📋 今日任务</h2>
+    <div id="ttRows"></div>
+    <p id="ttNote" style="margin:8px 0 0;color:var(--ink);opacity:.8;font-size:14px"></p>
+  </div>
+  <div class="checkin-card" id="checkinCard" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 14px 12px">
+    <h2 style="margin:0 0 4px;font-size:17px">⭐ 打卡与星星</h2>
+    <div id="ckRows"></div>
+  </div>
+  <a class="logic-daily-card" id="logicDailyCard" href="games/luoji/daily.html" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 14px 12px;color:var(--ink);text-decoration:none">
+    <h2 style="margin:0 0 4px;font-size:17px">⏱️ 逻辑一分钟 <span style="font-size:15px;font-weight:normal;color:var(--accent-deep,#3d5a40)">做今天这句 →</span></h2>
+    <div id="ldStatus" style="font-size:15px;opacity:.85"></div>
+  </a>
+  <div class="panels">
+    <button class="panel" type="button" data-m="shizi">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="32" height="36" rx="4"/><path d="M18 18h12M24 14v16M18 26h12"/></svg>
+      <b>识字</b><div class="prog"><i id="prog-shizi"></i></div><div class="prog-tx" id="progtx-shizi"></div>
+    </button>
+    <button class="panel" type="button" data-m="pinyin">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12h16"/><circle cx="22" cy="30" r="8"/><path d="M30 22v16"/></svg>
+      <b>拼音</b><div class="prog"><i style="width:2%"></i></div><div class="prog-tx">12 个知识点</div>
+    </button>
+    <button class="panel" type="button" data-m="yuwen">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8l8 8L20 36l-10 2 2-10z"/><path d="M28 12l8 8"/></svg>
+      <b>语法</b><div class="prog"><i style="width:12%"></i></div><div class="prog-tx">135 项</div>
+    </button>
+    <button class="panel" type="button" data-m="yuedu">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10c6-3 12-3 16 0 4-3 10-3 16 0v28c-6-3-12-3-16 0-4-3-10-3-16 0z"/><path d="M24 10v28"/></svg>
+      <b>阅读与写作</b><div class="prog"><i style="width:5%"></i></div><div class="prog-tx">读写</div>
+    </button>
+    <button class="panel" type="button" data-m="logic">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="16"/><path d="M24 14v10l7 5"/></svg>
+      <b>逻辑</b><div class="prog"><i style="width:5%"></i></div><div class="prog-tx">211 题</div>
+    </button>
+    <button class="panel" type="button" data-m="bushou">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h6a4 4 0 014 4v4h4a4 4 0 014 4v6a4 4 0 01-4 4h-4v4a4 4 0 01-4 4h-6a4 4 0 01-4-4v-4h-4a4 4 0 01-4-4v-6a4 4 0 014-4h4v-4a4 4 0 014-4z"/></svg>
+      <b>部首</b><div class="prog"><i style="width:8%"></i></div><div class="prog-tx">222 部首</div>
+    </button>
+    <button class="panel" type="button" data-m="shici">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 28A14 14 0 1120 8a11 11 0 0016 20z"/></svg>
+      <b>古诗词</b><div class="prog"><i style="width:20%"></i></div><div class="prog-tx">192 首</div>
+    </button>
+    <button class="panel" type="button" data-m="guwen">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10c6-3 12-3 16 0 4-3 10-3 16 0v28c-6-3-12-3-16 0-4-3-10-3-16 0z"/><path d="M24 10v28"/></svg>
+      <b>古文</b><div class="prog"><i style="width:10%"></i></div><div class="prog-tx">50 篇</div>
+    </button>
+    <button class="panel" type="button" data-m="lab">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#4a7a59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6h8M22 6v12l-10 18a4 4 0 003.5 6h17a4 4 0 003.5-6L26 18V6"/><path d="M16 30h16"/></svg>
+      <b>实验</b><div class="prog"><i style="width:3%"></i></div><div class="prog-tx">152 题</div>
+    </button>
+  </div>
+</div>
+
+<!-- 模块页：返回栏 + 内容 -->
+<div id="view-module" class="module-view" style="display:none">
+  <div class="topbar">
+    <button class="back" type="button" id="btnBack">← 返回</button>
+    <h1 id="modTitle">识字</h1><span class="sub" id="modSub"></span>
+  </div>
+  <div class="app-main">
+
+    <div id="panel-shizi" class="panel-shizi">
+      <div class="shizi-board">
+        <div class="controls" id="controls">
+          <div class="browse-head">
+            <h2 class="browse-title">浏览字库</h2>
+            <div class="tabs" id="tabs">
+              <button class="tab" type="button" data-v="py">拼音</button>
+              <button class="tab" type="button" data-v="bu">部首</button>
+              <button class="tab" type="button" data-v="st">笔画</button>
+            </div>
+          </div>
+          <div class="searchbox">
+            <input id="q" type="text" placeholder="搜汉字 / 拼音，如：头 / tou" autocomplete="off">
+          </div>
+          <div class="tabrow">
+            <span class="browse-hint">点右侧索引可快速跳转</span>
+            <select id="gradeSel" title="生字表据统编 2024 修订版课本识字表；4下、5下、6下待录入" style="padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px">
+              <option value="">全部年级</option>
+              <option value="1上">一年级上册</option>
+              <option value="1下">一年级下册</option>
+              <option value="2上">二年级上册</option>
+              <option value="2下">二年级下册</option>
+              <option value="3上">三年级上册</option>
+              <option value="3下">三年级下册</option>
+              <option value="4上">四年级上册</option>
+              <option value="4下">四年级下册（待录入）</option>
+              <option value="5上">五年级上册</option>
+              <option value="5下">五年级下册（待录入）</option>
+              <option value="6上">六年级上册（课本无识字表）</option>
+              <option value="6下">六年级下册（待录入）</option>
+              <option value="none">未分级</option>
+            </select>
+            <button class="chip-toggle" type="button" id="onlyNew">只看未学</button>
+          </div>
+        </div>
+        <a href="quiz/index.html?tab=zika" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：识字大闯关 →</a>
+        <div class="list-area">
+          <main class="listwrap">
+            <div id="list"></div>
+          </main>
+          <nav id="rail" aria-label="快速索引"></nav>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-pinyin" class="panel-frame" style="display:none">
+      <iframe data-src="pinyin.html" title="拼音"></iframe>
+    </div>
+
+    <div id="panel-yuwen" class="panel-frame" style="display:none">
+      <iframe data-src="yuwen.html" title="语法"></iframe>
+    </div>
+
+    <div id="panel-yuedu" class="panel-frame" style="display:none">
+      <iframe data-src="yuedu-xiezuo.html" title="阅读与写作"></iframe>
+    </div>
+
+    <div id="panel-logic" class="panel-logic" style="display:none">
+      <div id="logiclist"></div>
+    </div>
+
+    <div id="panel-lab" class="panel-frame" style="display:none">
+      <iframe data-src="grammar_lab.html" title="实验"></iframe>
+    </div>
+
+    <div id="panel-bushou" class="panel-frame" style="display:none">
+      <iframe data-src="bushou.html" title="部首"></iframe>
+    </div>
+
+    <div id="panel-shici" class="panel-frame" style="display:none">
+      <iframe data-src="shici.html" title="古诗词"></iframe>
+    </div>
+
+    <div id="panel-guwen" class="panel-frame" style="display:none">
+      <iframe data-src="guwen.html" title="古文"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="data/index.js"></script>
+<script src="data/grade_map.js"></script>
+<script src="review-log.js"></script>
+<script src="index.js"></script>
+<script src="today-task.js"></script>
+<script src="checkin.js"></script>
+<script src="games/luoji/daily-home.js"></script>
+<script src="eye-care.js"></script>
+<script src="install.js"></script>
+<script src="wb/index.js"></script>
+<script>
+/* 首页面板导航：主页 / 模块页切换 */
+(function(){
+  var viewHome = document.getElementById('view-home');
+  var viewModule = document.getElementById('view-module');
+  var modTitle = document.getElementById('modTitle');
+  var modSub = document.getElementById('modSub');
+  var panels = {shizi: document.getElementById('panel-shizi'),
+                pinyin: document.getElementById('panel-pinyin'),
+                yuwen: document.getElementById('panel-yuwen'),
+                yuedu: document.getElementById('panel-yuedu'),
+                logic: document.getElementById('panel-logic'),
+                lab: document.getElementById('panel-lab'),
+                bushou: document.getElementById('panel-bushou'),
+                shici: document.getElementById('panel-shici'),
+                guwen: document.getElementById('panel-guwen')};
+  var titles = {shizi:['识字','3500 常用字'], pinyin:['拼音','声母 / 韵母 / 声调 / 拼读'], yuwen:['语法','句子 / 修辞 / 病句'],
+    yuedu:['阅读与写作','阅读 / 写作'],
+    logic:['逻辑','推理 / 判断'], lab:['实验','动手 / 观察'],
+    bushou:['部首','偏旁 / 字形演变'], shici:['古诗词','192 首 / 常识卡'],
+    guwen:['古文','文言 / 寓言 / 名篇']};
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  var logicAnimData = {};
+  /* 逻辑 P2-5 难度分层：lv 1=小学（直观例子/圈套圈），2=初中（大前提/小前提/中项），
+     3=高中（周延/肯定后件/形式化规则）；缺省 1。定级只看专题已有文本是否出现这些术语。 */
+  var LOGIC_LV_LABEL = {1:'L1 · 小学', 2:'L2 · 初中', 3:'L3 · 高中'};
+  function logicLv(it){ var v = parseInt(it.lv, 10); return (v===2||v===3) ? v : 1; }
+  /* 逻辑 P2-4 讨论卡：完成状态只记 localStorage，不判分 */
+  function logicTalkDone(){
+    try { return JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}'); } catch(e){ return {}; }
+  }
+  function logicTalkHtml(it){
+    var card = it['讨论卡']; if(!card) return '';
+    var done = !!logicTalkDone()[it.name];
+    return '<div class="yw-talk" data-talk-name="'+esc(it.name).replace(/"/g,'&quot;')+'">' +
+      '<div class="yw-step"><span class="yw-stepnum">💬</span><span class="yw-steptitle">和家人聊一聊</span></div>' +
+      '<p class="yw-exp">'+esc(card['问题']||'')+'</p>' +
+      '<p class="yw-exp">💡 提示：'+esc(card['提示']||'')+'</p>' +
+      '<p class="yw-exp">请举一个反例：想一个让这个说法站不住的例子，讲给家人听。</p>' +
+      '<button type="button" class="back" data-talk-done="1"'+(done?' disabled':'')+'>'+
+      (done?'✓ 已完成，和家人聊过了':'✓ 聊完了，记完成')+'</button></div>';
+  }
+  /* 逻辑 P2-5 列表 lv 筛选：全部 / L1小学 / L2初中 / L3高中（L2 目前暂无专题，点后显示空提示） */
+  var logicLvFilter = '全部';
+  function renderLogicList(){
+    var D = (window.NHZ_YUWEN||{}).logic;
+    var el = document.getElementById('logiclist');
+    if(!D || !el) return;
+    var counts = {'全部':0, '1':0, '2':0, '3':0};
+    D.categories.forEach(function(c){ c.items.forEach(function(it){ counts['全部']++; counts[String(logicLv(it))]++; }); });
+    var chips = ['全部','1','2','3'].map(function(k){
+      var label = k==='全部' ? '全部' : LOGIC_LV_LABEL[k];
+      return '<button type="button" class="back" data-logic-lv="'+k+'" style="'+(logicLvFilter===k?'':'opacity:.6')+'">'+esc(label)+'（'+counts[k]+'）</button>';
+    }).join(' ');
+    var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">'+chips+'</div>';
+    var shown = 0;
+    D.categories.forEach(function(c,ci){
+      var items = c.items.filter(function(it){ return logicLvFilter==='全部' || String(logicLv(it))===logicLvFilter; });
+      if(!items.length) return;
+      shown += items.length;
+      h += '<div class="ghead" id="logic-cat-'+ci+'">'+esc(c.name)+'<span class="gcount">'+items.length+'条</span></div>'+
+        items.map(lessonHtml).join('');
+    });
+    if(!shown) h += '<div class="noresult">该档暂无专题，换个档位试试</div>';
+    h += '<a href="quiz/index.html?tab=logic" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(245,197,24,.12);border:1px solid #f5c518;color:#f5c518;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🎮 互动练习：逻辑大闯关 →</a>';
+    h += '<a href="games/luoji/zebra.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">🦓 斑马谜题格：点线索卡排除，剩唯一解 →</a>';
+    /* 逻辑P1-5 每日一句：首页逻辑区「逻辑一分钟」入口 */
+    h += '<a href="games/luoji/daily.html" style="display:block;text-align:center;margin:10px 14px;padding:13px;border-radius:12px;background:rgba(74,122,89,.12);border:1px solid #4a7a59;color:#3d5a40;font-size:16px;font-weight:bold;text-decoration:none;user-select:none;-webkit-user-select:none;">⏱️ 逻辑一分钟：每日一句 →</a>';
+    el.innerHTML = h;
+  }
+  function lessonHtml(it, idx){
+    var b='', step=0;
+    function sh(t){step++;return '<div class="yw-step"><span class="yw-stepnum">'+step+'</span><span class="yw-steptitle">'+t+'</span></div>';}
+    function escA(s){return esc(s).replace(/"/g,'&quot;');}
+    function quizBlock(qs){
+      return '<div class="yw-quiz">'+qs.map(function(q,qi){
+        return '<div class="quiz-q"><div class="quiz-t">'+(qi+1)+'. '+esc(q.q)+'</div><div class="quiz-opts">'+
+          q.options.map(function(op,oi){return '<button data-a="'+q.answer+'" data-oi="'+oi+'" data-p="'+escA(q['解析']||'')+'">'+esc(op)+'</button>';}).join('')+
+          '</div><div class="quiz-fb"></div></div>';
+      }).join('')+'</div>';
+    }
+    /* 学前先看：仅当有真实前置时显示 */
+    if(it['前置知识']&&it['前置知识'].length){
+      b += '<div class="yw-qianzhi"><div class="yw-step"><span class="yw-stepnum">📖</span><span class="yw-steptitle">学前先看</span></div><p class="yw-exp">先复习：'+it['前置知识'].map(function(q){ return esc(q); }).join('、')+'</p></div>';
+    }
+    /* 今天的目标 */
+    if(it['目标']) b += '<div class="yw-goal">🎯 今天的目标：'+esc(it['目标'])+'</div>';
+    /* 先试试：动手练第1题提到最前面 */
+    var lx = it['练习']||[];
+    if(lx.length){
+      b += '<div class="yw-try"><div class="yw-step"><span class="yw-stepnum">✏️</span><span class="yw-steptitle">先试试</span></div><p class="yw-exp">先做一道题，再往下看讲解。</p>'+quizBlock([lx[0]])+'</div>';
+    }
+    if(it['讲解']) b += sh('规则一句话')+'<p class="yw-exp">'+esc(it['讲解'])+'</p>';
+    /* 动画演示：沿用语法页播放器（步骤0的词＋每步说明） */
+    if(it['动画']&&it['动画'].steps&&it['动画'].steps.length){
+      var aid = 'lanim'+(typeof idx==='number'?idx:0)+'_'+Math.floor(Math.random()*100000);
+      b += sh('动画演示')+'<div class="yw-anim" id="'+aid+'">'+
+        '<div class="yw-anim-tokens">'+it['动画'].steps[0].tokens.map(function(t){ return '<span class="tok">'+esc(t)+'</span>'; }).join('')+'</div>'+
+        '<div class="yw-anim-note">'+esc(it['动画'].steps[0].note||'')+'</div>'+
+        '<div class="yw-anim-ctrl"><button data-aid="'+aid+'" data-act="play">▶ 播放</button>'+
+        '<button data-aid="'+aid+'" data-act="step">单步</button></div></div>';
+      logicAnimData[aid] = it['动画'].steps;
+    }
+    /* 白板动画（wb/index.js 里登记了本专题名才出，如三段论、论证地图 A22-7）：点播放时才加载引擎与场景 */
+    if((window.NHZ_WB_INDEX||{})[it.name]) b += sh('白板动画')+'<div class="yw-wb" data-lwb="'+escA(it.name)+'"><button type="button" class="back yw-wb-start" data-lwb-start="1">▶ 播放白板动画</button></div>';
+    if(it['类比']) b += sh('打个比方')+'<div class="yw-analogy">'+it['类比']+'</div>';
+    if(it['图示']) b += sh('看图说话')+'<div class="yw-diagram">'+it['图示']+'</div>';
+    if(it['口诀']) b += '<div class="yw-koujue2">🗣️ 口诀：'+esc(it['口诀'])+'</div>';
+    /* 例子：同时有好/坏对照时分组，否则保持原样 */
+    if(it['例子']&&it['例子'].length){
+      var good = it['例子'].filter(function(e){ return e.indexOf('好')===0; });
+      var bad = it['例子'].filter(function(e){ return e.indexOf('坏')===0; });
+      var rest = it['例子'].filter(function(e){ return e.indexOf('好')!==0 && e.indexOf('坏')!==0; });
+      b += sh('例子');
+      if(good.length && bad.length){
+        b += '<div class="yw-exgroups">'+
+          '<div class="yw-exg"><b>✅ 正例</b><div class="words">'+good.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>'+
+          '<div class="yw-exg"><b>❌ 反例</b><div class="words">'+bad.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>'+
+          (rest.length?'<div class="yw-exg"><b>⚠️ 病例</b><div class="words">'+rest.map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div></div>':'')+
+          '</div>';
+      } else {
+        b += '<div class="words">'+it['例子'].map(function(w){return '<span>'+esc(w)+'</span>';}).join('')+'</div>';
+      }
+    }
+    if(it['怎么认']&&it['怎么认'].length) b += sh('怎么认')+'<div class="yw-exp">'+it['怎么认'].map(function(s,si){return (si+1)+'、'+esc(s);}).join('<br>')+'</div>';
+    if(it['深讲']) b += sh('深讲一点')+String(it['深讲']).split(/\n\s*\n/).map(function(para){return '<p class="yw-exp">'+esc(para.trim()).replace(/\n/g,'<br>')+'</p>';}).join('');
+    /* 逻辑扩充 v2：谬误总地图（分区 → 先问什么 → 指向专题） */
+    if(it['地图']) b += sh('🗺️ 谬误总地图')+Object.keys(it['地图']).map(function(zone){
+      var z = it['地图'][zone]||{};
+      return '<div class="yw-map-zone" style="border:1px solid #c9d3c0;border-radius:10px;padding:8px 12px;margin:8px 0;"><b>'+esc(zone)+'</b>'+
+        (z['先问']?'<div>先问：'+esc(z['先问'])+'</div>':'')+
+        '<div>'+(z['专题']||[]).map(function(n){return '<span style="display:inline-block;margin:3px 6px 0 0;padding:1px 8px;border-radius:8px;background:#eef3e8;">'+esc(n)+'</span>';}).join('')+'</div>'+
+        (z['备注']?'<div class="yw-exp" style="font-size:13px;">'+esc(z['备注'])+'</div>':'')+'</div>';
+    }).join('');
+    if(it['辨析']) b += '<div class="warn">🔍 辨析：'+esc(it['辨析'])+'</div>';
+    if(it['例句解析']&&it['例句解析'].length) b += sh('例句解析')+it['例句解析'].map(function(e){
+      return '<p class="yw-exp">“'+esc(e.句)+'”<br>↳ '+esc(e.析)+'</p>';}).join('');
+    if(it['易错']) b += sh('易错诊所')+'<div class="warn">⚠️ '+esc(it['易错'])+'</div>';
+    /* 小结：口诀复述＋快速回忆 */
+    if(it['口诀']) b += '<div class="yw-summary">📌 小结：'+esc(it['口诀'])+'<br>快速回忆：合上页面，试着说出「'+esc(it.name||'')+'」的要点，再展开对照。</div>';
+    if(lx.length > 1) b += sh('动手练')+quizBlock(lx.slice(1));
+    if(it['小测']&&it['小测'].length) b += sh('动手小测')+quizBlock(it['小测']);
+    /* 逻辑专题互动页（docs/gaijin/luoji-gaijin-sheji.md P0） */
+    var LOGIC_TOYS = { '排除法：列表格破案': ['games/luoji/zebra.html', '🦓 斑马谜题格：列表格打×破案'], '三段论': ['games/luoji/taoquan.html', '⭕ 套圈判官：自己摆圈判推理'], '推理三兄弟：演绎/归纳/类比': ['games/luoji/fanpai.html', '🃏 十五贯翻牌验证：如果…就…'], '假言推理四式': ['games/luoji/fanpai.html', '🃏 十五贯翻牌验证：如果…就…'], '常见谬误': ['games/luoji/miuwu.html', '🃏 谬误卡牌册：出牌点名'], '概念：定义与划分': ['games/luoji/fenchouti.html', '🗄️ 分抽屉：一个标准一次分完'], '四大逻辑规律': ['games/luoji/blocks.html', '🧱 规则积木：拼一句看圈怎么变'], '因果链：多米诺': ['games/luoji/domino.html', '🁢 多米诺：推一推，抽掉一块看会不会断'], '强加因果': ['games/luoji/domino.html', '🁢 多米诺：强加的那一块推不倒'] };
+    if(LOGIC_TOYS[it.name]) b += '<a class="yw-topicquiz" href="'+LOGIC_TOYS[it.name][0]+'" style="display:inline-block;margin:8px 8px 8px 0;padding:10px 14px;border-radius:10px;border:1px solid var(--accent-deep,#3d5a40);color:var(--accent-deep,#3d5a40);text-decoration:none">'+esc(LOGIC_TOYS[it.name][1])+' →</a>';
+    /* 逻辑专题：直达题库里同 point 的题（quiz/data_logic.js 每题有 point） */
+    if(it.name) b += '<a class="yw-topicquiz" href="quiz/index.html?tab=logic&point='+encodeURIComponent(it.name)+'" style="display:inline-block;margin:8px 0;padding:10px 14px;border-radius:10px;border:1px solid #f5c518;color:#f5c518;text-decoration:none">🎮 练这个专题的题 →</a>';
+    /* 逻辑 P2-4 讨论卡：专题末尾，不判分 */
+    if(it['讨论卡']) b += logicTalkHtml(it);
+    /* 逻辑扩充 v2：资料来源（折叠，点开才看） */
+    if(it['来源']&&it['来源'].length) b += '<details class="yw-src" style="margin:10px 0;font-size:13px;color:#5a6352;"><summary>📚 资料来源</summary><ul>'+
+      it['来源'].map(function(u){ u=String(u); return '<li>'+(/^https?:\/\//.test(u)?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u)+'</a>':esc(u))+'</li>'; }).join('')+'</ul></details>';
+    return '<div class="yw-item"><button class="yw-head"><span class="yw-name">'+esc(it.name||'')+'</span>'+
+      '<span class="yw-lv" style="margin-left:8px;font-size:13px;color:#3d5a40;border:1px solid #3d5a40;border-radius:8px;padding:1px 7px;">'+esc(LOGIC_LV_LABEL[logicLv(it)])+'</span>'+
+      (it['subtitle']?'<span class="yw-sub">'+esc(it['subtitle'])+'</span>':'')+
+      '<span class="yw-arrow">▾</span></button><div class="yw-body">'+b+'</div></div>';
+  }
+  function openModule(m, fromPop){
+    if(!panels[m]) return;
+    curMod = m; curDepth = 0; modSub.style.display = ''; renderCrumbs(null);
+    viewHome.style.display='none';
+    viewModule.style.display='block';
+    modTitle.textContent = titles[m][0];
+    modSub.textContent = titles[m][1];
+    for(var k in panels) panels[k].style.display = (k===m?'block':'none');
+    /* 子页 iframe 懒加载：首次打开面板时才把 data-src 赋给 src，首页初始只加载自身 */
+    var fr = panels[m].querySelector('iframe[data-src]');
+    if(fr && !fr.getAttribute('src')) fr.setAttribute('src', fr.getAttribute('data-src'));
+    else { cmdFrame('go', 0); }
+    /* 模块视图的返回按钮统一由父页提供；iframe 子页被嵌入时隐藏自家顶栏，避免出现两个 */
+    var btnBack = document.getElementById('btnBack');
+    if(btnBack) btnBack.style.display = '';
+    if(m==='logic' && !panels.logic.dataset.done && !window.NHZ_YUWEN){
+      /* 逻辑数据在 yuwen/data.js（~700KB），只在首次打开逻辑面板时按需加载（file:// 下 <script> 也可用） */
+      var lg = document.getElementById('logiclist');
+      if(lg && !lg.innerHTML) lg.innerHTML = '<div class="noresult">加载中…</div>';
+      if(!panels.logic.dataset.loading){
+        panels.logic.dataset.loading='1';
+        var sc = document.createElement('script');
+        sc.src = 'yuwen/data.js';
+        sc.onload = function(){ if(panels.logic.style.display!=='none') openModule('logic'); };
+        sc.onerror = function(){ delete panels.logic.dataset.loading; if(lg) lg.innerHTML = '<div class="noresult">逻辑内容加载失败，请检查网络后重试</div>'; };
+        document.head.appendChild(sc);
+      }
+    }
+    if(m==='logic' && !panels.logic.dataset.done && window.NHZ_YUWEN){
+      renderLogicList();
+      panels.logic.dataset.done='1';
+    }
+    window.scrollTo(0,0);
+  }
+
+  document.querySelectorAll('#view-home .panel').forEach(function(p){
+    p.addEventListener('click', function(){ openModule(p.getAttribute('data-m')); });
+  });
+  /* ---------- 返回 = 回上一级（负责人 2026-11-05/06：不要轻易回首页；只用界面层级，不用浏览器历史） ---------- */
+  var curMod = null, curDepth = 0;
+  function closeModule(){
+    curMod = null; curDepth = 0;
+    viewModule.style.display='none';
+    viewHome.style.display='flex';
+    modTitle.textContent = '';
+    window.scrollTo(0,0);
+  }
+  /* 导航全部由界面层级驱动，不使用浏览器历史（pushState/back/go/popstate 一律不用）：
+     子页（iframe）每次换页用 postMessage 报告面包屑；首页只记 curDepth；
+     「← 返回」和面包屑通过 postMessage 命令让子页回到指定层级；已在模块最外层才回首页。 */
+  function cmdFrame(cmd, i){
+    var p = curMod && panels[curMod], fr = p && p.querySelector('iframe');
+    if(!fr || !fr.contentWindow) return false;
+    try{ fr.contentWindow.postMessage({nhzCmd:cmd, i:i}, '*'); return true; }catch(e){ return false; }
+  }
+  function renderCrumbs(names){
+    if(!curMod) return;
+    if(!names || names.length < 2){ modTitle.textContent = titles[curMod][0]; modSub.style.display = ''; return; }
+    modSub.style.display = 'none';
+    modTitle.innerHTML = names.map(function(n, i){
+      return i < names.length - 1 ? '<a class="crumb" href="#" data-crumb="'+i+'">'+esc(n)+'</a><span class="crumb-sep">›</span>' : '<span class="crumb cur">'+esc(n)+'</span>';
+    }).join('');
+  }
+  modTitle.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('[data-crumb]') : null;
+    if(!a) return;
+    e.preventDefault();
+    var i = parseInt(a.getAttribute('data-crumb'), 10);
+    if(i < curDepth) cmdFrame('go', i);
+  });
+  window.addEventListener('message', function(e){
+    var d = e.data;
+    if(!d || !d.nhzNav || !curMod) return;
+    var p = panels[curMod], fr = p && p.querySelector('iframe');
+    if(!fr || e.source !== fr.contentWindow) return;
+    curDepth = Math.max(0, (d.crumbs || []).length - 1);
+    renderCrumbs(d.crumbs);
+  });
+  document.getElementById('btnBack').addEventListener('click', function(){
+    if(curDepth > 0 && cmdFrame('up')) return;
+    closeModule();
+  });
+  /* 从别的页面返回时用 ?m=模块名 直接打开对应模块（界面层级，不用浏览器历史） */
+  (function(){ var mm = /[?&]m=(\w+)/.exec(location.search); if(mm && panels[mm[1]]) openModule(mm[1]); })();
+
+  window.NHZReview = window.NHZReview || (function () {
+    var WK = 'nhz_wrong', SK = 'nhz_srs';
+    var IV = [1, 2, 4, 7, 15, 30];
+    function load(k, fb) {
+      try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fb : v; }
+      catch (e) { return fb; }
+    }
+    function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function hash(s) {
+      var h = 0;
+      for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+      return 'q' + (h < 0 ? -h : h);
+    }
+    function idOf(it) { return hash(it.q + '\n' + (it.options || []).join('\n') + '\n' + it.answer); }
+    function record(it, correct) {
+      if (!it || !it.q) return;
+      var id = idOf(it);
+      var wrong = load(WK, []), srs = load(SK, {}), now = Date.now();
+      if (correct) {
+        if (srs[id]) {
+          var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+          srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+          save(SK, srs);
+        }
+      } else {
+        var found = false;
+        for (var i = 0; i < wrong.length; i++) {
+          if (wrong[i].id === id) {
+            wrong[i] = { id: id, q: it.q, options: it.options || [], answer: it.answer,
+              解析: it['解析'] || '', src: it.src, point: it.point, addedAt: wrong[i].addedAt || now };
+            found = true; break;
+          }
+        }
+        if (!found) wrong.push({ id: id, q: it.q, options: it.options || [], answer: it.answer,
+          解析: it['解析'] || '', src: it.src, point: it.point, addedAt: now });
+        save(WK, wrong);
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+        save(SK, srs);
+      }
+    }
+    function review(id, remembered) {
+      var srs = load(SK, {}), now = Date.now();
+      if (!srs[id]) return false;
+      if (remembered) {
+        var iv = Math.min(srs[id].iv + 1, IV.length - 1);
+        srs[id] = { iv: iv, next: now + IV[iv] * 86400000 };
+      } else {
+        srs[id] = { iv: 0, next: now + IV[0] * 86400000 };
+      }
+      save(SK, srs);
+      return true;
+    }
+    function clearWrong(id) {
+      var wrong = load(WK, []), srs = load(SK, {}), nw = [];
+      for (var i = 0; i < wrong.length; i++) if (wrong[i].id !== id) nw.push(wrong[i]);
+      save(WK, nw);
+      if (srs[id]) { delete srs[id]; save(SK, srs); }
+    }
+    return { record: record, review: review, clearWrong: clearWrong,
+      loadWrong: function () { return load(WK, []); },
+      loadSrs: function () { return load(SK, {}); } };
+  })();
+  /* 逻辑专题白板：按顺序注入 <script>（file:// 可用），已加载的跳过 */
+  var lwbLoaded = {};
+  function lwbLoad(list, cb){
+    var i = 0;
+    (function next(ok){
+      if(!ok) return cb(false);
+      if(i >= list.length) return cb(true);
+      var src = list[i++];
+      if(lwbLoaded[src]) return next(true);
+      var sc = document.createElement('script'); sc.src = src;
+      sc.onload = function(){ lwbLoaded[src] = 1; next(true); };
+      sc.onerror = function(){ next(false); };
+      document.body.appendChild(sc);
+    })(true);
+  }
+  document.addEventListener('click', function(e){
+    /* 逻辑 P2-4 讨论卡完成：只记 localStorage，不判分 */
+    var tk = e.target.closest('[data-talk-done]');
+    if(tk){
+      e.stopPropagation();
+      var card = tk.closest('[data-talk-name]');
+      var nm = card ? card.getAttribute('data-talk-name') : '';
+      try {
+        var done = JSON.parse(localStorage.getItem('nhz_logic_talk_done') || '{}');
+        done[nm] = 1;
+        localStorage.setItem('nhz_logic_talk_done', JSON.stringify(done));
+      } catch(err){}
+      tk.disabled = true; tk.textContent = '✓ 已完成，和家人聊过了';
+      return;
+    }
+    /* 逻辑 P2-5 lv 筛选 chip：点后只显示该档专题 */
+    var lvb = e.target.closest('[data-logic-lv]');
+    if(lvb){
+      e.stopPropagation();
+      logicLvFilter = lvb.getAttribute('data-logic-lv');
+      renderLogicList();
+      return;
+    }
+    var h = e.target.closest('.yw-head');
+    if(h){ h.parentElement.classList.toggle('open'); return; }
+    var wbs = e.target.closest('[data-lwb-start]');
+    if(wbs){
+      e.stopPropagation();
+      var wbox = wbs.closest('[data-lwb]'), wname = wbox.getAttribute('data-lwb');
+      wbs.disabled = true; wbs.textContent = '加载中…';
+      lwbLoad(['wb/rough.js', 'wb/wb-engine.js', 'wb/terms.js', 'wb/s/' + window.NHZ_WB_INDEX[wname] + '.js'], function(ok){
+        if(!ok || !window.NHZWB || !window.NHZWB.has(wname)){ wbs.disabled = false; wbs.textContent = '加载失败，点此重试'; return; }
+        var pl = window.NHZWB.mount(wbox, wname); if(pl) pl.autoplay();
+      });
+      return;
+    }
+    var ab = e.target.closest('[data-aid]');
+    if(ab){
+      var aid = ab.getAttribute('data-aid');
+      var act = ab.getAttribute('data-act');
+      var steps = logicAnimData[aid];
+      var box = document.getElementById(aid);
+      if(!steps || !box) return;
+      var tokBox = box.querySelector('.yw-anim-tokens');
+      var note = box.querySelector('.yw-anim-note');
+      var cur = parseInt(box.getAttribute('data-cur') || '0', 10);
+      var playBtn = box.querySelector('[data-act="play"]');
+      e.stopPropagation();
+      if(box._animTimer){ clearInterval(box._animTimer); box._animTimer = null; }
+      if(playBtn) playBtn.disabled = false;
+      function showStep(i){
+        /* 每一步换成该步自己的词块（原来只显示 steps[0]，后面几步的小前提、结论等词块永远不出现）；比上一步新出现的词块高亮 */
+        box.setAttribute('data-cur', i);
+        var prev = i > 0 ? (steps[i-1].tokens || []) : [];
+        tokBox.innerHTML = (steps[i].tokens || []).map(function(t){
+          return '<span class="tok'+(prev.indexOf(t) < 0 ? ' on' : '')+'">'+esc(t)+'</span>';
+        }).join('');
+        note.textContent = steps[i].note || '';
+      }
+      if(act === 'step'){
+        cur = (cur + 1) % steps.length;
+        showStep(cur);
+      } else {
+        cur = 0;
+        showStep(0);
+        if(playBtn) playBtn.disabled = true;
+        box._animTimer = setInterval(function(){
+          if(!document.body.contains(box)){ clearInterval(box._animTimer); box._animTimer = null; return; }
+          cur++;
+          if(cur >= steps.length){
+            clearInterval(box._animTimer); box._animTimer = null;
+            if(playBtn) playBtn.disabled = false;
+            return;
+          }
+          showStep(cur);
+        }, 1200);
+      }
+      return;
+    }
+    var qb = e.target.closest('.quiz-opts button');
+    if(qb){
+      var oi = parseInt(qb.getAttribute('data-oi')), ans = parseInt(qb.getAttribute('data-a'));
+      var box = qb.closest('.quiz-q');
+      var fb = box.querySelector('.quiz-fb');
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('right','wrong');});
+      var pj = qb.getAttribute('data-p') || '';
+      if(oi===ans){ qb.classList.add('right'); fb.innerHTML='✅ 答对了！'+(pj?'<br>'+pj:''); }
+      else { qb.classList.add('wrong'); box.querySelectorAll('button')[ans].classList.add('right'); fb.innerHTML='❌ 再想想'+(pj?'<br>'+pj:''); }
+      if(!box.dataset.recorded){
+        box.dataset.recorded = '1';
+        var qt = box.querySelector('.quiz-t');
+        var opts = [];
+        box.querySelectorAll('button').forEach(function(bt){ opts.push(bt.textContent); });
+        var pitem = qb.closest('.yw-item');
+        var pname = (pitem && pitem.querySelector('.yw-name')) ? pitem.querySelector('.yw-name').textContent : '';
+        if(window.NHZReview) window.NHZReview.record({ q: qt ? qt.textContent.replace(/^\d+\.\s*/, '') : '', options: opts,
+          answer: opts[ans] || '', 解析: pj, src: '逻辑', point: pname }, oi===ans);
+      }
+    }
+  });
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>

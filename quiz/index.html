@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>互动练习 · newhanzi</title>
+<link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+<header class="qz-top">
+  <button class="qz-back" id="btnBack">← 返回</button>
+  <a class="qz-back back" href="../index.html" target="_top" style="text-decoration:none">🏠 首页</a>
+  <h1 id="qzTitle">互动练习</h1>
+</header>
+<main class="qz-main">
+  <section id="view-home"></section>
+  <section id="view-quiz" hidden>
+    <div class="qz-hud">
+      <div class="qz-prow">
+        <span id="qzProg">1/20</span>
+        <span id="qzModeTag"></span>
+        <span class="qz-hudscore"><span id="qzScore">0 分</span><span id="qzStreak"></span></span>
+      </div>
+      <div class="qz-track"><div id="qzBar"></div></div>
+    </div>
+    <div id="qbox"></div>
+    <div id="qfb" hidden></div>
+    <button class="qz-btn primary qz-next" id="btnNext" hidden>下一题 →</button>
+  </section>
+  <section id="view-done" hidden></section>
+</main>
+<script src="engine.js"></script>
+<script src="../nav-up.js"></script>
+</body>
+</html>

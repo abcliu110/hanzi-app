@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五言 vs 七言</title>
+<style>
+:root{--bg:#e4eedf;--card:#f2f6ee;--surface:#f8faf5;--ink:#2c3328;--muted:#6b7566;--accent:#4a7a59;--accent-deep:#3d5a40;--accent-soft:#d3e5d6;--line:#d5dfd0;--green:#3f8e6b;--red:#b85a52;}
+@media (prefers-color-scheme:dark){:root{--bg:#1a211c;--card:#243028;--surface:#202a23;--ink:#e6eee4;--muted:#9aa79b;--accent:#6fa87d;--accent-deep:#8fc39a;--accent-soft:#2c3d31;--line:#33402f;}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.6;padding:12px;max-width:640px;margin:0 auto;min-height:100vh;}
+.proto-head{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px;color:var(--accent-deep);font-weight:bold;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.round{font-size:15px;color:var(--muted);}
+.score{font-size:16px;font-weight:700;color:var(--accent-deep);}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;}
+.qtitle{font-size:15px;color:var(--muted);margin-bottom:10px;}
+.poem{background:var(--surface);border-radius:10px;padding:14px;margin-bottom:6px;}
+.poem .pt{font-weight:bold;font-size:18px;margin-bottom:2px;}
+.poem .pa{font-size:14px;color:var(--muted);margin-bottom:8px;}
+.poem .pl{font-size:18px;line-height:2;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.opt{min-height:56px;font-size:18px;font-weight:bold;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;}
+.opt:active{transform:scale(.97);}
+.feedback{border-radius:12px;padding:12px 14px;margin-bottom:12px;display:none;font-size:16px;}
+.feedback.show{display:block;}
+.feedback.good{background:var(--accent-soft);border:1px solid var(--accent);}
+.feedback.bad{background:var(--card);border:1px solid var(--red);}
+.feedback .exp{margin-top:6px;font-size:15px;color:var(--muted);}
+.btnrow{display:flex;gap:10px;margin-bottom:12px;}
+.btn{flex:1;min-height:56px;font-size:17px;font-weight:bold;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.result{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center;}
+.result h2{font-size:24px;margin-bottom:10px;}
+.result .big{font-size:48px;margin:10px 0;}
+.desc{font-size:15px;color:var(--muted);margin-bottom:12px;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><a href="../../../shici.html" style="display:inline-flex;align-items:center;padding:10px 18px;border-radius:12px;background:var(--accent);border:2px solid var(--accent-deep);color:#fff;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;user-select:none;-webkit-user-select:none;">← 返回</a><h1 style="font-size:20px;margin:0;">🔢 五言七言</h1></div>
+<div id="game">
+  <div class="topbar"><div class="round" id="round"></div><div class="score" id="score"></div></div>
+  <div class="qcard">
+    <div class="qtitle" id="qtitle"></div>
+    <div class="poem" id="poem"></div>
+    <div class="opts">
+      <button class="opt" id="opt1">五言</button>
+      <button class="opt" id="opt2">七言</button>
+    </div>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <div class="btnrow"><button class="btn" id="btnSkip">下一题 →</button></div>
+</div>
+<div id="end" class="hidden"></div>
+<script src="../../../data/shici.js"></script>
+<script src="../poem_link.js"></script>
+<script>
+var QS = [{"t": "洛阳秋夕", "a": "杜牧", "lines": ["清禁漏闲烟树寂"], "ans": "七言", "exp": "「清禁漏闲烟树寂」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "早发白帝城", "a": "李白", "lines": ["千里江陵一日还"], "ans": "七言", "exp": "「千里江陵一日还」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "赠汪伦", "a": "李白", "lines": ["李白乘舟将欲行"], "ans": "七言", "exp": "「李白乘舟将欲行」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "宣州谢朓楼饯别校书叔云", "a": "李白", "lines": ["明朝散发弄扁舟"], "ans": "七言", "exp": "「明朝散发弄扁舟」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望洞庭湖赠张丞相", "a": "孟浩然", "lines": ["端居耻圣明"], "ans": "五言", "exp": "「端居耻圣明」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "宣州谢朓楼饯别校书叔云", "a": "李白", "lines": ["抽刀断水水更流"], "ans": "七言", "exp": "「抽刀断水水更流」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "静夜思", "a": "李白", "lines": ["疑是地上霜"], "ans": "五言", "exp": "「疑是地上霜」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "山居秋暝", "a": "王维", "lines": ["随意春芳歇"], "ans": "五言", "exp": "「随意春芳歇」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "辋川集 鹿柴", "a": "王维", "lines": ["返景入深林"], "ans": "五言", "exp": "「返景入深林」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "宣州谢朓楼饯别校书叔云", "a": "李白", "lines": ["长风万里送秋雁"], "ans": "七言", "exp": "「长风万里送秋雁」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "江雪", "a": "柳宗元", "lines": ["万迳人踪灭"], "ans": "五言", "exp": "「万迳人踪灭」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["西当太白有鸟道"], "ans": "七言", "exp": "「西当太白有鸟道」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "月下独酌四首 一", "a": "李白", "lines": ["醉后各分散"], "ans": "五言", "exp": "「醉后各分散」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "闻官军收河南河北", "a": "杜甫", "lines": ["却看妻子愁何在"], "ans": "七言", "exp": "「却看妻子愁何在」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "山行", "a": "杜牧", "lines": ["霜叶红于二月花"], "ans": "七言", "exp": "「霜叶红于二月花」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "月下独酌四首 一", "a": "李白", "lines": ["我歌月裴回"], "ans": "五言", "exp": "「我歌月裴回」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "夏夜李尚书筵送宇文石首赴县联句", "a": "杜甫", "lines": ["翟表郎官瑞"], "ans": "五言", "exp": "「翟表郎官瑞」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "皇甫岳云溪杂题五首 鸟鸣涧", "a": "王维", "lines": ["夜静春山空"], "ans": "五言", "exp": "「夜静春山空」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白云歌送友人", "a": "李白", "lines": ["君今还入楚山里"], "ans": "七言", "exp": "「君今还入楚山里」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "山行", "a": "杜牧", "lines": ["停车坐爱枫林晚"], "ans": "七言", "exp": "「停车坐爱枫林晚」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "送灵澈上人", "a": "刘长卿", "lines": ["杳杳钟声晚"], "ans": "五言", "exp": "「杳杳钟声晚」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白雪歌送武判官归京", "a": "岑参", "lines": ["去时雪满天山路"], "ans": "七言", "exp": "「去时雪满天山路」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "皇甫岳云溪杂题五首 鸟鸣涧", "a": "王维", "lines": ["人闲桂花落"], "ans": "五言", "exp": "「人闲桂花落」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "左迁至蓝关示姪孙湘", "a": "韩愈", "lines": ["知汝远来应有意"], "ans": "七言", "exp": "「知汝远来应有意」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["地崩山摧壮士死"], "ans": "七言", "exp": "「地崩山摧壮士死」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "独坐敬亭山·其二（存疑）", "a": "李白", "lines": ["中间最高顶"], "ans": "五言", "exp": "「中间最高顶」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "辋川集 鹿柴", "a": "王维", "lines": ["复照青苔上"], "ans": "五言", "exp": "「复照青苔上」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "峨眉山月歌", "a": "李白", "lines": ["峨眉山月半轮秋"], "ans": "七言", "exp": "「峨眉山月半轮秋」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "题破山寺后禅院", "a": "常建", "lines": ["清晨入古寺"], "ans": "五言", "exp": "「清晨入古寺」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "茅屋为秋风所破歌", "a": "杜甫", "lines": ["归来倚仗自叹息"], "ans": "七言", "exp": "「归来倚仗自叹息」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望洞庭湖赠张丞相", "a": "孟浩然", "lines": ["空有羡鱼情"], "ans": "五言", "exp": "「空有羡鱼情」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "宣州谢朓楼饯别校书叔云", "a": "李白", "lines": ["举杯消愁愁更愁"], "ans": "七言", "exp": "「举杯消愁愁更愁」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白雪歌送武判官归京", "a": "岑参", "lines": ["散入珠帘湿罗幕"], "ans": "七言", "exp": "「散入珠帘湿罗幕」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "将进酒", "a": "李白", "lines": ["人生得意须尽欢"], "ans": "七言", "exp": "「人生得意须尽欢」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "春夜洛城闻笛", "a": "李白", "lines": ["散入春风满洛城"], "ans": "七言", "exp": "「散入春风满洛城」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "在岳咏蝉", "a": "骆宾王", "lines": ["南冠客思侵"], "ans": "五言", "exp": "「南冠客思侵」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白雪歌送武判官归京", "a": "岑参", "lines": ["将军角弓不得控"], "ans": "七言", "exp": "「将军角弓不得控」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "赋得古原草送别", "a": "白居易", "lines": ["晴翠接荒城"], "ans": "五言", "exp": "「晴翠接荒城」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "剑客", "a": "贾岛", "lines": ["谁为不平事"], "ans": "五言", "exp": "「谁为不平事」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "春夜洛城闻笛", "a": "李白", "lines": ["谁家玉笛暗飞声"], "ans": "七言", "exp": "「谁家玉笛暗飞声」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白雪歌送武判官归京", "a": "岑参", "lines": ["千树万树梨花开"], "ans": "七言", "exp": "「千树万树梨花开」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "滁州西涧", "a": "韦应物", "lines": ["野渡无人舟自横"], "ans": "七言", "exp": "「野渡无人舟自横」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "左迁至蓝关示姪孙湘", "a": "韩愈", "lines": ["肯将衰朽惜残年"], "ans": "七言", "exp": "「肯将衰朽惜残年」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["不与秦塞通人烟"], "ans": "七言", "exp": "「不与秦塞通人烟」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "锦瑟", "a": "李商隐", "lines": ["沧海月明珠有泪"], "ans": "七言", "exp": "「沧海月明珠有泪」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "黄鹤楼送孟浩然之广陵", "a": "李白", "lines": ["孤帆远影碧山尽"], "ans": "七言", "exp": "「孤帆远影碧山尽」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "饮酒·其五", "a": "陶渊明", "lines": ["采菊东篱下"], "ans": "五言", "exp": "「采菊东篱下」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "锦瑟", "a": "李商隐", "lines": ["蓝田日暖玉生烟"], "ans": "七言", "exp": "「蓝田日暖玉生烟」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "春夜喜雨", "a": "杜甫", "lines": ["当春乃发生"], "ans": "五言", "exp": "「当春乃发生」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望月怀远", "a": "张九龄", "lines": ["竟夕起相思"], "ans": "五言", "exp": "「竟夕起相思」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "杜少府之任蜀州", "a": "王勃", "lines": ["海内存知己"], "ans": "五言", "exp": "「海内存知己」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "枫桥夜泊", "a": "张继", "lines": ["姑苏城外寒山寺"], "ans": "七言", "exp": "「姑苏城外寒山寺」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "悯农二首·其一", "a": "李绅", "lines": ["谁知盘中餐"], "ans": "五言", "exp": "「谁知盘中餐」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["所守或匪亲"], "ans": "五言", "exp": "「所守或匪亲」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "马诗二十三首 一", "a": "李贺", "lines": ["无人织锦韂"], "ans": "五言", "exp": "「无人织锦韂」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["枯松倒挂倚绝壁"], "ans": "七言", "exp": "「枯松倒挂倚绝壁」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "无题", "a": "李商隐", "lines": ["夜吟应觉月光寒"], "ans": "七言", "exp": "「夜吟应觉月光寒」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "悯农二首·其一", "a": "李绅", "lines": ["粒粒皆辛苦"], "ans": "五言", "exp": "「粒粒皆辛苦」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "子夜吴歌 春歌", "a": "李白", "lines": ["红妆白日鲜"], "ans": "五言", "exp": "「红妆白日鲜」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "早春呈水部张十八员外二首 一", "a": "韩愈", "lines": ["最是一年春好处"], "ans": "七言", "exp": "「最是一年春好处」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "相思", "a": "王维", "lines": ["红豆生南国"], "ans": "五言", "exp": "「红豆生南国」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "饮酒·其五", "a": "陶渊明", "lines": ["而无车马喧"], "ans": "五言", "exp": "「而无车马喧」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "将进酒", "a": "李白", "lines": ["古来圣贤皆寂寞"], "ans": "七言", "exp": "「古来圣贤皆寂寞」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望岳", "a": "杜甫", "lines": ["决眦入归鸟"], "ans": "五言", "exp": "「决眦入归鸟」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "春望", "a": "杜甫", "lines": ["烽火连三月"], "ans": "五言", "exp": "「烽火连三月」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "题李凝幽居", "a": "贾岛", "lines": ["僧敲月下门"], "ans": "五言", "exp": "「僧敲月下门」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "秋浦歌十七首 一", "a": "李白", "lines": ["为我达扬州"], "ans": "五言", "exp": "「为我达扬州」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望月怀远", "a": "张九龄", "lines": ["海上生明月"], "ans": "五言", "exp": "「海上生明月」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "夜雨寄北", "a": "李商隐", "lines": ["何当共剪西窗烛"], "ans": "七言", "exp": "「何当共剪西窗烛」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望岳", "a": "杜甫", "lines": ["造化钟神秀"], "ans": "五言", "exp": "「造化钟神秀」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白云歌送友人", "a": "李白", "lines": ["水上女萝衣白云"], "ans": "七言", "exp": "「水上女萝衣白云」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "秋浦歌十七首 一", "a": "李白", "lines": ["下见江水流"], "ans": "五言", "exp": "「下见江水流」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "在岳咏蝉", "a": "骆宾王", "lines": ["谁为表予心"], "ans": "五言", "exp": "「谁为表予心」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "同赵二十二访张明府郊居联句", "a": "杜牧", "lines": ["不知闲醉与谁同"], "ans": "七言", "exp": "「不知闲醉与谁同」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "江雪", "a": "柳宗元", "lines": ["孤舟蓑笠翁"], "ans": "五言", "exp": "「孤舟蓑笠翁」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "秋词二首 一", "a": "刘禹锡", "lines": ["我言秋日胜春朝"], "ans": "七言", "exp": "「我言秋日胜春朝」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "赤壁", "a": "杜牧", "lines": ["折戟沈沙铁未销"], "ans": "七言", "exp": "「折戟沈沙铁未销」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "早发白帝城", "a": "李白", "lines": ["两岸猿声啼不尽"], "ans": "七言", "exp": "「两岸猿声啼不尽」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "左迁至蓝关示姪孙湘", "a": "韩愈", "lines": ["好收吾骨瘴江边"], "ans": "七言", "exp": "「好收吾骨瘴江边」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "将进酒", "a": "李白", "lines": ["天生我材必有用"], "ans": "七言", "exp": "「天生我材必有用」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "出塞二首 一", "a": "王昌龄", "lines": ["秦时明月汉时关"], "ans": "七言", "exp": "「秦时明月汉时关」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "咏柳", "a": "贺知章", "lines": ["不知细叶谁裁出"], "ans": "七言", "exp": "「不知细叶谁裁出」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "逢入京使", "a": "岑参", "lines": ["马上相逢无纸笔"], "ans": "七言", "exp": "「马上相逢无纸笔」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "白云歌送友人", "a": "李白", "lines": ["白云䖏䖏长随君"], "ans": "七言", "exp": "「白云䖏䖏长随君」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "杜少府之任蜀州", "a": "王勃", "lines": ["风烟望五津"], "ans": "五言", "exp": "「风烟望五津」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "逢雪宿芙蓉山主人", "a": "刘长卿", "lines": ["柴门闻犬吠"], "ans": "五言", "exp": "「柴门闻犬吠」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "雨过山村", "a": "王建", "lines": ["妇姑相唤浴蚕去"], "ans": "七言", "exp": "「妇姑相唤浴蚕去」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "闻王昌龄左迁龙标遥有此寄", "a": "李白", "lines": ["随风直到夜郎西"], "ans": "七言", "exp": "「随风直到夜郎西」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "辋川集 鹿柴", "a": "王维", "lines": ["但闻人语响"], "ans": "五言", "exp": "「但闻人语响」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "芙蓉楼送辛渐二首 一", "a": "王昌龄", "lines": ["洛阳亲友如相问"], "ans": "七言", "exp": "「洛阳亲友如相问」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "赠别二首 一", "a": "杜牧", "lines": ["春风十里扬州路"], "ans": "七言", "exp": "「春风十里扬州路」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "送杜少府之任蜀州", "a": "王勃", "lines": ["城阙辅三秦"], "ans": "五言", "exp": "「城阙辅三秦」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["锦城虽云乐"], "ans": "五言", "exp": "「锦城虽云乐」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "商山早行", "a": "温庭筠", "lines": ["枳花明驿墙"], "ans": "五言", "exp": "「枳花明驿墙」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望天门山", "a": "李白", "lines": ["两岸青山相对出"], "ans": "七言", "exp": "「两岸青山相对出」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望庐山瀑布水二首 一", "a": "李白", "lines": ["海风吹不断"], "ans": "五言", "exp": "「海风吹不断」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "送灵澈上人", "a": "刘长卿", "lines": ["青山独归远"], "ans": "五言", "exp": "「青山独归远」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "将进酒", "a": "李白", "lines": ["与君歌一曲"], "ans": "五言", "exp": "「与君歌一曲」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "行路难三首 一", "a": "李白", "lines": ["停杯投筯不能食"], "ans": "七言", "exp": "「停杯投筯不能食」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "夜上受降城闻笛", "a": "李益", "lines": ["风起塞云断"], "ans": "五言", "exp": "「风起塞云断」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "登高", "a": "杜甫", "lines": ["渚清沙白鸟飞回"], "ans": "七言", "exp": "「渚清沙白鸟飞回」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望庐山瀑布水二首 一", "a": "李白", "lines": ["且谐宿所好"], "ans": "五言", "exp": "「且谐宿所好」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "过故人庄", "a": "孟浩然", "lines": ["把酒话桑麻"], "ans": "五言", "exp": "「把酒话桑麻」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "蜀道难", "a": "李白", "lines": ["劒阁峥嵘而崔嵬"], "ans": "七言", "exp": "「劒阁峥嵘而崔嵬」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "江雪", "a": "柳宗元", "lines": ["千山鸟飞绝"], "ans": "五言", "exp": "「千山鸟飞绝」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "望庐山瀑布水二首 一", "a": "李白", "lines": ["挂流三百丈"], "ans": "五言", "exp": "「挂流三百丈」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "离思五首 一", "a": "元稹", "lines": ["须臾日射燕脂颊"], "ans": "七言", "exp": "「须臾日射燕脂颊」共7个字，是七言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "夏夜李尚书筵送宇文石首赴县联句", "a": "杜甫", "lines": ["客居逢自出"], "ans": "五言", "exp": "「客居逢自出」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "秋浦歌十七首 一", "a": "李白", "lines": ["秋浦长似秋"], "ans": "五言", "exp": "「秋浦长似秋」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}, {"t": "过故人庄", "a": "孟浩然", "lines": ["还来就菊花"], "ans": "五言", "exp": "「还来就菊花」共5个字，是五言。", "q": "这句诗是五言还是七言？（数一数字数）"}];
+var qi = 0, score = 0, answered = false;
+function $(id){return document.getElementById(id);}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+QS = shuffle(QS.slice());
+function render(){
+  answered = false;
+  var q = QS[qi];
+  $("round").textContent = "第 " + (qi+1) + " / " + QS.length + " 题";
+  $("score").textContent = "得分 " + score;
+  $("qtitle").textContent = q.q || "这首诗是什么体裁？";
+  $("poem").innerHTML = '<div class="pt">《'+q.t+'》</div><div class="pa">'+q.a+'</div><div class="pl">'+q.lines.join("<br>")+"</div>";
+  $("fb").className = "feedback";
+  $("opt1").disabled = $("opt2").disabled = false;
+}
+function answer(pick){
+  if(answered) return; answered = true;
+  var q = QS[qi];
+  var good = (pick === q.ans);
+  if(good) score += 10;
+  var fb = $("fb");
+  fb.className = "feedback show " + (good ? "good" : "bad");
+  fb.innerHTML = "<div>" + (good ? "✅ 答对了！" : "❌ 答错了，正确答案是「"+q.ans+"」") + "</div>" +
+    (q.exp ? '<div class="exp">📖 ' + q.exp + "</div>" : "") + POEM_LINK.linkHtml(q.lines[0], q.t, q.a);
+  $("score").textContent = "得分 " + score;
+  $("opt1").disabled = $("opt2").disabled = true;
+  setTimeout(next, 1600);
+}
+function next(){
+  qi++;
+  if(qi >= QS.length){ end(); return; }
+  render();
+  window.scrollTo(0,0);
+}
+function end(){
+  $("game").classList.add("hidden");
+  var e = $("end"); e.classList.remove("hidden");
+  var pct = Math.round(score / (QS.length*10) * 100);
+  var msg = pct>=90 ? "🌟 太厉害了！" : pct>=60 ? "👍 不错，继续加油！" : "💪 多练练会更好的！";
+  e.innerHTML = '<div class="result"><h2>'+msg+'</h2><div class="big">'+score+'分</div><p>共 '+QS.length+' 题，答对 '+(score/10)+' 题</p><div class="btnrow" style="margin-top:14px;"><button class="btn primary" onclick="location.reload()">🔄 再来一轮</button></div></div>';
+  window.scrollTo(0,0);
+}
+$("opt1").onclick = function(){ answer($("opt1").textContent); };
+$("opt2").onclick = function(){ answer($("opt2").textContent); };
+$("btnSkip").onclick = function(){ next(); };
+render();
+</script>
+<script src="../../../nav-up.js"></script>
+</body>
+</html>
