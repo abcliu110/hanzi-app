@@ -64,6 +64,8 @@
 
 **领取 2026-11-07 fuxi-loop（09:45 JST，负责人 2026-11-07「读设计文档和交接文档，缺的东西补起来」）：** A23 中 MASTER_PLAN 阶段三未做项——每日复习接入（首页入口+到期数、fuxi.html 日常可用）、提取练习升级（quiz 填空/简答自评题型，只用已有数据自动生成）、选项级反馈（核实 engine.js 误解显示 + 能从题库解析机械抽取的误解标注）、weekly 周报复习数据。动 fuxi.js/fuxi.html/today-task.js/index.js/weekly.js（本线主改），quiz/engine.js、index.html、sw.js 小改、提交前 rebase。不改 SRS_MODEL_SPEC 规格本身。
 
+**领取 2026-11-07 FUXI（12:40 JST，接手停掉的 fuxi-loop 线，取代其领取行）：** A23 阶段三剩余三项——①提取练习升级（quiz 填空/简答自评题型，只用已有数据自动生成，记入现有 NHZReview / nhz_srs）②选项级反馈：核实 quiz/engine.js 误解显示各区都生效、未接的区接上 ③weekly 周报加复习数据（NHZReviewLog）。误解标注 61→577 与啊哈块补 54 处由 A23C 做，本线不碰题库内容数据。quiz/engine.js、index.html、sw.js 小改、提交前 rebase。
+
 **领取（2026-11-05 12:25 JST，代理 hark-main2，负责人指示「把没有完成的任务全部做完」）：** A22-3、A22-4、A22-5、A22-9、A22-10、A22-11 本轮并行开做，其后依次 A22-6、A22-8、A22-12、A22-13、A22-14、A19 其余 11 首、A22-15/16/17。其他代理请先看本行再动这些项；共享文件（wb-engine.js、wb/index.js、index.html、quiz/engine.js、sw.js）改动小而集中，提交前 pull --rebase。
 
 **领取 2026-11-07 guwen-rest（负责人 2026-11-07「读设计文档和交接文档，缺的东西补起来」）：** A22-15 古文 P2（论语语境卡 / 进阶路线图 / 知识点真图示 / 历史人物时间轴，先核已有提交再补缺）、A21 遗留「逐字今译」、data/guwen.js 59 篇补学段字段（小学/初中/高中，统编篇目可核才标，供 Q10 筛选，不改默认显示）。A24 其余 10 点不做（等负责人审原型）。其他代理动这些项前请先看本行。
