@@ -62,7 +62,7 @@ test('拼音页简介芯片可听（&brief=1 只看 data.js 简介）：单韵�
 test('Q17 拼音开关：逐字注音用 pron 覆盖 + 查表主音，@行号 只对该行生效', async ({ page }) => {
   await page.goto('newhanzi/shici.html#poem-34'); // 春晓（主脚本是 IIFE，openPoem 不挂 window，用 hash 路由进详情）
   await expect(page.locator('.sc-readbar [data-rb=py]')).toBeVisible();
-  await expect(page.locator('.sc-memo-tip').first()).toContainText('觉读 jiào');
+  await expect(page.locator('.sc-memo-tip').first()).toContainText('觉读 jué');
   await expect(page.locator('.sc-memo-tip').first()).toContainText('处读 chù');
   await page.click('.sc-readbar [data-rb=py]');
   await expect(page.locator('.sc-lines')).toHaveClass(/py/);
@@ -73,7 +73,7 @@ test('Q17 拼音开关：逐字注音用 pron 覆盖 + 查表主音，@行号 �
     });
     return m;
   });
-  expect(py['觉']).toBe('jiào');
+  expect(py['觉']).toBe('jué');
   expect(py['处']).toBe('chù');
   expect(py['春']).toBe('chūn');
   expect(py['眠']).toBe('mián');
