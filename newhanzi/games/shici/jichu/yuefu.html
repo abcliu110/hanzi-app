@@ -52,6 +52,11 @@ var qi = 0, score = 0, answered = false;
 function $(id){return document.getElementById(id);}
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 QS = shuffle(QS.slice());
+/* A22-14 回流深链（2026-11-07 SC1）：题干里的《题名》在诗库唯一时给「去读整首」，诗库没有的不链 */
+function yfLink(q){
+  var m = /《([^》]+)》/.exec(q.q || '');
+  return (m && window.POEM_LINK) ? POEM_LINK.linkHtml(null, m[1], '') : '';
+}
 function render(){
   answered = false;
   var q = QS[qi];
@@ -81,7 +86,7 @@ function answer(pick, btn){
   var fb = $("fb");
   fb.className = "feedback show " + (good ? "good" : "bad");
   fb.innerHTML = "<div>" + (good ? "✅ 答对了！" : "❌ 答错了，正确答案是「"+q.ans+"」") + "</div>" +
-    (q.exp ? '<div class="exp">📖 ' + q.exp + "</div>" : "");
+    (q.exp ? '<div class="exp">📖 ' + q.exp + "</div>" : "") + yfLink(q);
   $("score").textContent = "得分 " + score;
   setTimeout(next, 2000);
 }
@@ -102,6 +107,8 @@ function end(){
 $("btnSkip").onclick = function(){ next(); };
 render();
 </script>
+<script src="../../../data/shici.js"></script>
+<script src="../poem_link.js"></script>
 <script src="../../../nav-up.js"></script>
 </body>
 </html>

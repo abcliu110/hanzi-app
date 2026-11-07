@@ -16,6 +16,10 @@ var POEMS = [{"t": "静夜思", "a": "李白", "lines": ["床前明月光", "疑
       (p.lines || []).forEach(function(l){ bank.push({ v: l, s: strip(l), t: p.t, a: p.a, o: null }); });
     });
   }
+  /* 2026-11-07 SC1：指定位置令按「分句」判位置。诗库一行常是一整联（如「人之初，性本善。」），
+     原先去标点后整行算位置，「句末」「第 N 字」会跨分句数错；现按，。！？；：拆成分句，任一分句满足即算。 */
+  function clauses(v){ return String(v).split(/[，。！？；：、,.!?;:\s]+/).map(strip).filter(function(x){ return x; }); }
+  function posOkLine(v, ch, pos){ return clauses(v).some(function(c){ return posOk(c, ch, pos); }); }
   function posOk(s, ch, pos){
     if(!s) return false;
     if(pos === '首') return s[0] === ch;
@@ -27,9 +31,9 @@ var POEMS = [{"t": "静夜思", "a": "李白", "lines": ["床前明月光", "疑
     src: src, bank: bank, strip: strip,
     bankSingle: function(aliases){ return bank.filter(function(x){ return aliases.some(function(c){ return x.s.indexOf(c) >= 0; }); }); },
     bankDouble: function(a, b){ return bank.filter(function(x){ return x.s.indexOf(a) >= 0 && x.s.indexOf(b) >= 0; }); },
-    bankPos: function(ch, pos){ return bank.filter(function(x){ return posOk(x.s, ch, pos); }); },
+    bankPos: function(ch, pos){ return bank.filter(function(x){ return posOkLine(x.v, ch, pos); }); },
     okSingle: function(v, aliases){ var s = strip(v); return aliases.some(function(c){ return s.indexOf(c) >= 0; }); },
     okDouble: function(v, a, b){ var s = strip(v); return s.indexOf(a) >= 0 && s.indexOf(b) >= 0; },
-    okPos: function(v, ch, pos){ return posOk(strip(v), ch, pos); }
+    okPos: function(v, ch, pos){ return posOkLine(v, ch, pos); }
   };
 })();

@@ -65,7 +65,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","M
       <p style="font-size:13px;color:var(--muted);margin:0">先选令字，再选它在诗句里的位置：</p>
       <div class="kw-grid" id="posCharGrid"></div>
       <div class="kw-grid" id="posGrid"></div>
-      <p class="tip">指定位置令：如"月"在句末→"举头望明月"；"月"在第 3 字→"小时不识月"。</p>
+      <p class="tip">指定位置令：如"月"在句末→"举头望明月"；"月"在第 3 字→"江清月近人"。一联两句时，任一句合乎位置即可。</p>
     </div>
     <button class="btn" id="btnStart">开战！</button>
   </div>
@@ -182,9 +182,9 @@ function addMsg(who,text,infoHtml){
 }
 function aiSay(t,i){addMsg("ai",t,i);}
 $("btnSend").onclick=function(){
-  var v=FEIHUA.strip($("verseInput").value.trim());
+  var raw=$("verseInput").value.trim(), v=FEIHUA.strip(raw);
   if(v.length<5){$("tip").innerHTML="太短啦，写一句完整的诗句。规则："+esc(tokenRule());return;}
-  if(!okVerse(v)){$("tip").innerHTML="这句不符合"+esc(tokenLabel())+"。规则："+esc(tokenRule())+"换一句试试。";return;}
+  if(!okVerse(raw)){$("tip").innerHTML="这句不符合"+esc(tokenLabel())+"。规则："+esc(tokenRule())+"换一句试试。";return;}
   if(userVerses.indexOf(v)>=0){$("tip").innerHTML="这句你已经出过啦，换一句新的。";return;}
   userVerses.push(v);score++;
   addMsg("user",v,"第"+round+"轮 · +1");
@@ -201,7 +201,7 @@ $("btnGiveUp").onclick=function(){
   endGame(true);
 };
 function aiTurn(){
-  var bank=bankFor().filter(function(x){return !usedAI[x.s];});
+  var bank=bankFor().filter(function(x){return !usedAI[x.s] && userVerses.indexOf(x.s)<0;}); /* AI 不重复你出过的句子 */
   if(bank.length===0){aiSay("哎呀，我的"+tokenLabel()+"诗句用完了，你赢了！","");return endGame(false);}
   var pick=bank[Math.floor(Math.random()*bank.length)];
   usedAI[pick.s]=1;
@@ -218,7 +218,7 @@ function endGame(lost){
   msgs.forEach(function(m){h+="<li>"+m.querySelector("div:nth-child(2)").textContent+"</li>";});
   $("verseList").innerHTML=h;
   var full=bankFor();
-  $("fullTitle").textContent="📜 "+tokenLabel()+"在"+(FEIHUA.src==="诗库"?"诗库（192 首）":"题库")+"的全部句子（共 "+full.length+" 句）";
+  $("fullTitle").textContent="📜 "+tokenLabel()+"在"+(FEIHUA.src==="诗库"?"诗库（"+((window.NHZ_SHICI&&NHZ_SHICI.poems||[]).length)+" 首）":"题库")+"的全部句子（共 "+full.length+" 句）";
   $("fullList").innerHTML=full.map(function(x){
     return "<li>"+esc(x.v)+" ——"+esc(x.a)+"《"+esc(x.t)+"》"+poemLink(x.o)+"</li>";
   }).join("");

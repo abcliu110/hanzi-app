@@ -1,14 +1,16 @@
 /* A22-14 小游戏回流深链（共享模块）：只读 window.NHZ_SHICI（data/shici.js），不改任何数据文件。
    用法：POEM_LINK.href(诗句, 诗题, 作者) -> '../../../shici.html#poem-N' 或 null（诗库里没有就不链，不编造）；
    POEM_LINK.linkHtml(诗句, 诗题, 作者) -> '📖 去读整首《题》' 锚点 HTML 或 ''；
+   只给题名不给作者时，诗库同题唯一才链；
    POEM_LINK.splitTip('诗题·作者') -> {t, a}（题名本身含 '·' 时按最后一个 '·' 切分）。 */
 (function(){
   function strip(s){ return String(s || '').replace(/[，。！？、；：·"”'「」『』《》\s]/g, ''); }
   function norm(s){ return strip(s).replace(/其([一二三四五六七八九十])/g, '$1'); }
-  var byLine = {}, byTA = {};
+  var byLine = {}, byTA = {}, byT = {};
   var P = (window.NHZ_SHICI && NHZ_SHICI.poems) || [];
   P.forEach(function(p){
     byTA[norm(p.title) + '|' + norm(p.author)] = p.order;
+    var kt = norm(p.title); byT[kt] = byT[kt] === undefined ? p.order : 0; /* 同题多首记 0，不猜 */
     (p.lines || []).forEach(function(l){
       var k = strip(l);
       if(k && !byLine[k]) byLine[k] = p.order;
@@ -17,6 +19,8 @@
   function orderFor(line, title, author){
     if(line && byLine[strip(line)]) return byLine[strip(line)];
     if(title && byTA[norm(title) + '|' + norm(author || '')]) return byTA[norm(title) + '|' + norm(author || '')];
+    /* 2026-11-07 SC1：只给题名（如乐府知识题「《长歌行》…」）时，诗库里该题唯一才链 */
+    if(title && !author && byT[norm(title)]) return byT[norm(title)];
     return null;
   }
   window.POEM_LINK = {
