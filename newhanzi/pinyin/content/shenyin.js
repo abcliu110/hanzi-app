@@ -21,9 +21,9 @@
     if (b.ed === '1985') return { type: 'table', lv: b.lv, h: b.h, head: ['字', '词语', '1985 年以前', '现行规范', '审音表原文', '说明'],
       rows: b.items.map(function (it) { return ['{zi:' + it.zi + '}', it.w, '旧读 ' + it.old, '{py:' + it.now + '}', it.entry, it.note]; }),
       note: '现行规范＝1985 年《普通话异读词审音表》，学校、字典、普通话考试都按它。' };
-    return { type: 'table', lv: b.lv, h: b.h, head: ['字', '词语', '现行（1985 原表）', '修订稿「拟改」', '修订稿原文', '说明'],
-      rows: b.items.map(function (it) { return ['{zi:' + it.zi + '}', it.w, isPy(it.old) ? '{py:' + it.old + '}' : it.old, '拟改 ' + it.now, it.entry, it.note]; }),
-      note: '2016 年《普通话异读词审音表（修订稿）》是征求意见稿，到现在没有正式发布；这一栏所列只是「拟改」，考试、朗读仍按左边的现行读音。' };
+    return { type: 'table', lv: b.lv, h: b.h, head: ['字', '词语', '现行（1985 原表）', '修订稿（未发布）', '修订稿原文', '说明'],
+      rows: b.items.map(function (it) { return ['{zi:' + it.zi + '}', it.w, isPy(it.old) ? '{py:' + it.old + '}' : it.old, (isPy(it.old) ? '拟改 ' : '写明 ') + it.now, it.entry, it.note]; }),
+      note: '2016 年《普通话异读词审音表（修订稿）》是征求意见稿，到现在没有正式发布；「拟改」只是建议，「写明」是原表没收、修订稿补写进去的现行读音（不是改读）；考试、朗读仍按左边的现行读音。' };
   }
   /* 练：kind = pick 按现行规范选读音 / hear 听音判断 */
   function quiz(kind, lv, h) {
