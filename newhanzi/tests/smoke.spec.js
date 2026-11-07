@@ -525,6 +525,18 @@ test.describe('newhanzi smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('logic domino home entry (A22-2)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/index.html');
+    await page.locator('#view-home .panel[data-m="logic"]').click();
+    for (const name of ['因果链：多米诺', '强加因果']) {
+      await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+    }
+    await expect(page.locator('#logiclist a[href="games/luoji/domino.html"]')).toHaveCount(2);
+    expect(errors).toEqual([]);
+  });
+
   test('logic concept relations whiteboard + fenchouti drawers (A22-3)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));

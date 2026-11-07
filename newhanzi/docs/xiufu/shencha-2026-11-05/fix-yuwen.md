@@ -40,3 +40,4 @@
 - 复查脚本工作副本：/workspace/work/f1scan（yuwen_load.js ROOT 已改指本 worktree）；每批跑 `npm run check` + `python3 tools/content/fix_yuwen_validate.py` + `PW_NO_SERVER=1 PORT=4201 npx playwright test tests/smoke.spec.js -g "yuwen|logic|lab"`（自起 http.server 4201；沙箱重启后可能要重装 openssh-client / playwright chromium 与依赖）。
 
 - 未修且需拍板/人工的：§12 术语统一（「跑得快」程度/状态补语，等 Q14）；§9 同题重复（去重会改题数，影响 index/total，需确认）；§11 reading/writing 27 条缺「深讲」（需写新内容，按统编教材逐条写）；games/yufa 三个数据文件、data_logic.js 未全量规则检查；连词库「我同爸爸去市场」「同」更像介词；批 7 删乱码后部分题只剩 2–3 个选项，后续可补真实错误改法。
+- 2026-11-07 MAIN 收尾轮：旧副本 hz-y 的批 10 WIP（fix_yuwen_kb.py、yscan/b10_unk.txt 202 句）核对后不搬——批 10 已由 1a0eed00 完成；202 句现状 176 句已随 11-06 题库重写不在库、7 句已说明、19 句（100 题次）因 11-06 重写只讲答案而未说明，清单与建议见 `yuwen-b10-leftover.md`，是否补说明待负责人定。
