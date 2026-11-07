@@ -86,6 +86,8 @@
 
 **领取 2026-11-08 PZ（接手 A22-17 遗留「格律小作坊 pz 与平水韵冲突 5 处」；副本 /workspace/work/hz-pz，端口 4211）：** 只改 data/shici.js 5 首的 pz（悯农其一颗、凉州词场、己亥杂诗究、过故人庄场、春夜喜雨俱），脚本 tools/content/fix_shici_pz5.py；不碰 pron（读音线 fix_shici_duyin.py）。
 
+**领取 2026-11-08 GD（00:30 JST，古诗文读音 gushidu 卡，按 docs/anim/jiaojie/duyin-01-caidan.md 接入拼音菜单「易错读音」分组）：** 新建 pinyin/content/gushidu.js + 生成脚本 tools/content/gen_py_gushidu.py（只用 data/shici.js pron 及 fix_shici_duyin.py 写明的出处），改 pinyin/data.js、tools/check_pinyin_content.js、tests/duyin.spec.js、smoke 拼音卡数。鹿柴「返景」、一剪梅「罗裳」、酬乐天「前头」不下结论；不做依据标签复核、不动 Q6。副本 /workspace/work/hz-gd，端口 4213。
+
 ## 二、待确认（需产品负责人拍板，本轮不做）
 
 | ID | 来源 | 事项 |
