@@ -26,6 +26,11 @@ def d(c, *ks):
     return o
 
 TONE = 'āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹḿ'
+# 逐字轻声白名单：这些字卡的无调读音已核为轻声（Z 字卡小修 38f04ede，fix_zika_small_1108.py 头注；负责人 2026-11-08 00:55 拍板「zika_scan 轻声加白名单」）
+QINGSHENG_OK = {
+    '价': ('jie',), '划': ('huai',), '匙': ('shi',), '咧': ('lie',), '咱': ('zan',), '家': ('jia', 'jie'),
+    '慌': ('huang',), '殖': ('shi',), '瘩': ('da',), '臂': ('bei',), '边': ('bian',), '过': ('guo',),
+}
 def strip_tone(s):
     return ''.join(ch for ch in unicodedata.normalize('NFD', s) if unicodedata.category(ch) != 'Mn').replace('ü', 'v')
 PLACE = re.compile(r'是一个常用汉字|待补|待查|待核|TODO|todo|TBD|XXX|（示例）|\(示例\)|示例：|暂无|无数据|未知|占位|……$|^…|\?\?|？？')
@@ -52,7 +57,7 @@ for zi, c in C.items():
     ix = IDX.get(zi, {})
     if not py: add('读音_空', zi, '读音.拼音', '')
     for r in rd:
-        if not re.search('[' + TONE + ']', r) and r not in ('de','le','zhe','ma','ne','ba','me','men','ge','zi','tou','shang','mo','a','ya','wa','na','la','bo','lou','ha','luo','li','ou','o','ei','hng','m','n','ng','yo','zhao','jiang','pu','he','yao','xia','po','ye'):
+        if not re.search('[' + TONE + ']', r) and r not in QINGSHENG_OK.get(zi, ()) and r not in ('de','le','zhe','ma','ne','ba','me','men','ge','zi','tou','shang','mo','a','ya','wa','na','la','bo','lou','ha','luo','li','ou','o','ei','hng','m','n','ng','yo','zhao','jiang','pu','he','yao','xia','po','ye'):
             add('读音_无声调', zi, '读音.拼音', py, f'「{r}」无声调符号且不是常见轻声')
         if LATIN.search(r) and re.search('[^a-zü' + TONE + ']', r):
             add('读音_乱码', zi, '读音.拼音', py)
