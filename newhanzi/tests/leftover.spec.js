@@ -27,4 +27,18 @@ test.describe('leftover 2026-11-07', () => {
     await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:去');
     expect(errors).toEqual([]);
   });
+
+  test('logic 假言推理四式 gets 十五贯 whiteboard + fanpai (A-16)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/index.html');
+    await page.locator('#view-home .panel[data-m="logic"]').click();
+    const name = '假言推理四式';
+    await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+    const wb = page.locator('#logiclist .yw-wb[data-lwb="' + name + '"]');
+    await wb.locator('[data-lwb-start]').click();
+    await expect(wb.locator('svg').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#logiclist a[href="games/luoji/fanpai.html"]').first()).toBeAttached();
+    expect(errors).toEqual([]);
+  });
 });

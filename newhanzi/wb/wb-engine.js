@@ -2124,6 +2124,8 @@
 
   window.NHZWB = {
     add: function (name, spec) { REG[name] = spec; },
+    /* 同一套幕挂到另一个名字（一个场景文件服务两个专题；lint/基线仍按文件里 add 的那个名字） */
+    alias: function (name, from) { if (REG[from]) REG[name] = REG[from]; },
     has: function (name) { return !!REG[name]; },
     mount: function (el, name) { css(); return mount(el, name); },
     names: function () { return Object.keys(REG); },
