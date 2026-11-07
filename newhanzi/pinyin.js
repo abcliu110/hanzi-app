@@ -139,7 +139,7 @@
   }
 
   var curId = '';
-  function showDetail(id, brief) {
+  function showDetail(id, brief, focus) {
     var m = MENU.filter(function (x) { return x.id === id; })[0];
     if (!m) return;
     curId = id;
@@ -157,7 +157,7 @@
     loadContent(id, function (c) {
       if (curId !== id || detail.style.display === 'none') return; /* 期间已离开 */
       if (!c) { fallback(); return; }
-      try { NHZPinyinKP.render(detail, c, m); }
+      try { NHZPinyinKP.render(detail, c, m, { focus: focus }); }
       catch (e) { if (window.console) console.error(e); fallback(); }
     });
   }
@@ -167,7 +167,8 @@
     if (b) showDetail(b.getAttribute('data-id'));
   });
 
-  /* ?t=<id> 直达知识点（字卡等页面跳转用）；&brief=1 只看 data.js 简介（测试用） */
-  var q = /[?&]t=(\w+)/.exec(location.search);
-  if (q) showDetail(q[1], /[?&]brief=1/.test(location.search)); else showHome();
+  /* ?t=<id> 直达知识点（字卡等页面跳转用）；&k=<声母/韵母> 再直达那个芯片（pinyin-11）；&brief=1 只看 data.js 简介（测试用） */
+  var q = /[?&]t=(\w+)/.exec(location.search), fk = /[?&]k=([^&]+)/.exec(location.search), fkv = '';
+  if (fk) { try { fkv = decodeURIComponent(fk[1]); } catch (e) { fkv = ''; } }
+  if (q) showDetail(q[1], /[?&]brief=1/.test(location.search), fkv); else showHome();
 })();

@@ -8,13 +8,6 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-  function speak(text) {
-    try {
-      var u = new SpeechSynthesisUtterance(text);
-      u.lang = 'zh-CN'; u.rate = 0.85;
-      speechSynthesis.cancel(); speechSynthesis.speak(u);
-    } catch (e) { /* 不支持则静默 */ }
-  }
   /* 拼音可点（pinyin-10）：每个读音一个按钮，只播 pinyin/audio 真人录音（NHZPinyinAudio）；没有录音（轻声、叹词）就是普通文字。
      下面一行小字：声母 + 韵母拆拼，链到拼音区「拼读」。 */
   function pyButtons(py) {
@@ -29,14 +22,32 @@
     }).join('、');
     return h;
   }
+  /* 拆拼（pinyin-11）：声母、韵母各自链到拼音区对应知识点并直达那个芯片（pinyin.html?t=shengmu&k=b）；最后「怎么拼」去拼读页。
+     j q x 后的 u 还原成 ü 去找（ju → ü）；整体认读去整体认读页；y w 开头的去「y 和 w」页。 */
+  var PY_DAN = ['a', 'o', 'e', 'i', 'u', 'ü'], PY_FU = ['ai', 'ei', 'ui', 'ao', 'ou', 'iu', 'ie', 'üe', 'er'], PY_BI = ['an', 'en', 'in', 'un', 'ün', 'ang', 'eng', 'ing', 'ong'];
+  function finalTopic(f) { return PY_DAN.indexOf(f) >= 0 ? 'danyunmu' : PY_FU.indexOf(f) >= 0 ? 'fuyunmu' : PY_BI.indexOf(f) >= 0 ? 'biyunmu' : 'pindu'; }
+  function pyLink(t, k, label, tip) { return '<a class="py-kp" href="pinyin.html?t=' + t + (k ? '&k=' + encodeURIComponent(k) : '') + '" title="' + esc(tip) + '">' + esc(label) + '</a>'; }
   function pySplit(py) {
-    var S = window.NHZPinyinSyllable, h = '';
+    var S = window.NHZPinyinSyllable;
     var r0 = S && S.parse(String(py).split(/[,，、]/)[0] || '');
-    if (r0 && r0.ok && r0.legal) {
-      var parts = r0.wholeRead ? '整体认读' : (r0.initial ? r0.initial + ' + ' : '零声母 ') + (S.mark(r0.finalWritten, r0.tone) || r0.finalWritten);
-      h += '<a class="py-split" href="pinyin.html?t=' + (r0.wholeRead ? 'zhengti' : 'pindu') + '" title="去拼音区看怎么拼">' + esc(parts) + ' · 怎么拼 ›</a>';
+    if (!(r0 && r0.ok && r0.legal)) return '';
+    var h;
+    if (r0.wholeRead) h = '整体认读 ' + pyLink('zhengti', r0.written, S.mark(r0.written, r0.tone) || r0.written, '去「整体认读」看 ' + r0.written);
+    else if (!r0.initial) h = '零声母 ' + pyLink(/^[yw]/.test(r0.written) ? 'yw' : finalTopic(r0.finalWritten), /^[yw]/.test(r0.written) ? r0.written : r0.finalWritten, S.mark(r0.written, r0.tone) || r0.written, '去拼音区看 ' + r0.written);
+    else {
+      var fw = r0.finalWritten, f = /^[jqx]$/.test(r0.initial) && /^u/.test(fw) ? 'ü' + fw.slice(1) : fw;
+      h = pyLink('shengmu', r0.initial, r0.initial, '去「声母」看 ' + r0.initial) + ' + ' + pyLink(finalTopic(f), f, S.mark(fw, r0.tone) || fw, '去拼音区看韵母 ' + f);
     }
-    return h;
+    return '<span class="py-split">' + h + ' · <a class="py-how" href="pinyin.html?t=pindu" title="去拼音区看怎么拼">怎么拼 ›</a></span>';
+  }
+  /* 「读一读」（pinyin-11，负责人要真人发音）：只播第一个读音的 audio-cmn 真人单音节；没有录音（轻声、叹词等）按钮不可点。
+     不再用 Web Speech 读「字 + 拼音」。词语、例句目前没有真人录音，字卡上也没有朗读按钮（是否加词句录音待负责人定）。 */
+  function readBtn(py) {
+    var S = window.NHZPinyinSyllable, A = window.NHZPinyinAudio;
+    var r = S && py ? S.parse(String(py).split(/[,，、]/)[0] || '') : null;
+    var key = r && r.ok && r.audio ? r.written.replace(/ü/g, 'v') : '';
+    if (key && A && A.hasSyl(key, r.tone)) return '<button type="button" class="speak py-play" id="speakBtn" data-syl="' + esc(key) + '" data-tone="' + r.tone + '" title="听真人读 ' + esc(S.mark(r.written, r.tone)) + '">读一读</button>';
+    return '<button type="button" class="speak" id="speakBtn" disabled title="这个读音还没有真人录音">读一读（暂无录音）</button>';
   }
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.py-play');
@@ -109,7 +120,7 @@
         ? '<a class="bs-mean" href="bushou.html?b=' + encodeURIComponent(bsEntry.bushou) + '">🧩 偏旁部首「' +
           esc(bsEntry.bushou) + '」的含义与例字 ›</a>'
         : '') +
-      '<button class="speak" id="speakBtn">读一读</button></div>';
+      readBtn(dim['读音'] && dim['读音']['拼音']) + '</div>';
 
     /* 2. 字从哪来（字源 + 六书） */
     var zy = '';
@@ -273,11 +284,7 @@
     } catch (e) {}
 
     /* 交互 wiring */
-    document.getElementById('speakBtn').onclick = function () {
-      var t = r.zi;
-      if (dim['读音'] && dim['读音']['拼音']) t += '，' + dim['读音']['拼音'];
-      speak(t);
-    };
+    /* 「读一读」由上面的 .py-play 点击处理（真人录音） */
   }
 
   /* ---- 入口：单字数据走 data/zika/<字>.js，经 <script> 动态加载（file:// 可用） ---- */

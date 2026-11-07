@@ -267,7 +267,7 @@ test('字卡拼音可点：播真人录音，拆拼链接去拼音区', async ({
   const rq = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-fo2.mp3'));
   await page.locator('.hero .pinyin .py-play').first().click();
   await rq;
-  await expect(page.locator('.hero .pinyin .py-split')).toHaveAttribute('href', 'pinyin.html?t=pindu');
+  await expect(page.locator('.hero .pinyin .py-split .py-how')).toHaveAttribute('href', 'pinyin.html?t=pindu');
   await expect(page.locator('.hero .pinyin .py-split')).toContainText('f + ó');
   expect(errs).toEqual([]);
 });
@@ -332,4 +332,51 @@ test('听音选韵母：j q x 后的 u 还原成 ü，零声母 yu/yue/yun 取�
     return out;
   });
   expect(r).toEqual({ jun1: 'ok', xue2: 'ok', lun2: 'ok', yu3: 'ok', wei1: 'ok' });
+});
+
+test('字卡「读一读」播真人单音节，不用 Web Speech；没有录音的读音按钮不可点', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.addInitScript(() => { window.__tts = 0; if (window.speechSynthesis) window.speechSynthesis.speak = () => { window.__tts++; }; });
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('绿'));
+  await expect(page.locator('.bigzi')).toHaveText('绿', { timeout: 20000 });
+  const rq = page.waitForRequest((r) => r.url().endsWith('/pinyin/audio/cmn-lv4.mp3'));
+  await page.locator('#speakBtn').click(); await rq;
+  expect(await page.evaluate(() => window.__tts)).toBe(0);
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('们'));
+  await expect(page.locator('.bigzi')).toHaveText('们', { timeout: 20000 });
+  await expect(page.locator('#speakBtn')).toBeDisabled();
+  expect(errs).toEqual([]);
+});
+
+test('字卡拆拼直达知识点：声母去声母页并定位芯片，j q x 后的 u 按 ü 去单韵母页', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('菊'));
+  await expect(page.locator('.bigzi')).toHaveText('菊', { timeout: 20000 });
+  const kp = page.locator('.hero .pinyin .py-split .py-kp');
+  await expect(kp).toHaveCount(2);
+  await expect(kp.nth(0)).toHaveAttribute('href', 'pinyin.html?t=shengmu&k=j');
+  await expect(kp.nth(1)).toHaveAttribute('href', 'pinyin.html?t=danyunmu&k=' + encodeURIComponent('ü'));
+  await page.goto('newhanzi/zika.html?zi=' + encodeURIComponent('日'));
+  await expect(page.locator('.hero .pinyin .py-split .py-kp')).toHaveAttribute('href', 'pinyin.html?t=zhengti&k=ri');
+  // 拼音页 &k= 直达：芯片描边；四声芯片顺手展开
+  await page.goto('newhanzi/pinyin.html?t=danyunmu&k=' + encodeURIComponent('ü'));
+  await expect(page.locator('.py-chip.kp-focus')).toHaveCount(1);
+  await expect(page.locator('.py-tones')).toHaveCount(1);
+  await page.goto('newhanzi/pinyin.html?t=shengmu&k=zh');
+  await expect(page.locator('.py-chip.kp-focus')).toHaveCount(1);
+  await expect(page.locator('.py-chip.kp-focus')).toContainText('zh');
+  expect(errs).toEqual([]);
+});
+
+test('拼读机：拼出音节后显示 3500 字里的同音字并链字卡', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/pinyin.html?t=pindu');
+  const qb = page.locator('.blk[data-type="quiz-build"]').first();
+  await qb.locator('[data-go]').click();
+  await expect(qb.locator('.hz-l .zi-l').first()).toBeVisible();
+  const syl = await qb.locator('.bk.merged').innerText();
+  const ok = await page.evaluate((s) => Array.from(document.querySelectorAll('.blk[data-type="quiz-build"] .hz-l .zi-l')).every((a) => String(window.NHZ_PINYIN[a.textContent]).split(',')[0] === s), syl.trim());
+  expect(ok).toBe(true);
+  await expect(qb.locator('.hz-l .zi-l').first()).toHaveAttribute('href', /zika\.html\?zi=/);
+  expect(errs).toEqual([]);
 });

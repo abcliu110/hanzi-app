@@ -1,5 +1,5 @@
 /* 拼音区知识点页渲染（window.NHZPinyinKP）。内容来自 pinyin/content/<id>.js（格式见 pinyin/content/SCHEMA.md）。
- *   NHZPinyinKP.render(el, content, menuItem)  → 把知识点页画进 el
+ *   NHZPinyinKP.render(el, content, menuItem, {focus:'b'}) → 把知识点页画进 el；focus = 直达该声母/韵母芯片
  *   NHZPinyinKP.stop()                          → 停止音频和动画（离开页面时调用）
  *   NHZPinyinKP.level() / setLevel(1|2|3)       → 浅 / 中 / 深（默认 2，存 localStorage 'nhz-py-lv'）
  * 只播 pinyin/audio 里的真人录音（NHZPinyinAudio），不用 Web Speech。不做 3D/悬浮特效。
@@ -580,12 +580,46 @@
     });
     if (order.length) next();
   }
+  /* 拼读机拼出音节后：3500 字库里主读音（第一个读音）正好是它的字 → 链字卡（pinyin-content-a 提的）。
+     字表 data/pinyin_lookup.js、年级 data/grade_map.js 按需加载（都在 sw CORE 里）；排序：识字表册次（1上→6下）优先，同册按字库顺序。 */
+  var GRADE_ORDER = ['1上', '1下', '2上', '2下', '3上', '3下', '4上', '4下', '5上', '5下', '6上', '6下'];
+  var dictWait = null;
+  function loadDict() {
+    if (dictWait) return dictWait;
+    function js(src, ok) { return ok() ? Promise.resolve() : new Promise(function (res) { var sc = document.createElement('script'); sc.src = src; sc.onload = sc.onerror = function () { res(); }; document.head.appendChild(sc); }); }
+    dictWait = Promise.all([js('data/pinyin_lookup.js', function () { return !!window.NHZ_PINYIN; }), js('data/grade_map.js', function () { return !!window.NHZ_GRADE_MAP; })]);
+    return dictWait;
+  }
+  function homophones(marked) {
+    var P = window.NHZ_PINYIN || {}, G = window.NHZ_GRADE_MAP || {}, out = [], i = 0, want = String(marked).normalize('NFC');
+    Object.keys(P).forEach(function (z) {
+      var first = String(P[z]).split(/[,，]/)[0].trim().normalize('NFC');
+      if (first === want) { var g = GRADE_ORDER.indexOf(G[z]); out.push({ z: z, g: g < 0 ? 99 : g, i: i }); }
+      i++;
+    });
+    out.sort(function (a, b) { return a.g - b.g || a.i - b.i; });
+    return out;
+  }
+  function showHomophones(el, marked) {
+    el.innerHTML = '<span class="note">正在找同音字…</span>';
+    loadDict().then(function () {
+      if (!el.isConnected) return;
+      if (!window.NHZ_PINYIN) { el.innerHTML = ''; return; }
+      var list = homophones(marked), N = 16;
+      if (!list.length) { el.innerHTML = '<span class="note">3500 个常用字里，没有主读音是 <span class="py">' + esc(marked) + '</span> 的字。</span>'; return; }
+      function links(a) { return a.map(function (x) { return '<a class="zi-l" href="zika.html?zi=' + encodeURIComponent(x.z) + '" title="打开「' + esc(x.z) + '」字卡">' + esc(x.z) + '</a>'; }).join(''); }
+      el.innerHTML = '<div class="hz-h">读 <span class="py">' + esc(marked) + '</span> 的字（主读音，3500 字里 ' + list.length + ' 个，识字表先学的排前面）：</div><div class="hz-l">' + links(list.slice(0, N)) + '</div>' +
+        (list.length > N ? '<button type="button" class="kp-btn hz-more">全部 ' + list.length + ' 个</button>' : '');
+      var mb = el.querySelector('.hz-more');
+      if (mb) mb.onclick = function () { el.querySelector('.hz-l').innerHTML = links(list); mb.parentNode.removeChild(mb); };
+    });
+  }
   function quizBuild(box, b) {
     var inis = b.initials || [], fins = b.finals || [], tones = b.tones || [1, 2, 3, 4];
     var st = { i: inis[0], f: fins[0], t: tones[0] }, ctl = null;
     box.innerHTML = '<div class="prow"><span class="lab">声母</span><span class="bsel" data-row="i"></span></div><div class="prow"><span class="lab">韵母</span><span class="bsel" data-row="f"></span></div>' +
       '<div class="prow"><span class="lab">声调</span><span class="bsel" data-row="t"></span></div><div class="bump" aria-live="polite"></div>' +
-      '<div class="prow"><button type="button" class="kp-btn pri" data-go="1">碰！</button><button type="button" class="kp-btn" data-re="1">再来</button><span class="note qmsg"></span></div>';
+      '<div class="prow"><button type="button" class="kp-btn pri" data-go="1">碰！</button><button type="button" class="kp-btn" data-re="1">再来</button><span class="note qmsg"></span></div><div class="hz" aria-live="polite"></div>';
     function legal(i, f, t) { var s = buildSyl(i, f); return S.isLegal(s) && has(s, t); }
     function row(key, list, lab) {
       $('[data-row="' + key + '"]', box).innerHTML = list.map(function (v) {
@@ -596,7 +630,8 @@
     function render() {
       row('i', inis); row('f', fins); row('t', tones, function (t) { return '<span class="t' + t + '">' + S.mark('a', t) + ' ' + ROADN[t][0] + '</span>'; });
       var s = buildSyl(st.i, st.f), ok = legal(st.i, st.f, st.t);
-      ctl = ok ? bumpStage($('.bump', box), st.i, '', st.f, st.t, function (out) { $('.qmsg', box).textContent = '碰出来了：' + out + '。点它再听一遍。'; }) : null;
+      ctl = ok ? bumpStage($('.bump', box), st.i, '', st.f, st.t, function (out) { $('.qmsg', box).textContent = '碰出来了：' + out + '。点它再听一遍。'; showHomophones($('.hz', box), out); }) : null;
+      $('.hz', box).innerHTML = '';
       if (!ok) $('.bump', box).innerHTML = '<span class="eq">' + esc(st.i + ' – ' + st.f) + '</span><span class="note">普通话里没有 ' + esc(s) + (S.isLegal(s) ? '（这个声调没有录音）' : '') + ' 这个音节</span>';
       $('[data-go]', box).disabled = !ok;
       $('.qmsg', box).textContent = ok ? '先点韵母块听一听，再点「碰！」' : st.i + ' 和 ' + st.f + ' 不能这样拼。';
@@ -769,7 +804,19 @@
     applyLevel();
   }
 
-  function render(el, c, m) {
+  /* 直达某个声母/韵母（字卡拆拼链接 pinyin.html?t=shengmu&k=b）：找到当前档位可见的第一个同名芯片，滚过去、描边，四声芯片顺手展开 */
+  function chipLabel(ch) { var x = ch.cloneNode(true); $$('small,em', x).forEach(function (n) { n.parentNode.removeChild(n); }); return x.textContent.trim(); }
+  function focusKey(key) {
+    if (!root || !key) return false;
+    var want = String(key).normalize('NFC'), hit = null;
+    $$('.py-chip').some(function (ch) { if (ch.closest('.lvhide')) return false; if (chipLabel(ch).normalize('NFC') === want) { hit = ch; return true; } return false; });
+    if (!hit) return false;
+    hit.classList.add('kp-focus');
+    if (hit.getAttribute('data-kind') === 'tones') openTones(hit);
+    try { hit.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch (e) { hit.scrollIntoView(); }
+    return true;
+  }
+  function render(el, c, m, opt) {
     stop(); onLevel = []; LATER = [];
     root = el;
     var bi = 0;
@@ -788,6 +835,7 @@
     root = el.querySelector('.kp');
     LATER.forEach(function (x) { mount(x[0], x[1]); });
     applyLevel();
+    if (opt && opt.focus) focusKey(opt.focus);
   }
 
   /* 全局点击：段内跳转、档位、发音、四声条、情境卡 */
@@ -819,5 +867,5 @@
   var rz = null;
   window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (root && root.isConnected) onLevel.forEach(function (f) { f(); }); }, 150); });
 
-  window.NHZPinyinKP = { render: render, stop: stop, level: function () { return LV; }, setLevel: setLevel, segment: segment };
+  window.NHZPinyinKP = { render: render, focus: focusKey, stop: stop, level: function () { return LV; }, setLevel: setLevel, segment: segment };
 })();

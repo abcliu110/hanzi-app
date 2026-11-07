@@ -181,3 +181,9 @@
 .gcapt{font-size:16px;line-height:1.7;margin:4px 0}
 .gfb summary{cursor:pointer;color:var(--accent-deep);min-height:44px;display:flex;align-items:center}
 .nlead{stroke:var(--muted);stroke-width:1;fill:none}
+/* 拼读机：同音字链字卡 */
+.hz{margin-top:8px}.hz-h{font-size:15px;color:var(--muted)}
+.hz-l{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.hz-l .zi-l{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.hz-l .zi-l:hover{border-color:var(--accent)}
+.py-chip.kp-focus{outline:3px solid var(--accent-deep);outline-offset:3px}
