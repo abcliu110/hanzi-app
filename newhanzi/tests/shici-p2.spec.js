@@ -46,4 +46,16 @@ test.describe('shici P2 (A22-17)', () => {
     const blanks = await page.locator('.cell:not(.fixed)').count();
     expect(blanks).toBe(8);
   });
+
+  test('P2-3 朝代长河：6 段与诗库朝代一致，代表诗滚到才出现，取自诗库', async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto('newhanzi/games/shici/chaodai.html');
+    await expect(page.locator('.seg')).toHaveCount(6);
+    await expect(page.locator('.seg').first()).toHaveClass(/\bin\b/);
+    await expect(page.locator('.seg').nth(3)).not.toHaveClass(/\bin\b/);
+    await page.locator('#dots [data-i="3"]').click();
+    await expect(page.locator('.seg').nth(3)).toHaveClass(/\bin\b/);
+    await expect(page.locator('.seg').nth(3)).toContainText('静夜思');
+    await expect(page.locator('.seg').nth(3).locator('a')).toHaveAttribute('href', /#poem-1$/);
+  });
 });
