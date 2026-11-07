@@ -187,3 +187,4 @@
 .hz-l .zi-l{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;font-size:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
 .hz-l .zi-l:hover{border-color:var(--accent)}
 .py-chip.kp-focus{outline:3px solid var(--accent-deep);outline-offset:3px}
+.kp .erh{text-decoration:underline dotted var(--muted);text-underline-offset:3px}

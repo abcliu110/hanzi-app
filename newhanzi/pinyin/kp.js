@@ -65,7 +65,7 @@
   /* 一个带调音节 → 可点按钮（没有录音 = 普通文字） */
   function sylBtn(tok, cls) {
     var r = S.parse(tok);
-    if (r.erhua) return '<span class="py" title="儿化没有录音">' + esc(tok) + '</span>';
+    if (r.erhua) return '<span class="py erh" title="儿化没有录音，不播（不拿基本音节顶替）">' + esc(tok) + '</span>';
     if (r.ok && r.audio && has(r.written, r.tone)) return '<button type="button" class="' + (cls || 'pyi') + ' t' + r.tone + '" data-syl="' + esc(akey(r.written)) + '" data-tone="' + r.tone + '">' + esc(tok) + '</button>';
     return '<span class="py">' + esc(tok) + '</span>';
   }
@@ -122,11 +122,18 @@
   }
 
   /* ---------------- 注音字串（词语、儿歌） ---------------- */
-  function zis(w, py, real) {
+  function zis(w, py, real, seen) { /* seen：同一首儿歌各行共用的出现次数计数（real 数组按全首顺序） */
     var chars = Array.from(String(w)), toks = String(py || '').replace(/[，。！？、；：,.!?;:“”"（）()…—]/g, ' ').trim().split(/\s+/).filter(Boolean);
     var flat = [];
     toks.forEach(function (t) { (segment(t) || [t]).forEach(function (s) { flat.push(s); }); });
     var k = 0, out = '';
+    seen = seen || {};
+    /* real：'一':'yì' = 每处都这样读；'一':['yí',''] = 按出现顺序，'' 表示这一处读原调、不标（pinyin-11） */
+    function realOf(z) {
+      if (!real || !real[z]) return '';
+      var v = real[z], n = seen[z] = (seen[z] || 0) + 1;
+      return Array.isArray(v) ? (v[n - 1] || '') : v;
+    }
     chars.forEach(function (z) {
       if (!/[\u3400-\u9fff]/.test(z)) { out += '<span class="zi punc">' + (real ? '<span class="sd"></span>' : '') + '<span class="pyb nos" style="visibility:hidden">·</span><span class="zc">' + esc(z) + '</span></span>'; return; }
       var tok = flat[k] || '';
@@ -135,8 +142,8 @@
       var r = tok ? S.parse(tok) : null;
       var can = r && r.ok && !r.erhua && r.audio && has(r.written, r.tone);
       var pyb = !tok ? '<span class="pyb nos"></span>' : can ? '<button type="button" class="pyb t' + r.tone + '" data-syl="' + esc(akey(r.written)) + '" data-tone="' + r.tone + '">' + esc(tok) + '</button>'
-        : '<span class="pyb nos t5" title="' + (r && r.erhua ? '儿化没有录音' : r && r.tone === 5 ? '轻声没有单字录音' : '没有录音') + '">' + esc(tok) + '</span>';
-      var sd = real && real[z] ? '读 ' + esc(real[z]) : '';
+        : '<span class="pyb nos t5' + (r && r.erhua ? ' erh' : '') + '" title="' + (r && r.erhua ? '儿化没有录音，不播（不拿基本音节顶替）' : r && r.tone === 5 ? '轻声没有单字录音' : '没有录音') + '">' + esc(tok) + '</span>';
+      var rv = realOf(z), sd = rv ? '读 ' + esc(rv) : '';
       out += '<span class="zi">' + (real ? '<span class="sd">' + sd + '</span>' : '') + pyb + '<a href="zika.html?zi=' + encodeURIComponent(z) + '" title="打开「' + esc(z) + '」字卡">' + esc(z) + '</a></span>';
     });
     return '<div class="sent">' + out + '</div>';
@@ -157,16 +164,20 @@
     var dpr = window.devicePixelRatio || 1, w = cv.clientWidth || 200, h = cv.clientHeight || 150;
     if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
     var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-    var L = LV === 3 ? 30 : 22, R = LV === 3 ? 52 : 22, T = LV === 3 ? 18 : 32, B = LV === 3 ? 16 : 12;
+    /* mini = 变调小路（宽 150–240px）：L3 不画右侧小调形、刻度和调值字号缩小，免得挤（pinyin-09 遗留） */
+    var mini = !!(cv.closest && cv.closest('.mini'));
+    var L = LV === 3 ? (mini ? 22 : 30) : 22, R = LV === 3 ? (mini ? 12 : 52) : 22, T = LV === 3 ? (mini ? 22 : 18) : 32, B = LV === 3 ? (mini ? 10 : 16) : 12;
     var X = function (t) { return L + t * (w - L - R); }, Y = function (v) { return T + (5 - v) / 4 * (h - T - B); };
     var col = css('--t' + tone) || css('--accent'), ink = css('--ink'), muted = css('--muted'), soft = css('--accent-soft'), line = css('--line');
     var N = 60, i, t;
     if (LV === 3) {
-      g.font = '12px system-ui,sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
-      for (i = 1; i <= 5; i++) { g.strokeStyle = line; g.setLineDash([4, 4]); g.lineWidth = 1; g.beginPath(); g.moveTo(L, Y(i)); g.lineTo(w - R, Y(i)); g.stroke(); g.fillStyle = muted; g.fillText(String(i), L - 8, Y(i)); }
+      g.font = (mini ? '10' : '12') + 'px system-ui,sans-serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+      for (i = 1; i <= 5; i++) { if (mini && i % 2 === 0) { g.strokeStyle = line; g.setLineDash([2, 5]); } else { g.strokeStyle = line; g.setLineDash([4, 4]); } g.lineWidth = 1; g.beginPath(); g.moveTo(L, Y(i)); g.lineTo(w - R, Y(i)); g.stroke(); if (!mini || i % 2) { g.fillStyle = muted; g.fillText(String(i), L - (mini ? 5 : 8), Y(i)); } }
       g.setLineDash([]);
-      var bx = w - 12; g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(bx, Y(5)); g.lineTo(bx, Y(1)); g.stroke();
+      var bx = w - 12;
+      if (!mini) { g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(bx, Y(5)); g.lineTo(bx, Y(1)); g.stroke();
       g.beginPath(); for (i = 0; i <= N; i++) { t = i / N; var xx = bx - 30 + t * 30, yy = Y(pitch(tone, t)); if (i) g.lineTo(xx, yy); else g.moveTo(xx, yy); } g.stroke();
+      }
     } else {
       g.fillStyle = soft; g.beginPath(); g.moveTo(X(0), h);
       for (i = 0; i <= N; i++) { t = i / N; g.lineTo(X(t), Y(pitch(tone, t)) + 4); }
@@ -175,7 +186,8 @@
     g.strokeStyle = col; g.lineWidth = LV === 3 ? 4 : 6; g.lineCap = 'round'; g.beginPath();
     for (i = 0; i <= N; i++) { t = i / N; var x = X(t), y = Y(pitch(tone, t)); if (i) g.lineTo(x, y); else g.moveTo(x, y); }
     g.stroke();
-    if (LV === 3) { g.fillStyle = col; g.font = '700 22px system-ui,sans-serif'; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(VAL[tone], L + 4, tone === 3 ? T - 4 : h - B - 26); }
+    if (LV === 3 && mini) { g.fillStyle = col; g.font = '700 13px system-ui,sans-serif'; g.textAlign = 'right'; g.textBaseline = 'top'; g.fillText(VAL[tone], w - 4, 3); }
+    else if (LV === 3) { g.fillStyle = col; g.font = '700 22px system-ui,sans-serif'; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(VAL[tone], L + 4, tone === 3 ? T - 4 : h - B - 26); }
     if (LV === 2) {
       /* 调号用线条画（调号字形在很多字体里太小）：放在离路远的角——一二声右下，三声左上，四声右上 */
       var mw = 34, mh = 22, mx0 = tone === 3 ? L + 2 : w - R - mw - 4, my0 = tone >= 3 ? 6 : h - B - mh - 6;
@@ -754,7 +766,7 @@
       case 'pairs': body = '<div class="prow">' + (b.pairs || []).map(function (p) { return '<span class="pair">' + chip(p[0]) + '<span class="sl">/</span>' + chip(p[1]) + '</span>'; }).join('') + '</div>' + (b.tip ? '<p class="note">' + inline(b.tip) + '</p>' : ''); break;
       case 'scene': body = sceneHtml(b); break;
       case 'words': body = '<div class="pwords">' + (b.items || []).map(function (it) { return '<div class="word">' + zis(it.w, it.py) + '</div>'; }).join('') + '</div>'; break;
-      case 'verse': body = (b.title ? '<div class="verse-t">' + esc(b.title) + '</div>' : '') + (b.lines || []).map(function (l) { return zis(l.w, l.py, b.real); }).join(''); break;
+      case 'verse': body = (b.title ? '<div class="verse-t">' + esc(b.title) + '</div>' : '') + (function () { var seen = {}; return (b.lines || []).map(function (l) { return zis(l.w, l.py, b.real, seen); }).join(''); })(); break;
       case 'anim':
         if (b.kind === 'tone-road' || b.kind === 'bump' || b.kind === 'glide' || b.kind === 'nasal') { body = '<div class="kp-mount" id="' + id + '"></div>'; LATER.push([id, b]); }
         else body = '<div class="fallback">' + inline(b.fallback || '动画还在做，先看文字说明。') + '</div>';
@@ -849,7 +861,7 @@
       sc.classList.toggle('show');
       var lt = sc.getAttribute('data-letter');
       if (A && A.hasHudu(lt)) A.playHudu(lt);
-      else { var wd = segment(sc.getAttribute('data-word') || ''); if (wd && wd[0]) { var r = S.parse(wd[0]); if (r.audio) play(r.written, r.tone); } }
+      else { var wd = segment(sc.getAttribute('data-word') || ''); if (wd && wd[0]) { var r = S.parse(wd[0]); if (r.audio && !r.erhua) play(r.written, r.tone); } } /* 儿化不拿基本音节顶替 */
       return;
     }
     var c = e.target.closest('.py-chip.is-play');

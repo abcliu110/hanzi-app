@@ -380,3 +380,28 @@ test('拼读机：拼出音节后显示 3500 字里的同音字并链字卡', as
   await expect(qb.locator('.hz-l .zi-l').first()).toHaveAttribute('href', /zika\.html\?zi=/);
   expect(errs).toEqual([]);
 });
+
+test('儿化不播（不拿基本音节顶替）；verse.real 可按出现顺序给数组；L3 变调小路不画右侧小调形', async ({ page }) => {
+  const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('newhanzi/pinyin.html');
+  await page.evaluate(() => {
+    const c = { id: 'demo', name: '演示', lead: '{py:huār}', src: ['自编'],
+      kan: [{ type: 'scene', items: [{ letter: 'r', thing: '花', word: '花儿', py: 'huār', svg: '<svg viewBox="0 0 10 10"></svg>' }] },
+        { type: 'anim', kind: 'tone-road', params: { from: [3, 3], to: [2, 3], syl: ['ni', 'hao'] } }],
+      ting: [], lian: [],
+      yong: [{ type: 'verse', lines: [{ w: '一年一起。', py: 'yī nián yī qǐ.' }, { w: '第一。', py: 'dì yī.' }], real: { '一': ['yì', 'yì', ''] } }] };
+    window.NHZPinyinKP.setLevel(3);
+    window.NHZPinyinKP.render(document.getElementById('pyDetail'), c, { name: '演示' });
+    document.getElementById('pyHome').style.display = 'none';
+    document.getElementById('pyDetail').style.display = '';
+  });
+  const d = page.locator('#pyDetail');
+  await expect(d.locator('.kp-lead .erh')).toHaveCount(1);
+  await expect(d.locator('.kp-lead button')).toHaveCount(0);
+  let asked = false; page.on('request', (r) => { if (/cmn-hua1\.mp3$/.test(r.url())) asked = true; });
+  await d.locator('.scene').click(); await page.waitForTimeout(300);
+  expect(asked).toBe(false);
+  await expect(d.locator('.blk[data-type="verse"] .sd')).toHaveText(['读 yì', '', '读 yì', '', '', '', '', '']);
+  await expect(d.locator('.road.mini canvas')).toHaveCount(4);
+  expect(errs).toEqual([]);
+});

@@ -26,14 +26,14 @@ shengdiao danyunmu shengmu yw pindu fuyunmu biyunmu zhengti pinxie yibian yinbia
 | `pairs` | `h`, `pairs: [[{t,play},{t,play}], ...]`, `tip` | 对比听（送气/不送气、前后鼻等） |
 | `scene` | `h`, `items: [{letter:'b', thing:'挂钩上的布包', word:'包', py:'bāo', svg:'<svg…>'}]` | 音形结合情境卡。svg 只画物和动物，不画人 |
 | `mirror` | `h`, `base:'b'` | b/d/p/q 镜像翻转演示 |
-| `anim` | `h`, `kind:'tone-road'|'bump'|'glide'|'nasal'`, `params:{…}` | 动画（由框架实现；没实现的 kind 先显示静态说明 `fallback`） |
+| `anim` | `h`, `kind:'tone-road'|'bump'|'glide'|'nasal'`, `params:{…}`, `fallback` | 动画/示意图，四种都已实现。glide：`params:{items:[{f:'ai',from:'a',to:'i',play:'ai1',open:[3,1],round:[0,0]?,hidden:'e'?,note:'借 wei'?}], hint}`（口形开口 + 舌位图，三步）；nasal：`params:{pairs:[{front:{f:'an',play:'an1'},back:{f:'ang',play:'ang1'}}] 或 [['an','ang']], front:'前鼻…：说明', back:'后鼻…：说明'}`（口腔侧剖面，三步）。`fallback` 建议保留：画不出来时显示，画出来时放在「看文字说明」里 |
 | `quiz-listen` | `h`, `pool: ['ba1','pa1',…]`, `ask:'initial'|'final'|'tone'|'syllable'`, `options: [...]`（可省，自动从 pool 推） | 听音选择，随机出题 |
 | `quiz-choose` | `h`, `items: [{q:'…', options:['…'], answer:0, why:'…'}]` | 选择题，随机顺序 |
 | `quiz-build` | `h`, `initials:[…]`, `finals:[…]`, `tones:[1,2,3,4]` | 拼读机：选声母+韵母+声调，碰撞后播放（不合法组合禁用，用 NHZPinyinSyllable 判） |
 | `quiz-mark` | `h`, `items: ['hao','liu',…]` | 标调练习：点调号该落的字母 |
 | `quiz-find` | `h`, `target:'b'`, `distract:['d','p','q']`, `n:12` | 找一找 |
 | `words` | `h`, `items: [{w:'妈妈', py:'mā ma'}]` | 自编词语，拼音按字标原调；轻声音节不可点 |
-| `verse` | `h`, `title`, `lines: [{w:'小木马，不怕坡。', py:'xiǎo mù mǎ, bù pà pō.'}]`, `real: {'不':'bú'}` | 自编儿歌/短句；`real` 为 L2 起显示的实际读音 |
+| `verse` | `h`, `title`, `lines: [{w:'小木马，不怕坡。', py:'xiǎo mù mǎ, bù pà pō.'}]`, `real: {'不':'bú'}` | 自编儿歌/短句；`real` 为 L2 起显示的实际读音。同一字在全首里读法不同时写数组，按出现顺序：`real: {'一':['yì','yí','']}`（`''` = 这一处读原调、不标） |
 | `outline` | `h`, `p:[…]` | 仅在功能还没做完时临时说明，不得超过 1 块 |
 
 ## 规则
@@ -43,3 +43,7 @@ shengdiao danyunmu shengmu yw pindu fuyunmu biyunmu zhengti pinxie yibian yinbia
 - 事实依据：统编 2024 一上（21 声母、y/w 不算声母、6 单韵母、24 韵母分组、16 整体认读）；《汉语拼音方案》；GB/T 16159-2012；教育部《汉语拼音的教学特色》。
 - 每个知识点：看 ≥3 块、听读 ≥3 块、练 ≥3 种题型、用 ≥2 块（词语 ≥8 个 + 至少 1 首自编儿歌或 2 句短句）；L1/L2/L3 都要有内容。
 - 校验：`node tools/check_pinyin_content.js`（框架任务负责写）检查格式、音频键存在、拼音可解析、数量下限。
+
+## 直达（pinyin-11）
+- `pinyin.html?t=<知识点>&k=<芯片文字>`：打开知识点后滚到当前档位可见的第一个同名芯片（如 `?t=shengmu&k=zh`、`?t=danyunmu&k=ü`）并描边，四声芯片自动展开。字卡拆拼链接用它。
+- 听音选韵母（`quiz-listen ask:'final'`）的标准答案：j q x 后的 u 还原成 ü（jué → üe、jūn → ün）；y w 开头的零声母音节取韵母本身（yǔ → ü、yún → ün、wèi → ui）。写了 `options` 时，校验脚本检查每个 pool 音节的答案都在 options 里。
