@@ -90,3 +90,72 @@ test.describe('fuxi loop', () => {
     await expect(page.locator('[data-wrong]')).toContainText('举头望明月');
   });
 });
+
+// A23 提取练习升级（FUXI）：填空·自己写 / 简答·自评，题目由已有数据自动生成，记入 NHZReview
+test.describe('fuxi recall practice (A23 提取练习)', () => {
+  test('recall mode: typed exact answer auto-correct; self-grade wrong goes to nhz_wrong', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/quiz/index.html?tab=zika');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    const card = page.locator('.qz-mode[data-mode="recall"]');
+    await expect(card).toContainText('填空·自己写');
+    await expect(card).toContainText('50 题');
+    await card.click();
+    // 第 1 题：照题面在 blank 题库里找答案，写对 -> 直接算对
+    const s1 = await page.locator('#qbox .qz-sent').innerText();
+    const ans = await page.evaluate((txt) => {
+      const b = window.NHZ_QUIZ.modes.blank.find((q) => q.s.replace(/___/g, '____') === txt.trim());
+      return b ? b.opts[b.a] : null;
+    }, s1);
+    expect(ans).not.toBeNull();
+    await page.fill('#qzShortIn', ans);
+    await page.click('[data-act="scheck"]');
+    await expect(page.locator('#qfb')).toContainText('答对了');
+    await page.click('#btnNext');
+    // 第 2 题：不写，对答案 -> 亮出参考答案 -> 没答对
+    await page.click('[data-act="scheck"]');
+    await expect(page.locator('#qzSelf')).toBeVisible();
+    await expect(page.locator('#qzSelf')).toContainText('参考答案');
+    await page.click('[data-act="sself"][data-ok="0"]');
+    await expect(page.locator('#qfb')).toContainText('答错了');
+    const st = await page.evaluate(() => ({
+      wrong: JSON.parse(localStorage.getItem('nhz_wrong') || '[]'),
+      srs: JSON.parse(localStorage.getItem('nhz_srs') || '{}'),
+      qw: JSON.parse(localStorage.getItem('nhz_quiz_wrong') || '{}')
+    }));
+    expect(st.wrong.length).toBe(1);
+    expect(st.wrong[0].q.startsWith('填空：')).toBe(true);
+    expect(st.wrong[0].options).toEqual([]);
+    expect(st.srs[st.wrong[0].id].iv).toBe(0);
+    expect(st.qw.zika.recall.length).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
+  test('self-grade correct counts; guwen generates 重点词 recall and 句.今 short', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/quiz/index.html?tab=guwen');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    const rc = page.locator('.qz-mode[data-mode="recall"]');
+    await expect(rc).toBeVisible({ timeout: 15000 });
+    const n = (s) => parseInt(s.match(/(\d+) 题/)[1], 10);
+    expect(n(await rc.innerText())).toBeGreaterThanOrEqual(700);
+    expect(n(await page.locator('.qz-mode[data-mode="short"]').innerText())).toBeGreaterThanOrEqual(61);
+    await page.locator('.qz-mode[data-mode="short"]').click();
+    await page.fill('#qzShortIn', '随便写写');
+    await page.click('[data-act="scheck"]');
+    await page.click('[data-act="sself"][data-ok="1"]');
+    await expect(page.locator('#qfb')).toContainText('答对了');
+    await expect(page.locator('#qzShortIn')).toHaveJSProperty('readOnly', true);
+    expect(await page.evaluate(() => (JSON.parse(localStorage.getItem('nhz_wrong') || '[]')).length)).toBe(0);
+    // ?text= 篇名：只出这一篇的产出题
+    await page.goto('newhanzi/quiz/index.html?tab=guwen&text=' + encodeURIComponent('学弈'));
+    await expect(page.locator('.qz-mode[data-mode="recall"]')).toBeVisible({ timeout: 15000 });
+    await page.locator('.qz-mode[data-mode="recall"]').click();
+    await expect(page.locator('#qbox .qz-q')).toContainText('《学弈》');
+    expect(errors).toEqual([]);
+  });
+});
