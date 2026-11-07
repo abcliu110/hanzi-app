@@ -21,3 +21,36 @@ test.describe('guwen-rest', () => {
     expect(errors).toEqual([]);
   });
 });
+
+// GW 2026-11-07：A21 遗留「逐句对译点读」（guwen/duiyi.js，数据 句[] 由 tools/content/fix_gw_a21_duiyi.py 生成）
+test.describe('guwen duiyi (A21)', () => {
+  test('篇目页逐句对译：默认收起，展开后注字挂今义、点字今译同亮、停顿与句式', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="pianmu"]').first().click();
+    await page.locator('[data-go="全部"]').click();
+    await page.locator('.gw-item', { hasText: '陋室铭' }).first().click();
+    await expect(page.locator('.gw-dy-body')).toBeHidden();
+    await page.locator('[data-gwdy="toggle"]').click();
+    await expect(page.locator('.gw-dy-row')).toHaveCount(9);
+    const si = page.locator('.gw-dy-row').nth(2);
+    await expect(si.locator('.dy-w', { hasText: '斯' }).locator('.dy-g')).toHaveText('这');
+    await si.locator('.dy-w', { hasText: '斯' }).click();
+    await expect(si.locator('.dy-m.on')).toHaveText('这');
+    await expect(page.locator('.gw-dy-row').first().locator('.dy-t').first()).toHaveText('/');
+    const last = page.locator('.gw-dy-row').nth(8);
+    await expect(last.locator('.gw-dy-jin')).toContainText('有什么简陋的呢');
+    await last.locator('.gw-from', { hasText: '何…之' }).click();
+    await expect(page.locator('#gwmdetail')).toContainText('何…之');
+    expect(errors).toEqual([]);
+  });
+  test('没有对译数据的篇目不出按钮（伯牙鼓琴 Q11 待定）', async ({ page }) => {
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="pianmu"]').first().click();
+    await page.locator('[data-go="全部"]').click();
+    await page.locator('.gw-item', { hasText: '伯牙鼓琴' }).first().click();
+    await expect(page.locator('.gw-yw')).toBeVisible();
+    await expect(page.locator('[data-gwdy="toggle"]')).toHaveCount(0);
+  });
+});

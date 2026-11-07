@@ -369,8 +369,8 @@ test.describe('newhanzi smoke', () => {
     // 内容里不再放「回××」按钮：用界面层级导航回上一级（离开篇目即停）
     expect(await page.evaluate(() => window.NHZNav.up())).toBe(true);
     expect(await page.evaluate(() => window.NHZGwSd.playing())).toBe(false);
-    // 没有 停 的篇目：按标点分节（过渡版）
-    await page.locator('.gw-item', { hasText: '学而时习之' }).first().click();
+    // 没有 停 的篇目：按标点分节（过渡版）（论语 4 章 2026-11-07 已加有出处的停顿，改用《揠苗助长》，同为 7 节）
+    await page.locator('.gw-item', { hasText: '揠苗助长' }).first().click();
     await expect(page.locator('#gwSdTip')).toContainText('过渡版');
     await page.locator('[data-gwsd="read"]').click();
     await expect(page.locator('.gw-yw .sdj')).toHaveCount(7);

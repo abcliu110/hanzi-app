@@ -40,7 +40,7 @@
     var sg = segments(t);
     return '<div class="gw-sd" data-gwsd-box><button type="button" class="gw-sdbtn" data-gwsd="read">🔊 诵读</button>' +
       '<button type="button" class="gw-sdbtn" data-gwsd="follow">🗣️ 跟我读</button>' +
-      '<span class="gw-sdtip" id="gwSdTip">' + (sg.ting ? '按课本朗读停顿分节' : '按标点分节（过渡版）') + '</span></div>';
+      '<span class="gw-sdtip" id="gwSdTip">' + (sg.ting ? '按朗读停顿分节（出处见逐句对译）' : '按标点分节（过渡版）') + '</span></div>';
   }
   function viewHtml(sg){
     return sg.jie.map(function(j, a){

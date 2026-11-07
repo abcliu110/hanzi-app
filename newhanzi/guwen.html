@@ -51,6 +51,22 @@
 .gw-yw .zd.on{background:#fff3c4}
 .gw-yw .pu{cursor:pointer;color:var(--accent-deep)}
 .gw-yw .sen.reading{background:#fff3c4;border-radius:6px}
+/* A21 逐句对译（guwen/duiyi.js） */
+.gw-dy{margin:8px 0}
+.gw-dy-tip{font-size:14px;color:var(--muted,#6b7566);margin:6px 0}
+.gw-dy-row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--surface)}
+.gw-dy-row.reading{background:#fff8dc}
+.gw-dy-yuan{font-size:22px;line-height:2.6;font-family:"Songti SC","STSong","SimSun",serif}
+.gw-dy-yuan .dy-w{display:inline-flex;flex-direction:column;align-items:center;vertical-align:top;line-height:1.3;margin:0 2px;cursor:pointer;border-bottom:3px solid #c46a2b;border-radius:3px;padding:0 2px}
+.gw-dy-yuan .dy-w .dy-g{font-size:12px;color:#6b7566;font-family:inherit;max-width:9em;white-space:normal;text-align:center;line-height:1.25}
+.gw-dy-yuan .dy-w.on{background:#fff3c4}
+.gw-dy-yuan .dy-t{color:#b9b2a3;margin:0 1px}
+.gw-dy-say{border:none;background:none;font-size:18px;cursor:pointer;vertical-align:middle;margin-left:6px}
+.gw-dy-jin{font-size:16px;color:var(--ink);margin-top:4px}
+.gw-dy-jin .dy-m{background:none;color:inherit;border-bottom:2px dotted #c46a2b}
+.gw-dy-jin .dy-m.on{background:#fff3c4}
+.gw-dy-shi{margin-top:6px}
+.gw-dy-xi{display:block;font-size:13px;color:#6b7566;margin:2px 0 4px}
 .gw-gloss{margin:8px 0;padding:10px 12px;border:1px solid #c46a2b;border-radius:12px;background:var(--surface);font-size:16px;min-height:1.6em}
 .gw-gloss b{font-size:20px;color:var(--accent-deep);font-family:Georgia,"Songti SC","SimSun",serif}
 .gw-src{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
@@ -85,6 +101,7 @@ if (window.self !== window.top) {
 <script src="data/guwen_links.js"></script>
 <script src="wb/index.js"></script>
 <script src="guwen/songdu.js"></script>
+<script src="guwen/duiyi.js"></script>
 <!-- Q15 四型渲染模板（图式/对照表/决策树/时间轴共享渲染器） -->
 <script src="pattern-templates.js"></script>
 <script>
@@ -384,6 +401,7 @@ window.NHZReview = window.NHZReview || (function () {
   }
   var curText = -1;
   if(window.NHZGwSd) NHZGwSd.cur = function(){ return detEl.style.display !== 'none' ? D.texts[curText] : null; };
+  if(window.NHZGwDy) NHZGwDy.cur = function(){ return detEl.style.display !== 'none' ? D.texts[curText] : null; };
   function showDetail(idx){
     var t = D.texts[idx]; if(!t) return;
     curText = idx; try{ speechSynthesis.cancel(); }catch(e){}
@@ -394,6 +412,7 @@ window.NHZReview = window.NHZReview || (function () {
       h += '<div class="gw-sec">🎬 语境卡</div><div class="gw-wb" data-gwwb="'+esc('古文:语境:'+t.title)+'"><button type="button" class="gw-filterbtn" data-gwwb-start="1">▶ 播放语境卡</button></div>';
     h += '<div class="gw-sec">📖 原文 <span class="gw-tag">点读</span></div><div class="gw-yuanwen gw-yw">'+yuanwenHtml(t)+'</div>';
     if(window.NHZGwSd) h += NHZGwSd.barHtml(t); /* P1-D 诵读跟读（guwen/songdu.js） */
+    if(window.NHZGwDy) h += NHZGwDy.html(t); /* A21 逐句对译点读（guwen/duiyi.js；默认收起） */
     h += '<div class="gw-gloss" id="gwGloss">点带橙线的字看意思；点句末标点听这一句。</div>';
     h += '<div class="gw-sec">💡 导读</div><p class="gw-p">'+esc(t.导读)+'</p>';
     h += '<div class="gw-sec">🔍 译意</div><p class="gw-p">'+esc(t.译意)+'</p>';
@@ -412,7 +431,7 @@ window.NHZReview = window.NHZReview || (function () {
     detEl.dataset.back = lastTextList || t.cat;
   }
   /* 原文点读（gaijin/guwen P0-A 的先行版）：用篇目已有的「重点」字词，在原文里给每个重点字词的第一次出现画橙线，
-     点开看释义和本篇相关知识点；点句末标点（。！？）朗读这一句。逐字今译（句.对/停/式）需另做逐句标注，未做。 */
+     点开看释义和本篇相关知识点；点句末标点（。！？）朗读这一句。逐句今译、注字、停顿、句式见下方「逐句对译」（guwen/duiyi.js，数据 句[]）。 */
   function yuanwenHtml(t){
     var src = String(t.原文 || ''), keys = (t.重点 || []).map(function(w){ return w[0]; }).filter(Boolean);
     keys.sort(function(a, b){ return b.length - a.length; });
