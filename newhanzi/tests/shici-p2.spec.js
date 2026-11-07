@@ -27,4 +27,23 @@ test.describe('shici P2 (A22-17)', () => {
     const nt = await page.locator('#edgeList li').count();
     await expect(page.locator('#filters [data-f=tang]')).toHaveText('唐朝 ' + nt + ' 条');
   });
+
+  test('P2-2 格律小作坊：只开放 pz 与平水韵无冲突的诗，两读字标◐', async ({ page }) => {
+    await page.goto('newhanzi/games/shici/gelu.html');
+    const st = await page.evaluate(() => window.__gelu);
+    expect(st.open).toBeGreaterThanOrEqual(80);
+    // 平水韵单读字冲突的 5 首不开放（颗/场/究/场/俱）
+    expect(st.blocked.sort((a, b) => a - b)).toEqual([19, 37, 138, 158, 169]);
+    await expect(page.locator('#poemSel option')).toHaveCount(st.open);
+    await expect(page.locator('#poemSel option[value="138"]')).toHaveCount(0);
+    await expect(page.locator('#todoText')).toContainText('暂不开放');
+    // 登鹳雀楼默认局：韵部取自字表
+    await expect(page.locator('#poemTip')).toContainText('尤韵');
+    // 望庐山瀑布「遥看」的看是两读
+    await page.locator('#poemSel').selectOption('2');
+    await expect(page.locator('.cell').nth(8).locator('.pu')).toHaveText('◐两读');
+    // 填满正确字 → 全对
+    const blanks = await page.locator('.cell:not(.fixed)').count();
+    expect(blanks).toBe(8);
+  });
 });
