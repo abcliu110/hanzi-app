@@ -11,4 +11,20 @@ test.describe('leftover 2026-11-07', () => {
     await page.locator('.qz-opts .qz-btn').first().click();
     await expect(next).toBeVisible();
   });
+  test('guwen shici same-name item has no guyin whiteboard (A-09)', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="yufa"]').first().click();
+    await page.locator('[data-ysub="m:shici"]').first().click();
+    await page.locator('#gwMItems .yw-head').filter({ has: page.getByText('去', { exact: true }) }).first().click();
+    await expect(page.locator('#gwmdetail')).toBeVisible();
+    await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveCount(0);
+    await page.goto('newhanzi/guwen.html');
+    await page.locator('[data-mod="yufa"]').first().click();
+    await page.locator('[data-ysub="m:guyin"]').first().click();
+    await page.locator('#gwMItems .yw-head', { hasText: '去' }).first().click();
+    await expect(page.locator('#gwmdetail [data-gwwb]')).toHaveAttribute('data-gwwb', '古文:去');
+    expect(errors).toEqual([]);
+  });
 });
