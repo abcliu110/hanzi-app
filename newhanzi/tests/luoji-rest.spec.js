@@ -72,3 +72,22 @@ test.describe('logic daily one-minute (A22-8)', () => {
     });
   }
 });
+
+test.describe('logic whiteboards added 2026-11-07 (luoji-rest)', () => {
+  const cases = [['隐含前提', 4, '查一查']];
+  for (const [name, n, tab] of cases) {
+    test('whiteboard ' + name, async ({ page }) => {
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
+      await page.goto('newhanzi/index.html');
+      await page.locator('#view-home .panel[data-m="logic"]').click();
+      await page.locator('#logiclist .yw-head', { hasText: name }).first().click({ timeout: 20000 });
+      const wb = page.locator('#logiclist .yw-wb[data-lwb="' + name + '"]');
+      await wb.locator('[data-lwb-start]').click();
+      await expect(wb.locator('svg').first()).toBeVisible({ timeout: 10000 });
+      await expect(wb.locator('.wb-tabs button')).toHaveCount(n);
+      await expect(wb.locator('.wb-tabs')).toContainText(tab);
+      expect(errors).toEqual([]);
+    });
+  }
+});
