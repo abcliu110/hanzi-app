@@ -55,10 +55,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","M
     <div class="src" id="src"></div>
   </div>
   <div class="links">
+    <a id="more" href="../../quiz/index.html?tab=logic">🎮 逻辑大闯关 →</a>
     <a href="../../quiz/index.html?tab=logic">🎮 逻辑大闯关 →</a>
     <a href="../../fuxi.html">📖 去错题本复习 →</a>
   </div>
-  <div class="foot">句子来源：逻辑区各专题例子，每日轮换 · 明天再来换新的一句</div>
+  <div class="foot">句子来源：逻辑区各专题「例句解析」原句，按日期轮换 · 明天再来换新的一句</div>
 </div>
 <script>
 /* 复习/错题统一记录（与 fuxi.js、games/luoji/miuwu.html 同款 helper，保持一致，勿单改一处）：
@@ -108,114 +109,94 @@ window.NHZReview = window.NHZReview || (function () {
     loadSrs: function () { return load(SK, {}); } };
 })();
 </script>
+<script src="daily_data.js"></script>
 <script>
 (function () {
   'use strict';
-  /* 每日一句题库（docs/gaijin/luoji-gaijin-sheji.md P1-5）：
-     句子、正确毛病、解析一律取自 yuwen/data.js 逻辑区各专题的「例子 / 例句解析 / 练习」，
-     每条注明出处专题名；干扰项取自同一批专题的其他毛病名。无出处的不编，首批 20 条。 */
-  var ITEMS = [
-    { s: '将近三十多个同学参加了比赛。', a: '自相矛盾', d: ['主客倒置', '强加因果'],
-      ex: '“将近”是不到三十，“多”是超过三十，一个说不到、一个说超过，两个意思打架，留一个就行。', src: '自相矛盾' },
-    { s: '他是众多死难者中幸免的一个。', a: '自相矛盾', d: ['以偏概全', '偷换概念'],
-      ex: '“死难者”就是已经死了的人，“幸免”是没死，同一个人既死了又没死，自己打自己。', src: '自相矛盾' },
-    { s: '会场上一片寂静，同学们都在大声讨论。', a: '自相矛盾', d: ['主客倒置', '强加因果'],
-      ex: '“一片寂静”是一点声音也没有，“大声讨论”却很吵，前后不能同时成立。', src: '自相矛盾' },
-    { s: '这首古诗对我们很熟悉。', a: '主客倒置', d: ['自相矛盾', '以偏概全'],
-      ex: '“熟悉”是人的感受，应该是“我们对这首古诗很熟悉”，诗不会熟悉我们。', src: '主客倒置' },
-    { s: '这部电影对观众很感动。', a: '主客倒置', d: ['强加因果', '自相矛盾'],
-      ex: '感动的是观众，电影是让人感动的东西，主语应该是“观众”。', src: '主客倒置' },
-    { s: '因为他是北方人，所以思想守旧。', a: '强加因果', d: ['以偏概全', '人身攻击'],
-      ex: '出生地推不出个人想法，两件事没有因果链，硬凑就是强加。', src: '强加因果' },
-    { s: '他穿了红衣服，所以比赛赢了。', a: '强加因果', d: ['滑坡谬误', '自相矛盾'],
-      ex: '衣服颜色和比赛输赢没有因果，只是碰巧同一天发生。', src: '强加因果' },
-    { s: '早上没吃鸡蛋，所以没考好。', a: '强加因果', d: ['以偏概全', '主客倒置'],
-      ex: '吃没吃鸡蛋不会让人变聪明，两件事只是碰巧同一天发生，硬说因果就是强加。', src: '强加因果' },
-    { s: '我班三个同学近视，所以全班都近视。', a: '以偏概全', d: ['强加因果', '滑坡谬误'],
-      ex: '三个同学只是全班的一小部分，从三个人推到全班，样本太小。', src: '以偏概全' },
-    { s: '我去过一次北京很堵，所以北京天天堵。', a: '以偏概全', d: ['强加因果', '人身攻击'],
-      ex: '一次堵车只是某一天的情况，推不到“天天”。', src: '以偏概全' },
-    { s: '我家猫怕水，所以所有猫都怕水。', a: '以偏概全', d: ['滑坡谬误', '主客倒置'],
-      ex: '一只猫怕水，推不到“所有猫”，拿个别推全体就是以偏概全。', src: '以偏概全' },
-    { s: '今天不上补习班，明天就考不上大学。', a: '滑坡谬误', d: ['人身攻击', '循环论证'],
-      ex: '不上补习班只是“可能”影响成绩，却被说成了“必然”考不上大学。', src: '常见谬误' },
-    { s: '这次考砸→考不上高中→找不到工作→人生完蛋。', a: '滑坡谬误', d: ['非黑即白', '稻草人谬误'],
-      ex: '每一步都只是“可能”，连起来却说成了“必然”，链条每环都要打问号。', src: '常见谬误' },
-    { s: '他学习不好，他的话不可信。', a: '人身攻击', d: ['滑坡谬误', '偷换概念'],
-      ex: '成绩好不好和话对不对没关系，攻击人而不反驳观点，是人身攻击。', src: '常见谬误' },
-    { s: '这本书好，因为它就是好书。', a: '循环论证', d: ['滑坡谬误', '人身攻击'],
-      ex: '用结论“就是好书”来证明结论“这本书好”，原地打转。', src: '常见谬误' },
-    { s: '你说“该减少作业”，他反驳“你就是不想学习”。', a: '稻草人谬误', d: ['人身攻击', '滑坡谬误'],
-      ex: '对方原话是“减少作业”，被曲解成“不想学习”再打倒，打的是自己立的稻草靶子。', src: '常见谬误' },
-    { s: '不喜欢数学，就是讨厌学习。', a: '非黑即白', d: ['滑坡谬误', '循环论证'],
-      ex: '不喜欢数学和讨厌学习之间还有很多情况，比如喜欢语文、喜欢画画，硬说成只有两种。', src: '常见谬误' },
-    { s: '问：蛋糕好吃吗？答：盘子很漂亮。', q: '这句话的言外之意是？', a: '蛋糕不好吃，不好意思直说', d: ['盘子确实很漂亮', '蛋糕很好吃'],
-      ex: '问蛋糕、答盘子，故意不提蛋糕，就是在委婉说蛋糕不好吃。', src: '言外之意' },
-    { s: '妈妈看着乱糟糟的房间说：“你房间真‘整洁’啊！”', q: '这句话的言外之意是？', a: '房间乱得不行，快收拾', d: ['妈妈在夸房间干净', '妈妈想换个房间'],
-      ex: '房间明明很乱，却说“整洁”，反着说就是要你听出“乱得不行，快收拾”。', src: '言外之意' },
-    { s: '这次考试要么第一，要么倒数第一。', a: '违反排中律', d: ['违反同一律', '违反矛盾律'],
-      ex: '第一和倒数第一之间还有第二名、第三名，硬说“要么这个要么那个”，是排中律用错了地方。', src: '四大逻辑规律' }
-  ];
-  /* 按本地日期取当日句子：日期字符串做种子，保证每天不同、第二天换一条；
-     选项顺序也用同一天种子打乱，同一天内反复打开是同一题、同一选项顺序（错题本去重靠它）。 */
-  function hashStr(s) {
-    var h = 0;
-    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return h < 0 ? -h : h;
-  }
+  /* 每日一句（A22-8，docs/gaijin/luoji-gaijin-sheji.md P1-5）。
+     题池 games/luoji/daily_data.js 由 tools/content/build_logic_daily.js 从 yuwen/data.js 逻辑区「例句解析」逐字生成（勿手改）。
+     轮换：按本地日期算“第几天”（dayNum），idx = dayNum % 题数，连续 N 天不重样、第 N+1 天从头轮；
+     选项顺序也用 dayNum 打乱，同一天反复打开是同一题、同一顺序。
+     当天作答记在 localStorage nhz_logic_daily（{ 'YYYY-MM-DD': { i, ok, pick } }，只留最近 31 天），首页卡片读它显示“今天做过没”。
+     答错 -> NHZReview.record 进错题本（选项按固定顺序记，保证同一句在错题本只有一条）。 */
+  var POOL = (window.NHZ_LOGIC_DAILY && window.NHZ_LOGIC_DAILY.items) || [];
+  var KEY = 'nhz_logic_daily';
+  function pad(n) { return ('0' + n).slice(-2); }
   var now = new Date();
-  var ds = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
-  var seed = hashStr(ds);
-  var idx = seed % ITEMS.length;
-  var it = ITEMS[idx];
-  var rng = seed * 31 + idx + 1;
+  var ds = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  var dayNum = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  var sentEl = document.getElementById('sent');
+  if (!POOL.length) { sentEl.textContent = '题池没加载上，请稍后再试。'; return; }
+  var idx = dayNum % POOL.length;
+  var it = POOL[idx];
+  var rng = dayNum * 31 + idx + 1;
   function rnd() { rng = (rng * 1103515245 + 12345) & 0x7fffffff; return rng / 0x80000000; }
-  var opts = [it.a, it.d[0], it.d[1]];
+  var opts = it.opts.slice();
   for (var i = opts.length - 1; i > 0; i--) {
     var j = Math.floor(rnd() * (i + 1));
     var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
   }
+  function loadLog() {
+    try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && typeof v === 'object' ? v : {}; }
+    catch (e) { return {}; }
+  }
+  function saveLog(rec) {
+    var all = loadLog(), cut = new Date(now.getTime());
+    cut.setDate(cut.getDate() - 31);
+    var cs = cut.getFullYear() + '-' + pad(cut.getMonth() + 1) + '-' + pad(cut.getDate());
+    Object.keys(all).forEach(function (d) { if (d < cs) delete all[d]; });
+    all[ds] = rec;
+    try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
   document.getElementById('dateline').textContent =
-    '📅 今天是 ' + now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 · 第 ' + (idx + 1) + ' / ' + ITEMS.length + ' 句';
-  document.getElementById('sent').textContent = it.s;
-  document.getElementById('ask').textContent = it.q || '这句话犯了什么毛病？';
-  document.getElementById('src').textContent = '出处：逻辑区「' + it.src + '」专题（yuwen/data.js 逻辑区例子 / 例句解析 / 练习）';
+    '📅 今天是 ' + now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 · 第 ' + (idx + 1) + ' / ' + POOL.length + ' 句';
+  sentEl.textContent = it.s;
+  document.getElementById('ask').textContent = it.q;
+  document.getElementById('src').textContent = '出处：逻辑区「' + it.src + '」专题 · 例句解析';
+  var more = document.getElementById('more');
+  more.href = '../../quiz/index.html?tab=logic&point=' + encodeURIComponent(it.point);
+  more.textContent = '🎯 练「' + it.point + '」专题的题 →';
   var btns = document.getElementById('btns');
   var fb = document.getElementById('fb');
   var expl = document.getElementById('expl');
   var done = false;
+  function reveal(pick, fresh) {
+    done = true;
+    var ok = (pick === it.a);
+    var all = btns.querySelectorAll('.btn');
+    for (var k = 0; k < all.length; k++) {
+      all[k].disabled = true;
+      if (all[k].textContent === it.a) all[k].className = 'btn ok';
+      else if (all[k].textContent === pick) all[k].className = 'btn bad';
+    }
+    if (ok) { fb.className = 'fb ok'; fb.textContent = fresh ? '✅ 答对了！' : '✅ 今天这句已经答对了，明天再来换新的一句。'; }
+    else { fb.className = 'fb bad'; fb.textContent = fresh ? '❌ 答错了，已进错题本，复习时会再见到它。' : '❌ 今天这句答错了，已在错题本里，明天再来换新的一句。'; }
+    expl.textContent = '💡 一句话解析：' + it.ex;
+    expl.className = 'expl show';
+  }
   opts.forEach(function (o) {
     var b = document.createElement('button');
     b.className = 'btn';
+    b.type = 'button';
     b.textContent = o;
     b.addEventListener('click', function () {
       if (done) return;
-      done = true;
       var ok = (o === it.a);
-      var all = btns.querySelectorAll('.btn');
-      for (var k = 0; k < all.length; k++) {
-        all[k].disabled = true;
-        if (all[k].textContent === it.a) all[k].className = 'btn ok';
-      }
-      if (ok) {
-        fb.className = 'fb ok';
-        fb.textContent = '✅ 答对了！不用进错题本。';
-      } else {
-        b.className = 'btn bad';
-        fb.className = 'fb bad';
-        fb.textContent = '❌ 答错了，已进错题本，明天复习时会再见到它。';
+      saveLog({ i: idx, ok: ok, pick: o });
+      if (!ok) {
         try {
           window.NHZReview.record({
-            q: '逻辑一分钟：' + it.s + '（' + (it.q || '这句话犯了什么毛病？') + '）',
-            options: opts.slice(), answer: it.a, 解析: it.ex, src: '逻辑', point: it.src
+            q: '逻辑一分钟：' + it.s + '（' + it.q + '）',
+            options: it.opts.slice(), answer: it.a, 解析: it.ex, src: '逻辑', point: it.point
           }, false);
         } catch (e) {}
       }
-      expl.textContent = '💡 一句话解析：' + it.ex;
-      expl.className = 'expl show';
+      reveal(o, true);
     });
     btns.appendChild(b);
   });
+  var prev = loadLog()[ds];
+  if (prev && prev.i === idx && prev.pick) reveal(prev.pick, false);
 })();
 </script>
 <script src="../../nav-up.js"></script>

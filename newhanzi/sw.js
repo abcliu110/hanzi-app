@@ -6,7 +6,7 @@
      → 改了代码/数据孩子下次打开就是新版，不必手动改 VERSION
    - VERSION 随清单自动变化；新增/删除页面后运行 python3 tools/gen_sw_core.py（测试会检查）。 */
 /* @generated-core-start */
-const VERSION = "nhz-2a265cfbea";
+const VERSION = "nhz-e4ac57d3c9";
 const CORE = [
   "./",
   "bushou.html",
@@ -31,7 +31,9 @@ const CORE = [
   "fuxi.html",
   "fuxi.js",
   "games/luoji/blocks.html",
+  "games/luoji/daily-home.js",
   "games/luoji/daily.html",
+  "games/luoji/daily_data.js",
   "games/luoji/domino.html",
   "games/luoji/fanpai.html",
   "games/luoji/fenchouti.html",
