@@ -118,7 +118,11 @@ var curPlayer = null;
    判据只认 scroll 模板的句字签名（y=70 且 size=40）与环的几何尺寸，不碰其他元素。 */
 function hideCaption(svg) {
   if (!svg) return;
-  var gs = svg.querySelectorAll('g'), i, g;
+  /* 2026-11-07 SC1：scroll 模板把句字、圈字环、注释（如「思：想念」，会把答案里的字直接写出来）、对比条
+     都包进 data-sc="cap" 组，有标记时只按标记藏，不再靠几何猜（旧判据把直径约 62 的圈字环漏掉了） */
+  var caps = svg.querySelectorAll('[data-sc="cap"]'), i, g;
+  if (caps.length) { for (i = 0; i < caps.length; i++) caps[i].style.display = 'none'; return; }
+  var gs = svg.querySelectorAll('g');
   for (i = 0; i < gs.length; i++) {
     g = gs[i];
     if (g.y === 70 && g.size === 40 && g.querySelector('text')) { g.style.display = 'none'; continue; }

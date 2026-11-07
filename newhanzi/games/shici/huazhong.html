@@ -102,6 +102,7 @@ seq(['../../wb/index.js', '../../data/shici.js', '../../wb/rough.js', '../../wb/
           showEmpty('已登记的白板还没有配好诗句，稍后再来。');
           return;
         }
+        var em = $('hzEmpty'); if (em) em.hidden = true; /* 题已备好，收起「正在加载」 */
         window.NHZ_QUIZ = { tab: 'shici', title: '画中有诗', modes: { hua: qs } };
         var eng = document.createElement('script');
         eng.src = '../../quiz/engine.js';

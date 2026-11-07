@@ -1822,11 +1822,13 @@
     var fills = {};
     (d.keep || []).forEach(function (o) { var nm = o.o || o; if (o.fill) fills[nm] = SFILL[o.fill]; if (SOBJ[nm]) SOBJ[nm].f(c, -5, fills[nm]); });   /* 前几幕的物件：负时刻画完，开幕即在 */
     var row = 0;
+    /* A22-12：句字 / 圈字环 / 注释 / 对比条包进 data-sc="cap" 组，画中有诗取终帧时据此藏掉（只藏文字提示，物件线稿全留） */
+    function cap(fn) { var g = c.G(fn); g.setAttribute('data-sc', 'cap'); return g; }
     if (d.lines) q.beat(d.linesSay || d.lines.join(''), function (t) { d.lines.forEach(function (l, i) { c.T(W / 2, 52 + i * 44, l, { size: 32 }, t + i * .8, .8); }); return d.lines.length * .8 + .4; });
     (d.beats || []).forEach(function (b) {
       q.beat(b.say || b.line, function (t) {
         var dd = .8, toks = null, tt = t;
-        if (b.line) { toks = c.sentence(70, Array.from(b.line), t, { size: 40, gap: 4, step: .18 }); tt = t + b.line.length * .18 + .2; dd = tt - t + .4; }
+        if (b.line) { cap(function () { toks = c.sentence(70, Array.from(b.line), t, { size: 40, gap: 4, step: .18 }); }); tt = t + b.line.length * .18 + .2; dd = tt - t + .4; }
         var col = b.color || {};
         (b.draw || []).forEach(function (o) {
           var nm = o.o || o, fl = null;
@@ -1834,9 +1836,9 @@
           if (SOBJ[nm]) { var du = SOBJ[nm].f(c, tt, fl); tt += du * .6; dd = Math.max(dd, tt - t + du * .4); }
         });
         if (toks) for (var ch2 in col) { var j = b.line.indexOf(ch2); if (j >= 0) c.recolor(toks[j].g, t + dd - .2, SCOL[ch2] || ACC); }
-        if (toks && b.hl) { var k = b.line.indexOf(b.hl); if (k >= 0) c.ring(toks[k].cx, 58, 62, 62, t + dd, ACC); dd += .7; }
-        if (b.note) { c.T(b.noteX || W / 2, b.noteY || 140, b.note, { size: 26, color: ACC }, t + dd, .8); dd += 1; }
-        if (b.cmp) { wrap(c, b.cmp, W / 2, 530, W - 200, 28, ACC, t + dd); dd += 1.4; }
+        if (toks && b.hl) { var k = b.line.indexOf(b.hl); if (k >= 0) cap(function () { c.ring(toks[k].cx, 58, 62, 62, t + dd, ACC); }); dd += .7; }
+        if (b.note) { cap(function () { c.T(b.noteX || W / 2, b.noteY || 140, b.note, { size: 26, color: ACC }, t + dd, .8); }); dd += 1; }
+        if (b.cmp) { cap(function () { wrap(c, b.cmp, W / 2, 530, W - 200, 28, ACC, t + dd); }); dd += 1.4; }
         return dd;
       }, { ask: b.ask || false });
     });
