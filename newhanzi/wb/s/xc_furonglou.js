@@ -13,5 +13,5 @@ NHZWB.add('诗:芙蓉楼送辛渐|王昌龄', { scenes: [
     ],
     end: '夜里，冷雨连着江面——诗人就写下了这句。' },
   { k: 'scroll', lv: 1, tab: '画出来',
-    beats: [ { line: '寒雨连江夜入吴', draw: ['moon', 'rain', 'river'], say: '夜里月亮在天上，冷雨落下来，连着江面，一直下到远方。' } ] }
+    beats: [ { line: '寒雨连江夜入吴', draw: ['rain', 'river'], say: '夜里冷雨落下来，雨连着江面，一直下到远方。' } ] }
 ] });

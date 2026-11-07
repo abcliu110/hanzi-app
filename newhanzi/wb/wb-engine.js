@@ -1671,6 +1671,24 @@
     moondown: { at: [300, 345], f: function (c, t) {
       c.R('line', [300, 265, 300, 430], { stroke: ACC, strokeWidth: 3 }, t, .5);
       c.R('linearPath', [[[288, 416], [300, 432], [312, 416]]], { stroke: ACC, strokeWidth: 3 }, t + .5, .2); return .8; } },
+    /* A22-6 写诗现场补的线稿（只用几何形，不画人）：酒杯（劝君更尽一杯酒）、雁阵（北风吹雁）、雪花（雪纷纷）、沙地（醉卧沙场） */
+    cup: { at: [600, 360], f: function (c, t) {
+      c.R('path', ['M545 300 L655 300 L630 380 L570 380 Z'], { stroke: INK, strokeWidth: 3 }, t, .6);
+      c.R('line', [600, 380, 600, 430], { stroke: INK, strokeWidth: 3 }, t + .5, .3);
+      c.R('line', [565, 432, 635, 432], { stroke: INK, strokeWidth: 3 }, t + .7, .3);
+      c.R('path', ['M556 318 Q600 330 644 318'], { stroke: GRAY, strokeWidth: 1.6 }, t + .9, .3); return 1.2; } },
+    geese: { at: [880, 210], f: function (c, t) {
+      [[820, 250], [850, 228], [880, 206], [910, 228], [940, 250]].forEach(function (p, k) {
+        c.R('linearPath', [[[p[0] - 14, p[1] - 6], [p[0], p[1] + 2], [p[0] + 14, p[1] - 6]]], { stroke: INK, strokeWidth: 2 }, t + k * .2, .2); });
+      return 1.2; } },
+    snow: { at: [600, 300], f: function (c, t) {
+      [[240, 200], [360, 260], [480, 190], [560, 300], [680, 230], [760, 320], [880, 270], [990, 210], [420, 360], [1060, 340]].forEach(function (p, k) {
+        c.R('line', [p[0] - 7, p[1], p[0] + 7, p[1]], { stroke: GRAY, strokeWidth: 1.8 }, t + k * .08, .15);
+        c.R('line', [p[0], p[1] - 7, p[0], p[1] + 7], { stroke: GRAY, strokeWidth: 1.8 }, t + k * .08 + .05, .15); });
+      return 1.2; } },
+    sand: { at: [600, 470], f: function (c, t) {
+      c.R('path', ['M80 470 Q260 430 440 468 T800 466 T1120 470'], { stroke: '#b89a5e', strokeWidth: 2.4 }, t, .6);
+      c.R('path', ['M160 500 Q360 478 560 500 T960 498'], { stroke: '#b89a5e', strokeWidth: 1.8 }, t + .4, .5); return 1; } },
     rain: { at: [920, 350], f: function (c, t) {
       [[780, 270, 752, 340], [840, 270, 812, 340], [900, 270, 872, 340], [960, 270, 932, 340], [1020, 270, 992, 340], [1080, 270, 1052, 340], [810, 380, 782, 450], [990, 380, 962, 450]].forEach(function (p, k) { c.R('line', p, { stroke: GRAY, strokeWidth: 2 }, t + k * .12, .2); });
       return 1.2; } },

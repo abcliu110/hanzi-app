@@ -13,5 +13,5 @@ NHZWB.add('诗:别董大|高适', { scenes: [
     ],
     end: '风吹雁，雪纷纷落——诗人就写下了这句。' },
   { k: 'scroll', lv: 1, tab: '画出来',
-    beats: [ { line: '北风吹雁雪纷纷', draw: ['wind', 'frost'], say: '北风吹过来，雪花纷纷扬扬落下来。' } ] }
+    beats: [ { line: '北风吹雁雪纷纷', draw: ['wind', 'geese', 'snow'], say: '北风吹过来，大雁在风里飞，雪花纷纷扬扬落下来。' } ] }
 ] });
