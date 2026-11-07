@@ -116,6 +116,8 @@ window.NHZ_WB_INDEX = {
   "隐含前提": "lj_yinhan",
   /* 逻辑区 A22-3 遗留：反对关系 / 矛盾关系（euler pair + 全集框） */
   "非黑即白": "lj_heibai",
+  /* 逻辑区 P2-3 之补：转移话题（汤不烫，我不痛；mark） */
+  "转移话题": "lj_zhuanyi",
   /* 古诗区（docs/gaijin/shici-gaijin-sheji.md P0-2）：键为「诗:题目|作者」 */
   "诗:绝句（两个黄鹂鸣翠柳）|杜甫": "sc_jueju_dufu",
   /* 古诗区 P0-2 其余 11 首 scroll（A19） */
