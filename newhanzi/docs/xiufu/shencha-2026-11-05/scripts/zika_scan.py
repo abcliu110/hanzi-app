@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """识字字卡全量机械扫描（只读）。
 用法：
-  node /workspace/work/hanzi-audit/scripts/zika_load.js      # 先汇总快照 → scripts/zika_all.json
-  python3 /workspace/work/hanzi-audit/scripts/zika_scan.py   # 输出 scripts/zika_hits.json + 终端计数
+  node zika_load.js      # 先汇总快照 → $TMPDIR/zika_all.json（读本仓库 newhanzi/data）
+  python3 zika_scan.py   # 输出 $TMPDIR/zika_hits.json + 终端计数
   python3 zika_scan.py --show 类别 [N]                       # 随机看某类 N 条
 """
 import json, re, sys, random, unicodedata
 from collections import Counter, defaultdict
 
-BASE = '/workspace/work/hanzi-audit/scripts/'
+import os, tempfile
+BASE = os.environ.get('NHZ_SCAN_DIR', tempfile.gettempdir()) + '/'  # zika_load.js 默认把快照写到系统临时目录（LEFTOVER 2026-11-07）
 A = json.load(open(BASE + 'zika_all.json'))
 C = A['cards']; PY = A['py']; GRADE = A['grade']
 IDX = {i['z']: i for i in A['index']}
@@ -91,10 +92,14 @@ for zi, c in C.items():
     jj = (d(c, '字源', '讲解') or '')
     if not ls: add('六书_空', zi, '六书.value', '')
     if sw and ls:
-        has_sheng = re.search(r'[聲声]', sw) and not re.search(r'亦[聲声]', sw)
+        # 形声说解是「从X，Y聲」：聲 前一字是声旁、后面是句末；「鳥聲也」「羣車聲也」「其聲舒揚」里的“聲”是“声音”，不算（LEFTOVER 2026-11-07）
+        has_sheng = re.search(r'从[^。]{1,6}[，,]?[^。从]{1,3}[聲声](?:[。；]|$)|[^。]{1,3}省[聲声]', sw) and not re.search(r'亦[聲声]', sw)
         yisheng = re.search(r'亦[聲声]', sw)
         xiang = re.search(r'象形|象[^。]{0,8}形', sw)
-        if has_sheng and ls in ('会意字', '象形字', '指事字') and not xiang:
+        yj = (d(c, '六书', '依据') or '').strip()  # 已写六书依据（各家说法）的卡不再报矛盾（fix-zika-b 断点 7，LEFTOVER 2026-11-07）
+        if yj:
+            pass
+        elif has_sheng and ls in ('会意字', '象形字', '指事字') and not xiang:
             add('六书_与说文矛盾', zi, '六书.value', f'六书={ls}｜说文：{sw[:40]}', '《说文》作「X声」应为形声')
         elif (not has_sheng) and (not yisheng) and ls == '形声字' and re.search(r'从.从|从.、.|象形', sw) and not re.search(r'省', sw):
             add('六书_与说文矛盾', zi, '六书.value', f'六书={ls}｜说文：{sw[:40]}', '《说文》无「声」，作「从X从Y」/象形')
