@@ -1,7 +1,7 @@
 /* 首页今日任务卡片（v3.0 清单型：行列式任务清单）。
  * 只读现有学习记录，不改任何已有面板与样式：
  *   今天新学读 nhz_learned（当日首次学习日期 = 今天的字数），
- *   到期复习读 nhz_srs（next <= now 的条数），
+ *   今日复习数取 review-log.js 的 NHZReviewToday()（与复习页今日队列同口径：有题面的到期 + 错题回炉 − 今天已复习），
  *   测验入口链到 quiz/index.html?tab=zika（与识字面板现有入口一致）。
  * 打勾按日期存 nhz_task（新键，不碰 nhz_learned/nhz_srs/nhz_wrong/nhz_quiz_wrong），
  * 三项全勾即完成当日任务，记 1 颗星（每日任务星最多 1 颗，见 NHZStars）。
@@ -63,10 +63,15 @@
     var learned = loadObj('nhz_learned', {});
     var nToday = 0;
     Object.keys(learned).forEach(function (z) { if (learned[z] === today) nToday++; });
+    /* 今日复习：与复习页今日队列同口径（review-log.js NHZReviewToday），无该脚本时退回旧口径 */
+    if (window.NHZReviewToday) {
+      var rt = window.NHZReviewToday();
+      return { nToday: nToday, due: rt.total, dueN: rt.due, retryN: rt.retry, doneToday: rt.doneToday };
+    }
     var srs = loadObj('nhz_srs', {});
     var due = 0;
     Object.keys(srs).forEach(function (id) { if (srs[id] && srs[id].next <= now) due++; });
-    return { nToday: nToday, due: due };
+    return { nToday: nToday, due: due, dueN: due, retryN: 0, doneToday: 0 };
   }
 
   function render() {
@@ -74,9 +79,18 @@
     var all = loadTask();
     var day = all[t] || {};
     var c = counts();
+    /* 今天在复习页做过题且已清空今日复习：自动勾上「今日复习」（只勾不取消） */
+    if (!day.review && c.doneToday > 0 && c.due === 0) {
+      all[t] = day; day.review = true;
+      if (day.new && day.quiz && !day._star && window.NHZStars.award('task')) day._star = 1;
+      saveTask(all);
+    }
     var items = [
       { k: 'new', label: '📖 今天新学', sub: '已学 ' + c.nToday + ' 字', go: '识字', act: 'goShizi' },
-      { k: 'review', label: '🔁 到期复习', sub: c.due ? '有 ' + c.due + ' 道到期' : '今天没有到期复习', href: 'fuxi.html' },
+      { k: 'review', label: '🔁 今日复习', sub: c.due
+          ? '有 ' + c.due + ' 道待复习（到期 ' + c.dueN + ' · 错题回炉 ' + c.retryN + '）' + (c.doneToday ? '，已复习 ' + c.doneToday + ' 道' : '')
+          : (c.doneToday ? '今天已复习 ' + c.doneToday + ' 道，复习完成' : '今天没有要复习的题'),
+        go: '去复习', href: 'fuxi.html' },
       { k: 'quiz', label: '🎮 测验', sub: '来一轮互动练习', href: 'quiz/index.html?tab=zika' }
     ];
     rowsEl.innerHTML = items.map(function (it) {

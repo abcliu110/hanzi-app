@@ -43,6 +43,8 @@
   }
 
   function dueReviewCount() {
+    /* 与复习页今日队列同口径（review-log.js）：有题面的到期 + 错题回炉，去掉今天已复习的 */
+    if (window.NHZReviewToday) { try { return window.NHZReviewToday().total; } catch (e) {} }
     var now = Date.now(), n = 0;
     try {
       var srs = JSON.parse(localStorage.getItem('nhz_srs') || '{}') || {};

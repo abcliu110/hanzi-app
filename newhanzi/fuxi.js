@@ -265,12 +265,16 @@
     var srs = window.NHZReview.loadSrs();
     var now = Date.now();
     var seen = {};
+    /* 今天已在复习页做过的题不再回到今日队列（忘了的题明天再来；见 review-log.js） */
+    var done = window.NHZReviewLog ? window.NHZReviewLog.doneToday() : {};
     wrong.forEach(function (w) { seen[w.id] = 1; });
     for (var sid in srs) seen[sid] = 1;
+    for (var dn in done) seen[dn] = 1;
     /* A段：到期复习（错题本或题面库均可回放），将忘优先 */
     var due = [];
     for (var did in srs) {
       if (!(srs[did] && srs[did].next <= now)) continue;
+      if (done[did]) continue;
       var face = window.NHZReview.faceOf(did);
       if (face) due.push({ it: face, qid: did, seg: 'due', k: now - srs[did].next });
     }
@@ -280,7 +284,7 @@
     /* B段：错题回炉——仅 iv=0 或尚无 srs 的未到期错题（已推进间隔的勿再塞回炉） */
     var retry = [];
     wrong.forEach(function (w) {
-      if (dueIds[w.id]) return;
+      if (dueIds[w.id] || done[w.id]) return;
       var s = srs[w.id];
       if (!s || s.iv === 0) retry.push({ it: w, qid: w.id, seg: 'retry', k: w.addedAt || 0 });
     });
@@ -305,54 +309,105 @@
   var app = document.getElementById('app');
   var lastNote = '';
   var queueIndex = {};
+  var wrongFilter = '';
 
   var SEG_LABEL = { due: '到期复习', retry: '错题回炉', 'new': '新学' };
 
+  /* 有 2 个以上选项且答案在选项里：直接点选作答（提取练习），否则「显示答案→记得/忘了」自评 */
+  function canPick(w) {
+    return !!(w && w.options && w.options.length >= 2 && w.options.indexOf(w.answer) >= 0);
+  }
   function queueCardHtml(e) {
-    var w = e.it, seg = e.seg;
+    var w = e.it, seg = e.seg, pick = canPick(w);
+    var opts = '';
+    if (pick) {
+      opts = '<div class="fx-opts">' + w.options.map(function (o, i) {
+        return '<button type="button" class="fx-opt fx-pick" data-act="pick" data-i="' + i + '">' + esc(o) + '</button>';
+      }).join('') + '</div>';
+    } else {
+      opts = optsHtml(w, false);
+    }
     return '<div class="fx-card" data-seg="' + seg + '" data-qid="' + esc(e.qid) + '">' +
       '<div class="fx-src"><span class="fx-seg fx-seg-' + seg + '">' + SEG_LABEL[seg] + '</span>' +
       esc(w.src || '') + (w.point ? ' · ' + esc(w.point) : '') + '</div>' +
-      '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w, false) +
+      '<p class="fx-q">' + esc(w.q) + '</p>' + opts +
+      (pick ? '<p class="fx-hint">先想一想，再点你选的答案。</p>' : '<p class="fx-hint">先在心里（或纸上）答出来，再看答案。</p>') +
       '<div class="fx-ans" hidden><p>答案：' + esc(w.answer) + '</p>' +
       (w['解析'] ? '<p>' + esc(w['解析']) + '</p>' : '') + '</div>' +
-      '<button class="fx-btn" data-act="show">显示答案</button>' +
+      (pick ? '' : '<button class="fx-btn" data-act="show">显示答案</button>') +
       '<span class="fx-grade" hidden><button class="fx-btn" data-act="remember">记得</button>' +
-      '<button class="fx-btn" data-act="forget">忘了</button></span></div>';
+      '<button class="fx-btn" data-act="forget">忘了</button></span>' +
+      '<p class="fx-res" hidden></p></div>';
   }
+
+  function headText() {
+    var left = document.querySelectorAll('.fx-qcard:not(.fx-done)').length;
+    var c = window.NHZReviewToday ? window.NHZReviewToday() : null;
+    var doneN = c ? c.doneToday : 0;
+    if (!document.querySelectorAll('.fx-qcard').length) {
+      return doneN ? '今天已复习 ' + doneN + ' 道，今日复习完成 🎉' : '';
+    }
+    return left ? '本节还剩 ' + left + ' 道' + (doneN ? ' · 今天已复习 ' + doneN + ' 道' : '')
+      : '本节做完了！今天已复习 ' + doneN + ' 道 🎉';
+  }
+  function updateHead() {
+    var el = document.getElementById('fxHead');
+    if (el) el.textContent = headText();
+    var note = document.getElementById('fxNote');
+    if (note) note.textContent = lastNote;
+  }
+
+  function srcOf(w) { return w.src || '其他'; }
 
   function render() {
     var wrong = window.NHZReview.loadWrong();
     var srs = window.NHZReview.loadSrs();
-    var now = Date.now();
     var built = buildQueue();
     var queue = built.list, cfg = built.cfg, counts = built.counts;
     queueIndex = {};
     queue.forEach(function (e) { queueIndex[e.qid] = e; });
 
     var h = '';
-    h += '<section class="fx-section"><h2>今日队列' +
+    h += '<section class="fx-section"><h2>今日复习' +
       (queue.length ? '（共' + queue.length + '道：到期' + counts.due + ' · 回炉' + counts.retry + ' · 新学' + counts.fresh +
         (counts.more > 0 ? ' · 另有' + counts.more + '道超出本节上限' : '') + '）' : '') + '</h2>';
+    h += '<p class="fx-head" id="fxHead"></p>';
     h += '<div class="fx-cfg">每日新学 <input id="fxNew" type="number" min="0" max="20" value="' + cfg.newPerDay + '" style="width:52px"> 题' +
       '　单节上限 <select id="fxMax">' +
       [20, 25, 30].map(function (m) {
         return '<option value="' + m + '"' + (m === cfg.maxPerSession ? ' selected' : '') + '>' + m + '题</option>';
       }).join('') + '</select></div>';
     if (!queue.length) {
-      h += '<p class="fx-empty">今天没有到期的复习，好好休息。</p>';
+      h += '<p class="fx-empty">今天没有要复习的题了，好好休息。各区练习做错的题会自动排进这里。</p>';
     } else {
-      queue.forEach(function (e) { h += queueCardHtml(e); });
+      queue.forEach(function (e) { h += queueCardHtml(e).replace('class="fx-card"', 'class="fx-card fx-qcard"'); });
     }
     h += '</section>';
-    h += '<section class="fx-section"><h2>错题本' + (wrong.length ? '（' + wrong.length + ' 道）' : '') + '</h2>';
+
+    /* 错题本：按来源分组筛选，默认收起，避免一长串 */
+    var bySrc = {}, srcOrder = [];
+    wrong.forEach(function (w) {
+      var k = srcOf(w);
+      if (!bySrc[k]) { bySrc[k] = 0; srcOrder.push(k); }
+      bySrc[k]++;
+    });
+    if (wrongFilter && !bySrc[wrongFilter]) wrongFilter = '';
+    h += '<section class="fx-section"><details class="fx-wb"' + (wrongFilter ? ' open' : '') + '><summary><h2>错题本' +
+      (wrong.length ? '（' + wrong.length + ' 道）' : '') + '</h2></summary>';
     if (!wrong.length) {
       h += '<p class="fx-empty">错题本是空的，做错的题目会自动记到这里。</p>';
     } else {
+      if (srcOrder.length > 1) {
+        h += '<div class="fx-chips"><button type="button" class="fx-chip' + (wrongFilter ? '' : ' on') + '" data-act="filter" data-src="">全部 ' + wrong.length + '</button>' +
+          srcOrder.map(function (k) {
+            return '<button type="button" class="fx-chip' + (wrongFilter === k ? ' on' : '') + '" data-act="filter" data-src="' + esc(k) + '">' + esc(k) + ' ' + bySrc[k] + '</button>';
+          }).join('') + '</div>';
+      }
       wrong.forEach(function (w) {
+        if (wrongFilter && srcOf(w) !== wrongFilter) return;
         var s = srs[w.id];
         h += '<div class="fx-card" data-wrong="' + esc(w.id) + '">' +
-          '<div class="fx-src">' + esc(w.src) + ' · ' + esc(w.point) +
+          '<div class="fx-src">' + esc(w.src) + (w.point ? ' · ' + esc(w.point) : '') +
           (s ? ' · 下次复习：' + fmtDate(s.next) : '') + '</div>' +
           '<p class="fx-q">' + esc(w.q) + '</p>' + optsHtml(w, true) +
           '<p>答案：' + esc(w.answer) + '</p>' +
@@ -360,9 +415,63 @@
           '<button class="fx-btn" data-act="clear">已掌握，清除</button></div>';
       });
     }
-    h += '</section>';
-    h += '<p class="fx-note" id="fxNote">' + esc(lastNote) + '</p>';
+    h += '</details></section>';
+    h += '<p class="fx-note" id="fxNote"></p>';
     app.innerHTML = h;
+    updateHead();
+  }
+
+  /* 一道题答完：回写复习安排 + 记复习日志，卡片原地变成「已复习」并显示答案，不整页重排 */
+  function grade(card, remembered) {
+    var seg = card.getAttribute('data-seg');
+    var qid = card.getAttribute('data-qid');
+    var entry = queueIndex[qid];
+    if (card.classList.contains('fx-done')) return;
+    if (seg === 'due') {
+      /* 到期复习：记得推进间隔，忘了回到 1 天 */
+      window.NHZReview.review(qid, remembered);
+      if (!remembered && entry) window.NHZReview.record(entry.it, false);
+      var s = window.NHZReview.loadSrs()[qid];
+      lastNote = s ? (remembered ? '记得！下次复习：' + fmtDate(s.next) + '。'
+        : '忘了也没关系，下次复习：' + fmtDate(s.next) + '。') : '已记录。';
+    } else if (seg === 'retry') {
+      /* 错题回炉：记得=推进间隔（勿清进度），忘了=重新安排明天；清除留给「已掌握」按钮 */
+      if (remembered) {
+        if (!window.NHZReview.loadSrs()[qid] && entry) window.NHZReview.record(entry.it, false);
+        window.NHZReview.review(qid, true);
+        var sr = window.NHZReview.loadSrs()[qid];
+        lastNote = sr ? '记得！下次复习：' + fmtDate(sr.next) + '。' : '已记录。';
+      } else if (entry) {
+        window.NHZReview.record(entry.it, false);
+        lastNote = '明天再复习这道。';
+      }
+    } else if (seg === 'new') {
+      /* 新学：记得=安排首次复习（写题面库），忘了=记入错题本 */
+      if (remembered) {
+        window.NHZReview.schedule(qid, 0, entry && entry.it);
+        lastNote = '新知识已学，明天第一次复习。';
+      } else if (entry) {
+        window.NHZReview.record(entry.it, false);
+        lastNote = '已记入错题本，明天复习。';
+      }
+    }
+    if (window.NHZReviewLog) window.NHZReviewLog.mark(qid, remembered);
+    card.classList.add('fx-done');
+    var ans = card.querySelector('.fx-ans'); if (ans) ans.hidden = false;
+    var sh = card.querySelector('[data-act="show"]'); if (sh) sh.hidden = true;
+    var gr = card.querySelector('.fx-grade'); if (gr) gr.hidden = true;
+    var hint = card.querySelector('.fx-hint'); if (hint) hint.hidden = true;
+    var res = card.querySelector('.fx-res');
+    if (res) { res.hidden = false; res.textContent = (remembered ? '✅ ' : '🔁 ') + lastNote; }
+    updateHead();
+    /* 复习完成记星：刚答的是到期/回炉卡，且本节已无未做的到期/回炉卡（每日最多 1 颗） */
+    if ((seg === 'due' || seg === 'retry') &&
+        !document.querySelector('.fx-qcard[data-seg="due"]:not(.fx-done), .fx-qcard[data-seg="retry"]:not(.fx-done)')) {
+      if (window.NHZStars && window.NHZStars.award('review')) {
+        lastNote += ' ⭐ 今天的复习做完了，+1 颗星！';
+        updateHead();
+      }
+    }
   }
 
   app.addEventListener('change', function (e) {
@@ -395,48 +504,30 @@
           if (opts[oi].textContent === entryShow.it.answer) opts[oi].classList.add('fx-right');
         }
       }
+    } else if (act === 'pick') {
+      if (card.classList.contains('fx-done')) return;
+      var en = queueIndex[card.getAttribute('data-qid')];
+      if (!en) return;
+      var picked = en.it.options[+btn.getAttribute('data-i')];
+      var ok = picked === en.it.answer;
+      var ps = card.querySelectorAll('.fx-pick');
+      for (var pi = 0; pi < ps.length; pi++) {
+        ps[pi].disabled = true;
+        if (en.it.options[pi] === en.it.answer) ps[pi].classList.add('fx-right');
+      }
+      if (!ok) btn.classList.add('fx-wrong');
+      grade(card, ok);
     } else if (act === 'remember' || act === 'forget') {
-      var seg = card.getAttribute('data-seg');
-      var qid = card.getAttribute('data-qid');
-      var remembered = act === 'remember';
-      var entry = queueIndex[qid];
-      if (seg === 'due') {
-        /* 到期复习：记得推进间隔，忘了回到 1 天 */
-        window.NHZReview.review(qid, remembered);
-        if (!remembered && entry) window.NHZReview.record(entry.it, false);
-        var s = window.NHZReview.loadSrs()[qid];
-        lastNote = s ? (remembered ? '记得！下次复习：' + fmtDate(s.next) + '。'
-          : '忘了也没关系，下次复习：' + fmtDate(s.next) + '。') : '已记录。';
-      } else if (seg === 'retry') {
-        /* 错题回炉：记得=推进间隔（勿清进度），忘了=重新安排明天；清除留给「已掌握」按钮 */
-        if (remembered) {
-          if (!window.NHZReview.loadSrs()[qid] && entry) window.NHZReview.record(entry.it, false);
-          window.NHZReview.review(qid, true);
-          var sr = window.NHZReview.loadSrs()[qid];
-          lastNote = sr ? '记得！下次复习：' + fmtDate(sr.next) + '。' : '已记录。';
-        } else if (entry) {
-          window.NHZReview.record(entry.it, false);
-          lastNote = '明天再复习这道。';
-        }
-      } else if (seg === 'new') {
-        /* 新学：记得=安排首次复习（写题面库），忘了=记入错题本 */
-        if (remembered) {
-          window.NHZReview.schedule(qid, 0, entry && entry.it);
-          lastNote = '新知识已学，明天第一次复习。';
-        } else if (entry) {
-          window.NHZReview.record(entry.it, false);
-          lastNote = '已记入错题本，明天复习。';
-        }
-      }
+      grade(card, act === 'remember');
+    } else if (act === 'filter') {
+      wrongFilter = btn.getAttribute('data-src') || '';
       render();
-      /* 复习完成记星：刚答的是到期/回炉卡，且本轮呈现队列已无到期/回炉卡（每日最多 1 颗） */
-      if ((seg === 'due' || seg === 'retry') && !document.querySelector('.fx-card[data-seg="due"], .fx-card[data-seg="retry"]')) {
-        if (window.NHZStars) window.NHZStars.award('review');
-      }
+      var d = app.querySelector('.fx-wb'); if (d) d.open = true;
     } else if (act === 'clear') {
       window.NHZReview.clearWrong(card.getAttribute('data-wrong'));
       lastNote = '已从错题本清除。';
       render();
+      var d2 = app.querySelector('.fx-wb'); if (d2) d2.open = true;
     }
   });
 

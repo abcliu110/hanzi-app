@@ -25,6 +25,20 @@
 .fx-seg-due{background:#fdecea;color:#b85a52}
 .fx-seg-retry{background:#fff8e1;color:#8a6d1a}
 .fx-seg-new{background:#d3e5d6;color:#3d5a40}
+.fx-pick{cursor:pointer;font-size:15px;padding:6px 14px;color:var(--ink)}
+.fx-pick:disabled{cursor:default}
+.fx-opt.fx-wrong{border-color:#b85a52;color:#b85a52;text-decoration:line-through}
+.fx-hint{font-size:13px;color:var(--muted)}
+.fx-res{font-size:15px;color:var(--accent-deep);font-weight:bold}
+.fx-done{opacity:.8}
+.fx-head{font-size:15px;color:var(--accent-deep);font-weight:bold;min-height:20px;margin:0 0 6px}
+.fx-wb summary{cursor:pointer;list-style:none}
+.fx-wb summary::-webkit-details-marker{display:none}
+.fx-wb summary h2{display:inline-block}
+.fx-wb summary h2::after{content:' ▾';font-size:14px;color:var(--muted)}
+.fx-chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fx-chip{border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:14px;background:var(--card);color:var(--ink);cursor:pointer}
+.fx-chip.on{border-color:var(--accent);color:var(--accent-deep);font-weight:bold}
 .fx-cfg{font-size:14px;color:var(--muted);margin:8px 0}
 .fx-cfg input,.fx-cfg select{font-size:14px;border:1px solid var(--line);border-radius:8px;padding:2px 8px;background:var(--card);color:var(--ink)}
 </style>
@@ -52,6 +66,7 @@
 <script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
 <script src="quiz/data_guwen.js"></script>
 <script>window.NHZ_POOLS.push(window.NHZ_QUIZ);</script>
+<script src="review-log.js"></script>
 <script src="fuxi.js"></script>
 <script src="nav-up.js"></script>
 </body>
