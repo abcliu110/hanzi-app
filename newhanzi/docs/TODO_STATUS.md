@@ -66,6 +66,8 @@
 
 **领取 2026-11-07 MAIN 收尾轮（12:40 JST，接手停掉的 fuxi-loop / shici-rest / guwen-rest / luoji-rest 线；负责人「现在只有你一个人在做」「别人没有做完的你全部做完」）：** 收尾杂项——逻辑 v2 遗留 3 处句子瑕疵、旧副本 hz-main（A22-2 文档）/hz-y（批 10 WIP）未提交改动搬入、本表提交号补登与停线标注、拼音 pinyin-11 交接中不需拍板的两项。副本 /workspace/work/hz-main2，Playwright 端口 4201。
 
+**领取 2026-11-08 PY（00:30 JST，接手 MAIN 收尾轮行中未做的「拼音 pinyin-11 交接中不需拍板的两项」；负责人 2026-11-08「完成交接文档中没有完成的任务」）：** pinyin-11-shengyu.md「已知 / 以后」两项——①拼读机同音字加次读音（标「多音」）②字卡拆拼三拼韵母 `&k=` 在拼读页定位。只动 pinyin/kp.js、pinyin/kp.css、tests/pinyin.spec.js、该交接文档。副本 /workspace/work/hz-py，Playwright 端口 4210。
+
 **领取 2026-11-07 fuxi-loop（09:45 JST，负责人 2026-11-07「读设计文档和交接文档，缺的东西补起来」）：** A23 中 MASTER_PLAN 阶段三未做项——每日复习接入（首页入口+到期数、fuxi.html 日常可用）、提取练习升级（quiz 填空/简答自评题型，只用已有数据自动生成）、选项级反馈（核实 engine.js 误解显示 + 能从题库解析机械抽取的误解标注）、weekly 周报复习数据。动 fuxi.js/fuxi.html/today-task.js/index.js/weekly.js（本线主改），quiz/engine.js、index.html、sw.js 小改、提交前 rebase。不改 SRS_MODEL_SPEC 规格本身。
 
 **领取 2026-11-07 FUXI（12:40 JST，接手停掉的 fuxi-loop 线，取代其领取行）：** A23 阶段三剩余三项——①提取练习升级（quiz 填空/简答自评题型，只用已有数据自动生成，记入现有 NHZReview / nhz_srs）②选项级反馈：核实 quiz/engine.js 误解显示各区都生效、未接的区接上 ③weekly 周报加复习数据（NHZReviewLog）。误解标注 61→577 与啊哈块补 54 处由 A23C 做，本线不碰题库内容数据。quiz/engine.js、index.html、sw.js 小改、提交前 rebase。
